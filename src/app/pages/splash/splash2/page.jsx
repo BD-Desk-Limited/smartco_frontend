@@ -8,7 +8,7 @@ const companyData = { //company information, name, id, logoUrl, authorizationTok
   name: "Sample Company",
   id: "company-id",
   logoUrl: "https://drive.google.com/file/d/1FVTyo3fMwaGTdSraEoFUxXUtOPD0aD7O/view?usp=drive_link",
-  authorizationToken:"",
+  authorizationToken:"sample-token",
 }
 const deviceIsAuthorized = true; //device is authorized to use the app, to be fetched from the server(sends the token to the server to check if the device is authorized for use by the company with the company id)
 
