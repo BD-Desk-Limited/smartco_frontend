@@ -4,27 +4,61 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-const companyData = { //company information, name, id, logoUrl, authorizationToken, etc.  to be fetched from local storage.
-  name: "Sample Company",
-  id: "company-id",
-  logoUrl: "https://drive.google.com/file/d/1FVTyo3fMwaGTdSraEoFUxXUtOPD0aD7O/view?usp=drive_link",
-  authorizationToken:"sample-token",
-}
-const deviceIsAuthorized = true; //device is authorized to use the app, to be fetched from the server(sends the token to the server to check if the device is authorized for use by the company with the company id)
-
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if(companyData.authorizationToken&&deviceIsAuthorized){
-        router.push("/pages/splash/splash3");
-      }else{
-        router.push("/pages/auth/login");
-      }
-    }, 5000);
+    // Retrieve the JSON string from localStorage
+    const storedCompanyData = localStorage.getItem("companyData");
 
-    return () => clearTimeout(timer);
+    // Parse the JSON string back into an object
+    const fetchedData = storedCompanyData ? JSON.parse(storedCompanyData) : null;
+
+    if (fetchedData) {
+      const authorize = async () => {
+        try {
+          // Send the company id and the authorization token to the server to check if the device is authorized
+          const response = await fetch(`${process.env.API_URL}/auth/is-device-authorized`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              companyId: fetchedData.id,
+              authorizationToken: fetchedData.authorizationToken,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const data = await response.json();
+          const isAuthorized = data.isAuthorized;
+
+          const timer = setTimeout(() => {
+            if (fetchedData.authorizationToken && isAuthorized) {
+              router.push("/pages/splash/splash3");
+            } else {
+              router.push("/pages/auth/login");
+            }
+          }, 5000);
+
+          return () => clearTimeout(timer);
+        } catch (error) {
+          console.error("Failed to authorize device:", error);
+          router.push("/pages/auth/login");
+        }
+      };
+
+      authorize();
+    } else {
+      const timer = setTimeout(() => {
+        router.push("/pages/auth/login");
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
   }, [router]);
 
   return (
