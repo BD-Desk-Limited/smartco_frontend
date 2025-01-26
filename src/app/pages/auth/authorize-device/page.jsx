@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import PictureCarousel from '@/components/auth/PictureCarousel';
-import LoginForm from '@/components/auth/LoginForm';
 
 const page = () => {
   return (
@@ -10,7 +9,7 @@ const page = () => {
         <PictureCarousel />
       </div>
       <div className="w-[50%] px-[10vw] items-center justify-center">
-        <LoginForm />
+        Authorization page
       </div>
     </div>
   );

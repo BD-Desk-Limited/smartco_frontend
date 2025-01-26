@@ -1,60 +1,61 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import Image from "next/image";
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useCompanyData } from '@/contexts/companyDataContext';
 
 export default function Home() {
   const router = useRouter();
 
+  const { companyData } = useCompanyData();
+
   useEffect(() => {
-    // Retrieve the JSON string from localStorage
-    const storedCompanyData = localStorage.getItem("companyData");
-
-    // Parse the JSON string back into an object
-    const fetchedData = storedCompanyData ? JSON.parse(storedCompanyData) : null;
-
-    if (fetchedData) {
+    if (companyData) {
       const authorize = async () => {
         try {
-          // Send the company id and the authorization token to the server to check if the device is authorized
-          const response = await fetch(`${process.env.API_URL}/auth/is-device-authorized`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              companyId: fetchedData.id,
-              authorizationToken: fetchedData.authorizationToken,
-            }),
-          });
+          const requestBody = {
+            companyId: companyData.id,
+            authorizationToken: companyData.authorizationToken,
+          };
 
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          // Send the company id and the authorization token to the server to check if the device is authorized
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            }
+          );
 
           const data = await response.json();
           const isAuthorized = data.isAuthorized;
 
           const timer = setTimeout(() => {
-            if (fetchedData.authorizationToken && isAuthorized) {
-              router.push("/pages/splash/splash3");
+            if (companyData.authorizationToken && isAuthorized) {
+              router.push('/pages/splash/splash3');
             } else {
-              router.push("/pages/auth/login");
+              router.push('/pages/auth/login');
             }
           }, 5000);
 
           return () => clearTimeout(timer);
         } catch (error) {
-          console.error("Failed to authorize device:", error);
-          router.push("/pages/auth/login");
+          const timer = setTimeout(() => {
+            router.push('/pages/auth/login');
+          }, 5000);
+
+          return () => clearTimeout(timer);
         }
       };
 
       authorize();
     } else {
       const timer = setTimeout(() => {
-        router.push("/pages/auth/login");
+        router.push('/pages/auth/login');
       }, 5000);
 
       return () => clearTimeout(timer);
@@ -69,13 +70,28 @@ export default function Home() {
         animate={{ scale: 1 }}
         transition={{ duration: 3 }}
       >
-        <Image src="/assets/logo_long.png" alt="Logo" width={400} height={400} />
+        <Image
+          src="/assets/logo_long.png"
+          alt="Logo"
+          width={400}
+          height={400}
+        />
       </motion.h1>
       <div className="absolute bottom-[-20vh] left-[-10vw]">
-        <Image src="/assets/brand_mark1.png" alt="Logo" width={450} height={450} />
+        <Image
+          src="/assets/brand_mark1.png"
+          alt="Logo"
+          width={450}
+          height={450}
+        />
       </div>
       <div className="absolute bottom-[25vh] right-[-10vw]">
-        <Image src="/assets/brand_mark1.png" alt="Logo" width={450} height={450} />
+        <Image
+          src="/assets/brand_mark1.png"
+          alt="Logo"
+          width={450}
+          height={450}
+        />
       </div>
     </div>
   );

@@ -1,13 +1,13 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/pages/splash/splash2");
+      router.push('/pages/splash/splash2');
     }, 3000);
 
     return () => clearTimeout(timer);
