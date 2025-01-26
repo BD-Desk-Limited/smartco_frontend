@@ -60,7 +60,7 @@ export default function Home() {
 
       return () => clearTimeout(timer);
     }
-  }, [router]);
+  }, [router, companyData]);
 
   return (
     <div className="min-h-screen min-w-full bg-brand-blue flex items-center justify-center overflow-hidden relative">

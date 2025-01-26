@@ -134,10 +134,8 @@ const LoginForm = () => {
                   className="cursor-pointer"
                 />
               </div>
-              <Link href="/pages/auth/forgot-password">
-                <span className="text-sm hover:font-semibold text-brand-blue cursor-pointer w-fit">
-                  Forgot Password?
-                </span>
+              <Link href="/pages/auth/forgot-password" className="text-sm hover:font-semibold text-brand-blue cursor-pointer w-fit">
+                Forgot Password?
               </Link>
             </div>
             {error && (
@@ -164,7 +162,7 @@ const LoginForm = () => {
             </button>
           </form>
           <span className="text-base text-text-black">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href={'/pages/auth/sign-up'}>
               <span className="text-brand-blue hover:font-semibold cursor-pointer">
                 Sign Up
