@@ -14,6 +14,7 @@ const LoginForm = () => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [message, setMessage] = React.useState(null);
+  const [loginAttempts, setLoginAttempts] = React.useState(0);
   const { setUser } = useAuth();
   const { companyData } = useCompanyData();
   const router = useRouter();
@@ -36,6 +37,10 @@ const LoginForm = () => {
 
       if (!response || response.error) {
         setError(response.error || 'error logging in, please try again');
+        setLoginAttempts(prev => prev + 1);
+        if (loginAttempts >= 2) {
+          router.push('/pages/auth/login-attempt-notification');
+        }
         return;
       } else if (response?.data) {
         if (response?.data?.verifyOTP) {
@@ -152,11 +157,10 @@ const LoginForm = () => {
             <button
               type="submit"
               disabled={!form.email || !form.password || loading}
-              className={`h-10 bg-brand-blue rounded-md text-lg text-white ${
-                loading || !form.email || !form.password
-                  ? 'cursor-not-allowed'
-                  : 'hover:bg-blue-shadow1'
-              } items-center justify-center`}
+              className={`h-10 bg-brand-blue rounded-md text-lg text-white ${loading || !form.email || !form.password
+                ? 'cursor-not-allowed'
+                : 'hover:bg-blue-shadow1'
+                } items-center justify-center`}
             >
               {loading ? 'Loading...' : 'Login'}
             </button>
