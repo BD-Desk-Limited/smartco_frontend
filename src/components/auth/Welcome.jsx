@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import LogoutButton from './LogoutButton';
-import ChatIcon from './ChatIcon';
+import ChatIcon from './commons/ChatIcon';
 
 const Welcome = () => {
 
@@ -62,7 +61,6 @@ const Welcome = () => {
                 </button>
             </div>
             <ChatIcon />
-            <LogoutButton />
         </div>
     )
 }
