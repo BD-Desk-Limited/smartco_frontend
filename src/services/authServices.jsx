@@ -80,7 +80,6 @@ export const verifyOTPService = async (body) => {
   }
 };
 
-
 export const authorizeDeviceService = async (body) => {
   try {
     const response = await fetch(
@@ -107,7 +106,6 @@ export const authorizeDeviceService = async (body) => {
     return { error: 'error authorizing device, please try again' };
   }
 };
-
 
 export const requestPasswordResetService = async (emailOrPhone) => {
   try {
@@ -144,7 +142,7 @@ export const verifyPasswordResetLinkService = async (token) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
       }
     );
 
@@ -160,7 +158,7 @@ export const verifyPasswordResetLinkService = async (token) => {
     console.error('Error:', error);
     return { error: 'error verifying password reset link, please try again' };
   }
-}
+};
 
 // Reset password takes in the token, old password and the new password
 export const resetPasswordService = async (body) => {
@@ -188,4 +186,33 @@ export const resetPasswordService = async (body) => {
     console.error('Error:', error);
     return { error: 'error resetting password, please try again' };
   }
-}
+};
+
+//signup service
+export const signupService = async (body) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/companies/register`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log('Response:', responseData);
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error signing up, please try again' };
+  }
+};

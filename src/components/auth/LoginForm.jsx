@@ -45,6 +45,7 @@ const LoginForm = () => {
             response?.data?.trustedDevice
           );
           sessionStorage.setItem('email', response?.data?.user?.email);
+          sessionStorage.setItem('verification-purpose', 'login');
           setMessage(response?.data?.message);
           setSuccess(true);
 
@@ -134,7 +135,10 @@ const LoginForm = () => {
                   className="cursor-pointer"
                 />
               </div>
-              <Link href="/pages/auth/forgot-password" className="text-sm hover:font-semibold text-brand-blue cursor-pointer w-fit">
+              <Link
+                href="/pages/auth/forgot-password"
+                className="text-sm hover:font-semibold text-brand-blue cursor-pointer w-fit"
+              >
                 Forgot Password?
               </Link>
             </div>

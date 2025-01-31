@@ -20,12 +20,14 @@ const OTPForm = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
+  const [purpose, setPurpose] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedEmail = sessionStorage.getItem('email');
       const storedUserId = sessionStorage.getItem('userId');
       const storedTrustedDevice = sessionStorage.getItem('trustedDevice');
+      const verificationPurpose = sessionStorage.getItem('verification-purpose');
 
       // Check if the user is logged in
       if (!storedUserId) {
@@ -34,6 +36,7 @@ const OTPForm = () => {
         setEmail(storedEmail);
         setUserId(storedUserId);
         setTrustedDevice(storedTrustedDevice);
+        setPurpose(verificationPurpose);
       }
     }
   }, []);
@@ -97,6 +100,7 @@ const OTPForm = () => {
       OTP: Number(otp.join('')),
       userId,
       trustedDevice,
+      verificationPurpose: purpose,
     };
 
     setLoading(true);
@@ -108,7 +112,7 @@ const OTPForm = () => {
       if (response.error) {
         setError(response.error);
         return;
-      } 
+      }
       if (response?.data) {
         setMessage('OTP verified successfully!!! logging in...');
         setSuccess(true);
@@ -120,10 +124,11 @@ const OTPForm = () => {
         sessionStorage.removeItem('email');
         sessionStorage.removeItem('userId');
         sessionStorage.removeItem('trustedDevice');
+        sessionStorage.removeItem('verification-purpose');
 
         // Redirect to the appropriate page based on the user's role and trusted device status
         if (response.data?.user?.role === 'manager') {
-          if (response.data?.trustedDevice===true) {
+          if (response.data?.trustedDevice === true) {
             setTimeout(() => {
               window.location.href = '/pages/dashboard/manager';
             }, 2000);
@@ -132,9 +137,9 @@ const OTPForm = () => {
               window.location.href = '/pages/auth/login';
             }, 2000);
           }
-        };
+        }
         if (response.data?.user?.role === 'admin') {
-          if (response.data?.trustedDevice===true) {
+          if (response.data?.trustedDevice === true) {
             setTimeout(() => {
               window.location.href = '/pages/dashboard/admin';
             }, 2000);
@@ -144,7 +149,7 @@ const OTPForm = () => {
             }, 2000);
           }
         }
-      };
+      }
     } catch (error) {
       setError('error verifying OTP, please try again');
       setLoading(false);
@@ -223,6 +228,15 @@ const OTPForm = () => {
               </div>
             </div>
           </div>
+          {purpose === 'register' && (
+            <div className="flex justify-center items-center gap-2 pt-5">
+              <span className="h-2 w-2 bg-brand-blue rounded-[100%]"></span>
+              <span className="h-0.5 w-10 bg-brand-blue"></span>
+              <span className="h-2 w-2 bg-brand-blue rounded-[100%]"></span>
+              <span className="h-0.5 w-10 bg-brand-gray"></span>
+              <span className="h-2 w-2 bg-brand-gray rounded-[100%]"></span>
+            </div>
+          )}
         </div>
       ) : (
         <div className="relative overflow-hidden flex items-center justify-center h-full z-20 gap-1 flex-col">
