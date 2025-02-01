@@ -9,13 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "axios": "^1.7.9",
     "framer-motion": "^12.0.1",
     "jwt-decode": "^4.0.0",
     "next": "15.1.5",
+    "next-pwa": "^5.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+<<<<<<< HEAD
     "smartco_frontend": "file:"
+=======
+    "react-phone-input-2": "^2.15.1",
+    "react-phone-input-3": "^0.0.5",
+    "react-phone-number-input": "^3.4.11"
+>>>>>>> 5967b130b3095c26fc88d5c1a874628f71edeb64
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
