@@ -19,7 +19,8 @@
     "react-dom": "^19.0.0",
     "react-phone-input-2": "^2.15.1",
     "react-phone-input-3": "^0.0.5",
-    "react-phone-number-input": "^3.4.11"
+    "react-phone-number-input": "^3.4.11",
+    "react-toastify": "^11.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
