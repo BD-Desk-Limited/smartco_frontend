@@ -1,8 +1,9 @@
 'use client';
 import React, { useEffect } from 'react';
 import PictureCarousel from '@/components/auth/PictureCarousel';
-import LoginAuthorize from '@/components/auth/LoginAuthorize';
 import { useAuth } from '@/contexts/authContext';
+import Image from 'next/image';
+import LoginAuthorize from '@/components/auth/LoginAuthorize';
 
 const Page = () => {
   const { user } = useAuth();
@@ -18,11 +19,14 @@ const Page = () => {
 
   if (!user || user?.role !== 'admin') {
     return (
+
       <div className='flex flex-col h-screen justify-center items-center gap-4'>
+        <Image src='/assets/Danger.png' width={100} height={100} alt='403' />
         <p className='text-error'>
           This device is not authorized for your company use. Contact your Admin or IT support for assistance.
         </p>
       </div>
+
     );
   }
 

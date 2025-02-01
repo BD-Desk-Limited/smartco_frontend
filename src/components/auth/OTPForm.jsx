@@ -187,11 +187,10 @@ const OTPForm = () => {
                   <button
                     onClick={handleOTPResend}
                     disabled={isResendDisabled}
-                    className={`${
-                      isResendDisabled
+                    className={`${isResendDisabled
                         ? 'cursor-not-allowed'
                         : 'cursor-pointer hover:font-semibold'
-                    } text-brand-green`}
+                      } text-brand-green`}
                   >
                     Resend Code
                   </button>

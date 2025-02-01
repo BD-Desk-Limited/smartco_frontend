@@ -14,7 +14,6 @@ const LoginForm = () => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [message, setMessage] = React.useState(null);
-  const [loginAttempts, setLoginAttempts] = React.useState(0);
   const { setUser } = useAuth();
   const { companyData } = useCompanyData();
   const router = useRouter();
@@ -37,10 +36,6 @@ const LoginForm = () => {
 
       if (!response || response.error) {
         setError(response.error || 'error logging in, please try again');
-        setLoginAttempts(prev => prev + 1);
-        if (loginAttempts >= 2) {
-          router.push('/pages/auth/login-attempt-notification');
-        }
         return;
       } else if (response?.data) {
         if (response?.data?.verifyOTP) {
@@ -66,7 +61,7 @@ const LoginForm = () => {
             !response?.data?.trustedDevice &&
             response?.data?.user?.role !== 'admin'
           ) {
-            router.push('/pages/auth/authorize-device');
+            router.push('/pages/auth/login-attempt-notification');
           } else if (
             response?.data?.trustedDevice &&
             response?.data?.user?.role === 'admin'
@@ -166,7 +161,14 @@ const LoginForm = () => {
                 : 'hover:bg-blue-shadow1'
                 } items-center justify-center`}
             >
-              {loading ? 'Loading...' : 'Login'}
+              {loading ? (
+                <>
+                  <div className="spinner-border animate-spin inline-block w-5 h-5 border-4 border-t-6 border-t-text-blue border-white rounded-full mr-2"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                'Login'
+              )}
             </button>
           </form>
           <span className="text-base text-text-black">

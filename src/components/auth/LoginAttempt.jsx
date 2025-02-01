@@ -52,9 +52,9 @@ const LoginAttempt = () => {
                 >
                     Authorize Device
                 </button>
-                <button className="border-brand-blue border-[1px] text-brand-blue py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-lg font-semibold">
+                <Link href="/pages/auth/login" className="border-brand-blue border-[1px] text-brand-blue py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-lg font-semibold">
                     Proceed for one-time use
-                </button>
+                </Link>
             </div>
 
             {/* Modal */}
