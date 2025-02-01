@@ -26,15 +26,14 @@ const ForgotPassword = () => {
       <button
         type="submit"
         className="bg-brand-blue text-white w-full rounded-md h-10 shadow-sm"
-      >Reset Password</button></form>
-    <span className="text-base text-text-black">
-      Don&apos;t have an account?{' '}
-      <Link href={'/pages/auth/sign-up'}>
-        <span className="text-brand-blue hover:font-semibold cursor-pointer">
-          Sign Up
-        </span>
-      </Link>
-    </span>
+      >Submit</button></form>
+
+    <Link href={'/pages/auth/login'}>
+      <span className="text-brand-blue hover:font-semibold cursor-pointer">
+        Return to Sign In Page
+      </span>
+    </Link>
+
   </div>;
 };
 
