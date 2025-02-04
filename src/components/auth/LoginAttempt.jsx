@@ -48,11 +48,11 @@ const LoginAttempt = () => {
             <div className="flex flex-col gap-10 w-full">
                 <button
                     onClick={openModal}
-                    className="bg-brand-blue py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-white text-lg font-semibold"
+                    className="bg-brand-blue hover:bg-blue-shadow5 py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-white text-lg font-semibold"
                 >
                     Authorize Device
                 </button>
-                <Link href="/pages/auth/login" className="border-brand-blue border-[1px] text-brand-blue py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-lg font-semibold">
+                <Link href="/pages/dashboard/admin" className="border-blue-shadow5 hover:bg-blue-shadow5 hover:text-text-white border-[1px] text-brand-blue py-[10px] px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-lg font-semibold">
                     Proceed for one-time use
                 </Link>
             </div>
@@ -64,20 +64,21 @@ const LoginAttempt = () => {
                         <h2 className="text-lg font-semibold text-text-black">Authorization</h2>
                         <Image src="/assets/Danger.png" width={64} height={64} alt="Danger" />
                         <p className="text-sm text-text-black">
-                            Authorizing this device ensures you can securely access your account.
+                            Authorizing this device means you and any one in your company can access their account through this device.
                         </p>
-                        <div className='flex items-center gap-4'>  <button
-                            onClick={closeModal}
-                            className="text-text-black text-sm font-semibold border-[0.5px] flex items-center border-blue-shadow9 px-4 py-2 gap-2 rounded-md"
-                        >
-                            Cancel
-                        </button><Link href="/pages/auth/authorize-device"
-                            className="bg-brand-blue text-sm font-semibold text-white px-4 py-2 rounded-md"
-                        >
+                        <div className='flex items-center gap-4'>  
+                            <button
+                                onClick={closeModal}
+                                className="text-text-black text-sm font-semibold border-[0.5px] flex items-center border-blue-shadow9 px-4 py-2 gap-2 rounded-md hover:bg-blue-shadow5"
+                            >
+                                Cancel
+                            </button>
+                            <Link href="/pages/auth/authorize-device"
+                                className="bg-brand-blue text-sm font-semibold text-white px-4 py-2 rounded-md hover:bg-blue-shadow5"
+                            >
                                 Continue
                             </Link>
                         </div>
-
                     </div>
                 </div>
             )}

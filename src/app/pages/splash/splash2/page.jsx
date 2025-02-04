@@ -1,17 +1,24 @@
 'use client';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useCompanyData } from '@/contexts/companyDataContext';
 
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
   const { companyData } = useCompanyData();
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (companyData) {
+      console.log('companyData', companyData);
+
       const authorize = async () => {
         try {
           const requestBody = {
@@ -32,10 +39,10 @@ export default function Home() {
           );
 
           const data = await response.json();
-          const isAuthorized = data.isAuthorized;
+          console.log('data', data);
 
           const timer = setTimeout(() => {
-            if (companyData.authorizationToken && isAuthorized) {
+            if (companyData.authorizationToken && data.isAuthorized) {
               router.push('/pages/splash/splash3');
             } else {
               router.push('/pages/auth/login');
@@ -44,6 +51,7 @@ export default function Home() {
 
           return () => clearTimeout(timer);
         } catch (error) {
+          console.error(error);
           const timer = setTimeout(() => {
             router.push('/pages/auth/login');
           }, 5000);
@@ -60,6 +68,7 @@ export default function Home() {
 
       return () => clearTimeout(timer);
     }
+    
   }, [router, companyData]);
 
   return (
@@ -95,4 +104,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};

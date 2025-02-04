@@ -1,8 +1,55 @@
 import React from 'react';
 import Image from 'next/image';
 import ChatIcon from './commons/ChatIcon';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCompanyData } from '@/contexts/companyDataContext';
 
 const Welcome = () => {
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const router = useRouter();
+  const { companyData } = useCompanyData();
+
+  useEffect(() => {
+    if (companyData) {
+
+      const authorize = async () => {
+        try {
+          const requestBody = {
+            companyId: companyData.id,
+            authorizationToken: companyData.authorizationToken,
+          };
+
+          // Send the company id and the authorization token to the server to check if the device is authorized
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            }
+          );
+
+          const data = await response.json();
+            if (companyData.authorizationToken && data.isAuthorized) {
+              setIsAuthorized(true);
+            } else {
+              router.push('/pages/auth/login');
+            }
+
+        } catch (error) {
+          console.error(error);
+          router.push('/pages/auth/login');
+        }
+      };
+
+      authorize();
+    }
+  }, [router, companyData]);
+
   const divStyle = {
     backgroundImage: `url('/images/welcome.png')`,
     backgroundPosition: 'center',
@@ -11,6 +58,10 @@ const Welcome = () => {
     height: '100vh',
     width: '100vw',
   };
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <div style={divStyle} className="w-full">
@@ -54,7 +105,9 @@ const Welcome = () => {
       <div className="absolute h-full justify-center right-28 flex flex-col gap-3">
         <p className="text-text-white text-center">Continue to</p>
         <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-          Admin console
+          <Link href='/pages/auth/login'>
+            Admin console
+          </Link>
         </button>
         <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
           Manager dashboard

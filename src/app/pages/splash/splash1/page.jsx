@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();
-
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/pages/splash/splash2');

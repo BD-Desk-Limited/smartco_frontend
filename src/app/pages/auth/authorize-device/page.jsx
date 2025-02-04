@@ -4,18 +4,15 @@ import PictureCarousel from '@/components/auth/PictureCarousel';
 import { useAuth } from '@/contexts/authContext';
 import Image from 'next/image';
 import LoginAuthorize from '@/components/auth/LoginAuthorize';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const { user } = useAuth();
+  const router = useRouter();
 
-  useEffect(() => {
-    if (!user || user?.role !== 'admin') {
-      const timeout = setTimeout(() => {
-        window.location.href = '/pages/auth/login';
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [user]);
+  const goBack = () => {
+    router.push('/pages/auth/login-attempt-notification');
+  };
 
   if (!user || user?.role !== 'admin') {
     return (
@@ -25,10 +22,15 @@ const Page = () => {
         <p className='text-error'>
           This device is not authorized for your company use. Contact your Admin or IT support for assistance.
         </p>
+        <button
+          onClick={goBack}
+          className='bg-error text-white px-4 py-2 rounded-md hover:bg-opacity-80'>
+            Ok
+          </button>
       </div>
 
     );
-  }
+  };
 
   return (
     <div className="h-screen w-full bg-white text-text-black text-base flex items-center flex-row justify-center">
@@ -38,6 +40,9 @@ const Page = () => {
       <div className="w-[50%] px-[10vw] items-center justify-center">
         <LoginAuthorize />
       </div>
+      <button onClick={goBack}>
+        <Image src='/assets/back.png' width={30} height={30} alt='Logo' className='p-1 rounded-[100%] absolute top-5 left-5 bg-brand-blue hover:bg-blue-shadow3'/>
+      </button>
     </div>
   );
 };

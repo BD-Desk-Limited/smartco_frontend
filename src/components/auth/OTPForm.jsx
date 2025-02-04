@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import OTPInput from './OTPInput';
 import { resendOTPService, verifyOTPService } from '@/services/authServices';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
 
 const OTPForm = () => {
@@ -21,6 +22,7 @@ const OTPForm = () => {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [purpose, setPurpose] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -28,6 +30,8 @@ const OTPForm = () => {
       const storedUserId = sessionStorage.getItem('userId');
       const storedTrustedDevice = sessionStorage.getItem('trustedDevice');
       const verificationPurpose = sessionStorage.getItem('verification-purpose');
+
+      console.log('trustedDevice', storedTrustedDevice);
 
       // Check if the user is logged in
       if (!storedUserId) {
@@ -117,8 +121,6 @@ const OTPForm = () => {
         setMessage('OTP verified successfully!!! logging in...');
         setSuccess(true);
         setLoading(false);
-        setUser(response?.data?.user);
-        sessionStorage.setItem('token', response?.data?.token);
 
         //clean up the session storage
         sessionStorage.removeItem('email');
@@ -126,28 +128,36 @@ const OTPForm = () => {
         sessionStorage.removeItem('trustedDevice');
         sessionStorage.removeItem('verification-purpose');
 
+        console.log('response', response.data.trustedDevice);
+
         // Redirect to the appropriate page based on the user's role and trusted device status
-        if (response.data?.user?.role === 'manager') {
-          if (response.data?.trustedDevice === true) {
-            setTimeout(() => {
-              window.location.href = '/pages/dashboard/manager';
-            }, 2000);
-          } else {
-            setTimeout(() => {
-              window.location.href = '/pages/auth/login';
-            }, 2000);
+
+        setLoading(false);
+
+        // Clean up the session storage
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('trustedDevice');
+        sessionStorage.removeItem('verification-purpose');
+
+        console.log('response', response.data.trustedDevice);
+
+        // Redirect to the appropriate page based on the user's role and trusted device status
+        if (response.data.trustedDevice) {
+          setUser(response?.data?.user);
+          sessionStorage.setItem('token', response?.data?.token);
+        
+          if (response.data?.user?.role === 'admin') {
+            router.push('/pages/dashboard/admin');
+          } else if (response.data?.user?.role === 'manager') {
+            router.push('/pages/dashboard/manager');
           }
-        }
-        if (response.data?.user?.role === 'admin') {
-          if (response.data?.trustedDevice === true) {
-            setTimeout(() => {
-              window.location.href = '/pages/dashboard/admin';
-            }, 2000);
-          } else {
-            setTimeout(() => {
-              window.location.href = '/pages/auth/authorize-device';
-            }, 2000);
+        } else {
+          if (response.data?.user?.role === 'admin') {
+            setUser(response?.data?.user);
+            sessionStorage.setItem('token', response?.data?.token);
           }
+          router.push('/pages/auth/login-attempt-notification');
         }
       }
     } catch (error) {
