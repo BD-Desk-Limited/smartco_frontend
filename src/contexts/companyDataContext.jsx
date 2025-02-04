@@ -19,6 +19,8 @@ export const CompanyDataProvider = ({ children }) => {
     SetCompanyData(fetchedData);
   }, []);
 
+  console.log('companyData:', companyData);
+
   const setCompanyData = (data) => {
     // Update the company data in state and localStorage
     SetCompanyData(data);
@@ -37,13 +39,3 @@ export const useCompanyData = () => {
   return useContext(CompanyDataContext);
 };
 
-// sample company data for testing
-/*localStorage.setItem(
-    "companyData", 
-    JSON.stringify(
-      { 
-        id: "67946d54693437249954fe46", 
-        authorizationToken:"e1751b28-49db-4475-bb19-60b0b7c6373b"
-      }
-    )
-  );*/

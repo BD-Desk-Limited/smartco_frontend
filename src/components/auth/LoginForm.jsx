@@ -22,6 +22,7 @@ const LoginForm = () => {
     setShowPassword(!showPassword);
   };
 
+  console.log('companyData', companyData);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,9 +31,9 @@ const LoginForm = () => {
       const body = {
         email: form?.email,
         password: form?.password,
-        deviceId: companyData?.id,
+        deviceId: companyData?.authorizationToken,
       };
-      const response = await loginService(form);
+      const response = await loginService(body);
 
       if (!response || response.error) {
         setError(response.error || 'error logging in, please try again');

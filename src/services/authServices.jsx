@@ -53,7 +53,6 @@ export const resendOTPService = async (body) => {
 };
 
 export const verifyOTPService = async (body) => {
-  console.log('Body:', body);
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-otp`,

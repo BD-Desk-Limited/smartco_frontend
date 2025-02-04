@@ -20,7 +20,7 @@ const ForgotPassword = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    const emailIsValid = verifyEmail(email);
+    const emailIsValid = verifyEmail(email).passed;
     if (!emailIsValid) {
       setError('Please enter a valid email address.');
       return;

@@ -1,18 +1,12 @@
-'use client';
-import React, { useEffect, useState } from 'react';
+import AdminDashboard from '@/components/dashboard/AdminDashboard';
+import React from 'react'
 
-const Page = () => {
-  const [isClient, setIsClient] = useState(false);
+const page = () => {
+  return (
+    <div>
+      <AdminDashboard/>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return null; // Render nothing on the server
-  }
-
-  return <div>admin dashboard</div>;
-};
-
-export default Page;
+export default page;

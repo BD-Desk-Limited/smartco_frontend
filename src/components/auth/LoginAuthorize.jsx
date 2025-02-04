@@ -4,22 +4,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import { authorizeDeviceService } from '@/services/authServices';
 import { verifyName } from '@/utilities/verifyInput';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/authContext';
+import { useCompanyData } from '@/contexts/companyDataContext';
 import { motion } from 'framer-motion';
 
 const LoginAuthorize = () => {
     const [error, setError] = useState(false);
     const [deviceName, setDeviceName] = useState('');
     const [loading, setLoading] = useState(false);
-    const [user, setUser] = useState(null);
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState('');
+    const { user } = useAuth();
+    const { setCompanyData } = useCompanyData();
     const router = useRouter();
-
-
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        setUser(storedUser);
-    }, []);
 
     const handleDeviceAuthorization = async (e) => {
         e.preventDefault();
@@ -27,7 +24,7 @@ const LoginAuthorize = () => {
         if (!nameValidation.passed) {
             setError(nameValidation.message);
             return;
-        }
+        };
         setLoading(true);
         setError(null);
         const deviceId = '';
@@ -45,13 +42,26 @@ const LoginAuthorize = () => {
             console.log(response);
             if (response?.error) {
                 setError(response.error);
-            } else {
+            };
+
+            if (response?.data){
                 setMessage(response?.data?.message || 'Device authorized successfully');
                 setSuccess(true);
+
+                //register device to local storage and in state before redirecting
+                const companydata = (
+                    { 
+                      id: user.company,
+                      authorizationToken: response?.data?.deviceId,
+                    }
+                );
+                  
+                setCompanyData(companydata);
+                
                 setTimeout(() => {
-                    router.push('/pages/auth/login');
+                    router.push('/pages/dashboard/admin');
                 }, 5000);
-            }
+            };
         } catch (error) {
             console.error('Error authorizing device:', error);
             setError('Error authorizing device, please try again');
@@ -109,7 +119,7 @@ const LoginAuthorize = () => {
                     <button
                         onClick={handleDeviceAuthorization}
                         disabled={loading}
-                        className="bg-brand-blue py-[10px] w-full px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-white text-lg font-semibold"
+                        className="bg-brand-blue hover:bg-blue-shadow5 py-[10px] w-full px-4 gap-[10px] rounded-[5px] flex items-center justify-center text-white text-lg font-semibold"
                     >
                         {loading ? (
                             <>
