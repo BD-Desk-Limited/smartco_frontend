@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 const ResetPassword = ({ token }) => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setErrorMessage] = useState('');
-    const [success, setSuccessMessage] = useState('');
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
     const [isVerifying, setIsVerifying] = useState(true);
     const [isTokenValid, setIsTokenValid] = useState(false);
     const [message, setMessage] = useState('');
@@ -30,18 +30,18 @@ const ResetPassword = ({ token }) => {
         const verifyToken = async () => {
             try {
                 if (!token) {
-                    setErrorMessage('Invalid or missing reset token.');
+                    setError('Invalid or missing reset token.');
                     setIsVerifying(false);
                     return;
                 }
                 const response = await verifyPasswordResetLinkService(token);
                 if (response.error) {
-                    setErrorMessage(response.error || 'Invalid token.');
+                    setError(response.error || 'Invalid token.');
                 } else {
                     setIsTokenValid(true);
                 }
             } catch (error) {
-                setErrorMessage('An error occurred while verifying the token.');
+                setError('An error occurred while verifying the token.');
             } finally {
                 setIsVerifying(false);
             }
@@ -54,7 +54,7 @@ const ResetPassword = ({ token }) => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            setErrorMessage('Passwords do not match.');
+            setError('Passwords do not match.');
             return;
         }
         setLoading(true);
@@ -64,16 +64,19 @@ const ResetPassword = ({ token }) => {
             console.log('Body:', body);
             const response = await resetPasswordService(body);
 
-            if (response.data) {
-                setMessage(response.data.message);
-                setSuccessMessage('Password reset successfully! Redirecting to login...');
-                setTimeout(() => router.push('/pages/auth/login'), 3000);
+            if (response?.error) {
+                setError(response.error);
             } else {
-                const data = await response.json();
-                setErrorMessage(data.message || 'Failed to reset password.');
+                setMessage(response?.data?.message);
+                setError(null);
+                setSuccess(true);
+                setTimeout(() => {
+                    router.push('/pages/auth/login');
+                }, 7000);
             }
         } catch (error) {
-            setErrorMessage('An error occurred. Please try again later.');
+            console.error('Error requesting password reset:', error);
+
         } finally {
             setLoading(false);
         }
