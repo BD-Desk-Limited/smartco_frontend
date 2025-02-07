@@ -2,6 +2,7 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
+import { getUserService } from '@/services/authServices';
 
 // Create a context for authentication
 const AuthContext = createContext(null);
@@ -29,6 +30,22 @@ export const AuthProvider = ({ children }) => {
         } else {
           // Token is valid
           setIsAuthenticated(true);
+          // Set the user object if user is not set
+          if (!user) {
+            const getUser = async () => {
+              const userData = await getUserService(token);
+              if (userData.data) {
+                setUser(userData.data);
+              }else {
+                console.error('Error getting user data:', userData.error);
+                sessionStorage.removeItem('token');
+                setIsAuthenticated(false);
+                setUser(null);
+                router.push('/pages/auth/login'); 
+              }
+            }
+            getUser();
+          }
         }
       } catch (error) {
         console.error('Invalid token:', error);

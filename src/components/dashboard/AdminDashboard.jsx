@@ -1,13 +1,19 @@
 'use client';
 import React from 'react'
 import { useAuth } from '@/contexts/authContext';
+import SideBar from './SideBar';
 
 const AdminDashboard = () => {
     const { logOut } = useAuth();
+
   return (
-    <div>
-        <p>Admin Dashboard</p>
-        <button onClick={logOut} className='p-3 bg-brand-blue text-text-white'>Logout</button>
+    <div className='flex flex-row gap-10'>
+        <div>
+          <SideBar/>
+        </div>
+        <div className='w-full'>
+          other components
+        </div>
     </div>
   )
 }
