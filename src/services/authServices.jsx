@@ -243,3 +243,31 @@ export const getUserService = async (token) => {
     return { error: 'error getting user details, please try again' };
   }
 };
+
+//sales point login service
+export const salesPointLoginService = async (body) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/sales-point-login`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error logging in, please try again' };
+  }
+};

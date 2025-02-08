@@ -15,14 +15,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = sessionStorage.getItem('token');
+    console.log('Token:', token);
     
     if (token !== null) {
       try {
         const decodedToken = jwtDecode(token);
+        console.log('Decoded Token:', decodedToken);
         const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp < currentTime) {
           // Token has expired
+          console.log('Token has expired');
           sessionStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
@@ -34,6 +37,7 @@ export const AuthProvider = ({ children }) => {
           if (!user) {
             const getUser = async () => {
               const userData = await getUserService(token);
+              console.log('User Data:', userData);
               if (userData.data) {
                 setUser(userData.data);
               }else {
@@ -67,13 +71,13 @@ export const AuthProvider = ({ children }) => {
         router.push('/pages/auth/login');
       }
     }
-  }, [router]);
+  }, [router, pathname, user]);
 
   const logOut = () => {
     sessionStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
-    router.push('/pages/auth/login');
+    router.push('/pages/splash/splash3');
   };
 
   if (
@@ -82,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     !pathname.startsWith('/pages/auth') &&
     !pathname.startsWith('/pages/splash')
   ) {
-    return null;
+    return <div>Loading...</div>;
   }
 
   return (

@@ -19,8 +19,6 @@ export const CompanyDataProvider = ({ children }) => {
     SetCompanyData(fetchedData);
   }, []);
 
-  console.log('companyData:', companyData);
-
   const setCompanyData = (data) => {
     // Update the company data in state and localStorage
     SetCompanyData(data);
