@@ -2,6 +2,7 @@
 import {useState, useEffect} from 'react';
 import LoginExisting from './LoginExisting';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const SelectSeller = ({selectedSeller, setSelectedSeller, sellersInfo}) => {
 
@@ -30,7 +31,7 @@ const SelectSeller = ({selectedSeller, setSelectedSeller, sellersInfo}) => {
                   className='flex flex-row gap-5 items-center my-1 px-5 border border-brand-gray shadow-brand-gray py-1 rounded-lg cursor-pointer hover:bg-brand-green hover:text-text-white'
                 >
                   <div className=''>
-                    <img src={seller.imageURL} alt={seller.name} width={30} height={30} className='rounded-[100%]'/>
+                    <Image src={seller.imageURL} alt={seller.name} width={30} height={30} className='rounded-[100%]'/>
                   </div>
                   <div>
                     <p className=''>{seller.name}</p>

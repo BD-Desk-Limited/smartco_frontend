@@ -57,7 +57,7 @@ const LoginExisting = ({seller, setSeller}) => {
         </div>
         <div className='flex flex-col gap-5 items-center w-full justify-center'>
             <div>
-                <img src={seller?.imageURL || '/assets/anonymous.png'} alt='seller' width={150} height={100} className='rounded-[100%]'/>
+                <Image src={seller?.imageURL || '/assets/anonymous.png'} alt='seller' width={150} height={100} className='rounded-[100%]'/>
             </div>    
             <span className='text-base w-full text-brand-green font-semibold'>{seller?.name}</span>
             <div className='w-full flex flex-col text-left'>

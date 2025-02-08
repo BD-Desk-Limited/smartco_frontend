@@ -15,6 +15,15 @@ const nextConfig = {
     NEXT_PUBLIC_WEBSITE_URL: process.env.NEXT_PUBLIC_WEBSITE_URL,
   },
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
+
   async redirects() {
     return [
       {
