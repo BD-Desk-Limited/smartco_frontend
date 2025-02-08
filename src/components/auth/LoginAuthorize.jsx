@@ -39,7 +39,6 @@ const LoginAuthorize = () => {
             };
 
             const response = await authorizeDeviceService(body);
-            console.log(response);
             if (response?.error) {
                 setError(response.error);
             };

@@ -104,17 +104,21 @@ const Welcome = () => {
       </div>
       <div className="absolute h-full justify-center right-28 flex flex-col gap-3">
         <p className="text-text-white text-center">Continue to</p>
-        <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-          <Link href='/pages/auth/login'>
+        <Link href='/pages/auth/login'>
+          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Admin console
-          </Link>
-        </button>
-        <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-          Manager dashboard
-        </button>
-        <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-          Go to sales point
-        </button>
+          </button>
+        </Link>
+        <Link href='/pages/auth/login'>
+          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+            Manager dashboard
+          </button>
+        </Link>
+        <Link href='/pages/auth/login/sales-point'>
+          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+            Sales point
+          </button>
+        </Link>
       </div>
       <ChatIcon />
     </div>

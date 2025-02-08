@@ -11,7 +11,6 @@ const SideBar = () => {
     const { user, logOut } = useAuth();
     const router = useRouter();
 
-    console.log('userdata:',user);
     const menuList = [
         {
             name: 'Dashboard',
@@ -100,10 +99,12 @@ const SideBar = () => {
                         <Image src='/assets/logout.png' alt='logout' width={15} height={15}/>
                         {isOpen &&<p className='text-sm'>Logout</p>}
                     </div>
-                    <div className='flex flex-row items-center gap-1 cursor-pointer hover:bg-error hover:text-text-white rounded-md py-2'>
-                        <Image src='/assets/toggle-off.png' alt='help' width={20} height={15}/>
-                        {isOpen &&<p className='text-sm'>Deactivate Account</p>}
-                    </div>
+                    {user?.superAdmin &&
+                        <div className='flex flex-row items-center gap-1 cursor-pointer hover:bg-error hover:text-text-white rounded-md py-2'>
+                            <Image src='/assets/toggle-off.png' alt='help' width={20} height={15}/>
+                            {isOpen &&<p className='text-sm'>Deactivate Account</p>}
+                        </div>
+                    }
                 </div>
                 <div>
                     <div className='flex flex-row items-center py-2 w-full text-center'>    
