@@ -1,7 +1,6 @@
 import { CompanyDataProvider } from '@/contexts/companyDataContext';
 import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
-import { AdminMenuProvider } from '@/contexts/adminMenuContext';
 
 const APP_NAME = "SmartCo.";
 const APP_DEFAULT_TITLE = 'SmartCo || Transforming Business Operations with Smart Solutions';
@@ -36,9 +35,7 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
         <AuthProvider>
           <CompanyDataProvider>
-            <AdminMenuProvider>
             {children}
-            </AdminMenuProvider>
           </CompanyDataProvider>
         </AuthProvider>
       </body>

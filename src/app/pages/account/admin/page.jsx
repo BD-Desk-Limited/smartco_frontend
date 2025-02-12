@@ -1,5 +1,5 @@
 "use client";
-import AdminDashboard from '@/components/dashboard/AdminDashboard';
+import AdminDashboard from '@/components/account/admin/dashboard/AdminDashboard';
 
 const Page = () => {
 

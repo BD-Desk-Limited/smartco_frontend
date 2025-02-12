@@ -84,7 +84,7 @@ const Welcome = () => {
             <p className="opacity-100 text-brand-green font-bold">Welcome!</p>
             <p className="font-bold">Get a smart view</p>
             <p className="font-bold">of your business</p>
-            <p className="text-xs mt-5 ">
+            <p className="text-sm mt-5 font-thin">
               From deep dives into performance metrics to effortless trend
               tracking, we empower you to make data-driven decisions with total
               confidence. Trust in a system that protects your sensitive
@@ -102,20 +102,20 @@ const Welcome = () => {
         </p>
         <p>All rights reserved BD-Desk Limited &copy;2024.</p>
       </div>
-      <div className="absolute h-full justify-center right-28 flex flex-col gap-3">
+      <div className="absolute h-full justify-center right-28 flex flex-col gap-3 w-56">
         <p className="text-text-white text-center">Continue to</p>
         <Link href='/pages/auth/login'>
-          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Admin console
           </button>
         </Link>
         <Link href='/pages/auth/login'>
-          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Manager dashboard
           </button>
         </Link>
         <Link href='/pages/auth/login/sales-point'>
-          <button className="bg-white px-3 py-1 rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Sales point
           </button>
         </Link>
