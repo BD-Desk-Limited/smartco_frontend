@@ -170,7 +170,7 @@ const CreateMaterial = ({ pageDescription }) => {
           <div className="bg-white p-5 mx-5 my-2 rounded-md h-full">
             <h1 className="font-bold">Material Onboarding</h1>
             <span className="text-sm text-text-gray font-thin">
-              Let's add a material to your store...
+              Let&apos;s add a material to your store...
             </span>
             <form className="flex flex-col gap-5 my-5">
               <div className="flex flex-row gap-5">
@@ -234,7 +234,7 @@ const CreateMaterial = ({ pageDescription }) => {
                             onClick={() => setCantFindCategory(true)}
                             className="text-xs font-semibold text-brand-blue cursor-pointer"
                           >
-                            Can't find the right category?
+                            Can&apos;t find the right category?
                           </span>
                         </div>
                       ) : (
@@ -355,7 +355,7 @@ const CreateMaterial = ({ pageDescription }) => {
                               onClick={() => setCantFindUnit(true)}
                               className="text-xs font-semibold text-brand-blue cursor-pointer"
                             >
-                              Can't find the right unit?
+                              Can&apos;t find the right unit?
                             </span>
                           </div>
                         </div>
