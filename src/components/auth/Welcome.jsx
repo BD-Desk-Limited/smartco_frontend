@@ -13,7 +13,6 @@ const Welcome = () => {
 
   useEffect(() => {
     if (companyData) {
-
       const authorize = async () => {
         try {
           const requestBody = {
@@ -34,12 +33,11 @@ const Welcome = () => {
           );
 
           const data = await response.json();
-            if (companyData.authorizationToken && data.isAuthorized) {
-              setIsAuthorized(true);
-            } else {
-              router.push('/pages/auth/login');
-            }
-
+          if (companyData.authorizationToken && data.isAuthorized) {
+            setIsAuthorized(true);
+          } else {
+            router.push('/pages/auth/login');
+          }
         } catch (error) {
           console.error(error);
           router.push('/pages/auth/login');
@@ -104,17 +102,17 @@ const Welcome = () => {
       </div>
       <div className="absolute h-full justify-center right-28 flex flex-col gap-3 w-56">
         <p className="text-text-white text-center">Continue to</p>
-        <Link href='/pages/auth/login'>
+        <Link href="/pages/auth/login">
           <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Admin console
           </button>
         </Link>
-        <Link href='/pages/auth/login'>
+        <Link href="/pages/auth/login">
           <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Manager dashboard
           </button>
         </Link>
-        <Link href='/pages/auth/login/sales-point'>
+        <Link href="/pages/auth/login/sales-point">
           <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Sales point
           </button>

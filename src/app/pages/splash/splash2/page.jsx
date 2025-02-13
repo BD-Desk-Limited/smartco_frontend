@@ -68,7 +68,6 @@ export default function Home() {
 
       return () => clearTimeout(timer);
     }
-    
   }, [router, companyData]);
 
   return (
@@ -104,4 +103,4 @@ export default function Home() {
       </div>
     </div>
   );
-};
+}

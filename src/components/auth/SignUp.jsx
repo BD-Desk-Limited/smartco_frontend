@@ -30,7 +30,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState(null);
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -46,13 +46,13 @@ const SignUp = () => {
       setError('Passwords do not match');
       setLoading(false);
       return;
-    }; 
+    }
 
     if (!verifyEmail(formData.businessEmail).passed) {
       setError(verifyEmail(formData.businessEmail).message);
       setLoading(false);
       return;
-    }; 
+    }
 
     if (
       !formData.fullName ||
@@ -64,20 +64,20 @@ const SignUp = () => {
     ) {
       setError('All fields are required');
       setLoading(false);
-      return
-    }; 
+      return;
+    }
 
     if (!verifyPhoneNumber(formData.phoneNumber).passed) {
       setError(verifyPhoneNumber(formData.phoneNumber).message);
       setLoading(false);
-      return
-    }; 
+      return;
+    }
 
     if (!verifyName(formData.fullName).passed) {
       setError(verifyName(formData.fullName).message);
       setLoading(false);
       return;
-    };
+    }
 
     if (!verifyName(formData.businessName).passed) {
       setError(verifyName(formData.businessName).message);
@@ -114,7 +114,7 @@ const SignUp = () => {
         businessEmail: formData.businessEmail,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
-        terms: formData.terms,  
+        terms: formData.terms,
       };
 
       const response = await signupService(body);
@@ -351,7 +351,7 @@ const SignUp = () => {
           <button
             type="submit"
             //onClick={}
-            className={`w-full bg-brand-blue text-white py-2 rounded-md mt-2 ${loading? 'cursor-not-allowed' : 'cursor-pointer hover:bg-blue-shadow6'}`}
+            className={`w-full bg-brand-blue text-white py-2 rounded-md mt-2 ${loading ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-blue-shadow6'}`}
             disabled={loading}
           >
             {loading ? 'Signing Up...' : 'Sign Up'}

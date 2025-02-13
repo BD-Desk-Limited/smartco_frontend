@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = sessionStorage.getItem('token');
     console.log('Token:', token);
-    
+
     if (token !== null) {
       try {
         const decodedToken = jwtDecode(token);
@@ -40,14 +40,14 @@ export const AuthProvider = ({ children }) => {
               console.log('User Data:', userData);
               if (userData.data) {
                 setUser(userData.data);
-              }else {
+              } else {
                 console.error('Error getting user data:', userData.error);
                 sessionStorage.removeItem('token');
                 setIsAuthenticated(false);
                 setUser(null);
-                router.push('/pages/auth/login'); 
+                router.push('/pages/auth/login');
               }
-            }
+            };
             getUser();
           }
         }
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       // No token found
       setIsAuthenticated(false);
       setUser(null);
-      
+
       if (
         pathname &&
         !pathname.startsWith('/pages/auth') &&

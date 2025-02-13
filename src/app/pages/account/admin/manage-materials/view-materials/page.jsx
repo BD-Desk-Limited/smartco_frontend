@@ -1,7 +1,7 @@
 import React from 'react';
 
 const page = () => {
-  return <div>view group page</div>;
+  return <div>View materials page</div>;
 };
 
 export default page;

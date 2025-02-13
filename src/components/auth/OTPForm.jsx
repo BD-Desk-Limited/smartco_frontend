@@ -29,7 +29,9 @@ const OTPForm = () => {
       const storedEmail = sessionStorage.getItem('email');
       const storedUserId = sessionStorage.getItem('userId');
       const storedTrustedDevice = sessionStorage.getItem('trustedDevice');
-      const verificationPurpose = sessionStorage.getItem('verification-purpose');
+      const verificationPurpose = sessionStorage.getItem(
+        'verification-purpose'
+      );
 
       console.log('trustedDevice', storedTrustedDevice);
 
@@ -146,11 +148,11 @@ const OTPForm = () => {
         if (response.data.trustedDevice) {
           setUser(response?.data?.user);
           sessionStorage.setItem('token', response?.data?.token);
-        
+
           if (response.data?.user?.role === 'admin') {
-            router.push('/pages/dashboard/admin');
+            router.push('/pages/account/admin');
           } else if (response.data?.user?.role === 'manager') {
-            router.push('/pages/dashboard/manager');
+            router.push('/pages/account/manager');
           }
         } else {
           if (response.data?.user?.role === 'admin') {
@@ -197,10 +199,11 @@ const OTPForm = () => {
                   <button
                     onClick={handleOTPResend}
                     disabled={isResendDisabled}
-                    className={`${isResendDisabled
+                    className={`${
+                      isResendDisabled
                         ? 'cursor-not-allowed'
                         : 'cursor-pointer hover:font-semibold'
-                      } text-brand-green`}
+                    } text-brand-green`}
                   >
                     Resend Code
                   </button>
