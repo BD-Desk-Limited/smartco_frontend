@@ -1,6 +1,7 @@
 import { CompanyDataProvider } from '@/contexts/companyDataContext';
 import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
+import { BulkMaterialUploadProvider } from '@/contexts/bulkMaterialUploadContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -36,7 +37,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
-          <CompanyDataProvider>{children}</CompanyDataProvider>
+          <BulkMaterialUploadProvider>
+            <CompanyDataProvider>
+              {children}
+            </CompanyDataProvider>
+          </BulkMaterialUploadProvider>
         </AuthProvider>
       </body>
     </html>

@@ -55,4 +55,17 @@ export function verifyPassword(password) {
           ? 'Password must contain at least one special character.'
           : 'Password is valid.',
   };
-}
+};
+
+//function to verify input text
+export function verifyInputText(inputText) {
+  const verified = /^[a-zA-Z0-9\s.,'-_]*$/.test(inputText);
+  if (verified) {
+    return { passed: true, message: 'Input text is valid.' };
+  } else {
+    return { passed: false, message: 'Invalid character in text input.' };
+  }
+};
+
+
+

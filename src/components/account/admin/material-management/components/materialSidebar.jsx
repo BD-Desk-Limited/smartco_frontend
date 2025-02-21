@@ -2,8 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const MaterialSidebar = ({ selectedSubMenu }) => {
-  const [isOpen, setIsOpen] = React.useState(true);
+const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
 
   const submenus = [
     {
