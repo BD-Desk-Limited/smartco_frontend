@@ -1,7 +1,8 @@
+import ViewMaterialPage from '@/components/account/admin/material-management/ViewMaterialsPage';
 import React from 'react';
 
 const page = () => {
-  return <div>View materials page</div>;
+  return <ViewMaterialPage/>;
 };
 
 export default page;

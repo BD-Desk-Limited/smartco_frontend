@@ -3,14 +3,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-const BulkMaterialUploadModal = ({setBulkUpload, closeModal, setOpenSidebar}) => {
+const BulkMaterialUploadModal = () => {
   const Router = useRouter();
-
-  const handleCloseModal = () => {
-    setBulkUpload(true);
-    closeModal();
-    setOpenSidebar(false);
-  };
 
   return (
     <div className="bg-text-white rounded-md flex flex-col justify-center items-center w-[35vw]">
@@ -28,7 +22,7 @@ const BulkMaterialUploadModal = ({setBulkUpload, closeModal, setOpenSidebar}) =>
         </p>
         <div className="w-full flex flex-row justify-center gap-5 text-sm">
           <a
-            onClick={handleCloseModal}
+            onClick={() => Router.push('/pages/account/admin/manage-materials/bulk-material-upload')}
             href="/documents/smartco_materials_upload_sheet.xlsx"
             download
             className="bg-brand-blue text-text-white rounded-md px-5 py-2 flex flex-row justify-center items-center gap-2 hover:bg-blue-shadow5"
@@ -42,7 +36,7 @@ const BulkMaterialUploadModal = ({setBulkUpload, closeModal, setOpenSidebar}) =>
             Download Template
           </a>
           <button
-            onClick={handleCloseModal}
+            onClick={() => Router.push('/pages/account/admin/manage-materials/bulk-material-upload')}
             className="border border-brand-blue text-brand-blue rounded-md px-5 py-2 hover:bg-brand-blue hover:text-text-white"
           >
             Already have a template

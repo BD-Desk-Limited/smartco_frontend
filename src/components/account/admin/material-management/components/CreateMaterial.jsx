@@ -13,11 +13,10 @@ import {
 import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import BulkMaterialUploadModal from './BulkMaterialUploadModal';
-import BulkMaterialsUpload from './BulkMaterialsUpload';
 import { verifyInputText } from '@/utilities/verifyInput';
 import SuccessModal from '@/components/account/successModal';
 
-const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
+const CreateMaterial = ({ pageDescription }) => {
   const [form, setForm] = React.useState({
     materialName: '',
     materialType: '',
@@ -189,7 +188,6 @@ const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
         unitOfMeasurement: form.materialUnit,
         description: form.materialDescription,
       };
-      console.log('form:', body);
 
       const response = await createMaterial(body);
       if(response.data) {
@@ -224,7 +222,7 @@ const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
         <Header />
       </div>
       <div>
-        <SubHeader title={bulkUpload? 'Bulk Upload Material':'Material Onboarding'} />
+        <SubHeader title={'Material Onboarding'} />
       </div>
       <div className="flex flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
@@ -235,7 +233,6 @@ const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
           />
         </div>
           <div className="flex flex-col w-full h-full">
-          {bulkUpload? <BulkMaterialsUpload /> : (
             <div className="bg-white p-5 mx-5 my-2 rounded-md h-full">
               <h1 className="font-bold">Material Onboarding</h1>
               <span className="text-sm text-text-gray font-thin">
@@ -467,11 +464,8 @@ const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
                 </button>
               </div>
             </div>
-          )}
             <PageDescription 
-              pageDescription={
-                bulkUpload? pageDescriptionBulk : pageDescriptionSingle
-              } 
+              pageDescription={pageDescription} 
             />
           </div>
       </div>
@@ -484,11 +478,7 @@ const CreateMaterial = ({ pageDescriptionSingle, pageDescriptionBulk }) => {
           >
             X
           </div>
-          <BulkMaterialUploadModal 
-            closeModal={() => setOpenModal(false)}
-            setBulkUpload={setBulkUpload} 
-            setOpenSidebar={setOpenSidebar}
-          />
+          <BulkMaterialUploadModal />
         </div>
       )}
       {success && (

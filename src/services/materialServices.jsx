@@ -160,7 +160,7 @@ export const getMaterials = async () => {
 
     if (response.ok) {
       const responseData = await response.json();
-      return { data: responseData };
+      return { data: responseData.data };
     } else {
       const errorData = await response.json();
       const errorMessage = errorData.message;
@@ -171,6 +171,34 @@ export const getMaterials = async () => {
     return { error: 'error getting materials, please try again' };
   }
 };
+
+//get material by id
+export const getMaterialById = async (id) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/materials/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error getting material, please try again' };
+  }
+};  
 
 //update material
 export const updateMaterial = async (id, body) => {
@@ -201,17 +229,18 @@ export const updateMaterial = async (id, body) => {
   }
 };
 
-//delete material (only allowed if stock is 0)
-export const deleteMaterial = async (id) => {
+//delete materials (only allowed if stock is 0)
+export const deleteMaterials = async (material_ids) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/materials/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/materials`,
       {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ material_ids }),
       }
     );
 

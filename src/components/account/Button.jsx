@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Button = ({ type, loading, loadingText, text, onClick }) => {
+const Button = ({ type, loading, loadingText, text, onClick, buttonStyle }) => {
   return (
     <button
       onClick={onClick}
@@ -8,7 +8,7 @@ const Button = ({ type, loading, loadingText, text, onClick }) => {
       disabled={loading}
       className={`h-10 bg-brand-blue rounded-md text-md text-white px-2 ${
         loading ? 'cursor-not-allowed' : 'hover:bg-blue-shadow1'
-      } items-center justify-center`}
+      } items-center justify-center ${buttonStyle}`}
     >
       {loading ? (
         <>

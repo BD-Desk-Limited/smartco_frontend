@@ -33,7 +33,7 @@ const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
         <motion.div
           initial={{ x: '-10%', y: '-10%' }}
           animate={{ x: 0, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
           className="bg-brand-green h-[80vh] w-full flex flex-col rounded-md m-2 py-1 text-text-white gap-3"
         >
           <p className="cursor-pointer w-full justify-end flex px-3">
