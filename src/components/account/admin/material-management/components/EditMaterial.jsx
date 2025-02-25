@@ -1,25 +1,25 @@
 import PageDescription from '@/components/account/PageDescription';
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/account/Header';
 import SubHeader from './SubHeader';
 import MaterialSidebar from './materialSidebar';
 import { createMaterialCategories, createMaterialUnits, getMaterialCategories, getMaterialUnits, updateMaterial, } from '@/services/materialServices';
 import Button from '@/components/account/Button';
+import ErrorInterface from '@/components/account/errorInterface';
+import SuccessModal from '@/components/account/SuccessModal';
+import { verifyInputText } from '@/utilities/verifyInput';
 
 const EditMaterial = ({ materialData, pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
-  const [selectedSubMenu, setSelectedSubMenu] = React.useState({
+
+  const selectedSubMenu = {
     name: 'View All Materials',
     link: '/view-materials',
-  });
-  const [updatedMaterialData, setUpdatedMaterialData] = React.useState({
-    name: materialData.name,
-    description: materialData.description,
-    materialType: materialData.materialType,
-    category: materialData.category,
-    unitOfMeasurement: materialData.unitOfMeasurement,
-  });
+  };
+
+  const [updatedMaterialData, setUpdatedMaterialData] = React.useState({});
   const [allCategories, setAllCategories] = React.useState([]);
   const [allUnits, setAllUnits] = React.useState([]);
   const [cantFindUnit, setCantFindUnit] = React.useState(false);
@@ -28,12 +28,19 @@ const EditMaterial = ({ materialData, pageDescription }) => {
   const [createdNewCategory, setCreatedNewCategory] = React.useState(false);
   const [createdNewUnit, setCreatedNewUnit] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
   const [newUnit, setNewUnit] = React.useState('');
-  const [newCategoryId, setNewCategoryId] = React.useState(null);
-  const [newUnitId, setNewUnitId] = React.useState(null);
   const [newMaterialImage, setNewMaterialImage] = React.useState(null);
   const [uploadNewImage, setUploadNewImage] = React.useState(false);
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+  const router = useRouter();
+
+
   const allTypes = ['raw-material', 'packaging-material'];
+
+  React.useEffect(() => {
+    setUpdatedMaterialData(materialData);
+  }, [materialData]);
 
   React.useEffect(() => {
     // Fetch all categories
@@ -66,14 +73,21 @@ const EditMaterial = ({ materialData, pageDescription }) => {
   }, []);
 
   const handleCreateCategory = async () => {
+    
+    const verifyInput = verifyInputText(newCategory);
+    if (!verifyInput.passed) {
+      setError(verifyInput.message);
+      return;
+    };
+    
     setLoading(true);
     // Create new category
     try {
       const response = await createMaterialCategories({ name: newCategory });
       if (response.data) {
         setCreatedNewCategory(true);
-        setNewCategoryId(response?.data?.category?._id);
         setAllCategories([...allCategories, response.data.category]);
+        setUpdatedMaterialData({ ...updatedMaterialData, category: response.data.category });
       };
     } catch (err) {
       console.error(err)
@@ -82,14 +96,20 @@ const EditMaterial = ({ materialData, pageDescription }) => {
   };
 
   const handleCreateUnit = async () => {
+    const verifyInput = verifyInputText(newUnit);
+    if (!verifyInput.passed) {
+      setError(verifyInput.message);
+      return;
+    };
+    
     setLoading(true);
     // Create new unit
     try {
       const response = await createMaterialUnits({ name: newUnit });
       if (response.data) {
         setCreatedNewUnit(true);
-        setNewUnitId(response?.data?.unit?._id);
         setAllUnits([...allUnits, response.data.unit]);
+        setUpdatedMaterialData({ ...updatedMaterialData, unitOfMeasurement: response.data.unit });
       };
     } catch (err) {
       console.error(err)
@@ -102,25 +122,64 @@ const EditMaterial = ({ materialData, pageDescription }) => {
     setNewMaterialImage(file);
   };
 
-  const handleUpdateMaterial = async() => {
+  const handleUpdateMaterial = async () => {
+
+    // Validate form fields
+    let inputValidationErrors = [];
+    const handleValidation = (input, message) => {
+      if (!input) {
+        inputValidationErrors.push(message);
+      }else{
+        const verifyInput = verifyInputText(input);
+        if (!verifyInput.passed) {
+          inputValidationErrors.push(verifyInput.message+ ' ' + message);
+        };
+      }
+    };
+
+    handleValidation(updatedMaterialData.name, 'Please enter a valid material name');
+    handleValidation(updatedMaterialData.description, 'Please enter a valid material description');
+    handleValidation(updatedMaterialData.materialType, 'Please select a valid material type');
+    handleValidation(updatedMaterialData.category.name, 'Please select a valid material category');
+    handleValidation(updatedMaterialData.unitOfMeasurement.name, 'Please select a valid unit of measurement');
+    if (inputValidationErrors.length > 0) {
+      setError(inputValidationErrors[0]);
+      return;
+    };
+
+    if (materialData === updatedMaterialData && !newMaterialImage) {
+      setError('You have not made any changes to the material');
+      return;
+    };
+
     // Update material details
-    const updatedMaterial = {
+    const body = {
       name: updatedMaterialData.name,
       description: updatedMaterialData.description,
       materialType: updatedMaterialData.materialType,
-      category: createdNewCategory ? newCategoryId : updatedMaterialData.category._id,
-      unitOfMeasurement: createdNewUnit ? newUnitId : updatedMaterialData.unitOfMeasurement._id,
+      category: updatedMaterialData.category._id,
+      unitOfMeasurement: updatedMaterialData.unitOfMeasurement._id,
       imageUrl: materialData?.imageURL || null,
     };
-
-    // Upload image
-    const formData = new FormData();
-    formData.append('file', newMaterialImage);
-    formData.append('data', JSON.stringify(updatedMaterial));
-    console.log(formData);
-
+  
     // Call API to update material
-    
+    setLoading(true);
+    try {
+      const response = await updateMaterial(materialData._id, body, newMaterialImage);
+      if (response.data) {
+        console.log('Material updated successfully', response.data);
+        setAllCategories([...allCategories, response.data.category]);
+        setAllUnits([...allUnits, response.data.unit]);
+        setShowSuccessModal(true);
+      }else{
+        setError(response.error || 'Error updating material, please try again');
+      };
+    } catch (err) {
+      console.error('Error updating material', err);
+      setError('Error updating material, please try again');
+    }finally{
+      setLoading(false);
+    };
   };
 
   return (
@@ -150,8 +209,9 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                     <label className='text-sm'>Material Name</label>
                     <input
                       type='text'
-                      defaultValue={materialData.name}
-                      className='border border-gray-border rounded-md w-full h-9 p-1'
+                      defaultValue={updatedMaterialData.name}
+                      onChange={(e) => setUpdatedMaterialData({ ...updatedMaterialData, name: e.target.value })}
+                      className='border border-gray-border rounded-md w-full h-9 p-1 focus:outline-none focus:border-gray-shadow2'
                     />
                   </div>
                   <div className='flex flex-col gap-0.5'>
@@ -159,7 +219,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                     <select
                       value={updatedMaterialData.materialType}
                       onChange={(e) => setUpdatedMaterialData({ ...updatedMaterialData, materialType: e.target.value })}
-                      className='border border-gray-border rounded-md w-full h-9'
+                      className='border border-gray-border rounded-md w-full h-9 focus:outline-none focus:border-gray-shadow2'
                     >
                       {allTypes.map((type, index) => (
                         <option key={index} value={type}>{type}</option>
@@ -181,7 +241,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                               type='text'
                               placeholder='Enter new category'
                               onChange={(e) => setNewCategory(e.target.value)}
-                              className='border border-gray-border rounded-md w-full h-9 p-1 text-text-gray'
+                              className='border border-gray-border rounded-md w-full h-9 p-1 text-text-gray focus:outline-none focus:border-gray-shadow2'
                             />
                             <Button
                               text={'create category'}
@@ -201,12 +261,15 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                         <div className='flex flex-col gap-0.5'>
                           <label className='text-sm'>Material Category</label>
                           <select
-                            value={updatedMaterialData.category}
-                            onChange={(e) => setUpdatedMaterialData({ ...updatedMaterialData, category: e.target.value })}
-                            className='border border-gray-border rounded-md w-full h-9'
+                            value={updatedMaterialData.category?._id}
+                            onChange={(e) => {
+                              const selectedCategory = allCategories.find(category => category._id === e.target.value);
+                              setUpdatedMaterialData({ ...updatedMaterialData, category: selectedCategory });
+                            }}
+                            className='border border-gray-border rounded-md w-full h-9 focus:outline-none focus:border-gray-shadow2'
                           >
                             {allCategories?.map((category, index) => (
-                              <option key={index} value={category}>{category.name}</option>
+                              <option key={index} value={category?._id}>{category?.name}</option>
                             ))}
                           </select>
                           <span onClick={() => setCantFindCategory(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
@@ -222,9 +285,9 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                     <label className='text-sm'>Material Description</label>
                     <textarea
                       type='text'
-                      defaultValue={materialData.description}
+                      value={updatedMaterialData.description}
                       onChange={(e) => setUpdatedMaterialData({ ...updatedMaterialData, description: e.target.value })}
-                      className='border border-gray-border rounded-md w-full h-32 p-1'
+                      className='border border-gray-border rounded-md w-full h-32 p-1 focus:outline-none focus:border-gray-shadow2'
                     />
                   </div>
                   {createdNewUnit?
@@ -241,7 +304,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                             type='text'
                             placeholder='Enter new unit'
                             onChange={(e) => setNewUnit(e.target.value)}
-                            className='border border-gray-border rounded-md w-full h-9 p-1 text-text-gray'
+                            className='border border-gray-border rounded-md w-full h-9 p-1 text-text-gray focus:outline-none focus:border-gray-shadow2'
                           />
                           <Button
                             text={'create unit'}
@@ -261,12 +324,15 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                       <div className='flex flex-col gap-0.5'>
                         <label className='text-sm'>Unit of Measurement</label>
                         <select
-                          value={updatedMaterialData.unitOfMeasurement}
-                          onChange={(e) => setUpdatedMaterialData({ ...updatedMaterialData, unitOfMeasurement: e.target.value })}
-                          className='border border-gray-border rounded-md h-9'
+                          value={updatedMaterialData.unitOfMeasuremen?._id}
+                          onChange={(e) => {
+                            const selectedUnit = allUnits.find(unit => unit._id === e.target.value);
+                            setUpdatedMaterialData({ ...updatedMaterialData, unitOfMeasurement: selectedUnit });
+                          }}  
+                          className='border border-gray-border rounded-md h-9 focus:outline-none focus:border-gray-shadow2'
                         >
                           {allUnits?.map((unit, index) => (
-                            <option key={index} value={unit}>{unit.name}</option>
+                            <option key={index} value={unit?._id}>{unit?.name}</option>
                           ))}
                         </select>
                         <span onClick={() => setCantFindUnit(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
@@ -284,10 +350,10 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                       {newMaterialImage&& 
                         <Image 
                           src={URL.createObjectURL(newMaterialImage)} 
-                          alt='Material Image' 
-                          width={180} 
-                          height={180} 
-                          className='rounded-[100%] px-5' 
+                          alt='Material Image'
+                          height={150} 
+                          width={150}
+                          className='rounded-[100%] h-[150px] w-[150px]' 
                         />
                       }
                       
@@ -295,7 +361,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                     <input
                       type='file'
                       onChange={handleImageUpload}
-                      className='border border-gray-border rounded-md w-full h-9 p-1 cursor-pointer'
+                      className='border border-gray-border rounded-md w-full h-9 p-1 cursor-pointer focus:outline-none focus:border-gray-shadow2'
                     />
                     <span 
                       onClick={() => {setUploadNewImage(false); setNewMaterialImage(null)}}
@@ -306,11 +372,11 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                   </div>:
                   <div className='flex flex-col justify-center items-center w-full gap-1'>
                     <Image 
-                      src={materialData.image || '/assets/edit-material.png'}
+                      src={materialData.imageURL || '/assets/edit-material.png'}
                       alt={materialData.name || 'Material Image'}
                       width={200}
                       height={200}
-                      className='rounded-[100%]'
+                      className='rounded-[100%] h-[200px] w-[200px]'
                     />
                     <span 
                       onClick={() => setUploadNewImage(true)}
@@ -322,24 +388,45 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                 }
               </div>
             </div>
-            <div className='flex flex-row justify-center w-full gap-20 my-20 items-center'>
+            <div className='w-full mt-10'>
+              {error && <ErrorInterface error={error}/>}
+            </div>
+            <div className='flex flex-row justify-center w-full gap-20 my-10 items-center'>
               <Button
                 text={'Cancel'}
-                buttonStyle={'text-sm px-5 border border-brand-blue bg-text-white text-blue-700  rounded-md'}
-                onClick={() => {setUpdatedMaterialData(materialData);}}
+                buttonStyle={'text-sm px-5 border border-brand-blue  rounded-md'}
+                onClick={() => {
+                  setUpdatedMaterialData(materialData); 
+                  setNewMaterialImage(null);
+                  router.push('/pages/account/admin/manage-materials/view-materials');
+                }}
               />
               <Button
                 text={'Update Material'}
                 buttonStyle={'text-sm p-2'} 
                 onClick={handleUpdateMaterial}
+                loading={loading}
+                loadingText={'Updating...'}
               />
             </div>
           </div>
           <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
+      {showSuccessModal && 
+      <div className='inset-0 fixed z-70 flex justify-center items-center bg-black bg-opacity-50'>
+        <SuccessModal 
+          title={'Material Updated'}
+          message={'success!!!'}
+          subText={'Material has been updated successfully'}
+          buttonText={'close'}
+          buttonStyle={'hover:bg-blue-shadow2 p-2 bg-brand-blue text-white rounded-md'}
+          onClose={() => router.push('/pages/account/admin/manage-materials/view-materials')}
+        />
+      </div>
+      }
     </div>
-  )
+  );
 }
 
 export default EditMaterial;

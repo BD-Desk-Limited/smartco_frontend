@@ -201,17 +201,23 @@ export const getMaterialById = async (id) => {
 };  
 
 //update material
-export const updateMaterial = async (id, body) => {
+export const updateMaterial = async (id, body, file) => {
   try {
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(body));
+
+    if (file) {
+      formData.append('file', file);
+    }
+    
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${id}`,
       {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: formData,
       }
     );
 
