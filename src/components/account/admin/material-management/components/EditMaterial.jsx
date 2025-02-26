@@ -273,7 +273,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                             ))}
                           </select>
                           <span onClick={() => setCantFindCategory(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                            Can't find category?
+                            Can`&apos;`t find category?
                           </span>
                         </div>
                       }
@@ -324,7 +324,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                       <div className='flex flex-col gap-0.5'>
                         <label className='text-sm'>Unit of Measurement</label>
                         <select
-                          value={updatedMaterialData.unitOfMeasuremen?._id}
+                          value={updatedMaterialData.unitOfMeasurement?._id}
                           onChange={(e) => {
                             const selectedUnit = allUnits.find(unit => unit._id === e.target.value);
                             setUpdatedMaterialData({ ...updatedMaterialData, unitOfMeasurement: selectedUnit });
@@ -336,7 +336,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                           ))}
                         </select>
                         <span onClick={() => setCantFindUnit(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                          Can't find unit?
+                          Can`&apos;`t find unit?
                         </span>
                       </div>  
                     }</>

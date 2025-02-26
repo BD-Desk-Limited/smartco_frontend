@@ -1,13 +1,16 @@
 import PageDescription from '@/components/account/PageDescription';
 import React from 'react';
+import {useRouter} from 'next/navigation';
 import Header from '@/components/account/Header';
 import MaterialSidebar from './materialSidebar';
 import SubHeader from './SubHeader';
 import Image from 'next/image';
+import Button from '@/components/account/Button';
 
 const ViewMaterialDetails = ({materialData, pageDescription}) => {
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
+  const Router = useRouter();
 
   const selectedSubMenu = {
     name: 'View All Materials',
@@ -45,7 +48,7 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
               />
             </div>
             <div className='flex flex-col gap-2 w-full'>
-              <h1 className='font-bold text-lg'>{materialData.name}</h1>
+              <h1 className='font-bold text-xl'>{materialData.name}</h1>
               <p className='h-28 overflow-y-auto scrollbar-thin'>{materialData.description}</p>
               <p>Material Type: {materialData.materialType}</p>
               <p>Material Category: {materialData.category?.name}</p>
@@ -82,6 +85,17 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
                   </div>:
                   <span className='p-10 font-semibold text-error'>No stock available</span>}
                 </span>
+              </div>
+              <div className='flex flex-row gap-10 py-10'>
+                <Button 
+                  text={'Edit Material'}
+                  onClick={()=>Router.push(`/pages/account/admin/manage-materials/edit-material?id=${materialData._id}`)}
+                />
+                <Button 
+                  text={'Exit'}
+                  onClick={()=>Router.push('/pages/account/admin/manage-materials/view-materials')}
+                  buttonStyle={'bg-brand-gray px-5'}
+                />
               </div>
             </div>
           </div>

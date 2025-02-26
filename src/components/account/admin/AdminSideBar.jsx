@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 
-const SideBar = ({ selectedMenu }) => {
+const AdminSideBar = ({ selectedMenu }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
@@ -186,4 +186,4 @@ const SideBar = ({ selectedMenu }) => {
   );
 };
 
-export default SideBar;
+export default AdminSideBar;

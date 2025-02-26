@@ -14,7 +14,7 @@ import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import BulkMaterialUploadModal from './BulkMaterialUploadModal';
 import { verifyInputText } from '@/utilities/verifyInput';
-import SuccessModal from '@/components/account/successModal';
+import SuccessModal from '@/components/account/SuccessModal';
 
 const CreateMaterial = ({ pageDescription }) => {
   const [form, setForm] = React.useState({

@@ -36,13 +36,13 @@ const ViewMaterialDetailsPage = () => {
                 }
                 fetchMaterialData();
             };
-        }, [id]);
+        }, [id, router]);
 
     React.useEffect(() => {
         if (!id) {
             router.push('/pages/account/admin/manage-materials/view-materials');
         };
-    }, []);
+    }, [id, router]);
 
   return (
   <div>
