@@ -67,12 +67,12 @@ const LoginForm = () => {
             response?.data?.trustedDevice &&
             response?.data?.user?.role === 'admin'
           ) {
-            router.push('/pages/dashboard/admin');
+            router.push('/pages/account/admin');
           } else if (
             response?.data?.trustedDevice &&
             response?.data?.user?.role === 'manager'
           ) {
-            router.push('/pages/dashboard/manager');
+            router.push('/pages/account/manager');
           }
         }
       }
@@ -157,10 +157,11 @@ const LoginForm = () => {
             <button
               type="submit"
               disabled={!form.email || !form.password || loading}
-              className={`h-10 bg-brand-blue rounded-md text-lg text-white ${loading || !form.email || !form.password
-                ? 'cursor-not-allowed'
-                : 'hover:bg-blue-shadow1'
-                } items-center justify-center`}
+              className={`h-10 bg-brand-blue rounded-md text-lg text-white ${
+                loading || !form.email || !form.password
+                  ? 'cursor-not-allowed'
+                  : 'hover:bg-blue-shadow1'
+              } items-center justify-center`}
             >
               {loading ? (
                 <>

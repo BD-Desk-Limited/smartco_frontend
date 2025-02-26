@@ -36,4 +36,3 @@ export const CompanyDataProvider = ({ children }) => {
 export const useCompanyData = () => {
   return useContext(CompanyDataContext);
 };
-

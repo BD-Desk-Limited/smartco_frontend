@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -8,67 +8,69 @@ import { useAuth } from '@/contexts/authContext';
 import ErrorModal from '../commons/ErrorModal';
 
 const LoginNew = () => {
-    const [form, setForm] = useState({ staffId: '', pin: '' });
-    const [showPin, setShowPin] = useState(false);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const { setUser } = useAuth();
-    const { companyData } = useCompanyData();
-    const router = useRouter();
+  const [form, setForm] = useState({ staffId: '', pin: '' });
+  const [showPin, setShowPin] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { setUser } = useAuth();
+  const { companyData } = useCompanyData();
+  const router = useRouter();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError('');
-        const body = {
-            pin: form.pin,
-            staffId: form?.staffId,
-            deviceAuthorization: companyData?.authorizationToken,
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    const body = {
+      pin: form.pin,
+      staffId: form?.staffId,
+      deviceAuthorization: companyData?.authorizationToken,
+    };
+
+    if (form.pin.length < 4) {
+      setError('Pin must be at least 4 digits');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await salesPointLoginService(body);
+      if (response.error) {
+        setError(response?.error);
+        return;
+      }
+
+      if (response?.data) {
+        setUser(response?.data?.user);
+        localStorage.setItem('token', response?.data?.token);
+
+        //update sellers info in local storage
+        const sellersInfo = JSON.parse(localStorage.getItem('sellersInfo'));
+
+        //add new seller to the list
+        const newSeller = {
+          staffId: form.staffId,
+          imageURL: response?.data?.user?.profilePictureUrl,
+          name: response?.data?.user?.fullName,
+          companyId: companyData?.id,
         };
+        //check if the seller already exists
+        const sellerIndex = sellersInfo.findIndex(
+          (seller) => seller.staffId === form.staffId
+        );
+        if (sellerIndex === -1) {
+          sellersInfo.push(newSeller);
+        } else {
+          sellersInfo[sellerIndex] = newSeller;
+        }
+        localStorage.setItem('sellersInfo', JSON.stringify(sellersInfo));
 
-        if(form.pin.length < 4){
-            setError('Pin must be at least 4 digits');
-            return;
-        };
-
-        try{
-            setLoading(true);
-            const response = await salesPointLoginService(body);
-            if(response.error){
-                setError(response?.error);
-                return;
-            };
-
-            if(response?.data){
-                setUser(response?.data?.user);
-                localStorage.setItem('token', response?.data?.token);
-
-                //update sellers info in local storage
-                const sellersInfo = JSON.parse(localStorage.getItem('sellersInfo'));
-                
-                //add new seller to the list
-                const newSeller = {
-                    staffId: form.staffId,
-                    imageURL: response?.data?.user?.profilePictureUrl,
-                    name: response?.data?.user?.fullName,
-                    companyId: companyData?.id,
-                };
-                //check if the seller already exists
-                const sellerIndex = sellersInfo.findIndex(seller => seller.staffId === form.staffId);
-                if(sellerIndex === -1){
-                    sellersInfo.push(newSeller);
-                }else{
-                    sellersInfo[sellerIndex] = newSeller;
-                };
-                localStorage.setItem('sellersInfo', JSON.stringify(sellersInfo));
-
-                router.push('/pages/dashboard/sales-point');
-            }
-        }catch(error){
-            setError(error);
-        }finally{
-            setLoading(false);
-        };
-      };
+        router.push('/pages/dashboard/sales-point');
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full items-center justify-center flex flex-col gap-8">
@@ -85,7 +87,7 @@ const LoginNew = () => {
             placeholder="Staff ID"
             value={form.staffId}
             onChange={(e) => setForm({ ...form, staffId: e.target.value })}
-            className='w-full border rounded-md px-4 h-10 items-center shadow-sm focus:outline-none text-base border-brand-green'
+            className="w-full border rounded-md px-4 h-10 items-center shadow-sm focus:outline-none text-base border-brand-green"
           />
         </div>
         <div className="flex flex-col gap-2 w-full">
@@ -99,9 +101,7 @@ const LoginNew = () => {
               type={showPin ? 'text' : 'password'}
               placeholder="********"
               value={form.pin}
-              onChange={(e) =>
-                setForm({ ...form, pin: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, pin: e.target.value })}
               className={`w-full h-full rounded-md items-center focus:outline-none text-base`}
             />
             <Image
@@ -121,10 +121,11 @@ const LoginNew = () => {
         <button
           type="submit"
           disabled={!form.staffId || !form.pin || loading}
-          className={`h-10 bg-brand-green rounded-md text-lg text-white ${loading || !form.pin || !form.staffId
-            ? 'cursor-not-allowed'
-            : 'hover:bg-green-shadow3'
-            } items-center justify-center`}
+          className={`h-10 bg-brand-green rounded-md text-lg text-white ${
+            loading || !form.pin || !form.staffId
+              ? 'cursor-not-allowed'
+              : 'hover:bg-green-shadow3'
+          } items-center justify-center`}
         >
           {loading ? (
             <>
@@ -136,18 +137,18 @@ const LoginNew = () => {
           )}
         </button>
       </form>
-      {error && 
-        <div className='inset-0 fixed flex flex-col items-center justify-center bg-black bg-opacity-60 z-50'>
-            <ErrorModal 
-                message={error} 
-                title='Error !!!' 
-                buttonStyle='bg-brand-green' 
-                onClose={()=>setError('')}
-            />
+      {error && (
+        <div className="inset-0 fixed flex flex-col items-center justify-center bg-black bg-opacity-60 z-50">
+          <ErrorModal
+            message={error}
+            title="Error !!!"
+            buttonStyle="bg-brand-green"
+            onClose={() => setError('')}
+          />
         </div>
-      }
+      )}
     </div>
   );
-}
+};
 
 export default LoginNew;
