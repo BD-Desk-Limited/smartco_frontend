@@ -20,8 +20,7 @@ export const loginService = async (form) => {
       return { error: errorMessage };
     }
   } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error logging in, please try again' };
+    return { error: 'Internal server error, please try again or contact support' };
   }
 };
 

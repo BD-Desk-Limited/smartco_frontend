@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import AdminSideBar from '../AdminSideBar';
-import CreateGroupedMaterial from './components/CreateGroupedMaterial';
+import CreateGroupedMaterial from './components/groupedMaterials/CreateGroupedMaterial';
 
 const CreateGroupedMaterialPage = () => {
     const [selectedMenu, setSelectedMenu] = React.useState({
@@ -24,7 +24,7 @@ const CreateGroupedMaterialPage = () => {
           />
         </div>
         <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
-          <CreateGroupedMaterial 
+          <CreateGroupedMaterial
             pageDescription={pageDescription} 
           />
         </div>

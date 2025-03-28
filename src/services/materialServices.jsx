@@ -132,7 +132,8 @@ export const createMaterial = async (body) => {
 
     if (response.ok) {
       const responseData = await response.json();
-      return { data: responseData };
+      console.log('responseData', responseData);
+      return { data: responseData.data };
     } else {
       const errorData = await response.json();
       const errorMessage = errorData.message;
@@ -144,7 +145,7 @@ export const createMaterial = async (body) => {
   }
 };
 
-//get materials
+//get materials (non-grouped and not deleted)
 export const getMaterials = async () => {
   try {
     const response = await fetch(
@@ -199,6 +200,34 @@ export const getMaterialById = async (id) => {
     return { error: 'error getting material, please try again' };
   }
 };  
+
+//get materials (grouped and ungrouped)
+export const getAllMaterials = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/materials/grouped-and-ungrouped`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error getting materials, please try again' };
+  }
+};
 
 //update material
 export const updateMaterial = async (id, body, file) => {

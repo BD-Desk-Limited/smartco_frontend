@@ -36,7 +36,6 @@ const CreateMaterial = ({ pageDescription }) => {
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [openModal, setOpenModal] = React.useState(false);
-  const [bulkUpload, setBulkUpload] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
   const selectedSubMenu = {
@@ -204,7 +203,7 @@ const CreateMaterial = ({ pageDescription }) => {
         setCategoryCreated(false);
         setUnitCreated(false);
       } else {
-        setError(response.error);
+        setError(response.error || 'error creating material, please try again!!!');
       };
 
     } catch (error) {

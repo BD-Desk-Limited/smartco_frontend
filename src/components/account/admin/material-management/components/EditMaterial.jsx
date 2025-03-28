@@ -273,7 +273,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                             ))}
                           </select>
                           <span onClick={() => setCantFindCategory(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                            Can`&apos;`t find category?
+                            Can&apos;t find the right category?
                           </span>
                         </div>
                       }
@@ -336,7 +336,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                           ))}
                         </select>
                         <span onClick={() => setCantFindUnit(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                          Can`&apos;`t find unit?
+                          Can&apos;t find the right unit?
                         </span>
                       </div>  
                     }</>
