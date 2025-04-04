@@ -1,23 +1,39 @@
 import React from 'react';
 import Image from 'next/image';
 import Button from '@/components/account/Button';
+import ErrorInterface from '@/components/account/errorInterface';
 
-const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials}) => {
+const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials, setShowReview}) => {
+
+  const [previewError, setPreviewError] = React.useState(null);
+
+  const handleSave = () => {
+    setPreviewError(null);
+    if(!formData?.name || !formData?.description || !formData?.category || !formData?.unit) {
+      setPreviewError(`please fill in all fields: ${
+        !formData?.name ? 'name' :
+        !formData?.description ? 'description' :  
+        !formData?.category ? 'category' :
+        !formData?.unit ? 'unit' : ''
+      } is not filled`);
+      return;
+    };
+
+    if(formData?.components?.length < 2) {
+      setPreviewError('Please select at least two component materials to create a grouped material');
+      return;
+    };
+    setShowReview(true);
+  };
 
   const handleDeleteMaterial = (id) => {
     const newComponents = formData.components.filter((material) => material.id !== id);
     setFormData({...formData, components: newComponents});
   };
 
-  const handleCreateGroupedMaterial = () => {
-
-
-    // This function is not implemented in this snippet
-    console.log('Create grouped material');
-  };
 
   return (
-    <div className='bg-white w-[30%] p-5 rounded-md m-5 flex flex-col gap-5 text-text-gray'>
+    <div className='bg-white w-[40%] p-5 rounded-md m-5 flex flex-col gap-5 text-text-gray border border-brand-gray'>
       <h2 className='font-semibold text-md'>Grouped Material Summary</h2>
       <div className='flex flex-col gap-1 text-sm'>
         <p className='font-bold text-md'><span>{formData?.name}</span></p>
@@ -67,17 +83,21 @@ const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials}) =>
         </table>
       </div>
 
+      {previewError && (
+        <ErrorInterface error={previewError}/>
+      )}
+
       {
         formData?.components?.length > 1 && (
           <div className='flex flex-row justify-center gap-2'>
             <Button
-              onClick={handleCreateGroupedMaterial}
-              text={'Save'}
+              onClick={handleSave}
+              text={'Submit'}
               buttonStyle={'bg-brand-blue text-white px-3 py-1 rounded-md'}
             />
             <Button
               onClick={() => setFormData({...formData, components: []})}
-              text={'Cancel'}
+              text={'Clear'}
               buttonStyle={'bg-red-500 text-white px-3 py-1 rounded-md'}
             />
           </div>

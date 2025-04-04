@@ -198,7 +198,8 @@ const ViewMaterial = ({pageDescription}) => {
                                 className="focus:outline-none cursor-pointer"
                             >
                                 <option value={''}>All Categories</option>
-                                {allCategories?.map((category) => (
+                                {allCategories.length>0 && 
+                                    allCategories?.map((category, index) => (
                                     <option key={category}>{category}</option>
                                 ))}
                             </select>

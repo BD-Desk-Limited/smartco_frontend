@@ -32,7 +32,6 @@ const BulkUploadReview = ({pageDescription}) => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log('submitting', bulkMaterialData);
 
         try{
             setLoading(true);

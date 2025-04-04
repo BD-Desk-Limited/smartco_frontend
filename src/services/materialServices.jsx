@@ -133,7 +133,7 @@ export const createMaterial = async (body) => {
     if (response.ok) {
       const responseData = await response.json();
       console.log('responseData', responseData);
-      return { data: responseData.data };
+      return { data: responseData };
     } else {
       const errorData = await response.json();
       const errorMessage = errorData.message;

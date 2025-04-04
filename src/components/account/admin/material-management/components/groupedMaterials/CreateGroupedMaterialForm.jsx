@@ -2,7 +2,7 @@ import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import React from 'react'
 
-const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCategories, groupedMaterials, allUnits}) => {
+const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCategories, allUnits}) => {
   const [newComponentMaterial, setNewComponentMaterial] = React.useState('');
   const [newComponentQuantity, setNewComponentQuantity] = React.useState('');
   const [cantFindCategory, setCantFindCategory] = React.useState(false);
@@ -24,7 +24,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
     const component = {
       id: newComponentMaterial,
       quantity: newComponentQuantity,
-      isGrouped: allMaterials.find(material => material._id === newComponentMaterial)?.isGrouped, 
+      isGroup: allMaterials.find(material => material._id === newComponentMaterial)?.isGroup, 
     };
 
     setFormData({
@@ -182,6 +182,9 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
 
           <div className='flex items-center justify-center bg-gray-shadow9 w-full p-3 rounded-md'>
             <div className='flex flex-col items-center justify-center gap-2 w-full'>
+              <h2 className='text-text-black text-md text-center'>
+                select component materials for your new grouped material. After you have finished, click save on the summary panel on the right to create the new material. 
+              </h2>
               <div className='flex flex-row gap-3 items-center'>
                 <div>
                   <label className='text-text-black text-sm'>Add component Materials</label>
@@ -234,7 +237,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
           </div>
         </div>
       </div>
-    </form>
+    </form> 
   )
 }
 

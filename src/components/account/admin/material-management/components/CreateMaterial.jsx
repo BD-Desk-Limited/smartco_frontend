@@ -188,8 +188,8 @@ const CreateMaterial = ({ pageDescription }) => {
         description: form.materialDescription,
       };
 
-      const response = await createMaterial(body);
-      if(response.data) {
+      const {data, error} = await createMaterial(body);
+      if(data && data.success) {
         setSuccess(true);
         setForm({
           materialName: '',
@@ -202,7 +202,7 @@ const CreateMaterial = ({ pageDescription }) => {
         setCantFindUnit(false);
         setCategoryCreated(false);
         setUnitCreated(false);
-      } else {
+      } else if (error) {
         setError(response.error || 'error creating material, please try again!!!');
       };
 
