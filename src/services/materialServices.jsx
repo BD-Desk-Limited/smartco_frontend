@@ -229,6 +229,34 @@ export const getAllMaterials = async () => {
   }
 };
 
+//get materials (grouped)
+export const getGroupedMaterials = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/materials/grouped`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error getting materials, please try again' };
+  }
+}
+
 //update material
 export const updateMaterial = async (id, body, file) => {
   try {

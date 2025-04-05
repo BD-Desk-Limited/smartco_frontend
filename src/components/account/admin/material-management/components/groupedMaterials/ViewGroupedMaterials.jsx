@@ -1,25 +1,28 @@
-import React, { use } from 'react';
-import Image from 'next/image';
-import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
-import MaterialSidebar from './materialSidebar';
-import PageDescription from '@/components/account/PageDescription';
-import Link from 'next/link';
-import ExportContent from '../../../ExportContent';
-import { deleteMaterials, getMaterials } from '@/services/materialServices';
-import Spinner from '@/components/account/Spinner';
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import { getAllMaterials } from '@/services/materialServices';
+import Header from '@/components/account/Header';
+import SubHeader from '../SubHeader';
+import MaterialSidebar from '../materialSidebar';
+import Image from 'next/image';
+import Link from 'next/link';
+import Spinner from '@/components/account/Spinner';
+import PageDescription from '@/components/account/PageDescription';
+import ExportContent from '@/components/account/ExportContent';
 import DeleteModal from '@/components/account/DeleteModal';
+import ComponentMaterialsModal from './ComponentMaterialsModal';
 
-
-const ViewMaterial = ({pageDescription}) => {
+const ViewGroupedMaterials = ({pageDescription}) => {
+    
     const selectedSubMenu = {
-        name: 'View All Materials',
-        link: '/view-materials',
+        name: 'View Grouped Materials',
+        link: '/view-grouped-materials',
     };
+
     const [openSidebar, setOpenSidebar] = React.useState(false);
     const [searchInput, setSearchInput] = React.useState('');
-    const [allMaterials, setAllMaterials] = React.useState([]);
+    const [allMaterialsIncludingUngrouped, setAllMaterialsIncludingUngrouped] = React.useState([]);
+    const [groupedMaterials, setGroupedMaterials] = React.useState([]);
     const [filteredMaterials, setFilteredMaterials] = React.useState([]);
     const [selectedMaterials, setSelectedMaterials] = React.useState([]);
     const [selectedCategory, setSelectedCategory] = React.useState('');
@@ -29,30 +32,34 @@ const ViewMaterial = ({pageDescription}) => {
     const [loading, setLoading] = React.useState(false);
     const [deleteErrors, setDeleteErrors] = React.useState([]);
     const [deleteMessages, setDeleteMessages] = React.useState([]);
+    const [materialToView, setMaterialToView] = React.useState(null);
     const Router = useRouter();
 
     React.useEffect(() => {
-        const fetchAllMaterials = async () => {
+        const fetchGroupedMaterials = async () => {
             try{
                 setLoading(true);
-                const response = await getMaterials();
+                const response = await getAllMaterials();
+                const data = response.data || [];
                 if(response.data){
-                    setAllMaterials(response.data);
+                    setAllMaterialsIncludingUngrouped(response.data);
+                    const groupedMaterials = data.filter(material => material.isGroup === true);
+                    setGroupedMaterials(groupedMaterials);
                 };
                 if(response.error){
-                    console.error('Error fetching materials:', response.error);
+                    console.error('Error fetching grouped materials:', response.error);
                 };
             }catch(error){
-                console.error('Error fetching materials:', error);
+                console.error('Error fetching grouped materials:', error);
             }finally{
                 setLoading(false);
             }
         };
-        fetchAllMaterials();
+        fetchGroupedMaterials();
     }, []);
 
     React.useEffect(() => {
-        const filtered = Array.isArray(allMaterials)&& allMaterials?.filter(
+        const filtered = Array.isArray(groupedMaterials)&& groupedMaterials?.filter(
             (material) =>
               (material.name.toLowerCase().includes(searchInput.toLowerCase()) ||
               material.description.toLowerCase().includes(searchInput.toLowerCase()))&&
@@ -61,11 +68,11 @@ const ViewMaterial = ({pageDescription}) => {
         )||[];
         setFilteredMaterials(filtered);
         
-    }, [allMaterials, searchInput, selectedCategory, selectedMaterialType]);
+    }, [groupedMaterials, searchInput, selectedCategory, selectedMaterialType]);
 
-    const allCategories = [...new Set(allMaterials.map(material => material.category?.name))];
-    const allMaterialTypes = [...new Set(allMaterials.map(material => material.materialType))];
-    
+    const allCategories = [...new Set(groupedMaterials.map(material => material.category?.name))];
+    const allMaterialTypes = [...new Set(groupedMaterials.map(material => material.materialType))];
+
     const handleResetFilters = () => {
         setSelectedCategory('');
         setSelectedMaterialType('');
@@ -135,15 +142,27 @@ const ViewMaterial = ({pageDescription}) => {
         };
     };
 
+    const getMaterialNameAndUnitById = (id) => {
+
+        const material = allMaterialsIncludingUngrouped.find((material) => material._id === id);
+        if (material) {
+            return `(${material?.unitOfMeasurement?.name}) ${material?.name}`;
+        } else {
+            return 'Unknown Material';
+        }
+    };
+
+    console.log('groupedMaterials', groupedMaterials);
+
   return (
     <div>
         <div className="w-full sticky top-0 z-50">
           <Header />
         </div>
         <div className="w-full">
-            <SubHeader title={'List of Materials'}/>
+            <SubHeader title={'List of Grouped Materials'}/>
         </div>
-        <div className="flex flex-row gap-0 w-full h-full">
+        <div className="flex flex-row w-full h-full gap-5">
           <div className="min-w-fit">
             <MaterialSidebar 
               selectedSubMenu={selectedSubMenu}
@@ -211,17 +230,17 @@ const ViewMaterial = ({pageDescription}) => {
                             onClick={handleResetFilters}
                             className='h-8 px-1 border border-gray-border rounded-md flex flex-row items-center text-text-black'
                         >
-                            {`All Materials - ${allMaterials.length}`}
+                            {`All Materials - ${groupedMaterials.length}`}
                         </button>
                         <button>
-                            <Link href='/pages/account/admin/manage-materials' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
+                            <Link href='/pages/account/admin/manage-materials/create-grouped-material' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
                                 <Image
                                     src="/assets/add.png"
                                     alt="add"
                                     width={15}
                                     height={15}
                                 />
-                                <span className=''>Add Material</span>
+                                <span className=''>Add Grouped Material</span>
                             </Link>
                         </button>
                         <button 
@@ -259,7 +278,7 @@ const ViewMaterial = ({pageDescription}) => {
                                             {filteredMaterials.map((material) => (
                                                 <tr 
                                                   key={material._id} 
-                                                  onClick={() => Router.push(`/pages/account/admin/manage-materials/view-material-details?id=${material._id}`)}
+                                                  onClick={() => Router.push(`/pages/account/admin/manage-materials/view-group-details?id=${material._id}`)}
                                                   className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
                                                 >
                                                   <td className="px-4 py-2">
@@ -280,7 +299,18 @@ const ViewMaterial = ({pageDescription}) => {
                                                   <td className="px-4 py-2">{material.materialType}</td>
                                                   <td className="px-4 py-2">{material.unitOfMeasurement?.name}</td>
                                                   <td className="px-4 py-2 flex flex-row w-full justify-between">
-                                                    <Link href={`/pages/account/admin/manage-materials/edit-material?id=${material._id}`} title='Edit Material'>
+                                                    <Image
+                                                        src="/assets/eye-gray.png"
+                                                        alt="view"
+                                                        width={15}
+                                                        height={15}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Stop event propagation
+                                                            setMaterialToView(material);
+                                                        }} 
+                                                        title='View Component Materials'
+                                                    />
+                                                    <Link href={`/pages/account/admin/manage-materials/edit-grouped-material?id=${material._id}`} title='Edit Material'>
                                                       <Image
                                                         src="/assets/edit.png"
                                                         alt="view"
@@ -333,15 +363,16 @@ const ViewMaterial = ({pageDescription}) => {
                                         className='bg-brand-gray text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-80 flex flex-row items-center gap-1'
                                     >
                                         {`Clear Selection`}
-                                        
+
                                     </button>
                                 </div>
                             }
                         </div>
                     )
+
                 }
             </div>
-            <PageDescription pageDescription={pageDescription}/>
+            <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
 
@@ -360,18 +391,22 @@ const ViewMaterial = ({pageDescription}) => {
                             "Name": material.name, 
                             "Category": material.category?.name, 
                             "Material Type": material.materialType, 
-                            "Unit": material.unitOfMeasurement?.name
+                            "Unit": material.unitOfMeasurement?.name,
+                            "Description": material.description,
+                            "Component Materials": material.components?.map((componentMaterial) => {
+                                return `${componentMaterial?.quantity}${getMaterialNameAndUnitById(componentMaterial.id)}, `;
+                            }),
                         }
                     })}
                     onClose={() => setExportContent(false)}
-                    title={'Export Materials'}
+                    title={'Export Grouped Materials'}
                 />
             </div>
         }
 
         {openDeleteModal && 
             <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
-                <DeleteModal 
+                <DeleteModal
                     title={selectedMaterials.length>1? 'Delete Materials':'Delete Material'}
                     message={`Are you sure you want to delete the selected ${selectedMaterials.length>1? 'materials?':'material?'} This action cannot be undone.`}
                     buttonStyle={'bg-error hover:bg-error-hover text-white'}
@@ -383,9 +418,19 @@ const ViewMaterial = ({pageDescription}) => {
                 />
             </div>
         }
-        
+
+        {materialToView && 
+            <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center w-full h-full'>
+                <ComponentMaterialsModal 
+                    material={materialToView}
+                    allMaterials={allMaterialsIncludingUngrouped}
+                    onClose={() => setMaterialToView(null)}
+                />
+            </div>
+        }
+
     </div>
   )
 }
 
-export default ViewMaterial;
+export default ViewGroupedMaterials;
