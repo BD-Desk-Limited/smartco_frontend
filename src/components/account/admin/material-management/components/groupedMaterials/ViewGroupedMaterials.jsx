@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getAllMaterials } from '@/services/materialServices';
+import { deleteMaterials, getAllMaterials } from '@/services/materialServices';
 import Header from '@/components/account/Header';
 import SubHeader from '../SubHeader';
 import MaterialSidebar from '../materialSidebar';
@@ -43,11 +43,8 @@ const ViewGroupedMaterials = ({pageDescription}) => {
                 const data = response.data || [];
                 if(response.data){
                     setAllMaterialsIncludingUngrouped(response.data);
-                    const groupedMaterials = data.filter(material => material.isGroup === true);
+                    const groupedMaterials = data.filter(material => material.isGroup === true && material.isDeleted === false);
                     setGroupedMaterials(groupedMaterials);
-                };
-                if(response.error){
-                    console.error('Error fetching grouped materials:', response.error);
                 };
             }catch(error){
                 console.error('Error fetching grouped materials:', error);
@@ -108,7 +105,7 @@ const ViewGroupedMaterials = ({pageDescription}) => {
                     const deletedMaterialsId = data.deletedMaterials.map(material => material._id);
 
                     setDeleteMessages([`${data.deletedMaterials.length} materials deleted successfully.`]);
-                    setAllMaterials(allMaterials.filter(material => !deletedMaterialsId.includes(material._id)));
+                    setAllMaterialsIncludingUngrouped(allMaterialsIncludingUngrouped.filter(material => !deletedMaterialsId.includes(material._id)));
                     setSelectedMaterials([]);
                 }
                 if(data.materialsWithStock.length>0){
@@ -151,8 +148,6 @@ const ViewGroupedMaterials = ({pageDescription}) => {
             return 'Unknown Material';
         }
     };
-
-    console.log('groupedMaterials', groupedMaterials);
 
   return (
     <div>
@@ -278,7 +273,7 @@ const ViewGroupedMaterials = ({pageDescription}) => {
                                             {filteredMaterials.map((material) => (
                                                 <tr 
                                                   key={material._id} 
-                                                  onClick={() => Router.push(`/pages/account/admin/manage-materials/view-group-details?id=${material._id}`)}
+                                                  onClick={() => Router.push(`/pages/account/admin/manage-materials/view-material-details?id=${material._id}`)}
                                                   className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
                                                 >
                                                   <td className="px-4 py-2">

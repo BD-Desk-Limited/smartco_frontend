@@ -183,6 +183,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
               allMaterials={allMaterials}
               allUnits={allUnits}
               setShowReview={setShowReview}
+              handleDeleteMaterial={handleDeleteMaterial}
             />
           </div>
           <PageDescription pageDescription={pageDescription}/>

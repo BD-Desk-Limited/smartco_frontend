@@ -77,10 +77,10 @@ const ReviewGroupedMaterial = ({formData, loading, setShowReview, handleCreateGr
           />
           <Button 
             onClick={handleCreateGroupedMaterial}
-            text='Create'
+            text='Save'
             buttonStyle='bg-brand-blue text-white'
             loading={loading}
-            loadingText={'Creating...'}
+            loadingText={'Saving...'}
             disabled={loading}
           />
         </div>

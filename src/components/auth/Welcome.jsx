@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { use } from 'react';
 import Image from 'next/image';
 import ChatIcon from './commons/ChatIcon';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCompanyData } from '@/contexts/companyDataContext';
+import Spinner from '../account/Spinner';
 
 const Welcome = () => {
-  const [isAuthorized, setIsAuthorized] = useState(false);
+
   const router = useRouter();
   const { companyData } = useCompanyData();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     if (companyData) {
+      // Check if the company data is available
       const authorize = async () => {
         try {
           const requestBody = {
@@ -33,11 +36,11 @@ const Welcome = () => {
           );
 
           const data = await response.json();
-          if (companyData.authorizationToken && data.isAuthorized) {
-            setIsAuthorized(true);
-          } else {
+          if (!companyData.authorizationToken || !data.isAuthorized) {
             router.push('/pages/auth/login');
           }
+
+          setIsMounted(true); //if the device is authorized, allow mounting the component
         } catch (error) {
           console.error(error);
           router.push('/pages/auth/login');
@@ -45,7 +48,9 @@ const Welcome = () => {
       };
 
       authorize();
-    }
+    }else {
+      router.push('/pages/auth/login');
+    };
   }, [router, companyData]);
 
   const divStyle = {
@@ -57,8 +62,9 @@ const Welcome = () => {
     width: '100vw',
   };
 
-  if (!isAuthorized) {
-    return null;
+  // Check if the component is mounted before rendering
+  if (!isMounted) {
+    return <Spinner />;
   }
 
   return (

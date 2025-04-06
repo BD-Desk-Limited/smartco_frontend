@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
           sessionStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
-          router.push('/pages/auth/login');
+          router.push('/pages/splash/splash3');
         } else {
           // Token is valid
           setIsAuthenticated(true);
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
                 sessionStorage.removeItem('token');
                 setIsAuthenticated(false);
                 setUser(null);
-                router.push('/pages/auth/login');
+                router.push('/pages/splash/splash3');
               }
             };
             getUser();
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.removeItem('token');
         setIsAuthenticated(false);
         setUser(null);
-        router.push('/pages/auth/login');
+        router.push('/pages/splash/splash3');
       }
     } else {
       // No token found
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         !pathname.startsWith('/pages/auth') &&
         !pathname.startsWith('/pages/splash')
       ) {
-        router.push('/pages/auth/login');
+        router.push('/pages/splash/splash3');
       }
     }
   }, [router, pathname, user]);

@@ -6,6 +6,7 @@ import MaterialSidebar from './materialSidebar';
 import SubHeader from './SubHeader';
 import Image from 'next/image';
 import Button from '@/components/account/Button';
+import GroupedMaterialBreakdown from './groupedMaterials/GroupedMaterialBreakdown';
 
 const ViewMaterialDetails = ({materialData, pageDescription}) => {
 
@@ -19,7 +20,7 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
 
   const batchesWithStock = materialData.batches?.filter(batch => batch.quantity > 0);
   const totalStock = batchesWithStock?.reduce((acc, batch) => acc + batch.quantity, 0);
-
+  console.log('materialData', materialData);
   return (
     <div className='w-full h-full max-h-screen overflow-hidden'>
       <div className="w-full sticky top-0 z-50">
@@ -49,10 +50,21 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
             </div>
             <div className='flex flex-col gap-2 w-full'>
               <h1 className='font-bold text-xl'>{materialData.name}</h1>
-              <p className='h-28 overflow-y-auto scrollbar-thin'>{materialData.description}</p>
-              <p>Material Type: {materialData.materialType}</p>
-              <p>Material Category: {materialData.category?.name}</p>
-              <p>Unit: {materialData.unitOfMeasurement?.name}</p>
+              <div className='flex flex-row justify-between gap-2'>
+                <div className='w-[50%] flex flex-col gap-2'>
+                  <p className='h-28 overflow-y-auto scrollbar-thin'>{materialData.description}</p>
+                  <p>Material Type: {materialData.materialType}</p>
+                  <p>Material Category: {materialData.category?.name}</p>
+                  <p>Unit: {materialData.unitOfMeasurement?.name}</p>
+                </div>
+    
+                {
+                  materialData.isGroup && 
+                    <GroupedMaterialBreakdown 
+                      id={materialData._id}
+                    /> 
+                }
+              </div>
               <div>
                 <span className=''>Stock Level:</span>
                 <span className=''>
@@ -86,14 +98,21 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
                   <span className='p-10 font-semibold text-error'>No stock available</span>}
                 </span>
               </div>
+              
               <div className='flex flex-row gap-10 py-10'>
                 <Button 
                   text={'Edit Material'}
-                  onClick={()=>Router.push(`/pages/account/admin/manage-materials/edit-material?id=${materialData._id}`)}
+                  onClick={materialData.isGroup? 
+                    ()=>Router.push(`/pages/account/admin/manage-materials/edit-grouped-material?id=${materialData._id}`):
+                    ()=>Router.push(`/pages/account/admin/manage-materials/edit-material?id=${materialData._id}`)
+                  }
                 />
                 <Button 
                   text={'Exit'}
-                  onClick={()=>Router.push('/pages/account/admin/manage-materials/view-materials')}
+                  onClick={materialData.isGroup?
+                    ()=>Router.push('/pages/account/admin/manage-materials/view-grouped-materials'):
+                    ()=>Router.push('/pages/account/admin/manage-materials/view-materials')
+                  }
                   buttonStyle={'bg-brand-gray px-5'}
                 />
               </div>

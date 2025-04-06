@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 
-const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials, setShowReview}) => {
+const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials, setShowReview, handleDeleteMaterial}) => {
 
   const [previewError, setPreviewError] = React.useState(null);
 
@@ -24,11 +24,6 @@ const CreateGroupedMaterialsPreview = ({formData, setFormData, allMaterials, set
       return;
     };
     setShowReview(true);
-  };
-
-  const handleDeleteMaterial = (id) => {
-    const newComponents = formData.components.filter((material) => material.id !== id);
-    setFormData({...formData, components: newComponents});
   };
 
 

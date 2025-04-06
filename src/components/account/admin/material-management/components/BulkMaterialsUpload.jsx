@@ -80,7 +80,7 @@ const BulkMaterialsUpload = ({pageDescription}) => {
       if (!material.materialType) {
         error.materialType.push({error: `Material type is required for row ${index + 1}`, row: index + 1});
       };
-      if(!['raw-material', 'packaging-material'].includes(material.materialType)){
+      if(!['raw-material', 'packaging'].includes(material.materialType)){
         error.materialType.push({error: `Material type must be either 'raw-material' or 'packaging-material' for row ${index + 2}. Please check the spellings on the template`, row: index + 1});
       };
 

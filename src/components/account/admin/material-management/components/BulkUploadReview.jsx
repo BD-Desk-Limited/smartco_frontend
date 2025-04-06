@@ -54,7 +54,7 @@ const BulkUploadReview = ({pageDescription}) => {
     const handleRefresh = () => {
         setBulkMaterialData(null);
         setErrorData(null);
-        Router.push('/pages/account/admin/manage-materials/bulk-material-upload');
+        Router.push('/pages/account/admin/manage-materials');
     };
 
     const hasError = errorData && errorData.length > 0 && !errorData.every((error) => Object.values(error).every((value) => value.length === 0));
@@ -151,7 +151,7 @@ const BulkUploadReview = ({pageDescription}) => {
                                               <th>Material Type</th>
                                               <th>Material Category</th>
                                               <th>Material Unit</th>
-                                              <th>Material Description</th>
+                                              <th className='w-60'>Material Description</th>
                                           </tr>
                                       </thead>
                                       <tbody className='w-full max-h-50 overflow-y-auto scrollbar-thin'>

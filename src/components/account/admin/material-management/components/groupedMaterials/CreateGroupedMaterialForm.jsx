@@ -9,6 +9,9 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
   const [cantFindUnit, setCantFindUnit] = React.useState(false);
   const [error, setError] = React.useState('');
 
+  // Filter out deleted materials from allMaterials
+  const allMaterialsNotDeleted = allMaterials&& allMaterials.filter(material => !material.isDeleted);
+
   const handleAddComponent = () => {
     setError('');
     if (!newComponentMaterial || !newComponentQuantity) {
@@ -35,6 +38,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
     setNewComponentMaterial('');
     setNewComponentQuantity('');
   };
+
 
   return (
     <form className="flex flex-col gap-5 my-5 bg-white p-10 rounded-md w-full max-h-[80vh] overflow-y-auto scrollbar-thin">
@@ -183,7 +187,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
           <div className='flex items-center justify-center bg-gray-shadow9 w-full p-3 rounded-md'>
             <div className='flex flex-col items-center justify-center gap-2 w-full'>
               <h2 className='text-text-black text-md text-center'>
-                select component materials for your new grouped material. After you have finished, click save on the summary panel on the right to create the new material. 
+                select component materials for your new grouped material. After you have finished, click submit on the summary panel on the right to create the new material. 
               </h2>
               <div className='flex flex-row gap-3 items-center'>
                 <div>
@@ -195,9 +199,9 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
                   >
                     <option value={''} className='text-text-gray bg-opacity-30 hover:bg-blue-shadow5'>Select Material</option>
                     {
-                      allMaterials && 
-                      allMaterials.length > 0 &&
-                      allMaterials.map((material) => (
+                      allMaterialsNotDeleted && 
+                      allMaterialsNotDeleted.length > 0 &&
+                      allMaterialsNotDeleted.map((material) => (
                         <option key={material._id} value={material._id}>
                           {material.name}
                         </option>
