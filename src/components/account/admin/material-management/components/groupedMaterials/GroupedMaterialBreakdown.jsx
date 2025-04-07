@@ -23,18 +23,28 @@ const GroupedMaterialBreakdown = ({id}) => {
         fetchGroupedMaterialBreakdown();
     }, [id]);
 
-  return (
+    //get materials that appears twice, and sum up their quantities
+    const aggregatedBreakdown = groupedMaterialBreakdown.reduce((acc, material) => {
+      const existingMaterial = acc.find(item => item.name === material.name);
+      if (existingMaterial) {
+        existingMaterial.quantity += material.quantity;
+      } else {
+        acc.push({ ...material });
+      }
+      return acc;
+    }, []);
+     
+    return (
     <div className='w-[40%] text-left'>
       <h1 className='font-semibold'>Components breakdown</h1>
       <table className="w-full">
-        <thead className='bg-brand-gray text-white text-sm'>
-          <tr className='text-left flex justify-between px-5'>
-            <th className='p-1'>Material</th>
-            <th className='p-1'>Quantity</th>
-          </tr>
-        </thead>
+      <thead className='bg-brand-gray text-white text-sm'>
+        <tr className='text-left flex justify-between px-5'>
+        <th className='p-1'>Material</th>
+        <th className='p-1'>Quantity</th>
+        </tr>
+      </thead>
       </table>
-      {/* Wrap tbody in a scrollable div */}
       <div className="max-h-40 overflow-y-auto scrollbar-thin shadow-md">
         <table className="w-full">
           <tbody className='text-sm'>
@@ -43,7 +53,7 @@ const GroupedMaterialBreakdown = ({id}) => {
                 <td colSpan={2} className='text-center'>Loading...</td>
               </tr>
             ) : (
-              groupedMaterialBreakdown.map((material) => (
+              aggregatedBreakdown.map((material) => (
                 <tr key={material._id} className='border-t border-brand-gray flex  justify-between px-5'>
                   <td className='px-2'>{material.name}</td>
                   <td className='px-2'>{material.quantity} {material?.unitOfMeasurement?.name}</td>
