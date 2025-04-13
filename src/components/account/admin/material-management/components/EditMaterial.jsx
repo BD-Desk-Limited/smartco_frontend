@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import { createMaterialCategories, createMaterialUnits, getMaterialCategories, getMaterialUnits, updateMaterial, } from '@/services/materialServices';
 import Button from '@/components/account/Button';

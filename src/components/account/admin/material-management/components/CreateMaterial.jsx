@@ -1,7 +1,7 @@
 import React, { use } from 'react';
 import MaterialSidebar from './materialSidebar';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import {
   getMaterialCategories,

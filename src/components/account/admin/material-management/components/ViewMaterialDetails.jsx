@@ -3,7 +3,7 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import Header from '@/components/account/Header';
 import MaterialSidebar from './materialSidebar';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import Image from 'next/image';
 import Button from '@/components/account/Button';
 import GroupedMaterialBreakdown from './groupedMaterials/GroupedMaterialBreakdown';

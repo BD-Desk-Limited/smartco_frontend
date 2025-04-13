@@ -8,12 +8,12 @@ import { getMaterialById } from '@/services/materialServices';
 const EditMaterialPage = () => {
 
     const [selectedMenu, setSelectedMenu] = React.useState({
-        name: 'Manage Materials',
+        name: 'Materials Management',
         icon: '/assets/material.png',
         iconActive: '/assets/material_active.png',
         link: '/manage-materials',
         title: 'Manage Materials',
-    });
+      });
 
     const pageDescription =
     'The Edit Material page allows you to modify the details of existing materials in your store(s). You can update material information, change categories and units, and save the changes. This ensures that your material data remains accurate and up-to-date, facilitating better inventory management and product creation. Additionally, you can upload an image of the material to provide a visual reference, making it easier to identify and manage materials within your inventory.';

@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteMaterials, getAllMaterials } from '@/services/materialServices';
 import Header from '@/components/account/Header';
-import SubHeader from '../SubHeader';
+import SubHeader from '../../../../SubHeader';
 import MaterialSidebar from '../materialSidebar';
 import Image from 'next/image';
 import Link from 'next/link';

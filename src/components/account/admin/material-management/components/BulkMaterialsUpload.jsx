@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import SuccessModal from '@/components/account/SuccessModal';
 import PageDescription from '@/components/account/PageDescription';

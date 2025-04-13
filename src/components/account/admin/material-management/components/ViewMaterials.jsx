@@ -1,7 +1,7 @@
 import React, { use } from 'react';
 import Image from 'next/image';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import PageDescription from '@/components/account/PageDescription';
 import Link from 'next/link';

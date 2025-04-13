@@ -5,7 +5,7 @@ import ViewGroupedMaterials from './components/groupedMaterials/ViewGroupedMater
 
 const ViewGroupedMaterialPage = () => {
   const [selectedMenu, setSelectedMenu] = React.useState({
-    name: 'Manage Materials',
+    name: 'Materials Management',
     icon: '/assets/material.png',
     iconActive: '/assets/material_active.png',
     link: '/manage-materials',
