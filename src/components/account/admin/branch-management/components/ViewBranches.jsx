@@ -11,78 +11,11 @@ import Spinner from '@/components/account/Spinner';
 import ExportContent from '@/components/account/ExportContent';
 import DeleteModal from '@/components/account/DeleteModal';
 import DeactivationModal from '@/components/account/DeactivationModal';
-
-
-const branchData = [
-    {
-        _id: "1",
-        name: "Downtown Branch",
-        branchId: "BR001",
-        address: "123 Main Street, Downtown",
-        email: "downtown@company.com",
-        phoneNumber: "123-456-7890",
-        band: "A",
-        profilePictureUrl: "/assets/branch1.png",
-        company: "64b7f3c2e4a1a2b3c4d5e6f7",
-        status: "active",
-        taxBand: { name: "Standard", rate: 10 },
-    },
-    {
-        _id: "2",
-        name: "Uptown Branch",
-        branchId: "BR002",
-        address: "456 Elm Street, Uptown",
-        email: "uptown@company.com",
-        phoneNumber: "987-654-3210",
-        band: "B",
-        profilePictureUrl: "/assets/branch2.png",
-        company: "64b7f3c2e4a1a2b3c4d5e6f7",
-        status: "inactive",
-        taxBand: { name: "Reduced", rate: 5 },
-    },
-    {
-        _id: "3",
-        name: "Midtown Branch",
-        branchId: "BR003",
-        address: "789 Oak Avenue, Midtown",
-        email: "midtown@company.com",
-        phoneNumber: "555-123-4567",
-        band: "C",
-        profilePictureUrl: "/assets/branch3.png",
-        company: "64b7f3c2e4a1a2b3c4d5e6f7",
-        status: "active",
-        taxBand: { name: "Zero", rate: 0 },
-    },
-    {
-        _id: "4",
-        name: "Suburban Branch",
-        branchId: "BR004",
-        address: "321 Pine Road, Suburbia",
-        email: "suburban@company.com",
-        phoneNumber: "444-555-6666",
-        band: "A",
-        profilePictureUrl: "/assets/branch4.png",
-        company: "64b7f3c2e4a1a2b3c4d5e6f7",
-        status: "active",
-        taxBand: { name: "Standard", rate: 10 },
-    },
-    {
-        _id: "5",
-        name: "Industrial Branch",
-        branchId: "BR005",
-        address: "654 Maple Lane, Industrial Park",
-        email: "industrial@company.com",
-        phoneNumber: "333-777-8888",
-        band: "B",
-        profilePictureUrl: "/assets/branch5.png",
-        company: "64b7f3c2e4a1a2b3c4d5e6f7",
-        status: "inactive",
-        taxBand: { name: "Reduced", rate: 5 },
-    },
-];
+import { deleteBranchesById, getAllBranchesByCompanyId, toggleBranchStatus } from '@/services/branchServices';
+import SuccessModal from '@/components/account/SuccessModal';
 
 const ViewBranches = ({pageDescription}) => {
-    
+
     const selectedSubMenu = {
         name: 'View all branches',
         link: '/',
@@ -97,17 +30,38 @@ const ViewBranches = ({pageDescription}) => {
     const [selectedTaxBand, setSelectedTaxBand] = useState('');
     const [exportContent, setExportContent] = useState(false);
     const [selectedBranches, setSelectedBranches] = useState([]);
+    const [selectedBranchStatus, setSelectedBranchStatus] = useState('');
     const [openStatusModal, setOpenStatusModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [deleteErrors, setDeleteErrors] = useState([]);
     const [deleteMessages, setDeleteMessages] = useState([]);
     const [deactivationErrors, setDeactivationErrors] = useState([]);
     const [deactivationMessages, setDeactivationMessages] = useState([]);
+    const [toggleStatusSuccess, setToggleStatusSuccess] = useState(false);
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     const Router = useRouter();
 
     useEffect(() => {
-        setAllBranches(branchData);
+        const fetchBranches = async () => {
+            setLoading(true);
+            try {
+                const { data, error } = await getAllBranchesByCompanyId();
+                if (error) {
+                    console.error(error, 'error fetching branches');
+                } else if (data) {
+                    setAllBranches(data);
+                }
+            }
+            catch (error) {
+                console.error('Error fetching branches:', error);
+                setAllBranches([]);
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+        fetchBranches();
     },[]);
 
     useEffect(() => {
@@ -124,7 +78,7 @@ const ViewBranches = ({pageDescription}) => {
         setFilteredBranches(filtered);
     }, [searchInput, selectedBand, selectedTaxBand, allBranches]);  
 
-    const collatedBands = allBranches && allBranches.map((branch) => branch.band) || [];
+    const collatedBands = allBranches.length && allBranches.map((branch) => branch.band) || [];
     const allBands = collatedBands && [...new Set(collatedBands)] || [];
 
     const collatedTaxBands = allBranches && allBranches.map((branch) => branch.taxBand.name) || [];
@@ -144,13 +98,52 @@ const ViewBranches = ({pageDescription}) => {
         }
     };
 
-    const handleChangeBranchStatus = (branchId) => {
-        
-    }
+    const handleChangeBranchStatus = async(branchId) => {
+
+        try{
+            setLoading(true);
+
+            let response;
+            if (selectedBranchStatus === 'active' || branchId.length > 1) {
+                //deactivate branches
+                response = await toggleBranchStatus(branchId, 'inactive');
+            }else if (selectedBranchStatus === 'inactive') {
+                //activate branches
+                response = await toggleBranchStatus(branchId, 'active');
+            }
+            if (response.error) {
+                console.error(response.error, 'error changing branch status');
+                setDeactivationErrors([response.error]);
+                setDeactivationMessages([]);
+            }else if (response.data) {
+                setDeactivationMessages([response.message]);
+                setDeactivationErrors([]);
+                setAllBranches((prevBranches) =>
+                    prevBranches.map((branch) =>
+                        branchId.includes(branch._id)
+                            ? { ...branch, status: selectedBranchStatus === 'active' ? 'inactive' : 'active' }
+                            : branch
+                    )
+                );
+                setToggleStatusSuccess(true);
+                setSelectedBranches([]);
+            }
+        }catch(err){
+            console.error('Error changing branch status:', err);
+            setDeactivationErrors(['Error changing branch status, please try again']);
+            setDeactivationMessages([]);
+        }finally{
+            setLoading(false);
+            setOpenStatusModal(false);
+            setSelectedBranches([]);
+        }
+    };
 
     const handleBranchToChangeStatus = (branchId) => {
+
         setOpenStatusModal(true);
         setSelectedBranches(branchId);
+
     };
 
     const handleBranchToDelete = (branchId) => {
@@ -158,7 +151,33 @@ const ViewBranches = ({pageDescription}) => {
         setSelectedBranches(branchId);
     };
 
-    const handleDeleteBranch = (branchId) => {}
+    const handleDeleteBranch = async(branchId) => {
+        try{
+            setLoading(true);
+            const response = await deleteBranchesById(branchId);
+            if (response.error) {
+                console.error(response.error, 'error deleting branches');
+                setDeleteErrors([response.error]);
+                setDeleteMessages([]);
+            }else if (response.data) {
+                setDeleteMessages([response.message]);
+                setDeleteErrors([]);
+                setAllBranches((prevBranches) =>
+                    prevBranches.filter(branch => !branchId.includes(branch._id))
+                );
+                setDeleteSuccess(true);
+                setSelectedBranches([]);
+            }   
+        }catch(err){
+            console.error('Error deleting branches:', err);
+            setDeleteErrors(['Error deleting branches, please try again']);
+            setDeleteMessages([]);
+        }finally{
+            setLoading(false);
+            setOpenDeleteModal(false);
+            setSelectedBranches([]);
+        }
+    }
 
     const handleClose = () => {
         setOpenDeleteModal(false);
@@ -334,6 +353,7 @@ const ViewBranches = ({pageDescription}) => {
                                                             onClick={(e) => {
                                                                 e.stopPropagation(); // Stop event propagation
                                                                 handleBranchToChangeStatus([branch._id]);
+                                                                setSelectedBranchStatus(branch.status);
                                                             }}
                                                             className='cursor-pointer'
                                                             title={branch.status === 'active'? 'Deactivate Branch': 'Activate Branch'}
@@ -362,7 +382,7 @@ const ViewBranches = ({pageDescription}) => {
                                                             handleBranchToDelete([branch._id]);
                                                           }}
                                                           className='cursor-pointer'
-                                                          title='Delete Material'
+                                                          title='Delete Branch'
                                                         />
                                                     </td>
                                                 </tr>
@@ -396,7 +416,10 @@ const ViewBranches = ({pageDescription}) => {
                                             alt="deactivate"
                                             width={27}
                                             height={27}
-                                            onClick={()=>handleBranchToChangeStatus(selectedBranches)}
+                                            onClick={()=>{
+                                                handleBranchToChangeStatus(selectedBranches);
+                                                setSelectedBranchStatus('active'); 
+                                            }}
                                             className='cursor-pointer'
                                             title='Deactivate Branches'
                                         />
@@ -436,6 +459,7 @@ const ViewBranches = ({pageDescription}) => {
                             "Phone Number": branch.phoneNumber,
                             "Band": branch.band,
                             "Tax Band": branch?.taxBand?.name,
+                            "Status": branch.status,
                         }
                     })}
                     onClose={() => setExportContent(false)}
@@ -448,7 +472,7 @@ const ViewBranches = ({pageDescription}) => {
             <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
                 <DeleteModal
                     title={selectedBranches.length>1? 'Delete branch':'Delete branches'}
-                    message={`Are you sure you want to delete the selected ${selectedBranches.length>1? 'branches?':'branch?'} This action cannot be undone.`}
+                    message={`Are you sure you want to delete the selected ${selectedBranches.length>1? 'branches?':'branch?'} This action cannot be undone, and all data will be lost.`}
                     buttonStyle={'bg-error hover:bg-error-hover text-white'}
                     onClose={handleClose}
                     onConfirm={() => handleDeleteBranch(selectedBranches)}
@@ -462,9 +486,26 @@ const ViewBranches = ({pageDescription}) => {
         {openStatusModal &&
             <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
                 <DeactivationModal
-                    title={selectedBranches.length>1? 'Deactivate branch':'Deactivate branches'}
-                    message={`Are you sure you want to deactivate the selected ${selectedBranches.length>1? 'branches?':'branch?'} This would stop every activity in the selected branches.`}
-                    buttonStyle={'bg-error hover:bg-error-hover text-white'}
+                    title={
+                        selectedBranches.length>1? (
+                            selectedBranchStatus === 'active'? 'Deactivate branches':'Activate branches'
+                        ):(
+                            selectedBranchStatus === 'inactive' ? 'Activate branch':'Deactivate branch'
+                        )
+                    }
+                    message={
+                        `Are you sure you want to ${
+                            selectedBranchStatus === 'active'? 'deactivate':'activate'
+                        } the selected ${
+                            selectedBranches.length>1? 'branches?':'branch?'
+                        } ${selectedBranchStatus === 'active' ? (`This would stop every activity in the selected ${
+                            selectedBranches.length>1? 'branches':'branch'
+                        }`):''}.`
+                    }
+                    buttonText={
+                        selectedBranchStatus === 'active'? 'Deactivate':'Activate'
+                    }
+                    buttonStyle={selectedBranchStatus === 'active'? 'bg-error hover:bg-error-hover text-white':'bg-success hover:bg-success-hover text-white'}
                     onClose={handleClose}
                     onConfirm={() => handleChangeBranchStatus(selectedBranches)}
                     loading={loading}
@@ -473,6 +514,39 @@ const ViewBranches = ({pageDescription}) => {
                 />
             </div>
         }
+
+        {toggleStatusSuccess && (
+            <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
+                <SuccessModal
+                    title={selectedBranchStatus === 'active'? 'Branches Deactivated': 'Branches Activated'}
+                    message={`The selected ${selectedBranches.length>1? 'branches':'branch'} have been successfully ${selectedBranchStatus === 'active'? 'deactivated':'activated'}.`}
+                    
+                    buttonStyle={'bg-success hover:bg-success-hover text-white'}
+                    onClose={() => {
+                        setToggleStatusSuccess(false);
+                        handleClose();
+                    }}
+                    loading={loading}
+                    loadingText={selectedBranchStatus === 'active'? 'Deactivating branches...':'Activating branches...'}
+                />
+            </div>
+        )}
+
+        {deleteSuccess && (
+            <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
+                <SuccessModal
+                    title={'Branches Deleted'}
+                    message={`The selected ${selectedBranches.length>1? 'branches':'branch'} have been successfully deleted.`}
+                    buttonStyle={'bg-success hover:bg-success-hover text-white'}
+                    onClose={() => {
+                        setDeleteSuccess(false);
+                        handleClose();
+                    }}
+                    loading={loading}
+                    loadingText={'Deleting branches...'}
+                />
+            </div>
+        )}
     </div>
   )
 }

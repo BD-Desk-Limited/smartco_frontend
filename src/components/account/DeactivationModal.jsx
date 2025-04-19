@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Button from './Button';
 
-const DeactivationModal = ({ message, title, buttonStyle, onClose, onConfirm, button2Style, deactivationMessages, deactivationErrors, loading }) => {
+const DeactivationModal = ({ message, title, buttonStyle, buttonText, onClose, onConfirm, button2Style, deactivationMessages, deactivationErrors, loading }) => {
   return (
     <motion.div 
         className="bg-white w-[30%] h-[55%] rounded-md shadow-md flex flex-col items-center justify-between gap-5"
@@ -46,9 +46,9 @@ const DeactivationModal = ({ message, title, buttonStyle, onClose, onConfirm, bu
                   <Button
                     onClick={onConfirm}
                     loading={loading}
-                    loadingText={'Deactivating...'}
+                    loadingText={`${buttonText}ing...`}
                     buttonStyle={buttonStyle}
-                    text={'Deactivate'}
+                    text={buttonText}
                   />
                   <Button
                     onClick={onClose}
