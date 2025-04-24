@@ -3,6 +3,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AdminSideBar from '../AdminSideBar';
 import ViewMaterialDetails from './components/ViewMaterialDetails';
 import { getMaterialById } from '@/services/materialServices';
+import { PageAccessRequirement } from '../../PageAccessRequirement';
 
 
 const ViewMaterialDetailsPage = () => {
@@ -43,6 +44,15 @@ const ViewMaterialDetailsPage = () => {
             router.push('/pages/account/admin/manage-materials/view-materials');
         };
     }, [id, router]);
+
+  const accessCheckFailed = PageAccessRequirement(
+      'admin',
+      'Materials_Management',
+  );  
+
+  if (accessCheckFailed) {
+    return accessCheckFailed;
+  };
 
   return (
   <div>

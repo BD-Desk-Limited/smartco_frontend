@@ -134,7 +134,6 @@ const ViewBranches = ({pageDescription}) => {
             setDeactivationMessages([]);
         }finally{
             setLoading(false);
-            setOpenStatusModal(false);
             setSelectedBranches([]);
         }
     };
@@ -217,7 +216,7 @@ const ViewBranches = ({pageDescription}) => {
                         />
                         <input
                             type="text"
-                            placeholder="Search materials"
+                            placeholder="Search branch name or email"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             className="focus:outline-none ml-2 w-full"
@@ -316,7 +315,7 @@ const ViewBranches = ({pageDescription}) => {
                                             {filteredBranches.map((branch) => (
                                                 <tr
                                                     key={branch._id} 
-                                                    onClick={() => Router.push(`/pages/account/admin/branch-management/view-branch-details?id${branch._id}`)}
+                                                    onClick={() => Router.push(`/pages/account/admin/branch-management/view-branch-details?id=${branch._id}`)}
                                                     className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
                                                 >
                                                     <td className="px-4 py-2">

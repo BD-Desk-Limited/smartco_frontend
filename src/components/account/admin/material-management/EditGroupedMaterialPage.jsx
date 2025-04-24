@@ -3,6 +3,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getGroupedMaterialById } from '@/services/materialServices';
 import EditGroupedMaterial from './components/groupedMaterials/EditGroupedMaterial';
 import AdminSideBar from '../AdminSideBar';
+import { PageAccessRequirement } from '../../PageAccessRequirement';
 
 const EditGroupedMaterialPage = () => {
 
@@ -42,6 +43,15 @@ const EditGroupedMaterialPage = () => {
       router.push('/pages/account/admin/manage-materials/view-grouped-materials');
     };
   }, [id, router]);
+
+  const accessCheckFailed = PageAccessRequirement(
+      'admin',
+      'Materials_Management',
+  );  
+
+  if (accessCheckFailed) {
+    return accessCheckFailed;
+  };
 
   return (
     <>

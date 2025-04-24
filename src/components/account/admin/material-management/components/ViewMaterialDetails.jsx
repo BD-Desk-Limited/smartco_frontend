@@ -20,7 +20,7 @@ const ViewMaterialDetails = ({materialData, pageDescription}) => {
 
   const batchesWithStock = materialData.batches?.filter(batch => batch.quantity > 0);
   const totalStock = batchesWithStock?.reduce((acc, batch) => acc + batch.quantity, 0);
-  console.log('materialData', materialData);
+  
   return (
     <div className='w-full h-full max-h-screen overflow-hidden'>
       <div className="w-full sticky top-0 z-50">
