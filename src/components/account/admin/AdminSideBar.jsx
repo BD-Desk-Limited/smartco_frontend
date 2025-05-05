@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 
 const AdminSideBar = ({ selectedMenu }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
 

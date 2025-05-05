@@ -3,7 +3,7 @@ import PageDescription from '@/components/account/PageDescription';
 import SubHeader from '@/components/account/SubHeader';
 import React from 'react'
 import BranchSidebar from './BranchSideBar';
-import { getAllBranchBandsByCompanyId, getAllTaxBandsByCompanyId } from '@/services/branchServices';
+import { editBranchById, getAllBranchBandsByCompanyId, getAllTaxBandsByCompanyId } from '@/services/branchServices';
 import Image from 'next/image';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
@@ -12,6 +12,7 @@ import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import WarningModal from '@/components/account/WarningModal';
 import SuccessModal from '@/components/account/SuccessModal';
+import { verifyInputText } from '@/utilities/verifyInput';
 
 const EditBranch = ({branchData, setBranchData, pageDescription}) => {
 
@@ -19,6 +20,7 @@ const EditBranch = ({branchData, setBranchData, pageDescription}) => {
         name: 'View all branches',
         link: '/',
     };
+    
     const [openSidebar, setOpenSidebar] = React.useState(false);
     const [updatedBranchData, setUpdatedBranchData] = React.useState({});
     const [companyBand, setCompanyBand] = React.useState([]);
@@ -26,7 +28,7 @@ const EditBranch = ({branchData, setBranchData, pageDescription}) => {
     const [showTaxBandInfo, setShowTaxBandInfo] = React.useState(false);
     const [openSubmitModal, setOpenSubmitModal] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const [success, setSuccess] = React.useState(null);
+    const [success, setSuccess] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
 
     React.useEffect(() => {
@@ -81,9 +83,69 @@ const EditBranch = ({branchData, setBranchData, pageDescription}) => {
     };
 
     const handleUpdateBranch = async () => {
-        console.log('updatedBranchData', updatedBranchData);
-    };
 
+        // Validate form fields
+        let inputValidationErrors = [];
+
+        const handleValidation = (input, message) => {
+            if (!input) {
+              inputValidationErrors.push(message);
+            }else{
+              const verifyInput = verifyInputText(input);
+              if (!verifyInput.passed) {
+                inputValidationErrors.push(verifyInput.message+ ' ' + message);
+              };
+            }
+        };
+
+        try{
+            setLoading(true);
+            setError(null);
+
+            handleValidation(updatedBranchData.name, 'Please enter a valid Branch name');
+            handleValidation(updatedBranchData.address, 'Please enter a valid Branch address');
+            handleValidation(updatedBranchData.email, 'Please enter a valid Branch email');
+            handleValidation(updatedBranchData.phoneNumber, 'Please enter a valid Branch phone number');
+            handleValidation(updatedBranchData.band, 'Please select a valid Band');
+            handleValidation(updatedBranchData.taxBand?.name, 'Please select a valid Tax Band');
+            handleValidation(updatedBranchData.openingHour, 'Please select a valid Opening Time');
+            handleValidation(updatedBranchData.closingHour, 'Please select a valid Closing Time');
+
+            if (inputValidationErrors.length > 0) {
+              setError(inputValidationErrors[0]);
+              setOpenSubmitModal(false);
+              setSuccess(null);
+              return;
+            };
+                
+            const body = {
+                ...updatedBranchData,
+                taxBand: updatedBranchData?.taxBand?._id,
+            };
+            
+            const response = await editBranchById(branchData?._id, body);
+
+            if (response.error) {
+                setError(response.error);
+                setSuccess(false);
+            };
+            if (response.data) {
+                setBranchData(response.data);
+                setUpdatedBranchData(response.data);
+                setError(null);
+                setSuccess(true);
+            };
+            
+        }
+        catch (err) {
+            console.error('Error updating branch:', err);
+            setError('An error occurred while updating the branch information. Please try again later.');
+        }
+        finally {
+            setLoading(false);
+            setOpenSubmitModal(false);
+        };
+    };
 
   return (
     <div className='max-h-screen overflow-y-auto no-scrollbar w-full'>
@@ -257,18 +319,21 @@ const EditBranch = ({branchData, setBranchData, pageDescription}) => {
                         {error && <ErrorInterface error={error} />}
 
                         {/*Buttons*/}
-                        <div className='flex flex-row justify-center gap-10 w-full my-2'>
-                            <Button
-                                text={'Save Changes'}
-                                onClick={()=>setOpenSubmitModal(true)}
-                                buttonStyle={'bg-brand-blue text-white rounded-md p-2 w-fit'}
-                            />
-                            <Button
-                                text={'Reset Changes'}
-                                onClick={handleReset}
-                                buttonStyle={'bg-brand-gray rounded-md p-2 w-fit'}
-                            />
-                        </div>
+                        {updatedBranchData !== branchData &&
+                            <div className='flex flex-row justify-center gap-10 w-full my-2'>
+                                <Button
+                                    text={'Save Changes'}
+                                    onClick={()=>setOpenSubmitModal(true)}
+                                    buttonStyle={'bg-brand-blue text-white rounded-md p-2 w-fit'}
+                                />
+
+                                <Button
+                                    text={'Reset Changes'}
+                                    onClick={handleReset}
+                                    buttonStyle={'bg-brand-gray rounded-md p-2 w-fit'}
+                                />
+                            </div>
+                        }
 
                     </div>
                 </form>
@@ -300,7 +365,7 @@ const EditBranch = ({branchData, setBranchData, pageDescription}) => {
             <div className='inset z-50 flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black bg-opacity-70'>
                 <SuccessModal
                     title={'Branch Updated'}
-                    message={'Branch information has been updated successfully.'}
+                    message={'Branch information has been successfully  updated.'}
                     buttonText={'OK'}
                     buttonStyle={'bg-brand-blue text-text-white'}
                     onClose={() => {setSuccess(null); setOpenSubmitModal(false)}}

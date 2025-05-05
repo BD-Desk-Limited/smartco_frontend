@@ -2,6 +2,34 @@
 
 const token = sessionStorage.getItem('token');
 
+//create branch
+export const createBranchService = async (branchData) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/branches`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(branchData),
+      }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error creating branch, please try again' };
+  }
+};
+
 //get all branches by company id
 export const getAllBranchesByCompanyId = async () => {
   try {
@@ -204,5 +232,62 @@ export const getAllTaxBandsByCompanyId = async () => {
   } catch (error) {
     console.error('Error:', error);
     return { error: 'error fetching tax bands, please try again' };
+  }
+};
+
+//edit branch by id
+export const editBranchById = async (branchId, branchData) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(branchData),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error editing branch, please try again' };
+  }
+};
+
+//create tax band
+export const createTaxBand = async (taxBandData) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(taxBandData),
+      }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error creating tax band, please try again' };
   }
 };

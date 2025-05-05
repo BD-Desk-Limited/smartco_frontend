@@ -1,6 +1,5 @@
 import React from 'react';
 import AdminSideBar from '@/components/account/admin/AdminSideBar';
-import MaterialSidebar from './components/materialSidebar';
 import BulkMaterialsUpload from './components/BulkMaterialsUpload';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 

@@ -14,7 +14,8 @@ const BranchManagementPage = () => {
   
     const pageDescription =
         'The Branch Management page allows you to view all branches within your company, filter through them, and perform quick actions such as creating a new branch, editing branch information, and managing branch details. This interface provides a comprehensive overview of all branches, enabling efficient management and updates. You can click on any branch to view its details, including its name, location, and associated metadata. Additionally, you have the option to edit branch information or delete branches that are no longer needed. Use the search and filter functionalities to quickly find specific branches.';
-  
+    
+    // Check if the user has access to this page
     const accessCheckFailed = PageAccessRequirement(
       'admin',
       'Branch_Management',

@@ -126,7 +126,7 @@ const ViewBranchDetails = ({pageDescription, branchData, setBranchData}) => {
                                     <Image src={'/assets/clock_green.png'} height={20} width={20} alt='opening hours'/>
                                     Opening Hour:
                                 </span>
-                                {branchData?.openingHours || 'Not available'}
+                                {branchData?.openingHour || 'Not available'}
                             </p>
                             
                             <p className="text-sm text-text-gray flex flex-col items-center border-r-2 border-gray-border pr-2">
@@ -134,7 +134,7 @@ const ViewBranchDetails = ({pageDescription, branchData, setBranchData}) => {
                                     <Image src={'/assets/clock_red.png'} height={20} width={20} alt='closing hours'/>
                                     closing Hour:
                                 </span>
-                                {branchData?.closingHours || 'Not available'}
+                                {branchData?.closingHour || 'Not available'}
                             </p>
                         </div>
                         
@@ -143,7 +143,7 @@ const ViewBranchDetails = ({pageDescription, branchData, setBranchData}) => {
                             <div className="flex flex-col gap-2 py-2">
                                 <p className="text-sm text-text-gray">Branch Band: <strong>{branchData?.band}</strong></p>
                                 <p className="text-sm text-text-gray">Created on: {branchData?.createdAt ? new Date(branchData.createdAt).toLocaleDateString() : 'N/A'}</p>
-                                <p className="text-sm text-text-gray">Created by: {branchData?.createdBy?.name}</p>
+                                <p className="text-sm text-text-gray">Created by: {branchData?.createdBy?.fullName}</p>
                                 <p className="text-sm text-text-gray">Last updated: {branchData?.updatedAt ? new Date(branchData.updatedAt).toLocaleDateString() : 'N/A'}</p>
                                 <p className="text-sm text-text-gray">Last updated by: {branchData?.updatedBy?.fullName}</p>
                                 <p className="text-sm text-text-gray flex flex-row gap-2 items-center">

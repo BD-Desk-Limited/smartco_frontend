@@ -214,7 +214,7 @@ const ViewMaterial = ({pageDescription}) => {
                             {`All Materials - ${allMaterials.length}`}
                         </button>
                         <button>
-                            <Link href='/pages/account/admin/manage-materials' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
+                            <Link href='/pages/account/admin/manage-materials/create-material' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
                                 <Image
                                     src="/assets/add.png"
                                     alt="add"
