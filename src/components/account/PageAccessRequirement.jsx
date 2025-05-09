@@ -12,10 +12,14 @@ export const PageAccessRequirement = (requiredRole, requiredAccess) => {
   }
 
   // Check if the user meets the conditions to access the page
+  const allActiveUserAccess = user?.accessLevel.length > 0 &&
+    user?.accessLevel.filter(access => access.accessGranted === true) || [];
+
+  
   const conditionsToShowPage = (
     user?.role === requiredRole &&
     (
-      user?.accessLevel.map((access) => access.accessName).includes(requiredAccess) || 
+      allActiveUserAccess.map((access) => access.accessName).includes(requiredAccess) || 
       user?.superAdmin || 
       user?.accessLevel.map((access) => access.accessName).includes('All_Access')
     )

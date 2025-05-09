@@ -147,6 +147,8 @@ const ViewBranches = ({pageDescription}) => {
 
     const handleBranchToDelete = (branchId) => {
         setOpenDeleteModal(true);
+        setDeleteErrors([]);
+        setDeleteMessages([]);
         setSelectedBranches(branchId);
     };
 
@@ -166,6 +168,7 @@ const ViewBranches = ({pageDescription}) => {
                 );
                 setDeleteSuccess(true);
                 setSelectedBranches([]);
+                setOpenDeleteModal(false);
             }   
         }catch(err){
             console.error('Error deleting branches:', err);
@@ -173,7 +176,6 @@ const ViewBranches = ({pageDescription}) => {
             setDeleteMessages([]);
         }finally{
             setLoading(false);
-            setOpenDeleteModal(false);
             setSelectedBranches([]);
         }
     }

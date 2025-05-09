@@ -52,11 +52,18 @@ const AdminSideBar = ({ selectedMenu }) => {
       title: 'Reports',
     },
     {
-      name: 'Manage Users',
+      name: 'Users Management',
       icon: '/assets/user.png',
       iconActive: '/assets/user_active.png',
-      link: '/users',
-      title: 'Users',
+      link: '/users-management',
+      title: 'Users Management',
+    },
+    {
+      name: 'My team',
+      icon: '/assets/team.png',
+      iconActive: '/assets/team_active.png',
+      link: '/my-team',
+      title: 'My Team',
     },
     {
       name: 'My Profile',

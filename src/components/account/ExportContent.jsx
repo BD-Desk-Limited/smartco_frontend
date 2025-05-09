@@ -40,7 +40,7 @@ const ExportContent = ({ data, onClose, title, metadata = {} }) => {
 
   // Function to print the table
   const printTable = () => {
-    const metadataContent = Object.entries(metadata).map(([key, values]) => `<p>${key}: ${values.join(', ')}</p>`).join('');
+    const metadataContent = Object.entries(metadata).map(([key, values]) => `<p>${key}: ${values?.join(', ')}</p>`)?.join('');
     const printContent = document.getElementById('printableTable').outerHTML;
     const printWindow = window.open('', '', 'width=800,height=600');
     printWindow.document.write('<html><head><title>Print Table</title>');
@@ -69,7 +69,7 @@ const ExportContent = ({ data, onClose, title, metadata = {} }) => {
         <div className='text-sm font-medium text-text-gray'>
         <hr className="my-1" />
           {Object.entries(metadata).map(([key, values]) => (
-            <p key={key} className='my-2'><strong>{key}:</strong> {values.join(', ')}</p>
+            <p key={key} className='my-2'><strong>{key}:</strong> {values?.join(', ')}</p>
           ))}
           <hr className="my-1" />
         </div>
