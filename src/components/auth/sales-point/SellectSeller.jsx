@@ -32,7 +32,7 @@ const SelectSeller = ({ selectedSeller, setSelectedSeller, sellersInfo }) => {
                 >
                   <div className="">
                     <Image
-                      src={seller.imageURL}
+                      src={seller.imageURL || '/assets/anonymous.png'}
                       alt={seller.name}
                       width={30}
                       height={30}
