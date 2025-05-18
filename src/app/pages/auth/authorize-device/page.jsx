@@ -30,7 +30,7 @@ const Page = () => {
         </button>
       </div>
     );
-  }
+  };
 
   return (
     <div className="h-screen w-full bg-white text-text-black text-base flex items-center flex-row justify-center">

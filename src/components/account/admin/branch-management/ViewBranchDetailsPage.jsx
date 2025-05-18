@@ -30,9 +30,11 @@ const ViewBranchDetailsPage = () => {
         const fetchBranchData = async () => {
           const response = await getBranchById(id);
           if (response.data) {
-              setBranchData(response.data);
-          } else {
-              router.push('/pages/account/admin/branch-management/view-branch');
+            setBranchData(response.data);
+          }
+          if (response.error) {
+            console.error('Error fetching branch data:', response.error);
+            router.push('/pages/account/admin/branch-management/view-branch');
           };
         }
         fetchBranchData();

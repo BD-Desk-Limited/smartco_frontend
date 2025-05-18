@@ -1,15 +1,10 @@
 'use client';
-import Button from '@/components/account/Button';
-import React from 'react';
+import UserDetailsPage from '@/components/account/admin/users-management/UserDetailsPage';
 
 const page = () => {
   return (
-    <div>User Details page  
-        <Button
-            text="Go Back"
-            onClick={() => window.history.back()}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
-        />
+    <div>  
+      <UserDetailsPage />
     </div>
   )
 }

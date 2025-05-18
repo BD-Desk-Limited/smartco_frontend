@@ -31,7 +31,9 @@ const ViewMaterialDetailsPage = () => {
                     const response = await getMaterialById(id);
                     if (response.data) {
                         setMaterialData(response.data);
-                    } else {
+                    } 
+                    if (response.error) {
+                        console.error('Error fetching material data:', response.error);
                         router.push('/pages/account/admin/manage-materials/view-materials');
                     };
                 }
