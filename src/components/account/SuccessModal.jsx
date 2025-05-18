@@ -16,7 +16,7 @@ const SuccessModal = ({ message, title, buttonStyle, onClose, subText, buttonTex
         {title}
       </h1>
       <Image src="/assets/verified.png" alt="error" width={50} height={50} />
-      {message&& <p className="text-base text-success">{message}</p>}
+      {message&& <p className="text-base text-center text-success">{message}</p>}
       {subText&& <span className="text-sm text-center px-5 text-text-gray">{subText}</span>}
       <button
         onClick={onClose}

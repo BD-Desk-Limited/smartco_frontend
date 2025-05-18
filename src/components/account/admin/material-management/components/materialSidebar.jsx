@@ -7,7 +7,7 @@ const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
   const submenus = [
     {
       name: 'Create Material',
-      link: '/',
+      link: '/create-material',
     },
     {
       name: 'Create Grouped Material',

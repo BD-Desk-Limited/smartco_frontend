@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import SuccessModal from '@/components/account/SuccessModal';
 import PageDescription from '@/components/account/PageDescription';
@@ -80,7 +80,7 @@ const BulkMaterialsUpload = ({pageDescription}) => {
       if (!material.materialType) {
         error.materialType.push({error: `Material type is required for row ${index + 1}`, row: index + 1});
       };
-      if(!['raw-material', 'packaging-material'].includes(material.materialType)){
+      if(!['raw-material', 'packaging'].includes(material.materialType)){
         error.materialType.push({error: `Material type must be either 'raw-material' or 'packaging-material' for row ${index + 2}. Please check the spellings on the template`, row: index + 1});
       };
 

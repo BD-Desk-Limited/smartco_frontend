@@ -63,7 +63,7 @@ const LoginNew = () => {
         }
         localStorage.setItem('sellersInfo', JSON.stringify(sellersInfo));
 
-        router.push('/pages/dashboard/sales-point');
+        router.push('/pages/account/sales-point');
       }
     } catch (error) {
       setError(error);
@@ -73,10 +73,31 @@ const LoginNew = () => {
   };
 
   return (
-    <div className="w-full items-center justify-center flex flex-col gap-8">
+    <div className="w-full items-center justify-center flex flex-col gap-8 rounded-lg shadow-lg p-10 relative">
+
+      {/* select from esisting users */}
+      <div 
+        onClick={() => router.push('/pages/auth/login/sales-point')}
+        className="flex text-left items-center pr-3 rounded-md gap-1 absolute top-0 left-0 hover:bg-gray-shadow10 cursor-pointer"
+      >
+        <p className="px-3 py-3 bg-gray-shadow9 rounded-[100%] cursor-pointer hover:bg-gray-shadow8">
+          <Image
+            src="/assets/back_green.png"
+            alt="back"
+            width={15}
+            height={20}
+            className=""
+          />
+        </p>
+        <h1 className="flex text-sm font-bold w-full justify-center items-center text-center text-brand-green">
+          Select from existing users
+        </h1>
+      </div>
+
       <h1 className="text-2xl text-brand-green w-full text-center font-semibold">
         Login to sales point
       </h1>
+      
       <form onSubmit={handleLogin} className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="email" className="w-full text-left text-base">

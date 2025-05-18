@@ -3,6 +3,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AdminSideBar from '../AdminSideBar';
 import ViewMaterialDetails from './components/ViewMaterialDetails';
 import { getMaterialById } from '@/services/materialServices';
+import { PageAccessRequirement } from '../../PageAccessRequirement';
 
 
 const ViewMaterialDetailsPage = () => {
@@ -13,7 +14,7 @@ const ViewMaterialDetailsPage = () => {
     const [materialData, setMaterialData] = React.useState({});
 
     const [selectedMenu, setSelectedMenu] = React.useState({
-        name: 'Manage Materials',
+        name: 'Materials Management',
         icon: '/assets/material.png',
         iconActive: '/assets/material_active.png',
         link: '/manage-materials',
@@ -30,7 +31,9 @@ const ViewMaterialDetailsPage = () => {
                     const response = await getMaterialById(id);
                     if (response.data) {
                         setMaterialData(response.data);
-                    } else {
+                    } 
+                    if (response.error) {
+                        console.error('Error fetching material data:', response.error);
                         router.push('/pages/account/admin/manage-materials/view-materials');
                     };
                 }
@@ -43,6 +46,15 @@ const ViewMaterialDetailsPage = () => {
             router.push('/pages/account/admin/manage-materials/view-materials');
         };
     }, [id, router]);
+
+  const accessCheckFailed = PageAccessRequirement(
+      'admin',
+      'Materials_Management',
+  );  
+
+  if (accessCheckFailed) {
+    return accessCheckFailed;
+  };
 
   return (
   <div>

@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import { createMaterialCategories, createMaterialUnits, getMaterialCategories, getMaterialUnits, updateMaterial, } from '@/services/materialServices';
 import Button from '@/components/account/Button';
@@ -36,7 +36,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
   const router = useRouter();
 
 
-  const allTypes = ['raw-material', 'packaging-material'];
+  const allTypes = ['raw-material', 'packaging'];
 
   React.useEffect(() => {
     setUpdatedMaterialData(materialData);
@@ -119,6 +119,11 @@ const EditMaterial = ({ materialData, pageDescription }) => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload a valid image file');
+      return;
+    };
     setNewMaterialImage(file);
   };
 
@@ -167,9 +172,8 @@ const EditMaterial = ({ materialData, pageDescription }) => {
     try {
       const response = await updateMaterial(materialData._id, body, newMaterialImage);
       if (response.data) {
-        console.log('Material updated successfully', response.data);
-        setAllCategories([...allCategories, response.data.category]);
-        setAllUnits([...allUnits, response.data.unit]);
+        newCategory && setAllCategories([...allCategories, response.data.category]);
+        newUnit && setAllUnits([...allUnits, response.data.unit]);
         setShowSuccessModal(true);
       }else{
         setError(response.error || 'Error updating material, please try again');
@@ -273,7 +277,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                             ))}
                           </select>
                           <span onClick={() => setCantFindCategory(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                            Can`&apos;`t find category?
+                            Can&apos;t find the right category?
                           </span>
                         </div>
                       }
@@ -336,7 +340,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                           ))}
                         </select>
                         <span onClick={() => setCantFindUnit(true)} className='text-sm text-brand-blue hover:text-blue-shadow4 cursor-pointer'>
-                          Can`&apos;`t find unit?
+                          Can&apos;t find the right unit?
                         </span>
                       </div>  
                     }</>

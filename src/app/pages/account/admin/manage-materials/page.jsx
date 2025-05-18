@@ -1,10 +1,10 @@
 'use client';
-import CreateMaterialPage from '@/components/account/admin/material-management/CreateMaterialPage';
+import ViewMaterialPage from '@/components/account/admin/material-management/ViewMaterialsPage';
 
 const Page = () => {
   return (
     <div>
-      <CreateMaterialPage />
+      <ViewMaterialPage />
     </div>
   );
 };

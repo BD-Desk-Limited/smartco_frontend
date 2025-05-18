@@ -3,11 +3,12 @@ import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
 import PageDescription from '@/components/account/PageDescription';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import Button from '@/components/account/Button';
 import { createMaterial } from '@/services/materialServices';
 import SuccessModal from '@/components/account/SuccessModal';
+import ErrorInterface from '@/components/account/errorInterface';
 
 
 const BulkUploadReview = ({pageDescription}) => {
@@ -32,7 +33,6 @@ const BulkUploadReview = ({pageDescription}) => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log('submitting', bulkMaterialData);
 
         try{
             setLoading(true);
@@ -42,7 +42,7 @@ const BulkUploadReview = ({pageDescription}) => {
                 setSuccess(true);
             };
             if(response.error){
-                setError(response.error);
+                setError(response.error || 'An error occurred, please try again');
             };
         }catch(error){
             console.error(error);
@@ -55,7 +55,7 @@ const BulkUploadReview = ({pageDescription}) => {
     const handleRefresh = () => {
         setBulkMaterialData(null);
         setErrorData(null);
-        Router.push('/pages/account/admin/manage-materials/bulk-material-upload');
+        Router.push('/pages/account/admin/manage-materials');
     };
 
     const hasError = errorData && errorData.length > 0 && !errorData.every((error) => Object.values(error).every((value) => value.length === 0));
@@ -152,7 +152,7 @@ const BulkUploadReview = ({pageDescription}) => {
                                               <th>Material Type</th>
                                               <th>Material Category</th>
                                               <th>Material Unit</th>
-                                              <th>Material Description</th>
+                                              <th className='w-60'>Material Description</th>
                                           </tr>
                                       </thead>
                                       <tbody className='w-full max-h-50 overflow-y-auto scrollbar-thin'>
@@ -170,6 +170,9 @@ const BulkUploadReview = ({pageDescription}) => {
                                           }
                                       </tbody>
                                   </table>
+
+                                  {error && <ErrorInterface error={error} />}
+
                                   {hasError?
                                     <Button 
                                         text={'Retry Upload'} 

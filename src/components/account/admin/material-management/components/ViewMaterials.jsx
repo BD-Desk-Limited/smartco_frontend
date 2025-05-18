@@ -1,7 +1,7 @@
 import React, { use } from 'react';
 import Image from 'next/image';
 import Header from '@/components/account/Header';
-import SubHeader from './SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import PageDescription from '@/components/account/PageDescription';
 import Link from 'next/link';
@@ -39,8 +39,11 @@ const ViewMaterial = ({pageDescription}) => {
                 if(response.data){
                     setAllMaterials(response.data);
                 };
+                if(response.error){
+                    console.error('Error fetching materials:', response.error);
+                };
             }catch(error){
-                console.error('Error:', error);
+                console.error('Error fetching materials:', error);
             }finally{
                 setLoading(false);
             }
@@ -198,7 +201,8 @@ const ViewMaterial = ({pageDescription}) => {
                                 className="focus:outline-none cursor-pointer"
                             >
                                 <option value={''}>All Categories</option>
-                                {allCategories?.map((category) => (
+                                {allCategories.length>0 && 
+                                    allCategories?.map((category, index) => (
                                     <option key={category}>{category}</option>
                                 ))}
                             </select>
@@ -210,7 +214,7 @@ const ViewMaterial = ({pageDescription}) => {
                             {`All Materials - ${allMaterials.length}`}
                         </button>
                         <button>
-                            <Link href='/pages/account/admin/manage-materials' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
+                            <Link href='/pages/account/admin/manage-materials/create-material' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
                                 <Image
                                     src="/assets/add.png"
                                     alt="add"
@@ -287,7 +291,7 @@ const ViewMaterial = ({pageDescription}) => {
                                                     </Link>
                                                     <Image
                                                       src="/assets/delete.png"
-                                                      alt="edit"
+                                                      alt="delete"
                                                       width={15}
                                                       height={15}
                                                       onClick={(e) => {
@@ -310,10 +314,10 @@ const ViewMaterial = ({pageDescription}) => {
                             </table>
                                 
                             {selectedMaterials.length>0 &&
-                                <div className='sticky bottom-0 bg-white flex flex-row py-1 justify-end px-5'>
+                                <div className='sticky bottom-0 bg-white flex flex-row py-1 justify-end px-5 gap-5'>
                                     <button 
                                         onClick={()=>handleMaterialToDelete(selectedMaterials)}
-                                        className='bg-brand-green text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-green-shadow1 flex flex-row items-center gap-1'
+                                        className='bg-error text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-90 flex flex-row items-center gap-1'
                                     >
                                         {`${selectedMaterials.length} selected`}
                                         <Image
@@ -322,6 +326,14 @@ const ViewMaterial = ({pageDescription}) => {
                                             width={15}
                                             height={15}
                                         />
+                                    </button>
+
+                                    <button
+                                        onClick={()=> setSelectedMaterials([])}
+                                        className='bg-brand-gray text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-80 flex flex-row items-center gap-1'
+                                    >
+                                        {`Clear Selection`}
+                                        
                                     </button>
                                 </div>
                             }

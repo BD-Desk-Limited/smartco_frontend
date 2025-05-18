@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 
 const AdminSideBar = ({ selectedMenu }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
 
@@ -17,21 +17,28 @@ const AdminSideBar = ({ selectedMenu }) => {
       title: 'Dashboard',
     },
     {
-      name: 'Store Management',
+      name: 'Branch Management',
       icon: '/assets/store.png',
-      iconActive: '/assets/store_active.png',
-      link: '/store-management',
-      title: 'Store Management',
+      iconActive: '/assets/branch.png',
+      link: '/branch-management',
+      title: 'Branch Management',
     },
     {
-      name: 'Product Management',
+      name: 'Products',
       icon: '/assets/product.png',
       iconActive: '/assets/product_active.png',
       link: '/product-management',
       title: 'Product Management',
     },
     {
-      name: 'Manage Materials',
+      name: 'Purchases',
+      icon: '/assets/purchase.png',
+      iconActive: '/assets/purchase.png',
+      link: '/purchases',
+      title: 'Purchases',
+    },
+    {
+      name: 'Materials Management',
       icon: '/assets/material.png',
       iconActive: '/assets/material_active.png',
       link: '/manage-materials',
@@ -45,11 +52,18 @@ const AdminSideBar = ({ selectedMenu }) => {
       title: 'Reports',
     },
     {
-      name: 'Notifications',
-      icon: '/assets/notification.png',
-      iconActive: '/assets/notification_active.png',
-      link: '/notifications',
-      title: 'Notifications',
+      name: 'Users Management',
+      icon: '/assets/user.png',
+      iconActive: '/assets/user_active.png',
+      link: '/users-management',
+      title: 'Users Management',
+    },
+    {
+      name: 'My team',
+      icon: '/assets/team.png',
+      iconActive: '/assets/team_active.png',
+      link: '/my-team',
+      title: 'My Team',
     },
     {
       name: 'My Profile',
