@@ -33,11 +33,9 @@ const OTPForm = () => {
         'verification-purpose'
       );
 
-      console.log('trustedDevice', storedTrustedDevice);
-
       // Check if the user is logged in
       if (!storedUserId) {
-        window.location.href = '/pages/auth/login';
+        router.push('/pages/auth/login');
       } else {
         setEmail(storedEmail);
         setUserId(storedUserId);
@@ -134,18 +132,7 @@ const OTPForm = () => {
 
         // Redirect to the appropriate page based on the user's role and trusted device status
 
-        setLoading(false);
-
-        // Clean up the session storage
-        sessionStorage.removeItem('email');
-        sessionStorage.removeItem('userId');
-        sessionStorage.removeItem('trustedDevice');
-        sessionStorage.removeItem('verification-purpose');
-
-        console.log('response', response.data.trustedDevice);
-
-        // Redirect to the appropriate page based on the user's role and trusted device status
-        if (response.data.trustedDevice) {
+        if (response?.data?.trustedDevice === true) {
           setUser(response?.data?.user);
           sessionStorage.setItem('token', response?.data?.token);
 
@@ -158,8 +145,10 @@ const OTPForm = () => {
           if (response.data?.user?.role === 'admin') {
             setUser(response?.data?.user);
             sessionStorage.setItem('token', response?.data?.token);
+            router.push('/pages/auth/login-attempt-notification');
+          }else {
+            router.push('/pages/auth/login-attempt-notification');
           }
-          router.push('/pages/auth/login-attempt-notification');
         }
       }
     } catch (error) {

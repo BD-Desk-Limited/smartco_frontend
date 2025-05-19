@@ -23,6 +23,7 @@ const LoginForm = () => {
   };
 
   console.log('companyData', companyData);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -35,7 +36,7 @@ const LoginForm = () => {
       };
       const response = await loginService(body);
 
-      if (!response || response.error) {
+      if (!response || response?.error) {
         setError(response.error || 'error logging in, please try again');
         return;
       } else if (response?.data) {
