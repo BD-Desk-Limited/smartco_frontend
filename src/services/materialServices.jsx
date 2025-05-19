@@ -1,8 +1,17 @@
 'use client';
-const token = sessionStorage.getItem('token');
+
+// safely access sessionStorage in client-side code
+// This function checks if the code is running in a browser environment
+const getToken = () => {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('token');
+  }
+  return null;
+};
 
 //create material categories
 export const createMaterialCategories = async (body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/create-category`,
@@ -32,6 +41,7 @@ export const createMaterialCategories = async (body) => {
 
 //get material categories
 export const getMaterialCategories = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/categories`,
@@ -60,6 +70,7 @@ export const getMaterialCategories = async () => {
 
 //create material units
 export const createMaterialUnits = async (body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/create-unit`,
@@ -89,6 +100,7 @@ export const createMaterialUnits = async (body) => {
 
 //get material units
 export const getMaterialUnits = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/units`,
@@ -117,6 +129,7 @@ export const getMaterialUnits = async () => {
 
 //create material
 export const createMaterial = async (body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials`,
@@ -147,6 +160,7 @@ export const createMaterial = async (body) => {
 
 //get materials (non-grouped and not deleted)
 export const getMaterials = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials`,
@@ -175,6 +189,7 @@ export const getMaterials = async () => {
 
 //get material by id
 export const getMaterialById = async (id) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${id}`,
@@ -203,6 +218,7 @@ export const getMaterialById = async (id) => {
 
 //get grouped material by id
 export const getGroupedMaterialById = async (id) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/grouped/${id}`,
@@ -230,6 +246,7 @@ export const getGroupedMaterialById = async (id) => {
 
 //get materials (grouped and ungrouped)
 export const getAllMaterials = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/grouped-and-ungrouped`,
@@ -258,6 +275,7 @@ export const getAllMaterials = async () => {
 
 //get materials (grouped and not deleted)
 export const getGroupedMaterials = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/grouped`,
@@ -286,6 +304,7 @@ export const getGroupedMaterials = async () => {
 
 //update material
 export const updateMaterial = async (id, body, file) => {
+  const token = getToken();
   try {
     const formData = new FormData();
     formData.append('data', JSON.stringify(body));
@@ -321,6 +340,7 @@ export const updateMaterial = async (id, body, file) => {
 
 //get material components breakdown
 export const getMaterialComponentsBreakdown = async (id) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/components/${id}`,
@@ -349,6 +369,7 @@ export const getMaterialComponentsBreakdown = async (id) => {
 
 //delete materials (only allowed if stock is 0)
 export const deleteMaterials = async (material_ids) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials`,
@@ -378,6 +399,7 @@ export const deleteMaterials = async (material_ids) => {
 
 //Add a new batch to a material
 export const addBatchToMaterial = async (materialId, body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches`,
@@ -407,6 +429,7 @@ export const addBatchToMaterial = async (materialId, body) => {
 
 //Get all batches of a material
 export const getMaterialBatches = async (materialId) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches`,
@@ -435,6 +458,7 @@ export const getMaterialBatches = async (materialId) => {
 
 //Update a batch of a material
 export const updateMaterialBatch = async (materialId, batchId, body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches/${batchId}`,
@@ -464,6 +488,7 @@ export const updateMaterialBatch = async (materialId, batchId, body) => {
 
 //Delete a batch of a material
 export const deleteMaterialBatch = async (materialId, batchId) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches/${batchId}`,
