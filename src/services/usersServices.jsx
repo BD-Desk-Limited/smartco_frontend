@@ -1,9 +1,17 @@
 'use client';
 
-const token = sessionStorage.getItem('token');
+// safely access sessionStorage in client-side code
+// This function checks if the code is running in a browser environment
+const getToken = () => {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('token');
+  }
+  return null;
+};
 
 //get all users by company id
 export const getAllUsersByCompanyId = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/users`,
@@ -32,6 +40,7 @@ export const getAllUsersByCompanyId = async () => {
 
 //deactivate user
 export const toggleUserStatus = async (userIds, status) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/users/status`,
@@ -65,6 +74,7 @@ export const toggleUserStatus = async (userIds, status) => {
 
 //delete users by id
 export const deleteUsersById = async (userIds) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/users`,
@@ -94,6 +104,7 @@ export const deleteUsersById = async (userIds) => {
 
 //get user by id
 export const getUserById = async (userId) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,

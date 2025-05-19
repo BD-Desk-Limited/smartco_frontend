@@ -1,9 +1,17 @@
 'use client';
 
-const token = sessionStorage.getItem('token');
+// safely access sessionStorage in client-side code
+// This function checks if the code is running in a browser environment
+const getToken = () => {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('token');
+  }
+  return null;
+};
 
 //create branch
 export const createBranchService = async (branchData) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/branches`,
@@ -32,6 +40,7 @@ export const createBranchService = async (branchData) => {
 
 //get all branches by company id
 export const getAllBranchesByCompanyId = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/branches`,
@@ -60,6 +69,7 @@ export const getAllBranchesByCompanyId = async () => {
 
 //activate or deactivate branch
 export const toggleBranchStatus = async (branchIds, status) => {
+    const token = getToken();
     try {
         const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/branches/status`,
@@ -93,6 +103,7 @@ export const toggleBranchStatus = async (branchIds, status) => {
 
 //delete branches by id
 export const deleteBranchesById = async (branchIds) => {
+    const token = getToken();
     try {
         const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/branches`,
@@ -124,6 +135,7 @@ export const deleteBranchesById = async (branchIds) => {
 
 //get branch by id
 export const getBranchById = async (branchId) => {
+  const token = getToken();
   try {
     const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}`,
@@ -152,6 +164,7 @@ export const getBranchById = async (branchId) => {
 
 //get all users by branch id
 export const getAllUsersByBranchId = async (branchId) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/branches/users/${branchId}`,
@@ -181,6 +194,7 @@ export const getAllUsersByBranchId = async (branchId) => {
 
 //get all branch bands by company id
 export const getAllBranchBandsByCompanyId = async (companyId) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/branches/bands/${companyId}`,
@@ -209,6 +223,7 @@ export const getAllBranchBandsByCompanyId = async (companyId) => {
 
 //get all taxbands by company id
 export const getAllTaxBandsByCompanyId = async () => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/tax-bands`,
@@ -237,6 +252,7 @@ export const getAllTaxBandsByCompanyId = async () => {
 
 //edit branch by id
 export const editBranchById = async (branchId, branchData) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}`,
@@ -266,6 +282,7 @@ export const editBranchById = async (branchId, branchData) => {
 
 //create tax band
 export const createTaxBand = async (taxBandData) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/tax-bands`,
