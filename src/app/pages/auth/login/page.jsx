@@ -25,6 +25,24 @@ const page = () => {
           />
         </Link>
       </button>
+      {/*copy right footer subtexts */}
+      
+      <div className="absolute bottom-5 left-5 text-text-black text-sm">
+        <p className="text-text-black text-sm">
+          © 2024 All rights reserved.
+          <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL} target='_blank' className="text-brand-blue hover:underline">
+            BD-Desk LTD.
+          </Link>
+          |{' '}
+          <Link href="/pages/auth/privacy" target='_blank' className="text-brand-blue hover:underline">
+            Privacy Policy
+          </Link>{' '}
+          |{' '}
+          <Link href="/pages/auth/terms" target='_blank' className="text-brand-blue hover:underline">
+            Terms of Service
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
