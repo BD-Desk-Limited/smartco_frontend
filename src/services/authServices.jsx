@@ -1,3 +1,12 @@
+// safely access sessionStorage in client-side code
+// This function checks if the code is running in a browser environment
+const getToken = () => {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('token');
+  }
+  return null;
+};
+
 export const loginService = async (form) => {
   try {
     const response = await fetch(
@@ -79,6 +88,7 @@ export const verifyOTPService = async (body) => {
 };
 
 export const authorizeDeviceService = async (body) => {
+  const token = getToken();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/add-trusted-device`,
@@ -86,6 +96,7 @@ export const authorizeDeviceService = async (body) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       }

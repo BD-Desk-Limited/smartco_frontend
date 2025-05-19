@@ -20,13 +20,14 @@ const LoginAuthorize = () => {
 
   const handleDeviceAuthorization = async (e) => {
     e.preventDefault();
+
+    setError(false);
     const nameValidation = verifyName(deviceName);
     if (!nameValidation.passed) {
       setError(nameValidation.message);
       return;
     }
     setLoading(true);
-    setError(null);
     const deviceId = '';
     try {
       const body = {
@@ -62,6 +63,8 @@ const LoginAuthorize = () => {
     } catch (error) {
       console.error('Error authorizing device:', error);
       setError('Error authorizing device, please try again');
+    } finally {
+      setLoading(false);
     }
   };
 
