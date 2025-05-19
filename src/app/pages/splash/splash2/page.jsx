@@ -17,7 +17,6 @@ export default function Home() {
 
   useEffect(() => {
     if (companyData) {
-      console.log('companyData', companyData);
 
       const authorize = async () => {
         try {
@@ -39,10 +38,9 @@ export default function Home() {
           );
 
           const data = await response.json();
-          console.log('data', data);
 
           const timer = setTimeout(() => {
-            if (companyData.authorizationToken && data.isAuthorized) {
+            if (companyData?.authorizationToken && data?.isAuthorized) {
               router.push('/pages/splash/splash3');
             } else {
               router.push('/pages/auth/login');
