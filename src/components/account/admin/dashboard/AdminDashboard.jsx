@@ -14,7 +14,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex flex-row gap-10">
       <div>
-        <AdminSideBar selectedMenu={selectedMenu} />
+        <AdminSideBar selectedMenu={selectedMenu} openSideBar={true}/>
       </div>
       <div className="w-full">other components</div>
     </div>
