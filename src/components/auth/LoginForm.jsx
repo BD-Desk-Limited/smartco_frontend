@@ -22,8 +22,6 @@ const LoginForm = () => {
     setShowPassword(!showPassword);
   };
 
-  console.log('companyData', companyData);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
