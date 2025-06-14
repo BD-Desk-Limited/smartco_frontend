@@ -71,6 +71,37 @@ export const toggleUserStatus = async (userIds, status) => {
   }
 };
 
+//create user
+export const createUserService = async (body) => {
+  const token = getToken();
+
+  try {
+    
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error creating user, please try again' };
+  }
+};
 
 //delete users by id
 export const deleteUsersById = async (userIds) => {
@@ -167,3 +198,32 @@ export const updateUserService = async (userId, body, file) => {
     return { error: 'error updating user data, please try again' };
   }
 }
+
+//users teams
+export const getAllTeamsByCompanyID = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/teams`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching teams, please try again' };
+  }
+};

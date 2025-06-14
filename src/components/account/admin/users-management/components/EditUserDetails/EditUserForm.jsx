@@ -96,7 +96,7 @@ const EditUserForm = ({userData, updatedUserData, setUpdatedUserData, handleUpda
           type='text'
           id='team'
           onChange={(e) => setUpdatedUserData({ ...updatedUserData, team: e.target.value })}
-          value={updatedUserData?.team || ''}
+          value={updatedUserData?.team?.name || ''}
           className='mt-1 border border-gray-border rounded-md p-2 w-full focus:outline-none text-sm text-text-gray focus:ring-2 focus:ring-brand-blue'
         />
         </label>

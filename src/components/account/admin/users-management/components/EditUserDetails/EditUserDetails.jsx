@@ -13,7 +13,6 @@ import ErrorInterface from '@/components/account/errorInterface';
 import { updateUserService } from '@/services/usersServices';
 import SuccessModal from '@/components/account/SuccessModal';
 import { verifyEmail, verifyInputText, verifyPhoneNumber } from '@/utilities/verifyInput';
-import { validateEmail, validatePhoneNumber } from '@/app/utilities/validateInput';
 
 const EditUserDetails = ({pageDescription, userData}) => {
     

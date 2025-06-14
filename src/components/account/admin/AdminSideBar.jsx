@@ -101,7 +101,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   React.useEffect(() => {
     if (user?.superAdmin) {
       setUserRole('Super Admin');
-    } else if (user?.admin) {
+    } else if (user?.role) {
+      // Capitalize the first letter of the user's role
       setUserRole(user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1));
     }
   }, [user]);
@@ -120,18 +121,18 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     const conditionsToShowMenu = (
       user?.role === requiredRole &&
       (
-        allActiveUserAccess.map((access) => access.accessName).includes(menu?.requiredAccess) || 
-        user?.superAdmin || 
-        user?.accessLevel.map((access) => access.accessName).includes('All_Access')
+        allActiveUserAccess.some((access) => access.accessName === menu?.requiredAccess || !menu?.requiredAccess) || // Check if the user has the required access level
+        user?.superAdmin || // Check if the user is a super admin
+        user?.accessLevel.some((access) => access.accessName === 'All_Access') // Check if the user has "All Access" permission
       )
     );
 
-    // If access is denied, show the "No Permission" page
-    if (user && !conditionsToShowMenu) {
-      return false;
+    // If the user is authenticated and meets the conditions to show the menu, return true
+    if (user && conditionsToShowMenu) {
+      return true;
     }
-    // If all conditions are met, allow the menu to be clickable
-    return true;
+    // If the user does not meet the conditions, return false
+    return false;
   };
 
   return (
@@ -164,16 +165,18 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
           />
         </p>
       </div>
+
+      {/* Render the menu items */}
       <div className="h-full flex flex-col justify-between w-full text-text-white">
         <div className="flex flex-col gap-1">
           {menuList.map((menu, index) => (
             <div
               key={index}
-              className={`text-base gap-0 m-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
+              className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
               onClick={() => handleMenuClick(menu)}
             >
               {(user?.superAdmin&& menu.forNonSuperAdmin) ? null : 
-                hasAccessToMenu? (
+                hasAccessToMenu(menu)? (
                   <div
                     className="flex flex-row items-center  py-2"
                     title={!isOpen ? `${menu?.title}` : ''}
@@ -198,6 +201,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             </div>
           ))}
         </div>
+
+        {/* footer section */}
         <div className="flex flex-col gap-5 py-5 mx-5 border-t border-text-white justify-between">
           <div className="flex flex-col gap-2">
             <div
@@ -229,14 +234,14 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             )}
           </div>
           <div>
-            <div className="flex flex-row items-center py-2 w-full text-center">
+            <div className={`flex ${isOpen? " flex-row gap-3" : "flex-col gap-1"} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}>
               <Image
                 src="/assets/profile.png"
                 alt="profile"
                 width={20}
                 height={15}
               />
-              {isOpen && <p className="text-sm">{userRole}</p>}
+              <p className="text-sm">{userRole}</p>
             </div>
           </div>
         </div>

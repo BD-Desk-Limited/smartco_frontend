@@ -37,8 +37,8 @@ const UserBranchManagement = ({updatedUserData, setUpdatedUserData}) => {
   const addBranch = (branchId) => {
     const selectedBranch = allBranches.find(branch => branch._id === branchId);
     if (selectedBranch && !branches.some(branch => branch._id === selectedBranch._id)) {
-      setBranches(prev => [...prev, selectedBranch]);
-      setUpdatedUserData(prev => ({ ...prev, branch: [...prev.branch, selectedBranch] }));
+      setBranches(prev => prev? [...prev, selectedBranch] : [selectedBranch]);
+      setUpdatedUserData(prev => (prev?.branch? { ...prev, branch: [...prev.branch, selectedBranch] } : {...prev, branch: [selectedBranch] }));
     }
     // Reset the select input after adding
     document.querySelector('select').value = '';
@@ -56,7 +56,7 @@ const UserBranchManagement = ({updatedUserData, setUpdatedUserData}) => {
     <div className='bg-white shadow-md rounded-lg p-5 mr-10 relative h-full'>
       <h1 className='text-brand-blue font-semibold'>User Branches</h1>
       <div>
-        <p className='text-text-gray text-sm mt-2'>Manage the branches associated with the user.</p>
+        <p className='text-text-gray text-sm mt-2'>Branches associated with the user.</p>
         {branches?.length < 1 ?(
             <li className='text-text-gray w-full text-center p-2 rounded-md list-none my-10'>
               No branches associated with this user yet.
@@ -71,7 +71,7 @@ const UserBranchManagement = ({updatedUserData, setUpdatedUserData}) => {
                   title={branch.address}
                   className='flex items-center justify-between w-fit h-fit gap-2 bg-blue-shadow9 px-2 rounded-md cursor-default'
                 >
-                  <span className='text-text-black'>{branch.name.toLowerCase()}</span>
+                  <span className='text-text-black'>{branch?.name?.toLowerCase()}</span>
                   <Image
                    src={`/assets/cancel_blue.png`}
                    alt='Remove Branch'

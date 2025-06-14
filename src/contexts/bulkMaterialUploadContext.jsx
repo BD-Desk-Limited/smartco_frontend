@@ -7,7 +7,7 @@ const bulkMaterialUploadContext = createContext(null);
 
 export const BulkMaterialUploadProvider = ({ children }) => {
   const [bulkMaterialData, setBulkMaterialData] = useState(null);
-  const [errorData, setErrorData] = useState(null);
+  const [errorData, setErrorData] = useState([]);
 
   return (
     <bulkMaterialUploadContext.Provider value={{ bulkMaterialData, setBulkMaterialData, errorData, setErrorData }}>

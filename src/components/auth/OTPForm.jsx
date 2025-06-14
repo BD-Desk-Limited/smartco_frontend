@@ -43,7 +43,7 @@ const OTPForm = () => {
         setPurpose(verificationPurpose);
       }
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const timer = setInterval(() => {

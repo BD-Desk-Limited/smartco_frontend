@@ -103,8 +103,6 @@ const ViewUsers = ({pageDescription}) =>{
     return acc; // always return the accumulator
   }, []);
 
-  console.log('allBranches', allBranches);
-
   //Extracting all roles from all users and making it unique set
   const allRoles = [
     ...new Set(
