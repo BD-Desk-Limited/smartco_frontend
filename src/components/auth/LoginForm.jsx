@@ -15,7 +15,8 @@ const LoginForm = () => {
   const [success, setSuccess] = React.useState(false);
   const [message, setMessage] = React.useState(null);
   const { setUser } = useAuth();
-  const { companyData } = useCompanyData();
+  const companyDataContext = useCompanyData();
+  const companyData = companyDataContext?.companyData;
   const router = useRouter();
 
   const handleTogglePassword = () => {
