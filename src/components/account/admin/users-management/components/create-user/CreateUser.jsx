@@ -3,7 +3,7 @@ import SubHeader from '@/components/account/SubHeader'
 import React from 'react'
 import UsersManagementSidebar from '../UsersManagementSidebar'
 import PageDescription from '@/components/account/PageDescription';
-import CreateUserForm from './createUserForm';
+import CreateUserForm from './CreateUserForm';
 import { motion } from 'framer-motion';
 import UserBranchManagement from '../EditUserDetails/UserBranchManagement';
 import Button from '@/components/account/Button';
