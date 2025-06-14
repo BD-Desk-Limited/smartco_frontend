@@ -89,7 +89,7 @@ const SelectUserTeam = ({formData, setFormData}) => {
                             <span 
                                 className='text-right w-full '
                             >
-                                can't find team on the list?  
+                                can&apos;t find team on the list?  
                                 <strong
                                     onClick={() => {
                                         setCreateNewTeam(true); 
