@@ -1,10 +1,10 @@
-import React, { use } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 
-const AdminSideBar = ({ selectedMenu }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const AdminSideBar = ({ selectedMenu, openSideBar }) => {
+  const [isOpen, setIsOpen] = useState(openSideBar || false);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
 
@@ -15,6 +15,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/dashboard_active.png',
       link: '/',
       title: 'Dashboard',
+      requiredAccess: '',
     },
     {
       name: 'Branch Management',
@@ -22,6 +23,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/branch.png',
       link: '/branch-management',
       title: 'Branch Management',
+      requiredAccess: 'Branch_Management',
     },
     {
       name: 'Products',
@@ -29,6 +31,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/product_active.png',
       link: '/product-management',
       title: 'Product Management',
+      requiredAccess: 'Product_Management',
     },
     {
       name: 'Purchases',
@@ -36,6 +39,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/purchase.png',
       link: '/purchases',
       title: 'Purchases',
+      requiredAccess: 'Purchases',
     },
     {
       name: 'Materials Management',
@@ -43,6 +47,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/material_active.png',
       link: '/manage-materials',
       title: 'Manage Materials',
+      requiredAccess: 'Materials_Management',
     },
     {
       name: 'Reports',
@@ -50,6 +55,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/report_active.png',
       link: '/reports',
       title: 'Reports',
+      requiredAccess: 'Reports',
     },
     {
       name: 'Users Management',
@@ -57,6 +63,7 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/user_active.png',
       link: '/users-management',
       title: 'Users Management',
+      requiredAccess: 'Users_Management',
     },
     {
       name: 'My team',
@@ -64,6 +71,16 @@ const AdminSideBar = ({ selectedMenu }) => {
       iconActive: '/assets/team_active.png',
       link: '/my-team',
       title: 'My Team',
+      forNonSuperAdmin: true,
+      requiredAccess: 'Team_Management',
+    },
+    {
+      name: 'My Customers',
+      icon: '/assets/team.png',
+      iconActive: '/assets/customer_active.png',
+      link: '/my-customers',
+      title: 'My Customers',
+      requiredAccess: 'Customer_Management',
     },
     {
       name: 'My Profile',
@@ -84,13 +101,38 @@ const AdminSideBar = ({ selectedMenu }) => {
   React.useEffect(() => {
     if (user?.superAdmin) {
       setUserRole('Super Admin');
-    } else if (user?.admin) {
+    } else if (user?.role) {
+      // Capitalize the first letter of the user's role
       setUserRole(user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1));
     }
   }, [user]);
 
   const handleMenuClick = (menu) => {
     window.location.href = `/pages/account/admin${menu.link}`;
+  };
+
+
+  const hasAccessToMenu = (menu) => {
+    // Check if the user meets the conditions to access the menu
+    const requiredRole = 'admin';
+    const allActiveUserAccess = user?.accessLevel.length > 0 &&
+      user?.accessLevel.filter(access => access.accessGranted === true) || [];
+
+    const conditionsToShowMenu = (
+      user?.role === requiredRole &&
+      (
+        allActiveUserAccess.some((access) => access.accessName === menu?.requiredAccess || !menu?.requiredAccess) || // Check if the user has the required access level
+        user?.superAdmin || // Check if the user is a super admin
+        user?.accessLevel.some((access) => access.accessName === 'All_Access') // Check if the user has "All Access" permission
+      )
+    );
+
+    // If the user is authenticated and meets the conditions to show the menu, return true
+    if (user && conditionsToShowMenu) {
+      return true;
+    }
+    // If the user does not meet the conditions, return false
+    return false;
   };
 
   return (
@@ -123,36 +165,44 @@ const AdminSideBar = ({ selectedMenu }) => {
           />
         </p>
       </div>
+
+      {/* Render the menu items */}
       <div className="h-full flex flex-col justify-between w-full text-text-white">
         <div className="flex flex-col gap-1">
           {menuList.map((menu, index) => (
             <div
               key={index}
-              className={`text-base py-2 gap-0 m-0 hover:bg-white hover:text-brand-blue cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
+              className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
               onClick={() => handleMenuClick(menu)}
             >
-              <div
-                className="flex flex-row items-center"
-                title={!isOpen ? `${menu?.title}` : ''}
-              >
-                <Image
-                  src={
-                    selectedMenu?.name === menu.name
-                      ? menu.iconActive
-                      : menu.icon
-                  }
-                  alt={menu?.name}
-                  width={15}
-                  height={15}
-                  className={
-                    selectedMenu?.name === menu.name ? '' : 'bg-brand-blue'
-                  }
-                />
-                {isOpen && <p className="ml-2 text-sm">{menu?.name}</p>}
-              </div>
+              {(user?.superAdmin&& menu.forNonSuperAdmin) ? null : 
+                hasAccessToMenu(menu)? (
+                  <div
+                    className="flex flex-row items-center  py-2"
+                    title={!isOpen ? `${menu?.title}` : ''}
+                  >
+                    <Image
+                      src={
+                        selectedMenu?.name === menu.name
+                          ? menu.iconActive
+                          : menu.icon
+                      }
+                      alt={menu?.name}
+                      width={15}
+                      height={15}
+                      className={
+                        selectedMenu?.name === menu.name ? '' : 'bg-brand-blue'
+                      }
+                    />
+                    {isOpen && <p className="ml-2 text-sm">{menu?.name}</p>}
+                  </div>
+                ) : null
+              }
             </div>
           ))}
         </div>
+
+        {/* footer section */}
         <div className="flex flex-col gap-5 py-5 mx-5 border-t border-text-white justify-between">
           <div className="flex flex-col gap-2">
             <div
@@ -184,14 +234,14 @@ const AdminSideBar = ({ selectedMenu }) => {
             )}
           </div>
           <div>
-            <div className="flex flex-row items-center py-2 w-full text-center">
+            <div className={`flex ${isOpen? " flex-row gap-3" : "flex-col gap-1"} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}>
               <Image
                 src="/assets/profile.png"
                 alt="profile"
                 width={20}
                 height={15}
               />
-              {isOpen && <p className="text-sm">{userRole}</p>}
+              <p className="text-sm">{userRole}</p>
             </div>
           </div>
         </div>

@@ -17,7 +17,7 @@ const WarningModal = ({ message, title, button1Style,button2Style, button1Text, 
           {title}
         </h1>
         <div className='flex flex-col items-center justify-center h-[70%] gap-5 px-5'>
-          <Image src={imageSrc} alt="" width={50} height={50} />
+          <Image src={imageSrc || '/assets/warning.png'} alt="" width={50} height={50} />
           {message&& <p className="text-base text-center text-error">{message}</p>}
           {subText&& <span className="text-sm text-center text-text-gray px-5">{subText}</span>}
 

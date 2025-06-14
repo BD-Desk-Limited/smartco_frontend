@@ -58,8 +58,13 @@ const BulkUploadReview = ({pageDescription}) => {
         Router.push('/pages/account/admin/manage-materials');
     };
 
-    const hasError = errorData && errorData.length > 0 && !errorData.every((error) => Object.values(error).every((value) => value.length === 0));
-
+    // Check if there are any errors in the errorData
+    const hasError = errorData && errorData.length > 0 
+        && !errorData.every(
+            (error) => Object.values(error).every((value) => value.length === 0)
+        );
+    
+    // Filter out datasets with no errors
     const filteredErrorData = errorData && errorData.filter(dataset => 
         Object.values(dataset).some(value => value.length > 0)
     );

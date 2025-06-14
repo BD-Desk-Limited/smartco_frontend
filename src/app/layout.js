@@ -3,6 +3,8 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
 import { BulkMaterialUploadProvider } from '@/contexts/bulkMaterialUploadContext';
 import { BulkbranchUploadProvider } from '@/contexts/bulkBranchUploadContext';
+import BulkUserUpload from '@/components/account/admin/users-management/components/create-bulk-user/BulkUserUpload';
+import { BulkUserUploadProvider } from '@/contexts/bulkUserUploadContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -38,13 +40,15 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
-          <BulkMaterialUploadProvider>
-            <BulkbranchUploadProvider>
-              <CompanyDataProvider>
-                {children}
-              </CompanyDataProvider>
-            </BulkbranchUploadProvider>
-          </BulkMaterialUploadProvider>
+          <BulkUserUploadProvider>
+            <BulkMaterialUploadProvider>
+              <BulkbranchUploadProvider>
+                <CompanyDataProvider>
+                  {children}
+                </CompanyDataProvider>
+              </BulkbranchUploadProvider>
+            </BulkMaterialUploadProvider>
+          </BulkUserUploadProvider>
         </AuthProvider>
       </body>
     </html>

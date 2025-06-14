@@ -1,10 +1,8 @@
 import Image from 'next/image';
 import React from 'react'
 
-const EditUserForm = ({userData}) => {
-  const [updatedUserData, setUpdatedUserData] = React.useState({});
+const EditUserForm = ({userData, updatedUserData, setUpdatedUserData, handleUpdateUser}) => {
   const [openImageUploadModal, setOpenImageUploadModal] = React.useState(false);
-  const [imageFile, setImageFile] = React.useState(null);
   const [uploadError, setUploadError] = React.useState(null);
   
   const handlefileChange = (e) => {
@@ -20,10 +18,10 @@ const EditUserForm = ({userData}) => {
         setUpdatedUserData({
           ...updatedUserData,
           profilePictureUrl: reader.result,
+          imageFile: file, // Store the file for upload
         });
       };
       reader.readAsDataURL(file);
-      setImageFile(file);
       setOpenImageUploadModal(false);
       setUploadError(null);
     }
@@ -32,7 +30,7 @@ const EditUserForm = ({userData}) => {
   return (
     <div className='bg-white shadow-md rounded-lg p-2 relative'>
       {openImageUploadModal? (
-        <div className='flex flex-col gap-2 items-center justify-center h-full my-20 '>
+        <div className='flex flex-col gap-2 items-center justify-center h-full my-10 '>
           <h1 className='text-text-gray text-base font-semibold'>Upload Profile Picture</h1>
           <span className='flex flex-row gap-2 items-center justify-center w-full'>
             <input 
@@ -46,7 +44,7 @@ const EditUserForm = ({userData}) => {
           {uploadError && <span> {uploadError}</span> }
         </div>
       ):(
-        <div className='flex flex-row gap-3 items-center my-10'>
+        <div className='flex flex-row gap-3 items-center my-5'>
          <Image
            src={updatedUserData?.profilePictureUrl || '/assets/anonymous.png'}
            alt={'user'}
@@ -64,18 +62,45 @@ const EditUserForm = ({userData}) => {
         </div>
       )}
       
-      <ul className='flex flex-col px-5 gap-2 text-text-gray'>
-        <li className='text-lg font-semibold'>{userData?.fullName}</li>
-        <li className=''>{userData?.staffId}</li>
-        <li className=''>{userData?.email}</li>
-        <li className=''>{userData?.phoneNumber}</li>
-        {userData?.team && 
-          <li className=''>
-            <strong>Team/Department:</strong> 
-            {userData?.team?.name}
-          </li>
-        }
-      </ul>
+      <form onSubmit={handleUpdateUser} className='flex flex-col p-5 gap-3 text-text-gray'>
+        <span className='font-semibold'>Staff I D: {userData?.staffId}</span>
+        <label htmlFor='fullName' className='text-sm font-semibold'>Full Name
+        <input 
+          type='text'
+          id='fullName'
+          onChange={(e) => setUpdatedUserData({ ...updatedUserData, fullName: e.target.value })}
+          value={updatedUserData?.fullName || ''}
+          className='mt-1 border border-gray-border rounded-md p-2 w-full focus:outline-none text-sm text-text-gray focus:ring-2 focus:ring-brand-blue'
+        />
+        </label>
+        <label htmlFor='email' className='text-sm font-semibold'>Email
+        <input
+          type='email'
+          id='email'
+          onChange={(e) => setUpdatedUserData({ ...updatedUserData, email: e.target.value })}
+          value={updatedUserData?.email || ''}
+          className='mt-1 border border-gray-border rounded-md p-2 w-full focus:outline-none text-sm text-text-gray focus:ring-2 focus:ring-brand-blue'
+        />
+        </label>
+        <label htmlFor='phoneNumber' className='text-sm font-semibold'>Phone Number
+        <input
+          type='text'
+          id='phoneNumber'
+          onChange={(e) => setUpdatedUserData({ ...updatedUserData, phoneNumber: e.target.value })}
+          value={updatedUserData?.phoneNumber || ''}
+          className='mt-1 border border-gray-border rounded-md p-2 w-full focus:outline-none text-sm text-text-gray focus:ring-2 focus:ring-brand-blue'
+        />
+        </label>
+        <label htmlFor='team' className='text-sm font-semibold'>Team/Department
+        <input
+          type='text'
+          id='team'
+          onChange={(e) => setUpdatedUserData({ ...updatedUserData, team: e.target.value })}
+          value={updatedUserData?.team?.name || ''}
+          className='mt-1 border border-gray-border rounded-md p-2 w-full focus:outline-none text-sm text-text-gray focus:ring-2 focus:ring-brand-blue'
+        />
+        </label>
+      </form>
       <p className={`absolute top-1 right-1 px-2 shadow-black shadow-sm text-white italic rounded-full ${
         userData.role=== 'admin'? 'bg-error': 
         userData?.role === 'manager'? 'bg-brand-blue' : 'bg-brand-gray'

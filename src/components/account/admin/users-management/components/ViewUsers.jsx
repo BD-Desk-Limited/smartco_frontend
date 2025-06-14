@@ -94,7 +94,14 @@ const ViewUsers = ({pageDescription}) =>{
     allUsers.map(user => (user?.branch))
       .flat()
         .filter(branch => branch !== null)
-  )] || [];
+  )]//Extract branches objects with unique ids
+  .reduce((acc, current) => {
+    const x = acc.find(item => item._id === current._id);
+    if (!x) {
+      acc.push(current); // add current to acc if not found
+    }
+    return acc; // always return the accumulator
+  }, []);
 
   //Extracting all roles from all users and making it unique set
   const allRoles = [

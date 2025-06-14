@@ -71,17 +71,17 @@ const ViewBranches = ({pageDescription}) => {
                     (branch.name.toLowerCase().includes(searchInput.toLowerCase())||
                     branch.email.toLowerCase().includes(searchInput.toLowerCase())) &&
                 (branch.band === selectedBand || selectedBand === '') &&
-                (branch.taxBand.name === selectedTaxBand || selectedTaxBand === '')
+                (branch?.taxBand?.name === selectedTaxBand || selectedTaxBand === '')
                 return result;
             }
         );
         setFilteredBranches(filtered);
     }, [searchInput, selectedBand, selectedTaxBand, allBranches]);  
 
-    const collatedBands = allBranches.length && allBranches.map((branch) => branch.band) || [];
+    const collatedBands = allBranches.length && allBranches.map((branch) => branch?.band) || [];
     const allBands = collatedBands && [...new Set(collatedBands)] || [];
 
-    const collatedTaxBands = allBranches && allBranches.map((branch) => branch.taxBand.name) || [];
+    const collatedTaxBands = allBranches && allBranches.map((branch) => branch?.taxBand?.name) || [];
     const allTaxBands = collatedTaxBands && [...new Set(collatedTaxBands)] || [];
 
     const handleResetFilters = () => {
@@ -238,8 +238,8 @@ const ViewBranches = ({pageDescription}) => {
                                 className="focus:outline-none cursor-pointer"
                             >
                                 <option value={''}>All Bands</option>
-                                {allBands?.map((band) => (
-                                    <option key={band} className=''>{band}</option>
+                                {allBands?.map((band, index) => (
+                                    <option key={index} className=''>{band}</option>
                                 ))}
                             </select>
                         </div>
@@ -337,7 +337,7 @@ const ViewBranches = ({pageDescription}) => {
                                                     <td className="px-4 py-2">{branch.email}</td>
                                                     <td className="px-4 py-2">{branch.phoneNumber}</td>
                                                     <td className="px-4 py-2">{branch.band}</td>
-                                                    <td className="px-4 py-2">{branch.taxBand.name}</td>
+                                                    <td className="px-4 py-2">{branch.taxBand?.name}</td>
                                                     <td className={`px-4 py-2 ${
                                                         branch.status === 'active'? 'text-success': branch.status === 'inactive'? 'text-error': 'text-yellow-600'
                                                         }`}

@@ -22,11 +22,12 @@ const ViewUserDetails = ({pageDescription, userData}) => {
 
   const accessLevels = userData?.accessLevel && userData.accessLevel.map(
     (access) => ({
-      accessName: access.accessName.split[_][0] + ' ' + access.accessName.split[_][1],
+      accessName: access.accessName.split("_")[0] + ' ' + access.accessName.split("_")[1],
       accessGranted: access.accessGranted,
       allowedGrantOthers: access.allowedGrantOthers,
       lastModified: new Date(access.lastModified),
-      grantedBy: access.grantedBy?.fullName
+      grantedBy: access.grantedBy?.fullName,
+      modifiedBy: access.modifiedBy?.fullName
     })
   ) || [];
 
@@ -112,23 +113,25 @@ const ViewUserDetails = ({pageDescription, userData}) => {
                 <h3 className='mb-3'>View access permissions granted to this user</h3>
                 {userData?.accessLevel?.length ? (
                   <table className='w-full'>
-                    <thead className='border-2 border-y-text-gray'>
+                    <thead className='border-2 border-y-gray-shadow9 text-sm bg-gray-shadow9  text-text-black'>
                       <tr>
-                        <th>Access Type</th>
-                        <th>Access Granted</th>
-                        <th>Allowed to Grant Others</th>
-                        <th>Last Updated</th>
-                        <th>Updated By</th>
+                        <th className='py-1 text-left'>Access Type</th>
+                        <th className='py-1 text-left'>Access Granted</th>
+                        <th className='py-1 text-left'>Allowed to Grant Others</th>
+                        <th className='py-1 text-left'>Granted By</th>
+                        <th className='py-1 text-left'>Last Updated</th>
+                        <th className='py-1 text-left'>Updated By</th>
                       </tr>
                     </thead>
-                    <tbody className='border border-text-gray'>
+                    <tbody className='border border-text-gray text-sm'>
                       {accessLevels?.length && accessLevels?.map((access, index) => (
                           <tr key={index} className='hover:bg-background-1 hover:cursor-pointer'>
-                            <td className='border border-t-background-1 py-0.5 px-1'>{access.accessName}</td>
-                            <td className='border border-t-background-1 py-0.5 px-1'>{access.accessGranted ? 'Yes' : 'No'}</td>
-                            <td className='border border-t-background-1 py-0.5 px-1'>{access.allowedGrantOthers ? 'Yes' : 'No'}</td>
-                            <td className='border border-t-background-1 py-0.5 px-1'>{access.lastModified.toLocaleString()}</td>
-                            <td className='border border-t-background-1 py-0.5 px-1'>{access.grantedBy}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.accessName}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.accessGranted ? 'Yes' : 'No'}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.allowedGrantOthers ? 'Yes' : 'No'}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.grantedBy}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.lastModified.toLocaleString()}</td>
+                            <td className='border border-t-background-1 py-1 px-1'>{access.modifiedBy}</td>
                           </tr>
                         ))
                       }

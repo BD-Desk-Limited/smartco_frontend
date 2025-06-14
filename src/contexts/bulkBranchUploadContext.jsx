@@ -7,7 +7,7 @@ const bulkbranchUploadContext = createContext(null);
 
 export const BulkbranchUploadProvider = ({ children }) => {
   const [bulkbranchData, setBulkbranchData] = useState(null);
-  const [errorData, setErrorData] = useState(null);
+  const [errorData, setErrorData] = useState([]);
 
   return (
     <bulkbranchUploadContext.Provider value={{ bulkbranchData, setBulkbranchData, errorData, setErrorData }}>

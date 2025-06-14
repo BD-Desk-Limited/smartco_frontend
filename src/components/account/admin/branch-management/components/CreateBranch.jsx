@@ -14,6 +14,7 @@ import { createBranchService, getAllBranchBandsByCompanyId, getAllTaxBandsByComp
 import { validateEmail, validatePhoneNumber } from '@/app/utilities/validateInput';
 import WarningModal from '@/components/account/WarningModal';
 import {useRouter} from 'next/navigation';
+import BulkBranchUploadModal from './BulkBranchUploadModal';
 
 const bandDescription = `Band is used to group branches that share similar attributes, such as having the same sales price. This grouping helps organize branches logically based on shared characteristics, making it easier to manage and apply consistent rules or operations to them. For example:
 If you have multiple branches selling a product at the same price, you can group them into a single band. This allows you to manage pricing or promotions for all branches in that band collectively.
@@ -51,6 +52,7 @@ const CreateBranch = ({pageDescription}) => {
   const [createNewTaxBand, setCreateNewTaxBand] = React.useState(false);
   const [openSubmitModal, setOpenSubmitModal] = React.useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
+  const [openBulkUploadModal, setOpenBulkUploadModal] = React.useState(false);
   const Router = useRouter();
 
   React.useEffect(() => {
@@ -178,7 +180,7 @@ const CreateBranch = ({pageDescription}) => {
               </div>
               <button
                 className='bg-brand-green text-text-white rounded-md px-5 py-2 hover:bg-opacity-90'
-                onClick={() => Router.push('/pages/account/admin/branch-management/create-branch/bulk')}
+                onClick={() => setOpenBulkUploadModal(true)}
               >
                Create Branches in Bulk
               </button>
@@ -371,8 +373,19 @@ const CreateBranch = ({pageDescription}) => {
             />
           </div>
         </div>
-
       </div>
+      {openBulkUploadModal && (
+        <div className="inset-0 bg-black bg-opacity-70 fixed z-50 flex justify-center items-center flex-col">
+          <div
+            className="bg-gray-shadow2 text-text-white cursor-pointer py-3 px-5 m-1 rounded-[100%] hover:bg-gray-shadow5"
+            onClick={() => setOpenBulkUploadModal(false)}
+            title="close"
+          >
+            X
+          </div>
+          <BulkBranchUploadModal />
+        </div>
+      )}
       {createNewBand && 
         <div className='inset z-50 flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black bg-opacity-70'>
           <CreateNewBand 

@@ -43,7 +43,7 @@ const OTPForm = () => {
         setPurpose(verificationPurpose);
       }
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -132,7 +132,7 @@ const OTPForm = () => {
 
         // Redirect to the appropriate page based on the user's role and trusted device status
 
-        if (response?.data?.trustedDevice === true) {
+        if (response?.data?.trustedDevice) {
           setUser(response?.data?.user);
           sessionStorage.setItem('token', response?.data?.token);
 
