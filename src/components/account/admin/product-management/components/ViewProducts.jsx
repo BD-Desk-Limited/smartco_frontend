@@ -8,689 +8,153 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext'; 
 import ProductManagementSidebar from './ProductManagementSidebar';
 import Spinner from '@/components/account/Spinner';
+import DeleteModal from '@/components/account/DeleteModal';
+import ExportContent from '@/components/account/ExportContent';
+import SuccessModal from '@/components/account/SuccessModal';
+import DeactivationModal from '@/components/account/DeactivationModal';
+import { deleteProductsService, enableOrDisableProductService } from '@/services/productsServices';
 
 // Sample data for Product schema
 const sampleProducts = [
     {
+        _id: "EXEC-OAK-001",
         name: "Executive Oak Desk",
-        description: "Premium solid oak executive desk with brass hardware and leather inlay",
-        profileImage: "https://example.com/images/oak-desk.jpg",
-        key: "EXEC-OAK-001",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439011", // Oak wood material ID
-                quantity: 1,
-                isOptional: false,
-                price: 500,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439012", // Mahogany alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: 200 },
-                            { band: "retail", price: 300 },
-                            { band: "premium", price: 400 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                material: "507f1f77bcf86cd799439013", // Brass hardware
-                quantity: 8,
-                isOptional: false,
-                price: 50,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.5,
-            taxAmount: 68
-        },
-        pricing: [
-            { band: "wholesale", price: 800, currency: "USD" },
-            { band: "retail", price: 1200, currency: "USD" },
-            { band: "premium", price: 1500, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439020"
+        category: { _id: "507f1f77bcf86cd799439050", name: "Office Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "MOD-STL-002",
         name: "Modern Steel Bookshelf",
-        description: "Contemporary powder-coated steel bookshelf with adjustable shelves",
-        profileImage: "https://example.com/images/steel-bookshelf.jpg",
-        key: "MOD-STL-002",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439014", // Steel frame
-                quantity: 1,
-                isOptional: false,
-                price: 150,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439015", // Aluminum alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: 100 },
-                            { band: "retail", price: 150 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 6.0,
-            taxAmount: 18
-        },
-        pricing: [
-            { band: "wholesale", price: 300, currency: "USD" },
-            { band: "retail", price: 450, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439020"
+        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "LEA-CHR-003",
         name: "Leather Office Chair",
-        description: "Ergonomic leather office chair with lumbar support",
-        profileImage: "https://example.com/images/leather-chair.jpg",
-        key: "LEA-CHR-003",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439016", // Leather upholstery
-                quantity: 1,
-                isOptional: false,
-                price: 200,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439017", // Fabric alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: -50 },
-                            { band: "retail", price: -75 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                material: "507f1f77bcf86cd799439018", // Aluminum base
-                quantity: 1,
-                isOptional: false,
-                price: 80,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 7.25,
-            taxAmount: 29
-        },
-        pricing: [
-            { band: "wholesale", price: 400, currency: "USD" },
-            { band: "retail", price: 600, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439021"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "inactive"
     },
     {
+        _id: "GLS-CNF-004",
         name: "Glass Conference Table",
-        description: "Tempered glass conference table with chrome legs",
-        profileImage: "https://example.com/images/glass-table.jpg",
-        key: "GLS-CNF-004",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439019", // Tempered glass top
-                quantity: 1,
-                isOptional: false,
-                price: 300,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439020", // Chrome legs
-                quantity: 4,
-                isOptional: false,
-                price: 50,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439021", // Steel legs
-                        additionalPrice: [
-                            { band: "wholesale", price: -20 },
-                            { band: "retail", price: -30 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.0,
-            taxAmount: 40
-        },
-        pricing: [
-            { band: "wholesale", price: 500, currency: "USD" },
-            { band: "retail", price: 750, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439022"
+        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
+        availability: "In Stock",
+        status: "inactive"
     },
     {
+        _id: "PIN-FIL-005",
         name: "Pine Filing Cabinet",
-        description: "Four-drawer pine filing cabinet with brass handles",
-        profileImage: "https://example.com/images/pine-cabinet.jpg",
-        key: "PIN-FIL-005",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439022", // Pine wood
-                quantity: 1,
-                isOptional: false,
-                price: 120,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439011", // Oak upgrade
-                        additionalPrice: [
-                            { band: "wholesale", price: 80 },
-                            { band: "retail", price: 120 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 5.5,
-            taxAmount: 11
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439023"
+        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
+        availability: "Low Stock",
+        status: "active"
     },
     {
+        _id: "ERG-STD-006",
         name: "Ergonomic Standing Desk",
-        description: "Height-adjustable standing desk with electric motor",
-        profileImage: "https://example.com/images/standing-desk.jpg",
-        key: "ERG-STD-006",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439023", // Bamboo desktop
-                quantity: 1,
-                isOptional: false,
-                price: 150,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439024", // Laminate alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: -50 },
-                            { band: "retail", price: -75 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                material: "507f1f77bcf86cd799439025", // Electric motor
-                quantity: 1,
-                isOptional: false,
-                price: 200,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.25,
-            taxAmount: 49.5
-        },
-        pricing: [
-            { band: "wholesale", price: 600, currency: "USD" },
-            { band: "retail", price: 900, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439024"
+        category: { _id: "507f1f77bcf86cd799439050", name: "Office Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "VEL-ACC-007",
         name: "Velvet Accent Chair",
-        description: "Luxurious velvet accent chair with gold legs",
-        profileImage: "https://example.com/images/velvet-chair.jpg",
-        key: "VEL-ACC-007",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439026", // Velvet fabric
-                quantity: 1,
-                isOptional: false,
-                price: 100,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439027", // Linen alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: -30 },
-                            { band: "retail", price: -45 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 7.0,
-            taxAmount: 21
-        },
-        pricing: [
-            { band: "wholesale", price: 300, currency: "USD" },
-            { band: "retail", price: 450, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439025"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "IND-BAR-008",
         name: "Industrial Bar Stool",
-        description: "Reclaimed wood and steel industrial bar stool",
-        profileImage: "https://example.com/images/bar-stool.jpg",
-        key: "IND-BAR-008",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439028", // Reclaimed wood seat
-                quantity: 1,
-                isOptional: false,
-                price: 40,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439029", // Steel frame
-                quantity: 1,
-                isOptional: false,
-                price: 35,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 6.5,
-            taxAmount: 9.75
-        },
-        pricing: [
-            { band: "wholesale", price: 150, currency: "USD" },
-            { band: "retail", price: 225, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439026"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "inactive"
     },
     {
+        _id: "MAR-COF-009",
         name: "Marble Coffee Table",
-        description: "White marble top coffee table with brass base",
-        profileImage: "https://example.com/images/marble-table.jpg",
-        key: "MAR-COF-009",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439030", // Marble top
-                quantity: 1,
-                isOptional: false,
-                price: 400,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439031", // Granite alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: -100 },
-                            { band: "retail", price: -150 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.75,
-            taxAmount: 70
-        },
-        pricing: [
-            { band: "wholesale", price: 800, currency: "USD" },
-            { band: "retail", price: 1200, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439027"
+        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
+        availability: "Low Stock",
+        status: "inactive"
     },
     {
+        _id: "SCA-DIN-010",
         name: "Scandinavian Dining Chair",
-        description: "Minimalist oak dining chair with cushioned seat",
-        profileImage: "https://example.com/images/scandi-chair.jpg",
-        key: "SCA-DIN-010",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439011", // Oak frame
-                quantity: 1,
-                isOptional: false,
-                price: 80,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439032", // Foam cushion
-                quantity: 1,
-                isOptional: true,
-                price: 20,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 7.5,
-            taxAmount: 15
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439028"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "VIN-STO-011",
         name: "Vintage Storage Trunk",
-        description: "Distressed leather storage trunk with brass hardware",
-        profileImage: "https://example.com/images/storage-trunk.jpg",
-        key: "VIN-STO-011",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439033", // Distressed leather
-                quantity: 1,
-                isOptional: false,
-                price: 120,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439013", // Brass hardware
-                quantity: 6,
-                isOptional: false,
-                price: 30,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 6.25,
-            taxAmount: 18.75
-        },
-        pricing: [
-            { band: "wholesale", price: 300, currency: "USD" },
-            { band: "retail", price: 450, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439029"
+        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "ACR-SID-012",
         name: "Acrylic Side Table",
-        description: "Clear acrylic side table with curved edges",
-        profileImage: "https://example.com/images/acrylic-table.jpg",
-        key: "ACR-SID-012",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439034", // Clear acrylic
-                quantity: 1,
-                isOptional: false,
-                price: 80,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439035", // Frosted acrylic
-                        additionalPrice: [
-                            { band: "wholesale", price: 20 },
-                            { band: "retail", price: 30 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.0,
-            taxAmount: 16
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439030"
+        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "RUS-FAR-013",
         name: "Rustic Farmhouse Bench",
-        description: "Reclaimed barn wood bench with iron brackets",
-        profileImage: "https://example.com/images/farmhouse-bench.jpg",
-        key: "RUS-FAR-013",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439036", // Barn wood
-                quantity: 1,
-                isOptional: false,
-                price: 60,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439037", // Iron brackets
-                quantity: 4,
-                isOptional: false,
-                price: 25,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 5.0,
-            taxAmount: 10
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439031"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "inactive"
     },
     {
+        _id: "MES-OFF-014",
         name: "Mesh Office Chair",
-        description: "Breathable mesh office chair with adjustable height",
-        profileImage: "https://example.com/images/mesh-chair.jpg",
-        key: "MES-OFF-014",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439038", // Mesh fabric
-                quantity: 1,
-                isOptional: false,
-                price: 50,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439039", // Plastic base
-                quantity: 1,
-                isOptional: false,
-                price: 30,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 7.75,
-            taxAmount: 15.5
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439032"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "Out of Stock",
+        status: "inactive"
     },
     {
+        _id: "CER-GAR-015",
         name: "Ceramic Garden Stool",
-        description: "Hand-painted ceramic garden stool in blue and white",
-        profileImage: "https://example.com/images/ceramic-stool.jpg",
-        key: "CER-GAR-015",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439040", // Ceramic
-                quantity: 1,
-                isOptional: false,
-                price: 70,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439041", // Porcelain upgrade
-                        additionalPrice: [
-                            { band: "wholesale", price: 50 },
-                            { band: "retail", price: 75 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 6.0,
-            taxAmount: 12
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439033"
+        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "TEA-OUT-016",
         name: "Teak Outdoor Table",
-        description: "Weather-resistant teak outdoor dining table",
-        profileImage: "https://example.com/images/teak-table.jpg",
-        key: "TEA-OUT-016",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439042", // Teak wood
-                quantity: 1,
-                isOptional: false,
-                price: 300,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439043", // Marine varnish
-                quantity: 1,
-                isOptional: true,
-                price: 50,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.5,
-            taxAmount: 42.5
-        },
-        pricing: [
-            { band: "wholesale", price: 500, currency: "USD" },
-            { band: "retail", price: 750, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439034"
+        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "UPH-OTT-017",
         name: "Upholstered Ottoman",
-        description: "Round upholstered ottoman with storage compartment",
-        profileImage: "https://example.com/images/ottoman.jpg",
-        key: "UPH-OTT-017",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439044", // Fabric upholstery
-                quantity: 1,
-                isOptional: false,
-                price: 40,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439016", // Leather upgrade
-                        additionalPrice: [
-                            { band: "wholesale", price: 60 },
-                            { band: "retail", price: 90 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            }
-        ],
-        productTax: {
-            taxPercentage: 7.25,
-            taxAmount: 14.5
-        },
-        pricing: [
-            { band: "wholesale", price: 200, currency: "USD" },
-            { band: "retail", price: 300, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439035"
+        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
+        availability: "In Stock",
+        status: "inactive"
     },
     {
+        _id: "CON-DIN-018",
         name: "Concrete Dining Table",
-        description: "Modern concrete dining table with steel legs",
-        profileImage: "https://example.com/images/concrete-table.jpg",
-        key: "CON-DIN-018",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439045", // Concrete top
-                quantity: 1,
-                isOptional: false,
-                price: 200,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439014", // Steel legs
-                quantity: 4,
-                isOptional: false,
-                price: 40,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.0,
-            taxAmount: 32
-        },
-        pricing: [
-            { band: "wholesale", price: 400, currency: "USD" },
-            { band: "retail", price: 600, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439036"
+        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
+        availability: "Low Stock",
+        status: "inactive"
     },
     {
+        _id: "RAT-HAN-019",
         name: "Rattan Hanging Chair",
-        description: "Bohemian rattan hanging chair with cushions",
-        profileImage: "https://example.com/images/rattan-chair.jpg",
-        key: "RAT-HAN-019",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439046", // Rattan weave
-                quantity: 1,
-                isOptional: false,
-                price: 150,
-                choices: []
-            },
-            {
-                material: "507f1f77bcf86cd799439047", // Cotton cushions
-                quantity: 2,
-                isOptional: true,
-                price: 30,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 6.5,
-            taxAmount: 19.5
-        },
-        pricing: [
-            { band: "wholesale", price: 300, currency: "USD" },
-            { band: "retail", price: 450, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439037"
+        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
+        availability: "In Stock",
+        status: "active"
     },
     {
+        _id: "WAL-MED-020",
         name: "Walnut Media Console",
-        description: "Mid-century walnut media console with sliding doors",
-        profileImage: "https://example.com/images/walnut-console.jpg",
-        key: "WAL-MED-020",
-        components: [
-            {
-                material: "507f1f77bcf86cd799439048", // Walnut wood
-                quantity: 1,
-                isOptional: false,
-                price: 250,
-                choices: [
-                    {
-                        material: "507f1f77bcf86cd799439011", // Oak alternative
-                        additionalPrice: [
-                            { band: "wholesale", price: -50 },
-                            { band: "retail", price: -75 }
-                        ],
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                material: "507f1f77bcf86cd799439049", // Sliding hardware
-                quantity: 2,
-                isOptional: false,
-                price: 40,
-                choices: []
-            }
-        ],
-        productTax: {
-            taxPercentage: 8.25,
-            taxAmount: 49.5
-        },
-        pricing: [
-            { band: "wholesale", price: 600, currency: "USD" },
-            { band: "retail", price: 900, currency: "USD" }
-        ],
-        company_id: "507f1f77bcf86cd799439038"
+        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
+        availability: "In Stock",
+        status: "active"
     }
 ];
 
@@ -703,12 +167,20 @@ const ViewProducts = ({pageDescription}) => {
     
     const [openSidebar, setOpenSidebar] = React.useState(false);
     const [searchInput, setSearchInput] = React.useState('');
-    const [selectedProduct, setSelectedProduct] = React.useState('');
+    const [selectedProduct, setSelectedProduct] = React.useState([]);
     const [allProducts, setAllProducts] = React.useState([]);
+    const [filteredProducts, setFilteredProducts] = React.useState([]);
     const [selectedCategory, setSelectedCategory] = React.useState('');
     const [allCategories, setAllCategories] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
+    const [openEnableOrDisableModal, setOpenEnableOrDisableModal] = React.useState(false);
+    const [enableAndDisableErrors, setEnableAndDisableErrors] = React.useState([]);
+    const [productsStatus, setProductsStatus] = React.useState('');
     const [exportContent, setExportContent] = React.useState(false);
+    const [enableOrDisableSuccess, setEnableOrDisableSuccess] = React.useState(false);
+    const [deleteSuccess, setDeleteSuccess] = React.useState(false);
+    const [deleteErrors, setDeleteErrors] = React.useState([]);
 
     const Router = useRouter();
     const auth = useAuth();
@@ -718,11 +190,166 @@ const ViewProducts = ({pageDescription}) => {
         setAllProducts(sampleProducts);
     }, [loggedInUser, Router]);
 
+    // Get all unique categories from products
+    React.useEffect(() => {
+        if (allProducts.length > 0) {
+            const categories = allProducts.map(product => product.category);
+            const uniqueCategoriesObj = {};
+            categories.forEach(cat => {
+                if (cat && cat._id) {
+                    uniqueCategoriesObj[cat._id] = cat;
+                }
+            });
+            const uniqueCategories = Object.values(uniqueCategoriesObj);
+            setAllCategories(uniqueCategories);
+            setSelectedCategory(''); // Reset selected category if products change
+        }
+
+    }, [allProducts]);
+
+    // Filter products based on search input and selected category
+    React.useEffect(() => {
+        const filtered = allProducts.filter(product => {
+            const matchesSearch = product.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+                                  product.category.name.toLowerCase().includes(searchInput.toLowerCase());
+            const matchesCategory = selectedCategory ? product.category._id === selectedCategory : true;
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredProducts(filtered);
+    }, [searchInput, selectedCategory, allProducts]);
+
     const handleResetFilters = () => {
         setSearchInput('');
         setSelectedCategory('');
-        setSelectedProduct('');
+        setSelectedProduct([]);
     };
+
+    const handleOpenDeleteModal = (e, productId) => {
+      e.stopPropagation();
+      setOpenDeleteModal(true);
+      setSelectedProduct(productId);
+    };
+
+    const handleCloseDeleteModal = () => {
+      setOpenDeleteModal(false);
+      setSelectedProduct([]);
+    };
+
+  const handleOpenEnableOrDisableModal = (e, productId) => {
+    e.stopPropagation();
+    // Get the first product to compare status
+    const firstProduct = allProducts.find(p => p._id === productId[0]);
+    if (!firstProduct) {
+      setEnableAndDisableErrors(['Product not found.']);
+      setOpenEnableOrDisableModal(true);
+    return;
+    }
+
+    // Check if the status of all products are the same
+    const allSameStatus = productId.every(id => {
+      const product = allProducts.find(p => p._id === id);
+      return product && product.status === firstProduct.status;
+    });
+
+    if (allSameStatus) {
+      setSelectedProduct(productId);
+      setProductsStatus(firstProduct.status);
+      setEnableAndDisableErrors([]);
+    } else {
+      setEnableAndDisableErrors(['Please select products with the same status to enable or disable.']);
+    }
+
+    setOpenEnableOrDisableModal(true);
+  };
+
+
+  const handleEnableOrDisableProduct = async(productId) => {
+    
+    setEnableAndDisableErrors([]);
+    if (productId.length === 0) {
+      setEnableAndDisableErrors(['Please select at least one product to enable or disable.']);
+      setLoading(false);
+      return;
+    }
+
+    try{
+      setLoading(true);
+      const response = await enableOrDisableProductService(productId, productsStatus);
+      if (response.error) {
+        setEnableAndDisableErrors([response.error]);
+      } else if (response.data) {
+        setEnableOrDisableSuccess(true);
+        setEnableAndDisableErrors([]);
+        setOpenEnableOrDisableModal(false);
+      }
+    }catch (error) {
+      console.error('Error enabling or disabling product:', error);
+      setEnableAndDisableErrors(['Error enabling or disabling product, please try again']);
+    }finally {
+      setLoading(false);
+    }
+  };
+
+
+    const handleDeleteProduct = async(e) => {
+      e.stopPropagation();
+      
+      setDeleteErrors([]);
+      if (selectedProduct.length === 0) {
+        setDeleteErrors(['Please select at least one product to delete.']);
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const response = await deleteProductsService(selectedProduct);
+        if (response.error) {
+          setDeleteErrors([response.error || 'Error deleting products, please try again']);
+        } else if (response.data) {
+          setDeleteSuccess(true);
+          setDeleteErrors([]);
+          setOpenDeleteModal(false);
+          setSelectedProduct([]);
+          // Refresh the product list
+          setAllProducts(allProducts.filter(product => !selectedProduct.includes(product._id)));
+        }
+      } catch (error) {
+        console.error('Error deleting products:', error);
+        setDeleteErrors(['Error deleting products, please try again']);
+      } finally {
+        setLoading(false);
+      }
+
+    };
+
+    const handleSelectProduct = (productId) => {
+      if (selectedProduct.includes(productId)) {
+          setSelectedProduct(selectedProduct.filter(id => id !== productId));
+      } else {
+          setSelectedProduct([...selectedProduct, productId]);
+      }
+    };
+
+    const handleCloseAllModals = () => {
+      setOpenDeleteModal(false);
+      setExportContent(false);
+      setDeleteSuccess(false);
+      setSelectedProduct([]);
+      setOpenEnableOrDisableModal(false);
+      setEnableOrDisableSuccess(false);
+      setEnableAndDisableErrors([]);
+      setDeleteErrors([]);
+      setProductsStatus('');
+    };
+
+    const getSelectedCategoryNameById = (categoryId) => {
+      const category = allCategories.find(cat => cat._id === categoryId);
+      return category ? category.name : 'Unknown Category';
+    };
+
+    console.log('Enable or disable errors:', enableAndDisableErrors);
+
 
   return (
     <div>
@@ -742,6 +369,7 @@ const ViewProducts = ({pageDescription}) => {
         </div>
         <div className='flex flex-col h-full w-full'>
           <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+
             {/* search bar and filters */}
             <div className='flex flex-row gap-5 w-full justify-between items-center'>
               <div className='h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full'>
@@ -773,9 +401,12 @@ const ViewProducts = ({pageDescription}) => {
                     className="focus:outline-none cursor-pointer"
                   >
                     <option value={''}>All Categories</option>
-                    {allCategories?.map((category) => (
-                        <option key={category} value={category} className=''>{category}</option>
-                    ))}
+                    {allCategories&& allCategories.length > 0 && 
+                        allCategories?.map((category) => (
+                            <option key={category._id} value={category._id} className=''>
+                                {category.name}
+                            </option>
+                        ))}
                   </select>
                 </div>
                 <button 
@@ -814,8 +445,151 @@ const ViewProducts = ({pageDescription}) => {
 
             {/* Table */}
             {loading? (<Spinner />):(
-                <div>
-                    this is the table
+                <div className='overflow-x-auto w-full h-full min-h-[50vh] max-h-[60vh] overflow-y-auto scrollbar-thin relative'>
+                  <table className='w-full table-auto relative'>
+                    <thead className='bg-background-1 sticky top-[-1px] z-10'>
+                      <tr className='text-left text-text-gray text-sm font-medium border border-gray-border'>
+                        <th className='px-2 py-2 border border-gray-border text-center'>Product Name</th>
+                        <th className='px-2 py-2 border border-gray-border text-center'>Product I D</th>
+                        <th className='px-2 py-2 border border-gray-border text-center'>Category</th>
+                        <th className='px-2 py-2 border border-gray-border text-center'>Availability</th>
+                        <th className='px-2 py-2 border border-gray-border text-center'>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className='text-sm text-text-gray min-h-[40vh] w-full'>
+                        {filteredProducts?.length > 0 ? (
+                            filteredProducts?.map((product) => (
+                              <tr 
+                                key={product._id} 
+                                className={`border-b border-gray-border hover:bg-gray-shadow10 hover:text-text-black cursor-pointer items-center w-full`}
+                                onClick={() => Router.push(`/pages/account/admin/product-management/product-details?id=${product._id}`)}
+                              >
+                                <td className={`px-2 py-2 text-left flex items-center gap-2`}>
+                                  <input 
+                                    type="checkbox"
+                                    value={product._id}
+                                    checked={selectedProduct.includes(product._id)}
+                                    onClick={(e) => e.stopPropagation()} // Stop event propagation
+                                    onChange={(e) => {
+                                      e.stopPropagation(); // Stop event propagation
+                                      handleSelectProduct(e.target.value);
+                                    }}
+                                    className='cursor-pointer mr-5'
+                                  />
+
+                                  <Image
+                                    src={product?.imageURL || '/assets/shopping-bag.png'}
+                                    alt={product?.name || 'Product Image'}
+                                    width={30}
+                                    height={30}
+                                    className='object-cover'
+                                  />
+                                  <span className={`px-2 py-2 text-center font-semibold`}>{product?.name || '-'}</span>
+                                </td>
+                                <td className={`px-2 py-2 text-center w-1/6`}>{product?._id || '-'}</td>
+                                <td className={`px-2 py-2 text-center w-1/6`}>{product?.category?.name || '-'}</td>
+                                <td className={`px-2 py-2 text-center w-1/6`}>{product?.availability || '-'}</td>
+
+                                {/* Actions */}
+                                <td className={`px-2 py-2 text-center w-1/6`}>
+                                    <span className='flex flex-row items-center gap-2 justify-around'>
+                                      <button>
+                                          <Image
+                                              src="/assets/edit.png"
+                                              alt="edit"
+                                              width={15}
+                                              height={15}
+                                              className='cursor-pointer'
+                                              title='Edit Product'
+                                              onClick={(e) => {
+                                                  e.stopPropagation(); // Stop event propagation
+                                                  Router.push(`/pages/account/admin/product-management/edit-product?id=${product._id}`);
+                                                }
+                                              }
+                                          />
+                                      </button>
+                                      <button 
+                                        className=''
+                                      >
+                                        <Image
+                                          src= {product.status === 'active'? "/assets/switch_active.png" : "/assets/switch_inactive.png"}
+                                          alt="delete"
+                                          width={20}
+                                          height={20}
+                                          title={product.status === 'active' ? 'Disable Product' : 'Enable Product'}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenEnableOrDisableModal(e, [product._id])
+                                          }}
+                                          className='cursor-pointer'
+                                        />
+                                      </button>
+                                      <button 
+                                        className=''
+                                      >
+                                        <Image
+                                          src="/assets/delete.png"
+                                          alt="delete"
+                                          width={15}
+                                          height={15}
+                                          title='Delete Product'
+                                          onClick={(e) => handleOpenDeleteModal(e, [product._id])}
+                                          className='cursor-pointer'
+                                        />
+                                      </button>
+                                    </span>
+                                </td>
+                              </tr>
+                            ))
+                        ) : (
+                            <tr>
+                              <td colSpan={6} className='text-center py-32 text-lg'>No products found</td>
+                            </tr>
+                        )}
+                    </tbody>
+                  </table>
+
+                  {/* Selected products indicator */}
+                  {selectedProduct.length > 0 && (
+                    <div className='flex justify-end mt-4 sticky bottom-0 right-5 gap-5'>
+                      <div className='bg-brand-green text-sm text-text-white p-2 rounded-md flex items-center gap-2'>
+                        <span>{selectedProduct.length} SELECTED</span>
+                        <button 
+                          onClick={(e) => handleOpenEnableOrDisableModal(e, selectedProduct)}
+                          className='text-brand-green px-2 py-1 rounded text-sm hover:scale-105'
+                        >
+                          <Image
+                              src={productsStatus === 'active' ? "/assets/switch_active.png" : "/assets/switch_inactive.png"}
+                              alt="enable or disable"
+                              width={25}
+                              height={25}
+                              className='cursor-pointer'
+                              title={productsStatus === 'active' ? 'Disable selected Products' : 'Enable selected Products'}
+                          />
+                        </button>
+                        <button 
+                          onClick={(e) => handleOpenDeleteModal(e, selectedProduct)}
+                          className='text-brand-green px-2 py-1 rounded text-sm hover:scale-105'
+                        >
+                          <Image
+                              src="/assets/delete-white.png"
+                              alt="delete"
+                              width={15}
+                              height={15}
+                              className='cursor-pointer'
+                              title='Delete selected Products'
+                          />
+                        </button>
+                      </div>
+
+                      <button 
+                          onClick={() => setSelectedProduct([])}
+                          className='text-white bg-gray-shadow1 px-2 py-1 rounded text-sm hover:bg-gray-shadow3'
+                        >
+                          clear selection
+                        </button>
+                    </div>
+                  )}
                 </div>
             )}
 
@@ -823,8 +597,87 @@ const ViewProducts = ({pageDescription}) => {
         <div className=''><PageDescription pageDescription={pageDescription}/></div>
       </div>
     </div>
-  
-    {/* exports etc */}
+
+    {/* Delete Confirmation Modal */}
+    {openDeleteModal && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <DeleteModal
+          message={`Are you sure you want to delete this product? This action cannot be undone.`}
+          title={`Delete Product`}
+          buttonStyle={`bg-error text-white hover:bg-error-hover`}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleDeleteProduct}
+          button2Style={`bg-brand-blue text-white`}
+          deleteErrors={deleteErrors}
+          loading={loading}
+        />
+      </div>
+    )}
+
+    {/* Delete success Modal */}
+    {deleteSuccess && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <SuccessModal
+          message={`Product deleted successfully.`}
+          title={`Product Deleted`}
+          buttonStyle={`bg-brand-blue text-text-white`}
+          buttonText={`Done`}
+          onClose={handleCloseAllModals}
+        />
+      </div>
+    )}
+
+    {/* Enable or Disable Modal */}
+    {openEnableOrDisableModal && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <DeactivationModal
+          message={`Are you sure you want to ${productsStatus === 'active' ? 'disable this product? this would make the product unavailable for sale on the storefront.' : 'enable this product? this would make the product available for sale on the storefront.'}`}
+          title={`${productsStatus === 'active' ? 'Deactivate' : 'Activate'} Product`}
+          buttonStyle={`bg-brand-blue text-white hover:bg-brand-blue-hover`}
+          onClose={handleCloseAllModals}
+          onConfirm={(e)=>handleEnableOrDisableProduct(selectedProduct)}
+          loading={loading}
+          deactivationErrors={enableAndDisableErrors}
+        />
+      </div>
+    )}
+
+    {/* Enable or disable success Modal */}
+    {enableOrDisableSuccess && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <SuccessModal
+          message={`Product ${productsStatus === 'active' ? 'disabled' : 'enabled'} successfully.`}
+          title={`Product ${productsStatus === 'active' ? 'Disabled' : 'Enabled'}`}
+          buttonStyle={`bg-brand-blue text-text-white`}
+          buttonText={`Done`}
+          onClose={handleCloseAllModals}
+        />
+      </div>
+    )}
+
+    {/* Export Content Modal */}
+    {exportContent && filteredProducts.length > 0 &&
+      <div className='inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center'>
+        <ExportContent
+            metadata={{
+                Date : [new Date().toLocaleDateString()],
+                Time: [new Date().toLocaleTimeString()],
+                category: selectedCategory? [getSelectedCategoryNameById(selectedCategory)]: ["All"],
+            }}
+            data={filteredProducts.map((product, index )=> {
+                return {
+                  "S/No": index+1,
+                  "Name": product.name, 
+                  "Product ID": product._id,
+                  "Availability": product.availability,
+                  "Category": product.category?.name, 
+                }
+            })}
+            onClose={() => setExportContent(false)}
+            title={'Export Products'}
+        />
+      </div>
+    }
   </div>
   )
 }

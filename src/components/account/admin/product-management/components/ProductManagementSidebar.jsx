@@ -12,7 +12,7 @@ const ProductManagementSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
     },
     {
       name: 'Create New Product',
-      link: '/create-product',
+      link: '/create-new-product',
     },
   ];
 

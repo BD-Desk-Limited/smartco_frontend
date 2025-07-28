@@ -18,7 +18,7 @@ const DeleteModal = ({ message, title, buttonStyle, onClose, onConfirm, button2S
       </h1>
       <Image src="/assets/delete-warning.png" alt="error" width={70} height={70} />
       {
-        (deleteErrors.length>0 || deleteMessages.length>0) ? (
+        (deleteErrors && deleteErrors.length > 0 || deleteMessages && deleteMessages.length > 0) ? (
             <div className='flex flex-col items-center gap-1 max-h-[40%] overflow-y-auto scrollbar-thin w-full px-5'>
                 {deleteErrors.length>0 && 
                     <p className="text-sm text-error flex flex-col items-center text-center">

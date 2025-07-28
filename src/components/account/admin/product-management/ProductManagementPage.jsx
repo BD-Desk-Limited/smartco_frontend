@@ -29,23 +29,19 @@ const ProductManagementPage = () => {
     };
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1">
-        <div>
+    <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
+        <div className='h-full'>
           <AdminSideBar
             selectedMenu={selectedMenu}
             setSelectedMenu={setSelectedMenu}
           />
         </div>
-        <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+        <div className="w-full h-full overflow-y-auto no-scrollbar">
           <ViewProducts
             pageDescription={pageDescription} 
           />
         </div>
       </div>
-  )
-
-  return (
-    <div>ProductManagementPage</div>
   );
 }
 
