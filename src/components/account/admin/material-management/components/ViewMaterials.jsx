@@ -376,7 +376,7 @@ const ViewMaterial = ({pageDescription}) => {
                     message={`Are you sure you want to delete the selected ${selectedMaterials.length>1? 'materials?':'material?'} This action cannot be undone.`}
                     buttonStyle={'bg-error hover:bg-error-hover text-white'}
                     onClose={handleClose}
-                    onConfirm={() => handleDeleteMaterials(selectedMaterials)}
+                    onConfirm={() => handleDeleteMaterials()}
                     loading={loading}
                     deleteErrors={deleteErrors}
                     deleteMessages={deleteMessages}

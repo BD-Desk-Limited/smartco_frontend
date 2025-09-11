@@ -45,13 +45,13 @@ export const enableOrDisableProductService = async (productIds, status) => {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products/status`,
       {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ 
-          productIds: productIds,
+          product_ids: productIds,
           status: status,
          }),
       }
@@ -72,7 +72,7 @@ export const enableOrDisableProductService = async (productIds, status) => {
 };
 
 //delete product(s)
-export const deleteProductsService = async (productIds) => {
+export const deleteProductsService = async (product_ids) => {
     const token = getToken();
     try {
         const response = await fetch(
@@ -83,12 +83,13 @@ export const deleteProductsService = async (productIds) => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ productIds }),
+                body: JSON.stringify({ product_ids }),
             }
         );
 
         if (response.ok) {
             const responseData = await response.json();
+            console.log('Delete Response Data:', responseData);
             return { data: responseData.data };
         } else {
             const errorData = await response.json();

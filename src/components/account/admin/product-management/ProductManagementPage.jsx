@@ -16,7 +16,7 @@ const ProductManagementPage = () => {
     });
 
     const pageDescription =
-        'The Product Management page allows you to view all products in your system, filter and search through them, and perform actions such as adding new products, editing product details, and managing product availability. This interface provides a comprehensive overview of your product catalog, enabling efficient updates and organization. Click on any product to view or edit its information, including name, category, price, and stock status. Use the search and filter tools to quickly locate specific products or categories.';
+        'The Product Management page allows you to view all products. Products are finished and packaged items sold over the counter. They are typically displayed in the sales catalog but not in the inventory list. The inventory rather captures raw materials and components that are used to create these finished products. This interface provides a comprehensive overview of your products, enabling efficient updates and organization. Click on any product to view or edit its information, including name, category, price, and stock status. Use the search and filter tools to quickly locate specific products or categories.';
 
     // Check if the user has access to this page
     const accessCheckFailed = PageAccessRequirement(

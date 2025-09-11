@@ -13,150 +13,7 @@ import ExportContent from '@/components/account/ExportContent';
 import SuccessModal from '@/components/account/SuccessModal';
 import DeactivationModal from '@/components/account/DeactivationModal';
 import { deleteProductsService, enableOrDisableProductService } from '@/services/productsServices';
-
-// Sample data for Product schema
-const sampleProducts = [
-    {
-        _id: "EXEC-OAK-001",
-        name: "Executive Oak Desk",
-        category: { _id: "507f1f77bcf86cd799439050", name: "Office Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "MOD-STL-002",
-        name: "Modern Steel Bookshelf",
-        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "LEA-CHR-003",
-        name: "Leather Office Chair",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "inactive"
-    },
-    {
-        _id: "GLS-CNF-004",
-        name: "Glass Conference Table",
-        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
-        availability: "In Stock",
-        status: "inactive"
-    },
-    {
-        _id: "PIN-FIL-005",
-        name: "Pine Filing Cabinet",
-        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
-        availability: "Low Stock",
-        status: "active"
-    },
-    {
-        _id: "ERG-STD-006",
-        name: "Ergonomic Standing Desk",
-        category: { _id: "507f1f77bcf86cd799439050", name: "Office Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "VEL-ACC-007",
-        name: "Velvet Accent Chair",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "IND-BAR-008",
-        name: "Industrial Bar Stool",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "inactive"
-    },
-    {
-        _id: "MAR-COF-009",
-        name: "Marble Coffee Table",
-        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
-        availability: "Low Stock",
-        status: "inactive"
-    },
-    {
-        _id: "SCA-DIN-010",
-        name: "Scandinavian Dining Chair",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "VIN-STO-011",
-        name: "Vintage Storage Trunk",
-        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "ACR-SID-012",
-        name: "Acrylic Side Table",
-        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "RUS-FAR-013",
-        name: "Rustic Farmhouse Bench",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "inactive"
-    },
-    {
-        _id: "MES-OFF-014",
-        name: "Mesh Office Chair",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "Out of Stock",
-        status: "inactive"
-    },
-    {
-        _id: "CER-GAR-015",
-        name: "Ceramic Garden Stool",
-        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "TEA-OUT-016",
-        name: "Teak Outdoor Table",
-        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "UPH-OTT-017",
-        name: "Upholstered Ottoman",
-        category: { _id: "507f1f77bcf86cd799439052", name: "Seating" },
-        availability: "In Stock",
-        status: "inactive"
-    },
-    {
-        _id: "CON-DIN-018",
-        name: "Concrete Dining Table",
-        category: { _id: "507f1f77bcf86cd799439053", name: "Tables" },
-        availability: "Low Stock",
-        status: "inactive"
-    },
-    {
-        _id: "RAT-HAN-019",
-        name: "Rattan Hanging Chair",
-        category: { _id: "507f1f77bcf86cd799439054", name: "Outdoor Furniture" },
-        availability: "In Stock",
-        status: "active"
-    },
-    {
-        _id: "WAL-MED-020",
-        name: "Walnut Media Console",
-        category: { _id: "507f1f77bcf86cd799439051", name: "Storage Furniture" },
-        availability: "In Stock",
-        status: "active"
-    }
-];
+import { getAllProductsByCompanyIdService } from '@/services/productsServices';
 
 const ViewProducts = ({pageDescription}) => {
 
@@ -176,33 +33,48 @@ const ViewProducts = ({pageDescription}) => {
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     const [openEnableOrDisableModal, setOpenEnableOrDisableModal] = React.useState(false);
     const [enableAndDisableErrors, setEnableAndDisableErrors] = React.useState([]);
+    const [enableAndDisableMessages, setEnableAndDisableMessages] = React.useState([]);
     const [productsStatus, setProductsStatus] = React.useState('');
     const [exportContent, setExportContent] = React.useState(false);
     const [enableOrDisableSuccess, setEnableOrDisableSuccess] = React.useState(false);
-    const [deleteSuccess, setDeleteSuccess] = React.useState(false);
+    const [deleteMessages, setDeleteMessages] = React.useState([]);
     const [deleteErrors, setDeleteErrors] = React.useState([]);
 
     const Router = useRouter();
-    const auth = useAuth();
-    const loggedInUser = auth.user;
 
+    // Get all products, update total pages and reset current page
     React.useEffect(() => {
-        setAllProducts(sampleProducts);
-    }, [loggedInUser, Router]);
+      const fetchProducts = async () => {
+        setLoading(true);
+        try {
+          const response = await getAllProductsByCompanyIdService();
+          if (response.error) {
+            console.error('Error fetching products:', response.error);
+          } else if (response.data) {
+            setAllProducts(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        } finally {
+          setLoading(false);
+        } 
+      };
+      fetchProducts();
+    }, []);
 
     // Get all unique categories from products
     React.useEffect(() => {
         if (allProducts.length > 0) {
-            const categories = allProducts.map(product => product.category);
-            const uniqueCategoriesObj = {};
-            categories.forEach(cat => {
-                if (cat && cat._id) {
-                    uniqueCategoriesObj[cat._id] = cat;
-                }
-            });
-            const uniqueCategories = Object.values(uniqueCategoriesObj);
-            setAllCategories(uniqueCategories);
-            setSelectedCategory(''); // Reset selected category if products change
+          const categories = allProducts.map(product => product.category);
+          const uniqueCategoriesObj = {};
+          categories.forEach(cat => {
+              if (cat && cat._id) {
+                  uniqueCategoriesObj[cat._id] = cat;
+              }
+          });
+          const uniqueCategories = Object.values(uniqueCategoriesObj);
+          setAllCategories(uniqueCategories);
+          setSelectedCategory(''); // Reset selected category when products change
         }
 
     }, [allProducts]);
@@ -232,28 +104,33 @@ const ViewProducts = ({pageDescription}) => {
 
     const handleCloseDeleteModal = () => {
       setOpenDeleteModal(false);
-      setSelectedProduct([]);
+      setDeleteErrors([]);
+      setDeleteMessages([]);
     };
 
   const handleOpenEnableOrDisableModal = (e, productId) => {
     e.stopPropagation();
+
+    setEnableAndDisableMessages([]); //Reset messages
+    setEnableAndDisableErrors([]);   //Reset errors
+
     // Get the first product to compare status
     const firstProduct = allProducts.find(p => p._id === productId[0]);
     if (!firstProduct) {
       setEnableAndDisableErrors(['Product not found.']);
       setOpenEnableOrDisableModal(true);
-    return;
+      return;
     }
 
     // Check if the status of all products are the same
     const allSameStatus = productId.every(id => {
       const product = allProducts.find(p => p._id === id);
-      return product && product.status === firstProduct.status;
+      return product && product.isDisabled === firstProduct.isDisabled;
     });
 
     if (allSameStatus) {
       setSelectedProduct(productId);
-      setProductsStatus(firstProduct.status);
+      setProductsStatus(firstProduct.isDisabled ? 'inactive' : 'active');
       setEnableAndDisableErrors([]);
     } else {
       setEnableAndDisableErrors(['Please select products with the same status to enable or disable.']);
@@ -274,81 +151,111 @@ const ViewProducts = ({pageDescription}) => {
 
     try{
       setLoading(true);
-      const response = await enableOrDisableProductService(productId, productsStatus);
-      if (response.error) {
-        setEnableAndDisableErrors([response.error]);
-      } else if (response.data) {
-        setEnableOrDisableSuccess(true);
-        setEnableAndDisableErrors([]);
-        setOpenEnableOrDisableModal(false);
+      let response;
+      if(productsStatus === 'active'){
+        // Disable product(s)
+        response = await enableOrDisableProductService(productId, 'inactive');
+      }else if(productsStatus === 'inactive'){
+        // Enable product(s)
+        response = await enableOrDisableProductService(productId, 'active');
       }
+
+      if (response.error) {
+            console.error(response.error, 'error changing user status');
+            setEnableAndDisableErrors([response.error]);
+            setEnableAndDisableMessages([]);
+        }else if (response.data) {
+            setEnableAndDisableMessages([response.message]);
+            setEnableAndDisableErrors([]);
+            // Update the product status in the allProducts state
+            const updatedProducts = allProducts.map(product => {
+                if (productId.includes(product._id)) {
+                    return { ...product, isDisabled: productsStatus === 'active' ? true : false };
+                }
+                return product;
+            });
+            setAllProducts(updatedProducts);
+            setOpenEnableOrDisableModal(false);
+            setEnableOrDisableSuccess(true);
+            setSelectedProduct([]);
+        }
     }catch (error) {
       console.error('Error enabling or disabling product:', error);
       setEnableAndDisableErrors(['Error enabling or disabling product, please try again']);
+      setEnableAndDisableMessages([]);
     }finally {
       setLoading(false);
     }
   };
+  console.log('products status', allProducts.map(product => product.isDisabled));
+
+  const handleDeleteProducts = async() => {
+      try{
+          setLoading(true);
+          const response = await deleteProductsService(selectedProduct);
+          if(response.data){
+              const data = response.data;
+              if(data.deletedProducts.length>0){
+                  const deletedProductsId = data.deletedProducts.map(product => product._id)
+                  setDeleteMessages([`${data.deletedProducts.length} products deleted successfully.`]);
+                  setAllProducts(allProducts.filter(product => !deletedProductsId.includes(product._id)));
+                  setSelectedProduct([]);
+                  setDeleteErrors([]);
+                  setOpenDeleteModal(false);
+              }
+              if(data.productsNotDeleted.length>0){
+                  const productsNotDeletedIds = data.productsNotDeleted.map(product => product.product_id);
+                  const collectErrorMessages = data.productsNotDeleted.map(product => product.message)
+                  const errorTypes = [...new Set(collectErrorMessages)];
+                  let errorProductsNotDeleted = []
+                  errorTypes.forEach((errorType) => {
+                      const errorProduct = data.productsNotDeleted.filter(product => product.message === errorType);
+                      errorProductsNotDeleted =  [...errorProductsNotDeleted, {errorType, errorProduct}];
+                  })
+                  const errorMessages = errorProductsNotDeleted.map(error => {
+                      return `${error.errorType} - Products affected: ${error.errorProduct.map(product => product.name).join(', ')}`;
+                  });
+                  
+                  setDeleteErrors(errorMessages);
+                  setSelectedProduct(productsNotDeletedIds);
+              }
+          };
+          if(response.error){
+              setDeleteErrors([response.error]||['Error deleting products, please try again.']);
+          };
+      }catch(error){
+          console.error('Error:', error);
+          setDeleteErrors(['Error deleting products, please try again.']);
+      }finally{
+          setLoading(false);
+      };
+  };
 
 
-    const handleDeleteProduct = async(e) => {
-      e.stopPropagation();
-      
-      setDeleteErrors([]);
-      if (selectedProduct.length === 0) {
-        setDeleteErrors(['Please select at least one product to delete.']);
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      try {
-        const response = await deleteProductsService(selectedProduct);
-        if (response.error) {
-          setDeleteErrors([response.error || 'Error deleting products, please try again']);
-        } else if (response.data) {
-          setDeleteSuccess(true);
-          setDeleteErrors([]);
-          setOpenDeleteModal(false);
-          setSelectedProduct([]);
-          // Refresh the product list
-          setAllProducts(allProducts.filter(product => !selectedProduct.includes(product._id)));
-        }
-      } catch (error) {
-        console.error('Error deleting products:', error);
-        setDeleteErrors(['Error deleting products, please try again']);
-      } finally {
-        setLoading(false);
-      }
+  const handleSelectProduct = (productId) => {
+    if (selectedProduct.includes(productId)) {
+        setSelectedProduct(selectedProduct.filter(id => id !== productId));
+    } else {
+        setSelectedProduct([...selectedProduct, productId]);
+    }
+  };
 
-    };
+  const handleCloseAllModals = () => {
+    setOpenDeleteModal(false);
+    setExportContent(false);
+    setDeleteMessages([]);
+    setSelectedProduct([]);
+    setOpenEnableOrDisableModal(false);
+    setEnableOrDisableSuccess(false);
+    setEnableAndDisableErrors([]);
+    setDeleteErrors([]);
+    setProductsStatus('');
+  };
 
-    const handleSelectProduct = (productId) => {
-      if (selectedProduct.includes(productId)) {
-          setSelectedProduct(selectedProduct.filter(id => id !== productId));
-      } else {
-          setSelectedProduct([...selectedProduct, productId]);
-      }
-    };
-
-    const handleCloseAllModals = () => {
-      setOpenDeleteModal(false);
-      setExportContent(false);
-      setDeleteSuccess(false);
-      setSelectedProduct([]);
-      setOpenEnableOrDisableModal(false);
-      setEnableOrDisableSuccess(false);
-      setEnableAndDisableErrors([]);
-      setDeleteErrors([]);
-      setProductsStatus('');
-    };
-
-    const getSelectedCategoryNameById = (categoryId) => {
-      const category = allCategories.find(cat => cat._id === categoryId);
-      return category ? category.name : 'Unknown Category';
-    };
-
-    console.log('Enable or disable errors:', enableAndDisableErrors);
+  const getSelectedCategoryNameById = (categoryId) => {
+    const category = allCategories.find(cat => cat._id === categoryId);
+    return category ? category.name : 'Unknown Category';
+  };
 
 
   return (
@@ -488,7 +395,7 @@ const ViewProducts = ({pageDescription}) => {
                                 </td>
                                 <td className={`px-2 py-2 text-center w-1/6`}>{product?._id || '-'}</td>
                                 <td className={`px-2 py-2 text-center w-1/6`}>{product?.category?.name || '-'}</td>
-                                <td className={`px-2 py-2 text-center w-1/6`}>{product?.availability || '-'}</td>
+                                <td className={`px-2 py-2 text-center w-1/6`}>Available in <span className='font-semibold'>{product?.availability || '-'}</span> {product?.availability > 1 ? 'branches' : 'branch'}</td>
 
                                 {/* Actions */}
                                 <td className={`px-2 py-2 text-center w-1/6`}>
@@ -512,11 +419,11 @@ const ViewProducts = ({pageDescription}) => {
                                         className=''
                                       >
                                         <Image
-                                          src= {product.status === 'active'? "/assets/switch_active.png" : "/assets/switch_inactive.png"}
+                                          src= {product.isDisabled !== true ? "/assets/switch_active.png" : "/assets/switch_inactive.png"}
                                           alt="delete"
                                           width={20}
                                           height={20}
-                                          title={product.status === 'active' ? 'Disable Product' : 'Enable Product'}
+                                          title={product.isDisabled ? 'Enable Product' : 'Disable Product'}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleOpenEnableOrDisableModal(e, [product._id])
@@ -602,20 +509,21 @@ const ViewProducts = ({pageDescription}) => {
     {openDeleteModal && (
       <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
         <DeleteModal
-          message={`Are you sure you want to delete this product? This action cannot be undone.`}
-          title={`Delete Product`}
+          message={`Are you sure you want to delete the selected ${selectedProduct.length>1? 'products?':'product?'} This action cannot be undone.`}
+          title={selectedProduct.length>1? 'Delete Products':'Delete Product'}
           buttonStyle={`bg-error text-white hover:bg-error-hover`}
           onClose={handleCloseDeleteModal}
-          onConfirm={handleDeleteProduct}
+          onConfirm={handleDeleteProducts}
           button2Style={`bg-brand-blue text-white`}
           deleteErrors={deleteErrors}
+          deleteMessages={deleteMessages}
           loading={loading}
         />
       </div>
     )}
 
     {/* Delete success Modal */}
-    {deleteSuccess && (
+    {deleteMessages.length > 0 && (
       <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
         <SuccessModal
           message={`Product deleted successfully.`}
@@ -631,13 +539,29 @@ const ViewProducts = ({pageDescription}) => {
     {openEnableOrDisableModal && (
       <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
         <DeactivationModal
-          message={`Are you sure you want to ${productsStatus === 'active' ? 'disable this product? this would make the product unavailable for sale on the storefront.' : 'enable this product? this would make the product available for sale on the storefront.'}`}
-          title={`${productsStatus === 'active' ? 'Deactivate' : 'Activate'} Product`}
+          message={
+            `Are you sure you want to ${
+                productsStatus === 'active'? 'deactivate':'activate'
+            } the selected ${
+                selectedProduct.length>1? 'products?':'product?'
+            } ${productsStatus === 'active' ? (`This would make the ${
+                selectedProduct.length>1? 'products':'product'
+            } unavailable for sale in the store-front `):''}.`
+          }
+          title={
+          selectedProduct.length>1? (
+            productsStatus === 'active'? 'Disable products':'Enable products'
+          ):(
+             productsStatus === 'inactive' ? 'Enable product':'Disable product'
+          )
+          }
           buttonStyle={`bg-brand-blue text-white hover:bg-brand-blue-hover`}
+          buttonText={productsStatus === 'active' ? 'Disable' : 'Enable'}
           onClose={handleCloseAllModals}
           onConfirm={(e)=>handleEnableOrDisableProduct(selectedProduct)}
           loading={loading}
           deactivationErrors={enableAndDisableErrors}
+          deactivationMessages={enableAndDisableMessages}
         />
       </div>
     )}
@@ -669,7 +593,7 @@ const ViewProducts = ({pageDescription}) => {
                   "S/No": index+1,
                   "Name": product.name, 
                   "Product ID": product._id,
-                  "Availability": product.availability,
+                  "Availability":  `Available in ${product.availability} ${product.availability > 1 ? 'branches' : 'branch'}`,
                   "Category": product.category?.name, 
                 }
             })}
