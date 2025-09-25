@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
           if (!user) {
             const getUser = async () => {
               const userData = await getUserService(token);
-              console.log('User Data:', userData);
               if (userData.data) {
                 setUser(userData.data);
               } else {

@@ -53,7 +53,6 @@ const CreateBranch = ({pageDescription}) => {
   const [openSubmitModal, setOpenSubmitModal] = React.useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [openBulkUploadModal, setOpenBulkUploadModal] = React.useState(false);
-  const Router = useRouter();
 
   React.useEffect(() => {
     const fetchBands = async () => {

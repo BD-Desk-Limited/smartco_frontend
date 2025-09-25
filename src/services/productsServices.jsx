@@ -134,16 +134,18 @@ export const getProductByIdService = async (productId) => {
 //create or update product
 export const createOrUpdateProductService = async (productData) => {
   const token = getToken();
+  
   try {
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products`,
       {
         method: productData._id ? 'PUT' : 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(productData),
+        
+        body: productData
       }
     );
 
@@ -161,3 +163,31 @@ export const createOrUpdateProductService = async (productData) => {
   }
 };
 
+//get all product categories by company id
+export const getAllProductCategoriesByCompanyIdService = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/categories`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching product categories, please try again' };
+  }
+};

@@ -187,7 +187,6 @@ const ViewProducts = ({pageDescription}) => {
       setLoading(false);
     }
   };
-  console.log('products status', allProducts.map(product => product.isDisabled));
 
   const handleDeleteProducts = async() => {
       try{
