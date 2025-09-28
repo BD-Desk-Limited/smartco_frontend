@@ -2,11 +2,13 @@ import React from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
+import { useRouter } from 'next/navigation';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const [isOpen, setIsOpen] = useState(openSideBar || false);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
+  const router = useRouter();
 
   const menuList = [
     {
@@ -108,7 +110,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   }, [user]);
 
   const handleMenuClick = (menu) => {
-    window.location.href = `/pages/account/admin${menu.link}`;
+    router.push(`/pages/account/admin${menu.link}`);
   };
 
 

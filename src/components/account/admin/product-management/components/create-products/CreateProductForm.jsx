@@ -19,7 +19,8 @@ const CreateProductForm = ({
   setTaxBands,
   materials,
   setMaterials,
-  handleCreateProduct
+  handleCreateProduct,
+  error
 }) => {
 
   const [categorySearch, setCategorySearch] = React.useState({});
@@ -380,35 +381,49 @@ const CreateProductForm = ({
             }
         </form>
 
+        
+
         {/* Buttons */}
-        <div className='flex flex-row justify-between px-10 py-2 sticky bottom-0 bg-white'>
-          <button 
-            onClick={handleAddMoreProduct}
-            className='flex flex-row p-2 text-brand-blue bg-blue-shadow9 gap-2 rounded-lg text-sm font-semibold items-center'
-          >
-            <Image
-               src={`/assets/add_blue.png`}
-               alt='add product'
-               width={20}
-               height={20}
-            />
-            <span className=''>Add More Product</span>
-          </button>
-          <div className='flex gap-2'>
-            <button 
-              onClick={(e) => handleCreateProduct(e)}
-              className='bg-brand-blue p-2 rounded-lg text-text-white'
-            >
-              {products?.length>1? `Create Products`: `Create Product`}
-            </button>
-            <button
-             onClick={handleResetForm}
-             className='border border-brand-blue rounded-lg text-brand-blue py-2 px-4'
-            >
-              Reset
-            </button>
-          </div>
+        <div className='flex flex-col py-3 sticky bottom-0 bg-white'>
+
+          {/* Error Message */}
+          {error && error.length > 0 && (
+            <div className='bg-error bg-opacity-20 border border-error text-error p-3 rounded-lg mb-3'>
+              {error.map((errMsg, idx) => (
+                <p key={idx} className='text-sm'>{errMsg}</p>
+              ))}
+            </div>
+          )}
           
+          <div className='flex flex-row justify-between px-10'>
+            <button 
+              onClick={handleAddMoreProduct}
+              className='flex flex-row p-2 text-brand-blue bg-blue-shadow9 gap-2 rounded-lg text-sm font-semibold items-center'
+            >
+              <Image
+                 src={`/assets/add_blue.png`}
+                 alt='add product'
+                 width={20}
+                 height={20}
+              />
+              <span className=''>Add More Product</span>
+            </button>
+            <div className='flex gap-2'>
+              <button 
+                onClick={(e) => handleCreateProduct(e)}
+                className='bg-brand-blue p-2 rounded-lg text-text-white'
+              >
+                {products?.length>1? `Create Products`: `Create Product`}
+              </button>
+              <button
+               onClick={handleResetForm}
+               className='border border-brand-blue rounded-lg text-brand-blue py-2 px-4'
+              >
+                Reset
+              </button>
+            </div>
+
+          </div>
         </div>
     </div>
   )

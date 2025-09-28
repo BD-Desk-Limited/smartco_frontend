@@ -175,7 +175,12 @@ const SelectComponents = ({ products, setProducts, productIndex, materials, clos
       <span className="text-base font-semibold text-white w-full text-center">Select the components that make up this product</span>
 
       {/* component counter */}
-      <span className='absolute top-2 right-2 font-bold bg-error p-1'>{`${currentComponentIndex + 1} / ${currentProduct?.components?.length || 0}`}</span>
+      <span 
+        onClick={() => setShowSelectComponents(prev => ({...prev, [productIndex]: true}))}
+        className='absolute top-2 right-2 font-bold bg-error p-1'
+      >
+        {`${currentComponentIndex + 1} / ${currentProduct?.components?.length || 0}`}
+      </span>
 
       {!showSelectComponents[productIndex] || (!currentProduct?.components || currentProduct.components.length === 0) ? (
         <div className="flex w-full gap-4">

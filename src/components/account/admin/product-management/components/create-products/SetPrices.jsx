@@ -55,6 +55,7 @@ const SetPrices = ({
   const handleNext = (e) => {
     e.preventDefault();
 
+    setBandsError(prev => ({...prev, [productIndex]: ''}));
     const currentTabIndex = tabs.findIndex(tab => tab === activeTab);
 
     if(currentTabIndex !== -1 && currentTabIndex !== tabs.length-1){
@@ -65,6 +66,7 @@ const SetPrices = ({
 
   const handlePrev = (e) => {
     e.preventDefault();
+    setBandsError(prev => ({...prev, [productIndex]: ''}));
 
     const currentTabIndex = tabs.findIndex(tab => tab === activeTab);
 

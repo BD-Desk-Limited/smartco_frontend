@@ -4,7 +4,7 @@ export function verifyName(name) {
   if (verified) {
     return { passed: true, message: 'Name is valid.' };
   } else {
-    return { passed: false, message: 'Invalid name format.' };
+    return { passed: false, message: 'Invalid character in name format.' };
   }
 }
 
