@@ -118,39 +118,43 @@ const OTPForm = () => {
         return;
       }
       if (response?.data) {
+        
         setMessage('OTP verified successfully!!! logging in...');
         setSuccess(true);
         setLoading(false);
 
-        //clean up the session storage
-        sessionStorage.removeItem('email');
-        sessionStorage.removeItem('userId');
-        sessionStorage.removeItem('trustedDevice');
-        sessionStorage.removeItem('verification-purpose');
+        // set user and token in session storage for use in the login attempt notification page. It will be cleared once the user logs in successfully or closes the page.
+        sessionStorage.setItem('token', response?.data?.token);
+        setUser(response?.data?.user);
 
-        console.log('response', response.data.trustedDevice);
+        // If the device is not trusted redirect to login attempt notification where admin can register the device and other users gets notified that the device is untrusted.
+        if (response?.data.trustedDevice !== 'true') {
+          router.push('/pages/auth/login-attempt-notification');
+          return;
+        }
 
-        // Redirect to the appropriate page based on the user's role and trusted device status
-
-        if (response?.data?.trustedDevice) {
-          setUser(response?.data?.user);
-          sessionStorage.setItem('token', response?.data?.token);
-
-          if (response.data?.user?.role === 'admin') {
-            router.push('/pages/account/admin');
-          } else if (response.data?.user?.role === 'manager') {
-            router.push('/pages/account/manager');
-          }
+        // if the device is trusted log them in, then redirect based on role.
+        if (
+          response?.data.trustedDevice === 'true' &&
+          response?.data?.user?.role === 'admin'
+        ) {
+          router.push('/pages/account/admin');
+        } else if (
+          response?.data.trustedDevice === 'true' &&
+          response?.data?.user?.role === 'manager'
+        ) {
+          router.push('/pages/account/manager');
         } else {
-          if (response.data?.user?.role === 'admin') {
-            setUser(response?.data?.user);
-            sessionStorage.setItem('token', response?.data?.token);
-            router.push('/pages/auth/login-attempt-notification');
-          }else {
-            router.push('/pages/auth/login-attempt-notification');
-          }
+          setError('unauthorized user role, please contact admin');
+          return;
         }
       }
+      
+      //clean up the session storage
+      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('trustedDevice');
+      sessionStorage.removeItem('verification-purpose');
     } catch (error) {
       setError('error verifying OTP, please try again');
       setLoading(false);

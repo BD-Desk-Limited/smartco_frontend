@@ -21,7 +21,7 @@ const ProductManagementPage = () => {
     // Check if the user has access to this page
     const accessCheckFailed = PageAccessRequirement(
       'admin',
-      'Product_Management',
+      'Products_Management',
     );  
 
     if (accessCheckFailed) {

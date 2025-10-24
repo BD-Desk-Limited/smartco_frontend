@@ -5,6 +5,7 @@ import { BulkMaterialUploadProvider } from '@/contexts/bulkMaterialUploadContext
 import { BulkbranchUploadProvider } from '@/contexts/bulkBranchUploadContext';
 import { BulkUserUploadProvider } from '@/contexts/bulkUserUploadContext';
 import { CreateProductsProvider } from '@/contexts/createProductsContext';
+import { SetupProvider } from '@/contexts/setupContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -40,17 +41,19 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
-          <BulkUserUploadProvider>
-            <BulkMaterialUploadProvider>
-              <BulkbranchUploadProvider>
-                <CompanyDataProvider>
-                  <CreateProductsProvider>
-                    {children}
-                  </CreateProductsProvider>
-                </CompanyDataProvider>
-              </BulkbranchUploadProvider>
-            </BulkMaterialUploadProvider>
-          </BulkUserUploadProvider>
+            <SetupProvider>
+              <BulkUserUploadProvider>
+                <BulkMaterialUploadProvider>
+                  <BulkbranchUploadProvider>
+                    <CompanyDataProvider>
+                      <CreateProductsProvider>
+                        {children}
+                      </CreateProductsProvider>
+                    </CompanyDataProvider>
+                  </BulkbranchUploadProvider>
+                </BulkMaterialUploadProvider>
+              </BulkUserUploadProvider>
+            </SetupProvider>
         </AuthProvider>
       </body>
     </html>

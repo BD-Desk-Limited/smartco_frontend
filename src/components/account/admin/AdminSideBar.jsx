@@ -8,7 +8,6 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const [isOpen, setIsOpen] = useState(openSideBar || false);
   const { user, logOut } = useAuth();
   const [userRole, setUserRole] = useState('');
-  const router = useRouter();
 
   const menuList = [
     {
@@ -110,7 +109,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   }, [user]);
 
   const handleMenuClick = (menu) => {
-    router.push(`/pages/account/admin${menu.link}`);
+    window.location.href = `/pages/account/admin${menu.link}`;
   };
 
 

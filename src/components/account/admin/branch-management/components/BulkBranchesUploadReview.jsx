@@ -178,21 +178,23 @@ const BulkBranchesUploadReview = ({pageDescription}) => {
                                   </table>
 
                                   {error && <ErrorInterface error={error}/>}
-                                  {hasError?
+                                  <div className='flex flex-row gap-4 justify-center'>
                                     <Button 
                                       text={'Retry Upload'} 
                                       onClick={() => Router.push('/pages/account/admin/branch-management/create-branch/bulk')} 
                                       buttonStyle={'bg-brand-blue hover:bg-blue-shadow1'}
                                     />
-                                    :
-                                    <Button 
-                                      text={'Submit and save'} 
-                                      onClick={handleSubmit} 
-                                      loading={loading} 
-                                      loadingText={'submitting...'}
-                                      buttonStyle={'bg-brand-green hover:bg-green-shadow1'}
-                                    />
-                                  }
+                                    
+                                    {!hasError&&
+                                      <Button 
+                                        text={'Submit and save'} 
+                                        onClick={handleSubmit} 
+                                        loading={loading} 
+                                        loadingText={'submitting...'}
+                                        buttonStyle={'bg-brand-green hover:bg-green-shadow1'}
+                                      />
+                                    }
+                                  </div>
                               </div>
                           </div>
                       )

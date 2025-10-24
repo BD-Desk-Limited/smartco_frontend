@@ -14,10 +14,10 @@ import PageDescription from '@/components/account/PageDescription';
 
 const BulkUserUpload = ({pageDescription}) => {
 
-  const [selectedSubMenu, setSelectedSubMenu] = React.useState({
+  const selectedSubMenu = {
     staffId: 'Create New User',
     link: '/create-user',
-  });  
+  };
   const [file, setFile] = React.useState(null);
   const [error, setError] = React.useState('');
   const [uploading, setUploading] = React.useState(false);
@@ -25,7 +25,6 @@ const BulkUserUpload = ({pageDescription}) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
   const [reviewUpload, setReviewUpload] = React.useState(false);
   const { setBulkUserData, setErrorData, errorData } = useBulkUserUpload();
-  const [errors, setErrors] = React.useState([]);
   const Router = useRouter();  
 
   const validateFile = (file) => {
@@ -68,7 +67,7 @@ const BulkUserUpload = ({pageDescription}) => {
         fullName: [],
         email: [],
         role: [],
-        branches: [],
+        branch: [],
         phoneNumber: [],
       }; 
 
@@ -100,14 +99,14 @@ const BulkUserUpload = ({pageDescription}) => {
         error.role.push({error:`${verifyInputText(user.role).message} on row ${index + 1}`, row: index + 1});
       };
 
-      if (!user.branches || user.branches.length === 0) {
-        error.branches.push({error:`user branches are required for row ${index + 1}`, row: index + 1});
+      if (!user.branch || user.branch.length === 0) {
+        error.branch.push({error:`user branches are required for row ${index + 1}`, row: index + 1});
       };
-      if(!user.branches.every(branch => verifyInputText(branch).passed)){
+      if(!user.branch.every(branch => verifyInputText(branch).passed)){
         
-        user.branches.forEach((branch, branchIndex) => {
+        user.branch.forEach((branch, branchIndex) => {
           if (!verifyInputText(branch).passed) {
-            error.branches.push({error:`${verifyInputText(branch).message} for branch name on row ${index + 1}`, row: index + 1});
+            error.branch.push({error:`${verifyInputText(branch).message} for branch name on row ${index + 1}`, row: index + 1});
           }
         });
       };
@@ -202,7 +201,7 @@ const BulkUserUpload = ({pageDescription}) => {
               email: user.Email || '',
               role: user.Role || '',
               // Convert branches to an array if it's a string, and split by commas and return an array, remove any extra spaces
-              branches: user.Branches ? user.Branches.split(',').map(branch => branch.trim()) : [],
+              branch: user.Branches ? user.Branches.split(',').map(branch => branch.trim()) : [],
               phoneNumber: user.Phone_Number || '',
             };
           });

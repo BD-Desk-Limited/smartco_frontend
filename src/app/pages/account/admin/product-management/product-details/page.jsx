@@ -1,8 +1,9 @@
+import ProductDetailsPage from '@/components/account/admin/product-management/ProductDetailsPage'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>Details of Product</div>
+    <ProductDetailsPage />
   )
 }
 

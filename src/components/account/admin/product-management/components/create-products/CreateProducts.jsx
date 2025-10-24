@@ -45,14 +45,14 @@ const CreateProducts = ({pageDescription}) => {
         try {
           const response = await getAllMaterials();
           if (response.error) {
-              console.error('Error fetching products', response.error);
-              return;
+            console.error('Error fetching materials', response.error);
+            return;
           }
           if (response?.data) {
-              setMaterials(response.data);
+              setMaterials(response.data || []);
           }
         } catch (error) {
-            console.error('Error fetching products', error);
+            console.error('Error fetching materials', error);
         } finally {
             setLoading(false);
         }
@@ -294,35 +294,35 @@ const CreateProducts = ({pageDescription}) => {
         </div>
         <div className='flex flex-col h-full w-full'>
             <div className="p-5 h-full flex flex-row gap-5 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-                <div className='max-h-[90%] overflow-y-auto scrollbar-thin w-4/5'>
-                    <CreateProductForm
-                      emptyForm={emptyForm}
+              <div className='max-h-[90%] overflow-y-auto scrollbar-thin w-4/5'>
+                  <CreateProductForm
+                    emptyForm={emptyForm}
+                    products={products}
+                    setProducts={setProducts}
+                    productCategories={productCategories}
+                    setSelectedProduct={setSelectedProduct}
+                    bands={bands}
+                    taxBands={taxBands}
+                    bandsError={bandsError}
+                    setBandsError={setBandsError}
+                    setBands={setBands}
+                    setTaxBands={setTaxBands}
+                    materials={materials}
+                    loading={loading}
+                    setLoading={setLoading}
+                    setMaterials={setMaterials}
+                    handleCreateProduct={handleOpenWarning}
+                    error={error}
+                  />
+              </div>
+              <div className='max-h-[90%] overflow-y-auto scrollbar-thin w-1/5'>
+                  <CreateProductSidePreview 
                       products={products}
-                      setProducts={setProducts}
-                      productCategories={productCategories}
-                      setSelectedProduct={setSelectedProduct}
-                      bands={bands}
-                      taxBands={taxBands}
-                      bandsError={bandsError}
-                      setBandsError={setBandsError}
-                      setBands={setBands}
-                      setTaxBands={setTaxBands}
+                      selectedProduct={selectedProduct}
                       materials={materials}
-                      loading={loading}
-                      setLoading={setLoading}
-                      setMaterials={setMaterials}
-                      handleCreateProduct={handleOpenWarning}
-                      error={error}
-                    />
-                </div>
-                <div className='max-h-[90%] overflow-y-auto scrollbar-thin w-1/5'>
-                    <CreateProductSidePreview 
-                        products={products}
-                        selectedProduct={selectedProduct}
-                        materials={materials}
-                        taxBands={taxBands}
-                    />
-                </div>
+                      taxBands={taxBands}
+                  />
+              </div>
             </div>
         <div className=''><PageDescription pageDescription={pageDescription}/></div>
       </div>

@@ -144,7 +144,7 @@ const SetPrices = ({
     });
 
     if (!allBandsHavePrices) {
-      setBandsError(prev => ({...prev, [productIndex]: 'Please set a price for all bands.'}));
+      setBandsError(prev => ({...prev, [productIndex]: 'Please set a price for all price-bands.'}));
       setActiveTab('prices');
       return;
     }
@@ -189,7 +189,7 @@ const SetPrices = ({
         {/* price inputs for each band */}
         <div className='flex flex-col gap-2 p-2 max-h-[30vh] overflow-y-auto scrollbar-thin w-full'>
           {
-            bands.length>1 &&
+            bands.length>0 &&
             bands.map((band, index) => (
               band !== null &&
               <li key={index} className='list-none w-full flex flex-row gap-1'>
@@ -217,7 +217,7 @@ const SetPrices = ({
       <div className='min-h-[30vh] flex flex-col py-3 px-1 w-full items-center gap-1'>
         <div className='flex flex-col text-center gap-1'>
           <span className='font-semibold text-base'> {`Product Tax (%)`}</span>
-          <span className='text-sm w-full'>Is there an extra tax specifically charged on this products</span>
+          <span className='text-sm w-full'>Is there an extra tax specifically charged on this products?</span>
         </div>
 
         {bandsError[productIndex] &&
@@ -227,7 +227,7 @@ const SetPrices = ({
         }
         <div className='flex flex-col gap-2 p-2 max-h-[30vh] overflow-y-auto scrollbar-thin w-full'>
           {
-            taxBands.length>1 &&
+            taxBands.length>0 &&
             taxBands.map((taxBand, index) => (
               taxBand !== null &&
               <div key={taxBand._id} className='flex flex-col'>

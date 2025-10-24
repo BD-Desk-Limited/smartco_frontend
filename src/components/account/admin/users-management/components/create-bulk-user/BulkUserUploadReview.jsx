@@ -23,14 +23,18 @@ const BulkUserUploadReview = ({pageDescription}) => {
     const [usersWithErrors, setUsersWithErrors] = React.useState([]);
     const Router = useRouter();
 
-    const [selectedSubMenu, setSelectedSubMenu] = React.useState({
+    const selectedSubMenu = {
       staffId: 'Create New User',
       link: '/create-user',
-    });  
+    };
+
+    const goToUploadPage = () => {
+        Router.push('/pages/account/admin/users-management/create-bulk-user');
+    };
 
     React.useEffect(() => {
         if (!bulkUserData) {
-            Router.push('/pages/account/admin/users-management/create-bulk-user');
+            goToUploadPage();
         }
     }, [bulkUserData, Router]);
 
@@ -40,12 +44,12 @@ const BulkUserUploadReview = ({pageDescription}) => {
         try{
             setLoading(true);
             setError(null);
+            console.log('Submitting bulk user data:', bulkUserData);
             const response = await createUserService(bulkUserData);
             if(response.error){
                 setError(response.error || 'An error occurred, please try again');
             };
             if(response.data){
-                console.log('Bulk User Upload Response:', response.data);
                 setSuccess(true);
                 setExistingUsers(response?.data?.data?.existingUsers || []);
                 setNewUsers(response?.data?.data?.newUsers || []);
@@ -178,9 +182,9 @@ const BulkUserUploadReview = ({pageDescription}) => {
                                                     <td className='w-8 text-left'>{user.role.charAt(0).toUpperCase() + user?.role?.slice(1)}</td>
                                                     {/* separate branches with , if we have more than one branch. else render the first branch */}
                                                     <td className='w-1/4 text-left'>
-                                                        {user.branches.length > 1 ?
-                                                            user.branches.join(', ')
-                                                            : user.branches[0]
+                                                        {user.branch?.length > 1 ?
+                                                            user.branch?.join(', ')
+                                                            : user.branch[0]
                                                         }
                                                     </td>
                                                     <td className='w-1/6 text-left'>{user.phoneNumber || ' '}</td>
@@ -192,13 +196,13 @@ const BulkUserUploadReview = ({pageDescription}) => {
 
                                   {error && <ErrorInterface error={error} />}
 
-                                  {hasError?
-                                    <Button 
-                                        text={'Retry Upload'} 
-                                        onClick={() => Router.push('/pages/account/admin/users-management/create-bulk-user')} 
-                                        buttonStyle={'bg-brand-blue hover:bg-blue-shadow1'}
-                                    />
-                                    :
+                                <div className='w-full flex flex-row justify-center gap-10 mt-1'>
+                                <Button 
+                                    text={'Retry Upload'} 
+                                    onClick={goToUploadPage}
+                                    buttonStyle={'bg-brand-blue hover:bg-blue-shadow1'}
+                                />
+                                {!hasError &&
                                     <Button 
                                       text={'Submit and save'} 
                                       onClick={handleSubmit} 
@@ -207,6 +211,7 @@ const BulkUserUploadReview = ({pageDescription}) => {
                                       buttonStyle={'bg-brand-green hover:bg-green-shadow1'}
                                     />
                                   }
+                                </div>
                               </div>
                           </div>
                       )

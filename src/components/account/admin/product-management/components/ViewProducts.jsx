@@ -87,6 +87,9 @@ const ViewProducts = ({pageDescription}) => {
             const matchesCategory = selectedCategory ? product.category._id === selectedCategory : true;
             return matchesSearch && matchesCategory;
         });
+
+        // Sort filtered products alphabetically by name
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
         setFilteredProducts(filtered);
     }, [searchInput, selectedCategory, allProducts]);
 
@@ -394,7 +397,13 @@ const ViewProducts = ({pageDescription}) => {
                                 </td>
                                 <td className={`px-2 py-2 text-center w-1/6`}>{product?._id || '-'}</td>
                                 <td className={`px-2 py-2 text-center w-1/6`}>{product?.category?.name || '-'}</td>
-                                <td className={`px-2 py-2 text-center w-1/6`}>Available in <span className='font-semibold'>{product?.availability || '-'}</span> {product?.availability > 1 ? 'branches' : 'branch'}</td>
+                                <td className={`px-2 py-2 text-center w-1/6`}>
+                                  Available in 
+                                  <span className='font-semibold'>
+                                    {product?.availability || 0}
+                                  </span> 
+                                  {product?.availability > 1 ? 'branches' : 'branch'}
+                                </td>
 
                                 {/* Actions */}
                                 <td className={`px-2 py-2 text-center w-1/6`}>
@@ -448,9 +457,22 @@ const ViewProducts = ({pageDescription}) => {
                               </tr>
                             ))
                         ) : (
-                            <tr>
-                              <td colSpan={6} className='text-center py-32 text-lg'>No products found</td>
-                            </tr>
+                          <tr>
+                            <td colSpan={5} className='text-center py-32'>
+                              <div className='flex flex-col w-full justify-center items-center gap-4'>
+                                <span className='text-lg'>No products found</span>
+                                <Link href='/pages/account/admin/product-management/create-new-product' className='flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1'>
+                                  <Image
+                                      src="/assets/add.png"
+                                      alt="add"
+                                      width={15}
+                                      height={15}
+                                  />
+                                  <span>start by creating a product</span>
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
                         )}
                     </tbody>
                   </table>

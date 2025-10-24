@@ -10,11 +10,15 @@ import Spinner from '../account/Spinner';
 const Welcome = () => {
 
   const router = useRouter();
-  const { companyData } = useCompanyData();
   const [isMounted, setIsMounted] = useState(false);
+  const { companyData } = useCompanyData();
+  // wait for company data and component to load before checking authorization
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (companyData) {
+    if (isMounted && companyData) {
       // Check if the company data is available
       const authorize = async () => {
         try {
@@ -48,9 +52,7 @@ const Welcome = () => {
       };
 
       authorize();
-    }else {
-      router.push('/pages/auth/login');
-    };
+    }
   }, [router, companyData]);
 
   const divStyle = {

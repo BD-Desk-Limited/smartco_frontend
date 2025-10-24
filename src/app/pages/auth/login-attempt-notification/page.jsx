@@ -1,20 +1,34 @@
 'use client';
-import React, { useEffect } from 'react';
+import React from 'react';
 import PictureCarousel from '@/components/auth/PictureCarousel';
 import LoginAttempt from '@/components/auth/LoginAttempt';
 import { useAuth } from '@/contexts/authContext';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useCompanyData } from '@/contexts/companyDataContext';
 
 const Page = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const router = useRouter();
+  const { companyData } = useCompanyData();
+  console.log('Company Data:', companyData);
 
   const goToLogin = () => {
     router.push('/pages/auth/login');
   };
 
+
+
   if (!user || user?.role !== 'admin') {
+    
+    //clean up the session storage
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('trustedDevice');
+    sessionStorage.removeItem('verification-purpose');
+    sessionStorage.removeItem('token');
+    setUser(null);
+
     return (
       <div className="flex flex-col h-screen justify-center items-center gap-4">
         <Image src="/assets/Danger.png" width={100} height={100} alt="403" />
