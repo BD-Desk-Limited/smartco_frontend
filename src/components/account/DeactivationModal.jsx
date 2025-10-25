@@ -20,7 +20,7 @@ const DeactivationModal = ({ message, title, buttonStyle, buttonText, onClose, o
         <Image src="/assets/switch_inactive.png" alt="error" width={35} height={35} className='border border-gray-border rounded-3xl'/>
       </div>
       {
-        (deactivationErrors?.length>0 || deactivationMessages?.length>0) ? (
+        (deactivationErrors && deactivationErrors.length > 0 || deactivationMessages && deactivationMessages.length > 0) ? (
             <div className='flex flex-col items-center gap-1 max-h-[40%] overflow-y-auto scrollbar-thin w-full px-5'>
                 {deactivationErrors.length>0 && 
                     <p className="text-sm text-error flex flex-col items-center text-center">

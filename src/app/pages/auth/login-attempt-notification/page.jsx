@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import PictureCarousel from '@/components/auth/PictureCarousel';
 import LoginAttempt from '@/components/auth/LoginAttempt';
 import { useAuth } from '@/contexts/authContext';
@@ -7,14 +7,26 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const router = useRouter();
 
-  const goToLogin = () => {
+  const goToLogin = useCallback(() => {
     router.push('/pages/auth/login');
-  };
+  }, [router]);
+
 
   if (!user || user?.role !== 'admin') {
+
+    if (typeof window !== 'undefined') {
+      //clean up the session storage
+      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('trustedDevice');
+      sessionStorage.removeItem('verification-purpose');
+      sessionStorage.removeItem('token');
+      setUser(null);
+    }
+
     return (
       <div className="flex flex-col h-screen justify-center items-center gap-4">
         <Image src="/assets/Danger.png" width={100} height={100} alt="403" />

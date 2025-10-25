@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment } from 'react';
+import { useState, Fragment } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -7,11 +7,13 @@ import 'react-phone-number-input/style.css';
 import '@/app/globals.css';
 import {
   verifyEmail,
+  verifyInputText,
   verifyName,
   verifyPassword,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
 import { signupService } from '@/services/authServices';
+import CurrencyLocationMatch from './CurrencyLocationMatch';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +23,13 @@ const SignUp = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
+    businessAddress: '',
+    country: '',
+    currency: {
+      code: '',
+      symbol: '',
+      name: '',
+    },
     terms: false,
   });
 
@@ -41,6 +50,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -58,9 +68,13 @@ const SignUp = () => {
       !formData.fullName ||
       !formData.businessName ||
       !formData.businessEmail ||
+      !formData.businessAddress ||
       !formData.phoneNumber ||
       !formData.password ||
-      !formData.confirmPassword
+      !formData.confirmPassword ||
+      !formData.currency.code ||
+      !formData.currency.symbol ||
+      !formData.currency.name
     ) {
       setError('All fields are required');
       setLoading(false);
@@ -85,6 +99,12 @@ const SignUp = () => {
       return;
     }
 
+    if (!verifyInputText(formData.businessAddress).passed) {
+      setError(verifyInputText(formData.businessAddress).message + ' (Invalid address)');
+      setLoading(false);
+      return;
+    }
+
     if (!verifyPassword(formData.password).passed) {
       setError(verifyPassword(formData.password).message);
       setLoading(false);
@@ -103,17 +123,18 @@ const SignUp = () => {
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
-      //delete formData.confirmPassword;
+
+      setLoading(true);
+
       const body = {
         fullName: formData.fullName,
         businessName: formData.businessName,
         businessEmail: formData.businessEmail,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
+        businessAddress: formData.businessAddress,
+        currency: formData.currency,
         terms: formData.terms,
       };
 
@@ -141,15 +162,18 @@ const SignUp = () => {
       setLoading(false);
     }
   };
+  console.log('Form Data:', formData);
 
   const inputStyle = `w-full border-2 rounded-sm px-4 h-8 items-center drop-shadow-md focus:outline-brand-blue text-md border-[#DDDDDD]`;
   const labelStyle = `w-full text-left text-sm font-semibold`;
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full h-full flex flex-col items-center justify-center text-text-gray">
       {!success ? (
         <form className="w-full flex-col flex gap-3" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-3 w-full">
+          <h1 className="text-lg font-bold mb-2 text-brand-blue text-center">SIGN UP YOUR BUSINESS</h1>
+          <div className="flex flex-col gap-3 w-full max-h-[80vh] overflow-y-auto">
+            {/* Full Name Input */}
             <div className="flex flex-col gap-0.5 w-full">
               <label htmlFor="fullName" className={labelStyle}>
                 Full Name
@@ -163,6 +187,7 @@ const SignUp = () => {
                 className={`${inputStyle} ${formData.fullName?.length ? 'border-brand-blue' : ''} focus-within:border-brand-blue`}
               />
             </div>
+            {/* Business Name Input */}
             <div className="flex flex-col gap-0.5">
               <label htmlFor="businessName" className={labelStyle}>
                 Business Name
@@ -176,6 +201,7 @@ const SignUp = () => {
                 className={`${inputStyle} ${formData.businessName?.length ? 'border-brand-blue' : ''} focus-within:border-brand-blue`}
               />
             </div>
+            {/* Business Email Input */}
             <div className="flex flex-col gap-0.5">
               <label htmlFor="businessEmail" className={labelStyle}>
                 Business Email
@@ -189,6 +215,28 @@ const SignUp = () => {
                 className={`${inputStyle} ${formData.businessEmail?.length ? 'border-brand-blue' : ''} focus-within:border-brand-blue`}
               />
             </div>
+            {/* Business Address Input */}
+            <div className="flex flex-col gap-0.5">
+              <label htmlFor="businessAddress" className={labelStyle}>
+                Business Address
+              </label>
+              <textarea
+                id="businessAddress"
+                name="businessAddress"
+                value={formData.businessAddress}
+                onChange={handleChange}
+                placeholder='Enter your business address...'
+                className={`w-full border-2 p-2 items-center drop-shadow-md focus:outline-brand-blue text-md border-[#DDDDDD] h-24 font-mono rounded-md ${formData.businessAddress?.length ? 'border-brand-blue' : ''} focus-within:border-brand-blue`}
+              />
+            </div>
+            {/* Country Input */}
+            <div className="flex flex-col gap-0.5">
+              <CurrencyLocationMatch
+                dataObject={formData}
+                setDataObject={setFormData}
+              />
+            </div>
+            {/* Phone Number Input */}
             <div className="w-full flex flex-col gap-0.5">
               <label htmlFor="phoneNumber" className={labelStyle}>
                 Phone Number
@@ -204,6 +252,7 @@ const SignUp = () => {
                 </Fragment>
               </div>
             </div>
+            {/* Password Input */}
             <div className={`flex flex-col gap-0.5`}>
               <label htmlFor="password" className={labelStyle}>
                 Password
@@ -233,6 +282,7 @@ const SignUp = () => {
                 />
               </div>
             </div>
+            {/* Confirm Password Input */}
             <div className={`flex flex-col gap-0.5`}>
               <label htmlFor="confirmPassword" className={labelStyle}>
                 Confirm Password
@@ -260,6 +310,7 @@ const SignUp = () => {
                 />
               </div>
             </div>
+            {/* Password Requirements */}
             <div className="flex flex-row justify-between px-1">
               <p className="flex flex-row justify-center items-center bg-[#F2F2F2] rounded-md">
                 <Image
@@ -314,6 +365,7 @@ const SignUp = () => {
                 </span>
               </p>
             </div>
+            {/* Terms and Conditions */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -337,6 +389,7 @@ const SignUp = () => {
               </label>
             </div>
           </div>
+
           {error && (
             <span className="text-error w-full text-center text-base items-center flex justify-center gap-2">
               <Image

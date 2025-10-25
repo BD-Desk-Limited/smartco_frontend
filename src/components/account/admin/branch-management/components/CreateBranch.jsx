@@ -11,7 +11,7 @@ import Image from 'next/image';
 import CreateNewBand from './band/CreateNewBand';
 import CreateNewTaxBand from './band/CreateNewTaxBand';
 import { createBranchService, getAllBranchBandsByCompanyId, getAllTaxBandsByCompanyId } from '@/services/branchServices';
-import { validateEmail, validatePhoneNumber } from '@/app/utilities/validateInput';
+import { validateEmail, validatePhoneNumber } from '@/utilities/validateInput';
 import WarningModal from '@/components/account/WarningModal';
 import {useRouter} from 'next/navigation';
 import BulkBranchUploadModal from './BulkBranchUploadModal';
@@ -53,7 +53,6 @@ const CreateBranch = ({pageDescription}) => {
   const [openSubmitModal, setOpenSubmitModal] = React.useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [openBulkUploadModal, setOpenBulkUploadModal] = React.useState(false);
-  const Router = useRouter();
 
   React.useEffect(() => {
     const fetchBands = async () => {

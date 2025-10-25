@@ -158,7 +158,7 @@ export const createMaterial = async (body) => {
   }
 };
 
-//get materials (non-grouped and not deleted)
+//get materials (non-grouped) and not deleted)
 export const getMaterials = async () => {
   const token = getToken();
   try {

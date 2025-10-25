@@ -213,7 +213,6 @@ export const signupService = async (body) => {
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log('Response:', responseData);
       return { data: responseData };
     } else {
       const errorData = await response.json();

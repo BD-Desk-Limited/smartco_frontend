@@ -6,19 +6,19 @@ const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
 
   const submenus = [
     {
-      name: 'Create Material',
+      name: 'Create ungrouped Material',
       link: '/create-material',
     },
     {
-      name: 'Create Grouped Material',
+      name: 'Create grouped Material',
       link: '/create-grouped-material',
     },
     {
-      name: 'View All Materials',
+      name: 'View ungrouped Materials',
       link: '/view-materials',
     },
     {
-      name: 'View Grouped Materials',
+      name: 'View grouped Materials',
       link: '/view-grouped-materials',
     },
   ];

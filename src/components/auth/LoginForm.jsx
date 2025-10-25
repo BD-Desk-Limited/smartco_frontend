@@ -15,8 +15,7 @@ const LoginForm = () => {
   const [success, setSuccess] = React.useState(false);
   const [message, setMessage] = React.useState(null);
   const { setUser } = useAuth();
-  const companyDataContext = useCompanyData();
-  const companyData = companyDataContext?.companyData;
+  const { companyData } = useCompanyData();
   const router = useRouter();
 
   const handleTogglePassword = () => {
@@ -55,29 +54,38 @@ const LoginForm = () => {
           }, 7000);
           return;
         } else if (response?.data?.token) {
+
+          // set user and token in session storage for use in the login attempt notification page. It will be cleared once the user logs in successfully or closes the page.
           sessionStorage.setItem('token', response?.data?.token);
           setUser(response?.data?.user);
 
-          if (
-            !response?.data?.trustedDevice &&
-            response?.data?.user?.role !== 'admin'
-          ) {
+          // If the device is not trusted redirect to login attempt notification where admin can register the device and other users gets notified that the device is untrusted.
+          if (response?.data.trustedDevice !== 'true') {
             router.push('/pages/auth/login-attempt-notification');
-          } else if (
-            response?.data?.trustedDevice &&
+            return;
+          }
+
+          // if the device is trusted log them in, then redirect based on role.
+          if (
+            response?.data.trustedDevice === 'true' &&
             response?.data?.user?.role === 'admin'
           ) {
             router.push('/pages/account/admin');
           } else if (
-            response?.data?.trustedDevice &&
+            response?.data.trustedDevice === 'true' &&
             response?.data?.user?.role === 'manager'
           ) {
             router.push('/pages/account/manager');
+          } else {
+            setError('unauthorized user role, please contact admin');
+            return;
           }
         }
+        sessionStorage.removeItem('token');
+        setUser(null);
+        throw new Error('Error logging in, please try again');
       }
 
-      setError(null);
     } catch (error) {
       setError('error logging in, please try again');
       console.error('error logging in', error);

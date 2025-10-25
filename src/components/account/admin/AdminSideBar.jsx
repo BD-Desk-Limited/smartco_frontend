@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
+import { useRouter } from 'next/navigation';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const [isOpen, setIsOpen] = useState(openSideBar || false);

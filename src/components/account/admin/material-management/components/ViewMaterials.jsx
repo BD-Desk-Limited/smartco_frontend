@@ -50,18 +50,19 @@ const ViewMaterial = ({pageDescription}) => {
         };
         fetchAllMaterials();
     }, []);
-
+console.log('allMaterials', allMaterials);
     React.useEffect(() => {
         const filtered = Array.isArray(allMaterials)&& allMaterials?.filter(
             (material) =>
               (material.name.toLowerCase().includes(searchInput.toLowerCase()) ||
               material.description.toLowerCase().includes(searchInput.toLowerCase()))&&
-                (material.category.name === selectedCategory || selectedCategory === '') &&
+                (material.category?.name === selectedCategory || selectedCategory === '') &&
                 (material.materialType === selectedMaterialType || selectedMaterialType === '')
         )||[];
         setFilteredMaterials(filtered);
         
     }, [allMaterials, searchInput, selectedCategory, selectedMaterialType]);
+    
 
     const allCategories = [...new Set(allMaterials.map(material => material.category?.name))];
     const allMaterialTypes = [...new Set(allMaterials.map(material => material.materialType))];
@@ -203,7 +204,7 @@ const ViewMaterial = ({pageDescription}) => {
                                 <option value={''}>All Categories</option>
                                 {allCategories.length>0 && 
                                     allCategories?.map((category, index) => (
-                                    <option key={category}>{category}</option>
+                                    <option key={index}>{category}</option>
                                 ))}
                             </select>
                         </div>
@@ -376,7 +377,7 @@ const ViewMaterial = ({pageDescription}) => {
                     message={`Are you sure you want to delete the selected ${selectedMaterials.length>1? 'materials?':'material?'} This action cannot be undone.`}
                     buttonStyle={'bg-error hover:bg-error-hover text-white'}
                     onClose={handleClose}
-                    onConfirm={() => handleDeleteMaterials(selectedMaterials)}
+                    onConfirm={() => handleDeleteMaterials()}
                     loading={loading}
                     deleteErrors={deleteErrors}
                     deleteMessages={deleteMessages}

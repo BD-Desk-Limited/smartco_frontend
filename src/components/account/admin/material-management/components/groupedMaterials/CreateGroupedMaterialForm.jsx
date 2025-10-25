@@ -19,14 +19,16 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
       return;
     };
 
-    if (formData.components.find(component => component.id === newComponentMaterial)) {
+    // Check if component material is already added
+    const isAlreadyAdded = formData.components.some(component => component.id === newComponentMaterial);
+    if (isAlreadyAdded) {
       setError('Component material already added');
       return;
     };
 
     const component = {
       id: newComponentMaterial,
-      quantity: newComponentQuantity,
+      quantity: parseFloat(newComponentQuantity),
       isGroup: allMaterials.find(material => material._id === newComponentMaterial)?.isGroup, 
     };
 

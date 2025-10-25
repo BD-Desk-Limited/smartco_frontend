@@ -152,24 +152,24 @@ const BulkUploadReview = ({pageDescription}) => {
                                   <table className={`w-full flex flex-col gap-1 ${hasError? 'max-h-[30vh]':'max-h-[60vh]'} overflow-y-auto scrollbar-thin`}>
                                       <thead className='w-full'>
                                           <tr className='w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm'>
-                                              <th>S/No</th>
-                                              <th>Material Name</th>
-                                              <th>Material Type</th>
-                                              <th>Material Category</th>
-                                              <th>Material Unit</th>
-                                              <th className='w-60'>Material Description</th>
+                                              <th className='text-left w-2'>S/No</th>
+                                              <th className='text-left w-1/6'>Material Name</th>
+                                              <th className='text-left w-1/8'>Material Type</th>
+                                              <th className='text-left w-1/6'>Material Category</th>
+                                              <th className='text-left w-1/8'>Material Unit</th>
+                                              <th className='text-left w-1/4'>Material Description</th>
                                           </tr>
                                       </thead>
                                       <tbody className='w-full max-h-50 overflow-y-auto scrollbar-thin'>
                                           {
                                               bulkMaterialData.map((material, index) => (
                                                   <tr key={index} className='w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm'>
-                                                      <td className='font-semibold w-5'>{index + 1}</td>
-                                                      <td>{material.name}</td>
-                                                      <td>{material.materialType}</td>
-                                                      <td>{material.category}</td>
-                                                      <td>{material.unitOfMeasurement}</td>
-                                                      <td className='max-w-60 overflow-x-auto '>{material.description}</td>
+                                                      <td className='text-left font-semibold w-2'>{index + 1}</td>
+                                                      <td className='text-left w-1/6'>{material.name}</td>
+                                                      <td className='text-left w-1/8'>{material.materialType}</td>
+                                                      <td className='text-left w-1/6'>{material.category}</td>
+                                                      <td className='text-left w-1/8'>{material.unitOfMeasurement}</td>
+                                                      <td className='text-left w-1/4 overflow-x-auto '>{material.description}</td>
                                                   </tr>
                                               ))
                                           }

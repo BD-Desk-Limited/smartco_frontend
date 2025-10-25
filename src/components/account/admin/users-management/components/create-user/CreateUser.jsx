@@ -80,7 +80,7 @@ const CreateUser = ({pageDescription}) => {
 
     // validate team for admin role
     const validateTeam = verifyInputText(formData.team?.name);
-    if (formData.team && (!validateTeam.passed)) {
+    if (formData.role === 'admin' && (!formData.team.name || (!validateTeam.passed))) {
       inputValidationErrors.push(validateTeam.message + ' Please enter a valid team name.');
     };
 
@@ -112,14 +112,12 @@ const CreateUser = ({pageDescription}) => {
       team: formData.team?.name || null
     };
 
-    console.log('Creating user with data:', body);
-
     try{
       setLoading(true);
       const response = await createUserService(body);
 
       if(response.error){
-        setError(response.error.message);
+        setError(response.error || 'Failed to create user. Please try again later.');
         return;
       }
 
