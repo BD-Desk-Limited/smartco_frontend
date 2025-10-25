@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBulkUserUpload } from '@/contexts/bulkUserUploadContext';
 import { createUserService } from '@/services/usersServices';
@@ -28,15 +28,15 @@ const BulkUserUploadReview = ({pageDescription}) => {
       link: '/create-user',
     };
 
-    const goToUploadPage = () => {
+    const goToUploadPage = useCallback(() => {
         Router.push('/pages/account/admin/users-management/create-bulk-user');
-    };
+    }, [Router]);
 
     React.useEffect(() => {
         if (!bulkUserData) {
             goToUploadPage();
         }
-    }, [bulkUserData, Router]);
+    }, [bulkUserData, Router, goToUploadPage]);
 
     const handleSubmit = async(e) => {
         e.preventDefault();

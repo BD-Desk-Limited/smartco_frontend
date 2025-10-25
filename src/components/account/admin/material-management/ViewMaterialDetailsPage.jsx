@@ -22,15 +22,6 @@ const ViewMaterialDetailsPage = () => {
         title: 'Manage Materials',
     });
 
-    const accessCheckFailed = PageAccessRequirement(
-        'admin',
-        'Materials_Management',
-    );  
-  
-    if (accessCheckFailed) {
-      return accessCheckFailed;
-    };
-
     const pageDescription =
     'The View Material Details page allows you to see the details of existing materials in your store(s). You can view material information, stock levels, and batches history. This ensures that your material data remains accurate and up-to-date, facilitating better inventory management and product creation. Additionally, you can view an image of the material to provide a visual reference, making it easier to identify and manage materials within your inventory.';
 
@@ -55,7 +46,16 @@ const ViewMaterialDetailsPage = () => {
         if (!id) {
             router.push('/pages/account/admin/manage-materials/view-materials');
         };
-    }, [id, router]);
+    }, [id, router]);  
+
+    const accessCheckFailed = PageAccessRequirement(
+        'admin',
+        'Materials_Management',
+    );
+  
+    if (accessCheckFailed) {
+      return accessCheckFailed;
+    };
 
   return (
   <div>

@@ -1,33 +1,31 @@
 'use client';
-import React from 'react';
+import React, { useCallback } from 'react';
 import PictureCarousel from '@/components/auth/PictureCarousel';
 import LoginAttempt from '@/components/auth/LoginAttempt';
 import { useAuth } from '@/contexts/authContext';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCompanyData } from '@/contexts/companyDataContext';
 
 const Page = () => {
   const { user, setUser } = useAuth();
   const router = useRouter();
-  const { companyData } = useCompanyData();
-  console.log('Company Data:', companyData);
 
-  const goToLogin = () => {
+  const goToLogin = useCallback(() => {
     router.push('/pages/auth/login');
-  };
-
+  }, [router]);
 
 
   if (!user || user?.role !== 'admin') {
-    
-    //clean up the session storage
-    sessionStorage.removeItem('email');
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('trustedDevice');
-    sessionStorage.removeItem('verification-purpose');
-    sessionStorage.removeItem('token');
-    setUser(null);
+
+    if (typeof window !== 'undefined') {
+      //clean up the session storage
+      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('trustedDevice');
+      sessionStorage.removeItem('verification-purpose');
+      sessionStorage.removeItem('token');
+      setUser(null);
+    }
 
     return (
       <div className="flex flex-col h-screen justify-center items-center gap-4">

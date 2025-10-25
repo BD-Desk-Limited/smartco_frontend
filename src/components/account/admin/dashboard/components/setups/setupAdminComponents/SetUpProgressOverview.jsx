@@ -33,7 +33,7 @@ const SetupProgressOverview = ({ setupProgress, setupStepConfigs, onStepSelect, 
             Welcome to SmartCo, {user?.fullName}!
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Let's get your business system configured. Complete the required steps below to get started with all features.
+            Let&apos;s get your business system configured. Complete the required steps below to get started with all features.
           </p>
         </div>
 

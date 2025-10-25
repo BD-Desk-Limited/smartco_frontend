@@ -243,7 +243,7 @@ const CreateProductForm = ({
                                 {/** Set price **/}
                                 <div className="flex gap-1 flex-col w-1/7">
                                   <label className="text-sm font-thin text-text-white">
-                                      ''
+                                      {` `}
                                   </label>
                                   <div className={`relative border border-gray-border rounded-md p-2 text-sm text-text-white bg-brand-blue mb-1 cursor-pointer w-full shadow-md ${openPriceDropDown[index]? 'pb-5':''}`}>
                                     <div 
@@ -280,7 +280,7 @@ const CreateProductForm = ({
                                 {/** Select components **/}
                                 <div className="flex gap-1 flex-col max-w-1/6">
                                   <label className="text-sm font-thin text-text-white">
-                                      ''
+                                      {` `}
                                   </label>
                                   <div className={`relative border border-gray-border rounded-md p-2 text-sm text-text-white bg-brand-blue mb-1 cursor-pointer w-full shadow-md ${componentsDropDown[index]? 'pb-5':''}`}>
                                     <div 

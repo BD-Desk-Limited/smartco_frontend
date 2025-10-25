@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './authContext';
 import { checkCompanySetupCompletionService } from '@/services/setupServices';
@@ -35,11 +35,64 @@ export const SetupProvider = ({ children }) => {
     const router = useRouter();
     const pathname = usePathname();
 
+    // Function to get allowed pages from sessionStorage
+    const getAllowedPages = useCallback(() => {
+      if (typeof window !== 'undefined') {
+        try {
+          const stored = sessionStorage.getItem('setupAllowedPages');
+          return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+          console.error('Error parsing setupAllowedPages from sessionStorage:', error);
+          return [];
+        }
+      }
+      return [];
+    }, []);
+
+    // Helper function to check if a page is allowed
+    const isPageAllowed = useCallback((pathname) => {
+      const allowed = getAllowedPages(); //retrieve latest allowed pages from sessionStorage
+      const isPublic = publicPaths.some(path => pathname.startsWith(path)); //check if page is a public path
+
+      // Always allow public pages
+      if (isPublic) {
+        return true;
+      }
+
+      // If no allowed pages are set, deny access
+      if (!allowed || allowed.length === 0) {
+        return false;
+      }
+      
+      // Always allow exact matches
+      if (allowed.includes(pathname)) {
+        return true;
+      }
+
+      return false;
+    }, [getAllowedPages]);
+
+    // Helper function to check setup completion and progress
+    const checkSetupStatus = useCallback(async () => {
+      setLoading(true);
+      try {
+        const response = await checkCompanySetupCompletionService();
+
+        if (response.data) {
+           setSetupComplete(response.data.isMandatorySetUpComplete);
+           setSetupProgress(response.data);
+        }
+      } catch (error) {
+        console.error('Error checking setup status:', error);
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    }, []);
+
     // Check if user is admin and has required access to perform setup. If so, check setup status.
     useEffect(() => {
-
       const checkAdminStatus = () => {
-
         if (!user || adminStatusChecked) return;
 
         const hasAdminAccess = user && (
@@ -63,7 +116,7 @@ export const SetupProvider = ({ children }) => {
       };
 
       checkAdminStatus();
-    }, [user]);
+    }, [user, adminStatusChecked, checkSetupStatus]);
 
     // Redirect logic based on setup status and allowed pages to track which pages can be accessed during setup by authorized admins
     useEffect(() => {
@@ -89,64 +142,11 @@ export const SetupProvider = ({ children }) => {
         return;
       }
 
-    }, [setupComplete, isSetUpAdmin, loading, pathname, user, router, adminStatusChecked]);
+    }, [setupComplete, isSetUpAdmin, loading, pathname, user, router, adminStatusChecked, isPageAllowed]);
 
     // Helper function to determine if we should display any content yet on the page
     const dontDisplayYet = () => {
-      //if (loading || !user || !adminStatusChecked) return true; // Still loading or user not ready
-      //if (!isSetUpAdmin && !setupComplete && !rolesExemptFromSetup.includes(user?.role)) return true; // Non-admin trying to access during setup
       if (!setupComplete && !isPageAllowed(pathname) && pathname !== '/pages/account/admin') return true; // Admin on disallowed page during setup
-      return false;
-    };
-
-    // Helper function to check setup completion and progress
-    const checkSetupStatus = async () => {
-      setLoading(true);
-      try {
-        const response = await checkCompanySetupCompletionService();
-
-        if (response.data) {
-           setSetupComplete(response.data.isMandatorySetUpComplete);
-           setSetupProgress(response.data);
-        }
-      } catch (error) {
-        console.error('Error checking setup status:', error);
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Function to get allowed pages from sessionStorage
-    const getAllowedPages = () => {
-      if (typeof window !== 'undefined') {
-        const stored = sessionStorage.getItem('setupAllowedPages');
-        return stored ? JSON.parse(stored) : [];
-      }
-      return [];
-    };
-
-    // Helper function to check if a page is allowed
-    const isPageAllowed = (pathname) => {
-
-      const allowed = getAllowedPages(); //retrieve latest allowed pages from sessionStorage
-      const isPublic = publicPaths.some(path => pathname.startsWith(path)); //check if page is a public path
-
-      // Always allow public pages
-      if (isPublic) {
-        return true;
-      }
-
-      // If no allowed pages are set, deny access
-      if (!allowed || allowed.length === 0) {
-        return false;
-      }
-      
-      // Always allow exact matches
-      if (allowed.includes(pathname)) {
-        return true;
-      }
-
       return false;
     };
 

@@ -25,22 +25,13 @@ const ProductDetailsPage = () => {
   });
   const pageDescription =
     'The Product Details page provides a comprehensive overview of a product, including its name, category, tax information, prices across branch bands, stock status, and other relevant details. It also displays the product\'s components and any available alternatives for components that have options. Use this page to review all attributes and settings associated with the product, ensuring accurate management and visibility throughout your organization.';
-      
-  // Check if the user has access to this page
-  const accessCheckFailed = PageAccessRequirement(
-    'admin',
-    'Products_Management',
-  );  
-  if (accessCheckFailed) {
-    return accessCheckFailed;
-  };
+  
 
   React.useEffect(() => {
     // Fetch product data by id
     if (id) {
       const fetchProductData = async () => {
         const response = await getProductByIdService(id);
-        console.log('Product data response:', response);
         if (response.data) {
           setProductData(response.data);
         } 
@@ -67,13 +58,23 @@ const ProductDetailsPage = () => {
       }
       fetchBranches();
     }
-  }, []);
+  }, [id]);
 
   React.useEffect(() => {
     if (!id) {
       router.push('/pages/account/admin/product-management');
     };
   }, [id, router]);
+
+      
+  // Check if the user has access to this page
+  const accessCheckFailed = PageAccessRequirement(
+    'admin',
+    'Products_Management',
+  );  
+  if (accessCheckFailed) {
+    return accessCheckFailed;
+  };
 
   return (
     <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">

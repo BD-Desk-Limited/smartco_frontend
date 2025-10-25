@@ -217,7 +217,7 @@ const CurrencyLocationMatch = ({ dataObject, setDataObject }) => {
     };
 
     fetchCountries();
-  }, []);
+  }, [userLocation?.countryCode]);
 
   const filteredCountries = countries.filter(country =>
     country.name.toLowerCase().includes(searchTerm.toLowerCase())

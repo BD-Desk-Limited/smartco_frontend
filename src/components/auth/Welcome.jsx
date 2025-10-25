@@ -53,7 +53,7 @@ const Welcome = () => {
 
       authorize();
     }
-  }, [router, companyData]);
+  }, [router, companyData, isMounted]);
 
   const divStyle = {
     backgroundImage: `url('/images/welcome.png')`,
