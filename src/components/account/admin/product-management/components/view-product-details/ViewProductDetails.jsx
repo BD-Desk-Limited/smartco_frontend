@@ -18,8 +18,6 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
   const { companyData } = useCompanyData();
-  console.log('Product Data:', productData);
-  console.log('Company Data:', companyData);
 
   return (
     <div className='relative bg-background-1'>
@@ -30,7 +28,7 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
           <SubHeader title={'View Product Details'}/>
       </div>
       <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute top-0 z-10">
+        <div className="min-w-fit absolute top-0 z-20">
           <ProductManagementSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}

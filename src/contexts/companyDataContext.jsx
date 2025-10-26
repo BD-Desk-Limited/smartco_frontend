@@ -25,8 +25,6 @@ export const CompanyDataProvider = ({ children }) => {
     localStorage.setItem('companyData', JSON.stringify(data));
   };
 
-  console.log('Company Data in Context:', companyData);
-
   return (
     <CompanyDataContext.Provider value={{ companyData, setCompanyData }}>
       {children}
