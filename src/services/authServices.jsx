@@ -1,5 +1,10 @@
 // safely access sessionStorage in client-side code
 // This function checks if the code is running in a browser environment
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+if (!API_BASE) {
+  console.error('NEXT_PUBLIC_API_URL not set — API requests will be relative to this site.');
+}
+
 const getToken = () => {
   if (typeof window !== 'undefined') {
     return sessionStorage.getItem('token');
