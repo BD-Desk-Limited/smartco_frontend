@@ -34,11 +34,11 @@ const page = () => {
             BD-Desk LTD.
           </Link>
           |{' '}
-          <Link href="/pages/auth/privacy" target='_blank' className="text-brand-blue hover:underline">
+          <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL} target='_blank' className="text-brand-blue hover:underline">
             Privacy Policy
           </Link>{' '}
           |{' '}
-          <Link href="/pages/auth/terms" target='_blank' className="text-brand-blue hover:underline">
+          <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL} target='_blank' className="text-brand-blue hover:underline">
             Terms of Service
           </Link>
         </p>
