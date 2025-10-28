@@ -81,14 +81,13 @@ const LoginForm = () => {
             return;
           }
         }
-        sessionStorage.removeItem('token');
-        setUser(null);
-        throw new Error('Error logging in, please try again');
       }
 
     } catch (error) {
       setError('error logging in, please try again');
       console.error('error logging in', error);
+      sessionStorage.removeItem('token');
+      setUser(null);
       return null;
     } finally {
       setLoading(false);
