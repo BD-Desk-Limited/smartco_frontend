@@ -1,5 +1,6 @@
 import ErrorInterface from '@/components/account/errorInterface';
 import React, { useState } from 'react';
+import { useCompanyData } from '@/contexts/companyDataContext';
 
 const SetPrices = ({
   products, 
@@ -9,7 +10,8 @@ const SetPrices = ({
   taxBands, 
   bandsError,
   setBandsError,
-  closePriceDropdown
+  closePriceDropdown,
+  companyDetails,
 }) => {
 
   const [activeTab, setActiveTab] = useState('prices');
@@ -170,6 +172,8 @@ const SetPrices = ({
     setBandsError('');
   };
 
+  const companyData = useCompanyData();
+  console.log('company data:', companyData);
   return (
    <>
     {/* set Prices */}
@@ -196,11 +200,11 @@ const SetPrices = ({
                 <span className='bg-blue-shadow4 p-2 rounded-md w-1/2'>
                   {band}
                 </span>
-            
+                <span className='flex font-serif font-semibold items-center'>{companyDetails?.currency?.symbol || '$'}</span>
                 <input 
                   type='number'
                   min={0}
-                  placeholder='0.00'
+                  placeholder={`${companyDetails?.currency?.symbol || '$'}0.00`}
                   value={products[productIndex].pricing?.find(priceObj => priceObj.band === band)?.price || ''}
                   onChange={(e) => handleOnEnterPriceOrTax(e, band, 'price')}
                   className='w-1/2 rounded-md px-1 text-text-black'
@@ -246,12 +250,14 @@ const SetPrices = ({
                       )?.taxPercentage || ''
                     }
                     onChange={(e) => handleOnEnterPriceOrTax(e, taxBand, 'tax')}
-                    placeholder='0.00'
+                    placeholder={'0.00'}
                     className='min-w-1/4 rounded-md p-1 text-text-black '
                   />
 
                   <span className='w-full flex flex-col items-center justify-center'>
-                    <span>Additional fixed tax-amount</span>
+                    <span>
+                      Additional fixed tax-amount in {`(${companyDetails?.currency?.symbol || '$'})`}
+                    </span>
                     <input 
                       type='number'
                       min={0}
@@ -261,7 +267,7 @@ const SetPrices = ({
                         )?.additionalTaxAmount || ''
                       }
                       onChange={(e) => handleOnEnterPriceOrTax(e, taxBand, 'additional')}
-                      placeholder='$0.00'
+                      placeholder={`${companyDetails?.currency?.symbol || '$'}0.00`}
                       className='rounded-md p-1 text-text-black'
                     />
                   </span>

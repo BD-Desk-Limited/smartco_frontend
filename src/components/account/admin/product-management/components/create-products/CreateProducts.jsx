@@ -14,6 +14,7 @@ import { verifyName } from '@/utilities/verifyInput';
 import Spinner from '@/components/account/Spinner';
 import SuccessModal from '@/components/account/SuccessModal';
 import WarningModal from '@/components/account/WarningModal';
+import { getCompanyDetails } from '@/services/companyServices';
 
 
 const CreateProducts = ({pageDescription}) => {
@@ -37,6 +38,7 @@ const CreateProducts = ({pageDescription}) => {
     const [error, setError] = React.useState([]);
     const [openWarning, setOpenWarning] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
+    const [companyDetails, setCompanyDetails] = React.useState(null);
 
     //fetch all materials
     React.useEffect(() => {
@@ -130,6 +132,27 @@ const CreateProducts = ({pageDescription}) => {
 
       fetchBands();
     },[user?.company]);
+
+    //fetch company details
+    React.useEffect(() => {
+      if (user && user.company) {
+        // Fetch company details based on user.company
+        const fetchCompanyDetails = async () => {
+          try {
+            const response = await getCompanyDetails();
+            if (response?.data) {
+              setCompanyDetails(response.data);
+            } else if (response?.error) {
+              console.error('Error fetching company details:', response.error);
+            }
+          } catch (error) {
+            console.error('Error fetching company details:', error);
+          }
+        };
+  
+        fetchCompanyDetails();
+      }
+    }, [user, getCompanyDetails]);
 
     // handle all validations and open warning modal
     const handleOpenWarning = () => {
@@ -313,14 +336,16 @@ const CreateProducts = ({pageDescription}) => {
                     setMaterials={setMaterials}
                     handleCreateProduct={handleOpenWarning}
                     error={error}
+                    companyDetails={companyDetails}
                   />
               </div>
               <div className='max-h-[90%] overflow-y-auto scrollbar-thin w-1/5'>
                   <CreateProductSidePreview 
-                      products={products}
-                      selectedProduct={selectedProduct}
-                      materials={materials}
-                      taxBands={taxBands}
+                    products={products}
+                    selectedProduct={selectedProduct}
+                    materials={materials}
+                    taxBands={taxBands}
+                    companyDetails={companyDetails}
                   />
               </div>
             </div>

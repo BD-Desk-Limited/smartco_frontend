@@ -13,7 +13,6 @@ import CreateNewTaxBand from './band/CreateNewTaxBand';
 import { createBranchService, getAllBranchBandsByCompanyId, getAllTaxBandsByCompanyId } from '@/services/branchServices';
 import { validateEmail, validatePhoneNumber } from '@/utilities/validateInput';
 import WarningModal from '@/components/account/WarningModal';
-import {useRouter} from 'next/navigation';
 import BulkBranchUploadModal from './BulkBranchUploadModal';
 
 const bandDescription = `Band is used to group branches that share similar attributes, such as having the same sales price. This grouping helps organize branches logically based on shared characteristics, making it easier to manage and apply consistent rules or operations to them. For example:
@@ -53,7 +52,7 @@ const CreateBranch = ({pageDescription}) => {
   const [openSubmitModal, setOpenSubmitModal] = React.useState(false);
   const [openSuccessModal, setOpenSuccessModal] = React.useState(false);
   const [openBulkUploadModal, setOpenBulkUploadModal] = React.useState(false);
-
+  
   React.useEffect(() => {
     const fetchBands = async () => {
       try{
@@ -140,6 +139,8 @@ const CreateBranch = ({pageDescription}) => {
           address: '',
           email: '',
           phoneNumber: '',
+          band: '',
+          taxBand: '',
         });
       };
     }
@@ -258,7 +259,7 @@ const CreateBranch = ({pageDescription}) => {
               {/* Bands and taxband*/}
               <div className="flex flex-row gap-10 w-full">
                 <div className="flex flex-col gap-1 w-full">
-                  <label htmlFor="bands" className="text-sm font-semibold">Select Band</label>
+                  <label htmlFor="bands" className="text-sm font-semibold">Branch Band</label>
                   {showBandInfo? (
                     <span 
                       onMouseLeave={()=>setShowBandInfo(false)} 
@@ -277,12 +278,12 @@ const CreateBranch = ({pageDescription}) => {
                       >
                         {bands && bands.length>0 ?
                           <>
-                            <option value={""} className='opacity-50 bg-brand-blue'>Select a Band</option>
+                            <option value={""} className='opacity-50 bg-brand-blue'>Select branch Band</option>
                             {bands.map((band, index) => (
                               <option key={index} value={band}>{band}</option>
                             ))}
                           </>: 
-                          <option value="">No band available</option>
+                          <option value="" disabled>No band available</option>
                         }
                       </select>
                       <Image
@@ -305,7 +306,7 @@ const CreateBranch = ({pageDescription}) => {
                 </div>
 
                 <div className="flex flex-col gap-1 w-full">
-                  <label htmlFor="bands" className="text-sm font-semibold">Select Tax Band</label>
+                  <label htmlFor="bands" className="text-sm font-semibold">Branch Tax Band</label>
                   {showTaxBandInfo? (
                     <span 
                       onMouseLeave={()=>setShowTaxBandInfo(false)} 
@@ -324,12 +325,12 @@ const CreateBranch = ({pageDescription}) => {
                       >
                         {taxBands && taxBands.length>0 ? 
                           (<>
-                            <option value={""} className='opacity-50 bg-brand-blue'>Select a Tax-Band</option>
+                            <option value={""} className='opacity-50 bg-brand-blue'>Select Tax-Band</option>
                             {taxBands.map((band, index) => (
                               <option key={index} value={band.name}>{band.name}</option>
                             ))}
                           </>) : 
-                          <option value="">No tax-band available</option>
+                          <option value="" disabled>No tax band available</option>
                         }
                       </select>
                       <Image

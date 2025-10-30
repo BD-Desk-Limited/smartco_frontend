@@ -20,7 +20,8 @@ const CreateProductForm = ({
   materials,
   setMaterials,
   handleCreateProduct,
-  error
+  error,
+  companyDetails,
 }) => {
 
   const [categorySearch, setCategorySearch] = React.useState({});
@@ -270,6 +271,7 @@ const CreateProductForm = ({
                                           setBandsError={setBandsError}
                                           setBands={setBands}
                                           setTaxBands={setTaxBands}
+                                          companyDetails={companyDetails}
                                           closePriceDropdown={()=>handleOpenDropdown(index, setOpenPriceDropDown)}
                                         />
                                       </div>
@@ -296,7 +298,7 @@ const CreateProductForm = ({
                                       <span className='py-0.5'>select Components</span>
                                     </div>
                                     {componentsDropDown[index] &&(
-                                      <div className="absolute z-10 top-9 right-[-50%] bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col w-[55vw]">
+                                      <div className="absolute z-10 top-9 right-[-50%] bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col w-[50vw]">
                                         <SelectComponents
                                           products={products}
                                           setProducts={setProducts}

@@ -400,9 +400,9 @@ const ViewProducts = ({pageDescription}) => {
                                 <td className={`px-2 py-2 text-center w-1/6`}>
                                   Available in 
                                   <span className='font-semibold'>
-                                    {product?.availability || 0}
+                                    {` ${product?.availability || 0}`}
                                   </span> 
-                                  {product?.availability > 1 ? 'branches' : 'branch'}
+                                  {product?.availability > 1 ? ' branches' : ' branch'}
                                 </td>
 
                                 {/* Actions */}

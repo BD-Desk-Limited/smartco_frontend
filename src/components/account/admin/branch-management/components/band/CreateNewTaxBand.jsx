@@ -155,18 +155,18 @@ const CreateNewTaxBand = ({onClose, taxBands, setTaxBands, formData, setFormData
                     <table className='w-full relative'>
                       <thead className='bg-blue-shadow3 text-text-white text-sm sticky top-0'>
                         <tr>
-                          <th className='p-1'>Band Name</th>
-                          <th className='p-1 w-24 text-left'>Tax Rate</th>
-                          <th className='p-1'>Description</th>
+                          <th className='p-1 w-1/6 text-left'>Band Name</th>
+                          <th className='p-1 w-1/6 text-left '>Tax Rate</th>
+                          <th className='p-1 w-2/3 text-left'>Description</th>
                         </tr>
                       </thead>
                       <tbody className='text-brand-blue text-sm'>
                         {taxBands?.length>0?(
                           taxBands.map((band, index) => (
                             <tr key={index} className='border-b border-gray-border hover:bg-gray-border cursor-pointer'>
-                              <td className='p-1'>{band.name}</td>
-                              <td className='p-1'>{band.rate}%</td>
-                              <td className='p-1'>{band.description}</td>
+                              <td className='p-1 w-1/6 text-left'>{band.name}</td>
+                              <td className='p-1 w-1/6 text-left'>{band.rate}%</td>
+                              <td className='p-1 w-2/3 text-left'>{band.description}</td>
                             </tr>
                           ))
                         ):(

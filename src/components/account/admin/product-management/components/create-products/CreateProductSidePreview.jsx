@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CreateProductSidePreview = ({ selectedProduct, taxBands, materials }) => {
+const CreateProductSidePreview = ({ selectedProduct, taxBands, materials, companyDetails }) => {
 
   // Filter tax info with taxPercentage > 0 or additionalTaxAmount > 0 to avoid unnecessary rendering of zero tax bands.
   const taxInfo = selectedProduct?.productTax?.length > 0
@@ -78,7 +78,9 @@ const CreateProductSidePreview = ({ selectedProduct, taxBands, materials }) => {
               selectedProduct.pricing.map((price, index) => (
                 <li key={index} className='text-sm font-mono px-1 flex flex-row gap-1 justify-between'>
                   <span className=''>{price.band || 'N/A'}</span>
-                  <span className='font-bold'>{`${(price.price || 0).toFixed(2)}`}</span>
+                  <span className='font-bold'>
+                    {`${companyDetails?.currency?.symbol || '$'}${(price.price || 0).toFixed(2)}`}
+                  </span>
                 </li>
               ))
             ) : (
@@ -103,7 +105,7 @@ const CreateProductSidePreview = ({ selectedProduct, taxBands, materials }) => {
                     <span>
                       {`${tax.taxPercentage || 0}% `} 
                       {tax.additionalTaxAmount > 0 && (
-                        <span>{`+ ${tax.additionalTaxAmount || 0}`}</span>
+                        <span>{`+ ${companyDetails?.currency?.symbol || '$'}${tax.additionalTaxAmount || 0}`}</span>
                       )}
                     </span>
                   </li>

@@ -122,7 +122,7 @@ const EditGroupedMaterial = ({materialData, pageDescription}) => {
         })),
       };
 
-      //call Api to update material
+      //Api call  to update material
       setLoading(true);
       try{
         const response = await updateMaterial(materialData._id, body, newMaterialImage);
@@ -139,6 +139,12 @@ const EditGroupedMaterial = ({materialData, pageDescription}) => {
       }finally {
         setLoading(false);
       };
+    };
+
+    const handleCloseSuccessModal = () => {
+      setShowSuccess(false); 
+      setError(null);
+      router.push('/pages/account/admin/manage-materials/view-grouped-materials');
     };
 
   return (
@@ -219,7 +225,7 @@ const EditGroupedMaterial = ({materialData, pageDescription}) => {
             <SuccessModal
               message={'Grouped material updated successfully'} 
               title={'Success'} 
-              onClose={()=>{setShowSuccess(false); router.push('/pages/account/admin/manage-materials/view-grouped-materials')}}
+              onClose={handleCloseSuccessModal}
               subText={`you can now view the updated grouped material in the materials list`}
               buttonStyle={'bg-brand-blue'}
               buttonText={'Close'}
