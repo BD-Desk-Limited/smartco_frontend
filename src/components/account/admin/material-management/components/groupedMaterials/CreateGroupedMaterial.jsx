@@ -27,6 +27,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [addComponentsError, setAddComponentsError] = React.useState(null);
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
   const selectedSubMenu = {
@@ -152,6 +153,11 @@ const CreateGroupedMaterial = ({pageDescription}) => {
     setFormData({...formData, components: newComponents});
   };
 
+  const handleCloseSuccessModal = () => {
+    setShowSuccess(false);
+    setAddComponentsError(null);
+  };
+
   return (
     <div>
       <div className="w-full sticky top-0 z-50">
@@ -176,6 +182,8 @@ const CreateGroupedMaterial = ({pageDescription}) => {
               allCategories={allCategories}
               allUnits={allUnits}
               allMaterials={allMaterials}
+              error={addComponentsError}
+              setError={setAddComponentsError}
             />
             <CreateGroupedMaterialPreview
               formData={formData}
@@ -214,7 +222,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
             <SuccessModal 
               message={'Grouped material created successfully'} 
               title={'Success'} 
-              onClose={()=>setShowSuccess(false)} 
+              onClose={handleCloseSuccessModal} 
               subText={`you can now view the grouped material in the materials list`}
               buttonStyle={'bg-brand-blue'}
               buttonText={'Close'}

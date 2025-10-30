@@ -2,12 +2,11 @@ import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import React from 'react'
 
-const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCategories, allUnits}) => {
+const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCategories, allUnits, error, setError}) => {
   const [newComponentMaterial, setNewComponentMaterial] = React.useState('');
   const [newComponentQuantity, setNewComponentQuantity] = React.useState('');
   const [cantFindCategory, setCantFindCategory] = React.useState(false);
   const [cantFindUnit, setCantFindUnit] = React.useState(false);
-  const [error, setError] = React.useState('');
 
   // Filter out deleted materials from allMaterials
   const allMaterialsNotDeleted = allMaterials&& allMaterials.filter(material => !material.isDeleted);
