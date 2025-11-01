@@ -29,6 +29,31 @@ const BulkBranchesUploadReview = ({pageDescription}) => {
     }
   }, [bulkbranchData, Router]);
 
+  const formatBusinessHours = (timeInput) => {
+    //convert timeInput to string
+    const timeString = String(timeInput);
+    
+    // Format the time for business hours display, ensure whatever user inputs is properly formatted to HH:MMAM/PM
+    if (!timeString || timeString.length === 0) {
+      return { isValid: false, display: 'N/A' };
+    }
+    // Remove any whitespace and convert to uppercase
+    const cleanTime = timeString?.trim()?.toUpperCase();
+
+    // Regular expression for HH:MMAM/PM format
+    const timeRegex = /^(0?[1-9]|1[0-2]):([0-5][0-9])(AM|PM)$/;
+    if (!timeRegex.test(cleanTime)) {
+      return {
+        isValid: false,
+        display: 'Invalid Time'
+      };
+    }
+    return {
+      isValid: true,
+      display: cleanTime
+    };
+  };
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{
@@ -150,7 +175,7 @@ const BulkBranchesUploadReview = ({pageDescription}) => {
                                               <th className='mx-1 w-[10%] text-left'>Phone Number</th>
                                               <th className='mx-1 w-[10%] text-left'>Band</th>
                                               <th className='mx-1 w-[10%] text-left'>Tax Band</th>
-                                              <th className='mx-1 w-[5%] text-left'>Tax Rate</th>
+                                              <th className='mx-1 w-[5%] text-left'>Tax Rate(%)</th>
                                               <th className='mx-1 w-[15%] text-left'>Address</th>
                                               <th className='mx-1 w-[5%] text-left'>Opening Hour -</th>
                                               <th className='mx-1 w-[5%] text-left'>Closing Hour</th>
@@ -159,7 +184,7 @@ const BulkBranchesUploadReview = ({pageDescription}) => {
                                       <tbody className='w-full max-h-50 overflow-y-auto scrollbar-thin'>
                                           {
                                               bulkbranchData.map((branch, index) => (
-                                                <tr key={index} className='w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm'>
+                                                <tr key={index} className='w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm overflow-x-hidden'>
                                                     <td className='font-semibold w-7'>{index + 1}</td>
                                                     <td className='mx-1 w-[10%] text-left'>{branch.name}</td>
                                                     <td className='mx-1 w-[10%] text-left'>{branch.branchId}</td>
@@ -169,8 +194,12 @@ const BulkBranchesUploadReview = ({pageDescription}) => {
                                                     <td className='mx-1 w-[10%] text-left'>{branch.taxBand}</td>
                                                     <td className='mx-1 w-[5%] text-left'>{branch.taxRate}</td>
                                                     <td className='mx-1 w-[15%] text-left'>{branch.address}</td>
-                                                    <td className='mx-1 w-[5%] text-left'>{branch.openingHour || 'N/A'}</td>
-                                                    <td className='mx-1 w-[5%] text-left'>{branch.closingHour || 'N/A'}</td>
+                                                    <td className={`${formatBusinessHours(branch?.openingHour).display === 'Invalid Time' ? 'text-red-500' : ''} mx-1 w-[5%] text-left`}>
+                                                      {`${formatBusinessHours(branch?.openingHour).display}`}
+                                                    </td>
+                                                    <td className={`${formatBusinessHours(branch?.closingHour).display === 'Invalid Time' ? 'text-red-500' : ''} mx-1 w-[5%] text-left`}>
+                                                      {`${formatBusinessHours(branch?.closingHour).display}`}
+                                                    </td>
                                                 </tr>
                                               ))
                                           }

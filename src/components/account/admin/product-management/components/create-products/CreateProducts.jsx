@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/authContext';
 import { getAllBranchBandsByCompanyId, getAllTaxBandsByCompanyId } from '@/services/branchServices';
 import { createOrUpdateProductService, getAllProductCategoriesByCompanyIdService } from '@/services/productsServices';
 import { getAllMaterials } from '@/services/materialServices';
-import { verifyName } from '@/utilities/verifyInput';
+import { verifyInputText, verifyName } from '@/utilities/verifyInput';
 import Spinner from '@/components/account/Spinner';
 import SuccessModal from '@/components/account/SuccessModal';
 import WarningModal from '@/components/account/WarningModal';
@@ -25,7 +25,6 @@ const CreateProducts = ({pageDescription}) => {
     };
 
     const {products, setProducts, emptyForm} = useCreateProducts(); // global state for products to be created
-
     const [openSidebar, setOpenSidebar] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [productCategories, setProductCategories] = React.useState([]);
@@ -160,14 +159,14 @@ const CreateProducts = ({pageDescription}) => {
 
       // loop through products to validate each one
       for(const product of products){
-        if(!product.name || product.name.trim() === ''){
+        if(!product.name){
           setError([`Product name is required for product number ${products.indexOf(product) + 1}.`]);
           setLoading(false);
           return;
         };
 
         //validate invalid characters in name
-        const validName = verifyName(product.name);
+        const validName = verifyInputText(product.name);
         if(!validName.passed){
           setError([`${validName.message} for product number ${products.indexOf(product) + 1}.`]);
           setLoading(false);
@@ -175,14 +174,14 @@ const CreateProducts = ({pageDescription}) => {
         };
 
         // validate description for all products
-        if(!product.description || product.description.trim() === ''){
+        if(!product.description){
           setError([`Product description is required for ${product.name ? product.name : 'this'} product number ${products.indexOf(product) + 1}.`]);
           setLoading(false);
           return;
         }
 
         // validate invalid characters in description
-        const validDescription = verifyName(product.description);
+        const validDescription = verifyInputText(product.description);
         if(!validDescription.passed){
           setError([`${validDescription.message} for product description of ${product.name ? product.name : 'this'} product number ${products.indexOf(product) + 1}.`]);
           setLoading(false);

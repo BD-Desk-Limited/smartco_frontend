@@ -59,13 +59,36 @@ export function verifyPassword(password) {
 
 //function to verify input text
 export function verifyInputText(inputText) {
-  const verified = /^[a-zA-Z0-9\s.,'-_]*$/.test(inputText);
-  if (verified) {
-    return { passed: true, message: 'Input text is valid.' };
-  } else {
-    return { passed: false, message: 'Invalid character in text input.' };
+  if (inputText === null || inputText === undefined) {
+    return { passed: false, message: 'Input is required.' };
   }
-};
+  
+  const value = String(inputText).trim();
+  if (value.length === 0) {
+    return { passed: false, message: 'Input cannot be empty.' };
+  }
+
+  // More permissive regex that allows most common text characters
+  const allowed = /^[A-Za-z0-9\s.,''""’’&@#$%*()[\]{}|<>?!;:_/+\-=]*$/;
+  const verified = allowed.test(value);
+
+  //if (!verified) {
+  //  // Find invalid characters for debugging
+  //  const invalidChars = value.split('')
+  //    .filter(char => !char.match(allowed))
+  //    .join('');
+  //  
+  //  console.log('Invalid characters found:', invalidChars);
+  //  console.log('Full input:', value);
+  //}
+
+  return {
+    passed: verified,
+    message: verified 
+      ? 'Input text is valid.' 
+      : 'Invalid character in text input. Only letters, numbers, spaces, and common punctuation allowed.'
+  };
+}
 
 
 

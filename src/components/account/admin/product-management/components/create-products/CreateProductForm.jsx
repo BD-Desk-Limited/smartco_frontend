@@ -260,7 +260,7 @@ const CreateProductForm = ({
                                       <span className='py-0.5'>Set Price and Tax</span>
                                     </div>
                                     {openPriceDropDown[index] &&(
-                                      <div className="absolute z-10 top-9 right-0 bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col min-w-[30vw]">
+                                      <div className="absolute z-10 top-9 right-0 bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col min-w-[35vw]">
                                         <SetPrices
                                           products={products}
                                           setProducts={setProducts}

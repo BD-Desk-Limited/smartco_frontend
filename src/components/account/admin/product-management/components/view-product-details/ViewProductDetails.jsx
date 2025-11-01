@@ -4,10 +4,10 @@ import SubHeader from '@/components/account/SubHeader';
 import Header from '@/components/account/Header';
 import PageDescription from '@/components/account/PageDescription';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Spinner from '@/components/account/Spinner';
 import ProductAvailabilityDetails from './ProductAvailabilityDetails';
 import ProductComponentsPriceAndTaxDetails from './ProductComponentsPriceAndTaxDetails';
-import { useCompanyData } from '@/contexts/companyDataContext';
 
 const ViewProductDetails = ({pageDescription, productData, setProductData, branches, setBranches}) => {
 
@@ -17,7 +17,7 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
   };
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
-  const { companyData } = useCompanyData();
+  const Router = useRouter();
 
   return (
     <div className='relative bg-background-1'>
@@ -46,7 +46,7 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
                     <span>
                       {productData.name && (productData?.name[0]?.toUpperCase() + productData?.name?.slice(1)) || 'Unnamed Product'}
                     </span>
-                    <span className='text-xs text-text-gray'>ID: {productData?._id}</span>
+                    <span className='text-xs text-text-gray py-1'>ID: {productData?._id}</span>
                   </span>
                   <span className={`text-sm ${productData?.disabled ? 'bg-error' : 'bg-success text-text-white'} rounded-full p-1 items-center justify-center flex`}>
                     {productData?.disabled ? 'Inactive' : 'Active'}
@@ -63,7 +63,10 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
                 {/* Action Buttons */}
                 <ul className='flex flex-row gap-3 list-none'>
                   <li>
-                    <button className='border border-brand-blue text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-brand-blue hover:text-text-white transition'>  
+                    <button 
+                      onClick={() => Router.push(`/pages/account/admin/product-management/edit-product?id=${productData?._id}`)}
+                      className='border border-brand-blue text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-brand-blue hover:text-text-white transition'
+                    >  
                       <Image src={`/assets/edit.png`} alt={`Update`} width={16} height={16} />
                       Update
                     </button>
