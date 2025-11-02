@@ -2,12 +2,53 @@ import React from 'react'
 
 const ProductComponentsPriceAndTaxDetails = ({productData, setProductData}) => {
     const [activeTab, setActiveTab] = React.useState('components-and-price');
+    const [currencySymbol, setCurrencySymbol] = React.useState('');
 
     const tabs = [ 
-        {label: 'Components and Prices', value: 'components-and-price'}, 
-        {label: 'Components and Accessories', value: 'components-and-accessories'}, 
+        {label: 'Components and Prices', value: 'components-and-price'},
         {label: 'Tax Details', value: 'tax-details'} 
     ];
+
+    // Update currency symbol when productData changes
+    React.useEffect(() => {
+        const symbol = productData?.company_id?.currency?.symbol || '';
+        setCurrencySymbol(symbol);
+    }, [productData]);
+
+    const getBaseTax = (rate, basePrice) => {
+        // calculate base tax based on tax band rate and base price
+        return `${currencySymbol}${((rate / 100) * basePrice).toFixed(2)}`;
+    };
+
+    const getAdditionalTax = (tax, basePrice) => {
+        // calculate additional tax based on additional tax rate and base price
+        const amountFromTax = (tax?.taxPercentage / 100) * basePrice;
+        const additionalAmount = tax?.additionalTaxAmount || 0;
+        return (
+            <span>
+                {amountFromTax > 0 && (
+                    <>
+                        {currencySymbol}{amountFromTax?.toFixed(2)}
+                        <em className='text-error text-sm'>({tax?.taxPercentage}%) </em> +
+                    </>
+                )}
+                {' '}{currencySymbol}{ additionalAmount?.toFixed(2)}
+            </span>
+        );
+    };
+
+    const getTotalTax = (tax, basePrice) => {
+        const amountFromTax = (tax?.taxPercentage / 100) * basePrice;
+        const additionalAmount = tax?.additionalTaxAmount || 0;
+        const baseTax = (tax?.taxBand?.rate / 100) * basePrice;
+        const totalTax = amountFromTax + additionalAmount + baseTax;
+        return totalTax.toFixed(2);
+    };
+
+    const getNetPrice = (basePrice, totalTax) => {
+        const netPrice = basePrice - totalTax;
+        return `${currencySymbol}${netPrice.toFixed(2)}`;
+    };
 
   return (
     <div className='text-sm'>
@@ -35,18 +76,18 @@ const ProductComponentsPriceAndTaxDetails = ({productData, setProductData}) => {
                             <p className='font-semibold'>Base prices of product by bands:</p>
                             {productData?.pricing?.length > 0 ? (
                                 <div className='w-full text-text-gray'>
-                                    <table className='w-full mb-3'>
+                                    <table className='w-full mb-3 my-1'>
                                         <thead>
-                                            <tr className='bg-background-2 font-semibold border-y border-y-gray-border'>
+                                            <tr className='bg-background-2 border-y border-y-gray-border'>
                                                 <th className='p-1 text-left'>Price Band</th>
-                                                <th className='p-1 text-left'>Price</th>
+                                                <th className='p-1 text-left'>Base Price</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody className='border-b'>
                                            {productData.pricing.map((band, index) => (
-                                                <tr key={index} className='border-b'>
+                                                <tr key={index}>
                                                     <td className='p-1'>{band?.band || 'Unnamed Band'}</td>
-                                                    <td className='p-1'>{band?.price ? `#${band.price.toFixed(2)}` : 'N/A'}</td>
+                                                    <td className='p-1'>{band?.price ? `${currencySymbol}${band.price.toFixed(2)}` : 'N/A'}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -107,14 +148,58 @@ const ProductComponentsPriceAndTaxDetails = ({productData, setProductData}) => {
                     </div>
                 </div>
             )}
-            {activeTab === 'components-and-accessories' && (
-                <div>
-                    {/* Content for Components and Accessories Tab */}
-                </div>
-            )}
             {activeTab === 'tax-details' && (
                 <div>
-                    {/* Content for Tax Details Tab */}
+                    <h2 className='text-base text-text-black mb-4'>Product Tax Details</h2>
+                    <div className='w-full text-text-gray'>
+                        {productData?.productTax?.length > 0 ? (
+                            <>
+                                {productData?.productTax?.map((tax) => (
+                                    <div key={tax?.taxBand?._id} className='mb-2 p-2 border-b'>
+                                        <h3 className='font-semibold'>{`${tax?.taxBand?.name} branch(es)` || 'Unnamed Tax Band'}</h3>
+
+                                        {productData?.pricing?.length > 0 ? (
+                                            <table className='w-full mb-3 my-1'>
+                                                <thead>
+                                                    <tr className='bg-background-2 border border-gray-border text-sm'>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>Price Band</th>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>
+                                                            {`Base tax (${tax.taxBand.rate}%)`}
+                                                        </th>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>Product Additional tax</th>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>Total tax</th>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>Net Price</th>
+                                                        <th className='p-1 text-left bg-green-shadow8 border border-gray-border'>Gross Price</th>
+                                                    </tr>
+                                                </thead>
+                                            
+                                                <tbody>
+                                                    {productData?.pricing?.map((band, index) => (
+                                                        <tr key={index} className='border-b'>
+                                                            <td className='p-1'>{band?.band || 'Unnamed Band'}</td>
+                                                            <td className='p-1'>
+                                                                {`${getBaseTax(tax.taxBand.rate || 0, band?.price || 0)} `}
+                                                            </td>
+                                                            <td className='p-1'>{getAdditionalTax(tax, band?.price) || 0}</td>
+                                                            <td className='p-1'>{`${currencySymbol}${getTotalTax(tax, band?.price) || 0}`}</td>
+                                                            <td className='p-1'>{`${getNetPrice(band?.price, getTotalTax(tax, band?.price)) || 0}`}</td>
+                                                            <td className='p-1'>{`${currencySymbol}${band?.price.toFixed(2)}` || 'N/A'}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        ) : (
+                                            <p> No pricing bands available in this tax band.</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <p className='text-text-gray'>
+                                No tax details available for this product.
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

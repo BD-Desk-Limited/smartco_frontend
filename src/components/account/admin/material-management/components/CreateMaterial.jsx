@@ -203,7 +203,7 @@ const CreateMaterial = ({ pageDescription }) => {
         setCategoryCreated(false);
         setUnitCreated(false);
       } else if (error) {
-        setError(response.error || 'error creating material, please try again!!!');
+        setError(error || 'error creating material, please try again!!!');
       };
 
     } catch (error) {

@@ -3,7 +3,7 @@ import { useBulkbranchUpload } from '@/contexts/bulkBranchUploadContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import * as XLSX from 'xlsx';
-import { verifyEmail, verifyInputText, verifyPhoneNumber } from '@/utilities/verifyInput';
+import { verifyEmail, verifyInputText } from '@/utilities/verifyInput';
 import Header from '@/components/account/Header';
 import SubHeader from '@/components/account/SubHeader';
 import BranchSidebar from './BranchSideBar';

@@ -14,6 +14,7 @@ const ProductDetailsPage = () => {
   const router = useRouter();
   const [productData, setProductData] = React.useState({});
   const [branches, setBranches] = React.useState([]);
+  const [companyData, setCompanyData] = React.useState({});
 
   const [selectedMenu, setSelectedMenu] = React.useState({
     name: 'Products',
@@ -66,7 +67,6 @@ const ProductDetailsPage = () => {
     };
   }, [id, router]);
 
-      
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(
     'admin',
@@ -91,6 +91,7 @@ const ProductDetailsPage = () => {
           setProductData={setProductData}
           branches={branches}
           setBranches={setBranches}
+          companyData={companyData}
         />
       </div>
     </div>

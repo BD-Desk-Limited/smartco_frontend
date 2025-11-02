@@ -6,6 +6,7 @@ import OTPInput from './OTPInput';
 import { resendOTPService, verifyOTPService } from '@/services/authServices';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
+import Spinner from '../account/Spinner';
 
 const OTPForm = () => {
   const { setUser } = useAuth();
@@ -22,6 +23,7 @@ const OTPForm = () => {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [purpose, setPurpose] = useState('');
+  const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -122,6 +124,7 @@ const OTPForm = () => {
         setMessage('OTP verified successfully!!! logging in...');
         setSuccess(true);
         setLoading(false);
+        setRedirecting(true);
 
         // set user and token in session storage for use in the login attempt notification page. It will be cleared once the user logs in successfully or closes the page.
         sessionStorage.setItem('token', response?.data?.token);
@@ -148,6 +151,9 @@ const OTPForm = () => {
           setError('unauthorized user role, please contact admin');
           return;
         }
+
+        setRedirecting(false);
+        return;
       }
       
       //clean up the session storage
@@ -259,6 +265,14 @@ const OTPForm = () => {
             />
           </motion.h1>
           <div className="text-center">{message}</div>
+          {redirecting && (
+            <div className="mt-4">
+              <Spinner />
+              <p className="text-sm text-gray-600 mt-2">
+                Redirecting ...
+              </p>
+            </div>
+          )}
         </div>
       )}
       <div className="absolute bottom-[40vh] left-[10vw] z-0">
