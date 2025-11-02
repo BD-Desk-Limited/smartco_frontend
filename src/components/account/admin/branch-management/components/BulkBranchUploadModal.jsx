@@ -66,7 +66,7 @@ const BulkBranchUploadModal = () => {
           </div>
         </div>
         <div className="bg-brand-blue w-full text-center text-text-white rounded-b-md h-[8vh] flex justify-center items-center">
-          <p className="text-xs">Need help? Click "View Detailed Upload Instructions" above</p>
+          <p className="text-xs">Need help? Click &quot;View Detailed Upload Instructions&quot; above</p>
         </div>
       </div>
 

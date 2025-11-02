@@ -6,7 +6,7 @@ import OTPInput from './OTPInput';
 import { resendOTPService, verifyOTPService } from '@/services/authServices';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
-import { s } from 'framer-motion/dist/types.d-CtuPurYT';
+import Spinner from '../account/Spinner';
 
 const OTPForm = () => {
   const { setUser } = useAuth();

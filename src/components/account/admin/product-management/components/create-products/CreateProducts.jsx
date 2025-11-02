@@ -151,7 +151,7 @@ const CreateProducts = ({pageDescription}) => {
   
         fetchCompanyDetails();
       }
-    }, [user, getCompanyDetails]);
+    }, [user, getCompanyDetails, setCompanyDetails]);
 
     // handle all validations and open warning modal
     const handleOpenWarning = () => {
