@@ -1,3 +1,4 @@
+/* Working from here*/
 import Header from '@/components/account/Header';
 import SubHeader from '@/components/account/SubHeader';
 import React from 'react';
@@ -40,7 +41,11 @@ const EditableProductDetails = ({ pageDescription }) => {
   const [openComponentsOverlay, setOpenComponentsOverlay] = React.useState(false);
   const [showSelectComponents, setShowSelectComponents] = React.useState({});
 
-  const selectedSubMenu = { name: 'Edit Product', link: '/edit-product' };
+  const selectedSubMenu = {
+      name: 'View All Products',
+      link: '/',
+  };
+  const tabs = [ 'Components and pricing', 'Tax details' ];
 
   // Fetch product details
   React.useEffect(() => {
@@ -352,7 +357,13 @@ const EditableProductDetails = ({ pageDescription }) => {
                 {/* Center: Components, Prices & Tax with edit overlays */}
                 <div className='w-3/5 bg-white rounded-lg shadow-lg p-3 text-sm'>
                   <div className='flex flex-row items-center justify-between mb-2'>
-                    <h4 className='font-semibold text-brand-green'>Components, Prices & Tax</h4>
+                    <h4 className='font-semibold text-brand-green'>
+                      {tabs.map((tab, idx) => (
+                        <span key={idx} className={`cursor-pointer mr-4 ${idx === 0 ? 'border-b-2 border-brand-green pb-1' : ''}`}>
+                          {tab}
+                        </span>
+                      ))}
+                    </h4>
                     <div className='flex gap-2'>
                       <button onClick={()=> setOpenComponentsOverlay(true)} className='text-sm border border-brand-blue text-brand-blue px-2 py-1 rounded hover:bg-brand-blue hover:text-white'>Edit Components</button>
                       <button onClick={()=> setOpenPriceOverlay(true)} className='text-sm border border-brand-blue text-brand-blue px-2 py-1 rounded hover:bg-brand-blue hover:text-white'>Edit Price & Tax</button>
