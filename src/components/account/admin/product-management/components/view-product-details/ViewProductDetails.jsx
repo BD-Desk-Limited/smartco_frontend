@@ -1,3 +1,4 @@
+'use client';
 import React from 'react'
 import ProductManagementSidebar from '../ProductManagementSidebar';
 import SubHeader from '@/components/account/SubHeader';
@@ -8,6 +9,18 @@ import { useRouter } from 'next/navigation';
 import Spinner from '@/components/account/Spinner';
 import ProductAvailabilityDetails from './ProductAvailabilityDetails';
 import ProductComponentsPriceAndTaxDetails from './ProductComponentsPriceAndTaxDetails';
+import DeleteModal from '@/components/account/DeleteModal';
+import DeactivationModal from '@/components/account/DeactivationModal';
+import { capitalizeFirst } from '@/utilities/stringUtils';
+import { 
+  activateProductInAllBranchesService, 
+  deactivateProductInAllBranchesService, 
+  deleteProductsService, 
+  enableOrDisableProductService, 
+  updateProductAvailabilityInBranchesService 
+} from '@/services/productsServices';
+import SuccessModal from '@/components/account/SuccessModal';
+import ProductDescriptionSection from './ProductDescriptionSection';
 
 const ViewProductDetails = ({pageDescription, productData, setProductData, branches, setBranches}) => {
 
@@ -17,7 +30,166 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
   };
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
+  const [openEnableOrDisableModal, setOpenEnableOrDisableModal] = React.useState(false);
+  const [enableOrDisableSuccess, setEnableOrDisableSuccess] = React.useState(false);
+  const [enableAndDisableErrors, setEnableAndDisableErrors] = React.useState([]);
+  const [enableAndDisableMessages, setEnableAndDisableMessages] = React.useState([]);
+  const [openUpdateProductAvailabilityModal, setOpenUpdateProductAvailabilityModal] = React.useState(false);
+  const [productAvailabilityUpdateSuccess, setProductAvailabilityUpdateSuccess] = React.useState(false);
+  const [productAvailabilityUpdateErrors, setProductAvailabilityUpdateErrors] = React.useState([]);
+  const [productAvailabilityUpdateMessages, setProductAvailabilityUpdateMessages] = React.useState([]);
+  const [productAvailabilityAction, setProductAvailabilityAction] = React.useState({type: '', text:'', count: ''});
+  const [deleteMessages, setDeleteMessages] = React.useState([]);
+  const [deleteErrors, setDeleteErrors] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [selectedBranches, setSelectedBranches] = React.useState([]);
   const Router = useRouter();
+
+  const handleDeleteProducts = async() => {
+    try{
+        setLoading(true);
+        const response = await deleteProductsService([productData._id]);
+        if(response.data){
+          const data = response.data;
+          if(data.deletedProducts.length>0){
+            setDeleteMessages([`Product deleted successfully.`]);
+            setOpenDeleteModal(false);
+          }
+          if(data.productsNotDeleted.length>0){
+            const collectErrorMessages = data.productsNotDeleted.map(product => product.message)
+            const errorTypes = [...new Set(collectErrorMessages)];
+            let errorProductsNotDeleted = []
+            errorTypes.forEach((errorType) => {
+                const errorProduct = data.productsNotDeleted.filter(product => product.message === errorType);
+                errorProductsNotDeleted =  [...errorProductsNotDeleted, {errorType, errorProduct}];
+            })
+            const errorMessages = errorProductsNotDeleted.map(error => {
+                return `${error.errorType} - Products affected: ${error.errorProduct.map(product => product.name).join(', ')}`;
+            });
+            
+            setDeleteErrors(errorMessages);
+          }
+        };
+        if(response.error){
+          setDeleteErrors([response.error]||['Error deleting product, please try again.']);
+        };
+    }catch(error){
+      console.error('Error:', error);
+      setDeleteErrors(['Error deleting products, please try again.']);
+    }finally{
+      setLoading(false);
+    };
+  };
+
+  const handleEnableOrDisableProduct = async() => {
+      
+    const productId = [productData._id];
+    const productsStatus = productData?.isDisabled ? 'inactive' : 'active';
+
+    if (productId.length === 0) {
+      return;
+    }
+
+    try{
+      setLoading(true);
+      let response;
+      if(productsStatus === 'active'){
+        // Disable product(s)
+        response = await enableOrDisableProductService(productId, 'inactive');
+      }else if(productsStatus === 'inactive'){
+        // Enable product(s)
+        response = await enableOrDisableProductService(productId, 'active');
+      }
+
+      if (response.error) {
+          console.error(response.error, 'error changing user status');
+          setEnableAndDisableErrors([response.error || 'Error with product, please try again']);
+          setEnableAndDisableMessages([]);
+        }else if (response.data) {
+          setEnableAndDisableMessages([response.message || 'Product status changed successfully']);
+          setEnableAndDisableErrors([]);
+          // Update the product status in the local state
+          setProductData((prevData) => ({
+            ...prevData,
+            isDisabled: !prevData.isDisabled,
+          }));
+          setOpenEnableOrDisableModal(false);
+          setEnableOrDisableSuccess(true);
+        }
+    }catch (error) {
+      console.error('Error enabling or disabling product:', error);
+      setEnableAndDisableErrors(['Error enabling or disabling product, please try again']);
+      setEnableAndDisableMessages([]);
+    }finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseAllModals = (redirect) => {
+    setOpenDeleteModal(false);
+    setOpenEnableOrDisableModal(false);
+    setDeleteErrors([]);
+    setDeleteMessages([]);
+    setEnableOrDisableSuccess(false);
+    setEnableAndDisableErrors([]);
+    setEnableAndDisableMessages([]);
+    setProductAvailabilityUpdateErrors([]);
+    setProductAvailabilityUpdateMessages([]);
+    setProductAvailabilityUpdateSuccess(false);
+    if (redirect) {
+      Router.push('/pages/account/admin/product-management');
+    }
+  };
+
+  const handleUpdateProductAvailability = async () => {
+    try {
+      setLoading(true);
+
+      // Make API call to update product availability based on productAvailabilityAction and selected branches
+      let response;
+
+      if (productAvailabilityAction.count === 'all') {
+        if (productAvailabilityAction.type === 'makeAvailable') {
+          response = await activateProductInAllBranchesService(productData._id);
+        } else if (productAvailabilityAction.type === 'makeUnavailable') {
+          response = await deactivateProductInAllBranchesService(productData._id);
+        }
+      } else {
+        const branchIds = selectedBranches;
+        response = await updateProductAvailabilityInBranchesService(productData._id, branchIds, productAvailabilityAction.type);
+      }
+
+      if (response.error) {
+        console.error(response.error, 'error updating product availability');
+        setProductAvailabilityUpdateErrors([response.error || 'Error updating product availability, please try again']);
+        setProductAvailabilityUpdateMessages([]);
+      }
+      else if (response.data) {
+        setProductAvailabilityUpdateMessages([response.message || 'Product availability updated successfully']);
+        setProductAvailabilityUpdateErrors([]);
+        // Update the product availability status in the local state
+        setProductData((prevData) => ({
+          ...prevData,
+          availabilityStatus: response.data.availabilityStatus?.map(branch => ({
+            branch: {_id : branch.branch},
+            madeAvailable: branch.madeAvailable,
+            status: branch.status,
+          })) || [],
+        }));
+        setOpenUpdateProductAvailabilityModal(false);
+        setProductAvailabilityUpdateSuccess(true);
+      }
+    
+    } catch (error) {
+      console.error('Error updating product availability:', error);
+      setProductAvailabilityUpdateErrors(['Error updating product availability, please try again']);
+      setProductAvailabilityUpdateMessages([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className='relative bg-background-1'>
@@ -48,8 +220,8 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
                     </span>
                     <span className='text-xs text-text-gray py-1'>ID: {productData?._id}</span>
                   </span>
-                  <span className={`text-sm ${productData?.disabled ? 'bg-error' : 'bg-success text-text-white'} rounded-full p-1 items-center justify-center flex`}>
-                    {productData?.disabled ? 'Inactive' : 'Active'}
+                  <span className={`text-sm ${productData?.isDisabled ? 'bg-error' : 'bg-success text-text-white'} rounded-full p-1 items-center justify-center flex`}>
+                    {productData?.isDisabled ? 'Inactive' : 'Active'}
                   </span>
                 </h3>
 
@@ -72,13 +244,19 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
                     </button>
                   </li>
                   <li>
-                    <button className='border border-amber-500 text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-amber-500 hover:text-text-white transition'>  
+                    <button 
+                      onClick={() => setOpenEnableOrDisableModal(true)}
+                      className={`border text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 ${productData?.isDisabled ? 'hover:bg-brand-green border-brand-green' : 'hover:bg-amber-500 border-amber-500'} hover:text-text-white transition`} 
+                    >
                       <Image src={`/assets/warning.png`} alt={`Update`} width={16} height={16} />
-                      Disable
+                      { productData?.isDisabled ? 'Activate' : 'Deactivate' }
                     </button>
                   </li>
                   <li>
-                    <button className='border border-error text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-error hover:text-text-white transition'>  
+                    <button 
+                      onClick={() => setOpenDeleteModal(true)}
+                      className='border border-error text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-error hover:text-text-white transition'
+                    >  
                       <Image src={`/assets/delete.png`} alt={`Update`} width={16} height={16} />
                       Delete
                     </button>
@@ -88,50 +266,14 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
               </div>
 
               <div className='flex flex-row w-full px-5 gap-5'>
+                {/* Product Description and Audit Section */}
                 <div className='w-1/5 gap-5 flex flex-col'>
-                  <div className='bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2'>
-                    <Image
-                      src={productData?.imageURL ? productData?.imageURL : `/assets/shopping.png`}
-                      alt={productData?.name || 'Product Image'}
-                      className='w-40 h-40 object-cover rounded-lg '
-                      width={100}
-                      height={100}
-                    />
-                    <span className='flex flex-col'>
-                      <span className='text-text-gray text-sm'>
-                        Category
-                      </span> 
-                      <span className='font-semibold text-brand-blue'>
-                        {productData?.category?.name || 'Uncategorized'}
-                      </span>
-                    </span>
-                  </div>
-
-                  {/* Description Section */}
-                  <div className='bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2'>
-                    <h4 className='font-semibold text-brand-blue mb-2'>Description</h4>
-                    <p className='text-text-gray text-sm h-24 overflow-y-auto no-scrollbar'>
-                      {productData?.description || 'No description available for this product.'}
-                    </p>
-                  </div>
-
-                  {/* Audit Section */}
-                  <div className='bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2 h-24 overflow-y-auto no-scrollbar'>
-                    <p className='text-text-gray text-sm'>
-                      Created at: {productData?.createdAt ? new Date(productData?.createdAt).toLocaleString() : 'N/A'}
-                    </p>
-                    <p className='text-text-gray text-sm'>
-                      Created by: {productData?.createdBy?.fullName || 'N/A'}
-                    </p>
-                    <p className='text-text-gray text-sm'>
-                      Last updated: {productData?.updatedAt ? new Date(productData?.updatedAt).toLocaleString() : 'N/A'}
-                    </p>
-                    <p className='text-text-gray text-sm'>
-                      Updated by: {productData?.updatedBy?.fullName || 'N/A'}
-                    </p>
-                  </div>
+                  <ProductDescriptionSection
+                    productData={productData}
+                  />
                 </div>
 
+                {/* Product Components, Price and Tax Details Section */}
                 <div className='w-3/5 bg-white rounded-lg shadow-lg p-2'>
                   <ProductComponentsPriceAndTaxDetails 
                     productData={productData}
@@ -142,10 +284,12 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
                 {/* Product Availability Details Section */}
                 <div className='w-1/5 bg-white rounded-lg shadow-lg p-2'>
                   <ProductAvailabilityDetails 
-                    branches={branches} 
-                    setBranches={setBranches}
-                    branchesProductIsAvailableIn={productData?.availabilityStatus || []}
-                    setProductData={setProductData}
+                    branches={branches}
+                    selectedBranches={selectedBranches}
+                    setSelectedBranches={setSelectedBranches}
+                    branchesAvailabilityStatus={productData?.availabilityStatus || []}
+                    setProductAvailabilityAction={setProductAvailabilityAction}
+                    setOpenUpdateProductAvailabilityModal={setOpenUpdateProductAvailabilityModal}
                   />
                 </div>
               </div>
@@ -159,6 +303,110 @@ const ViewProductDetails = ({pageDescription, productData, setProductData, branc
           </div>
         </div>
       </div>
+
+    {/* Delete Confirmation Modal */}
+    {openDeleteModal && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <DeleteModal
+          message={`Are you sure you want to delete this product? This action cannot be undone.`}
+          title={`${capitalizeFirst(productData?.name) || 'Product'}`}
+          buttonStyle={`bg-error text-white hover:bg-error-hover`}
+          onClose={()=>handleCloseAllModals(false)}
+          onConfirm={handleDeleteProducts}
+          button2Style={`bg-brand-blue text-white`}
+          deleteErrors={deleteErrors}
+          deleteMessages={deleteMessages}
+          loading={loading}
+        />
+      </div>
+    )}
+
+    {/* Delete success Modal */}
+    {deleteMessages.length > 0 && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <SuccessModal
+          message={`Product deleted successfully.`}
+          title={`Product Deleted`}
+          buttonStyle={`bg-brand-blue text-text-white`}
+          buttonText={`Done`}
+          onClose={() => handleCloseAllModals(true)}
+        />
+      </div>
+    )}
+
+    {/* Enable or Disable Modal */}
+    {openEnableOrDisableModal && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <DeactivationModal
+          message={
+            `Are you sure you want to ${
+                productData?.isDisabled? 'activate':'deactivate'
+            } this product? \n ${!productData?.isDisabled? 'This would make the product unavailable for sale in the store-front across all branches.' : ''}`
+          }
+          title={
+            productData?.isDisabled? 'Disable products':'Enable products'
+          }
+          buttonStyle={`bg-brand-blue text-white hover:bg-brand-blue-hover`}
+          buttonText={productData?.isDisabled ? 'Activate' : 'Deactivate'}
+          onClose={() => handleCloseAllModals(false)}
+          onConfirm={()=>handleEnableOrDisableProduct([productData._id])}
+          loading={loading}
+          deactivationErrors={enableAndDisableErrors}
+          deactivationMessages={enableAndDisableMessages}
+        />
+      </div>
+    )}
+
+    {/* Enable or disable success Modal */}
+    {enableOrDisableSuccess && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <SuccessModal
+          message={`Product ${productData?.isDisabled? 'deactivated' : 'activated'} successfully.`}
+          title={`Product ${productData?.isDisabled? 'Deactivated' : 'Activated'}`}
+          buttonStyle={`bg-brand-blue text-text-white`}
+          buttonText={`Done`}
+          onClose={() => handleCloseAllModals(false)}
+        />
+      </div>
+    )}
+
+    {/* Update product availability modal */}
+    { openUpdateProductAvailabilityModal && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <DeactivationModal
+          message={`${
+            capitalizeFirst(productAvailabilityAction.text)} in ${
+              productAvailabilityAction.count
+            } ${
+              productAvailabilityAction.count === 1 ? 'branch' : 'branches'
+            }?`
+          }
+          title={`Update Product Availability`}
+          onClose={()=> setOpenUpdateProductAvailabilityModal(false)}
+          onConfirm={handleUpdateProductAvailability}
+          buttonStyle={`bg-brand-blue text-white hover:bg-brand-blue-hover`}
+          button2Style={`bg-blue-shadow6`}
+          buttonText={`Confirm`}
+          button2Text={`Cancel`}
+          loading={loading}
+          deactivationErrors={productAvailabilityUpdateErrors}
+          deactivationMessages={productAvailabilityUpdateMessages}
+        />
+      </div>
+    )}
+
+    {/* Update product availability success Modal */}
+    {productAvailabilityUpdateSuccess && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70'>
+        <SuccessModal
+          message={`Product availability updated successfully.`}
+          title={`Product Availability Updated`}
+          buttonStyle={`bg-brand-blue text-text-white`}
+          buttonText={`Done`}
+          onClose={() => handleCloseAllModals(false)}
+        />
+      </div>
+    )}
     </div>
   );
 }

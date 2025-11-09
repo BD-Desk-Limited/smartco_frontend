@@ -6,6 +6,7 @@ import ViewProductDetails from './components/view-product-details/ViewProductDet
 import AdminSideBar from '../AdminSideBar';
 import { getProductByIdService } from '@/services/productsServices';
 import { getAllBranchesByCompanyId } from '@/services/branchServices';
+import Spinner from '../../Spinner';
 
 const ProductDetailsPage = () => {
 
@@ -14,7 +15,7 @@ const ProductDetailsPage = () => {
   const router = useRouter();
   const [productData, setProductData] = React.useState({});
   const [branches, setBranches] = React.useState([]);
-  const [companyData, setCompanyData] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
 
   const [selectedMenu, setSelectedMenu] = React.useState({
     name: 'Products',
@@ -26,11 +27,11 @@ const ProductDetailsPage = () => {
   });
   const pageDescription =
     'The Product Details page provides a comprehensive overview of a product, including its name, category, tax information, prices across branch bands, stock status, and other relevant details. It also displays the product\'s components and any available alternatives for components that have options. Use this page to review all attributes and settings associated with the product, ensuring accurate management and visibility throughout your organization.';
-  
 
   React.useEffect(() => {
     // Fetch product data by id
     if (id) {
+      setLoading(true);
       const fetchProductData = async () => {
         const response = await getProductByIdService(id);
         if (response.data) {
@@ -42,12 +43,14 @@ const ProductDetailsPage = () => {
         };
       }
       fetchProductData();
+      setLoading(false);
     };
-  }, [id, router]);
+  }, [id, router, loading]);
 
   //get all branches by company id
   React.useEffect(() => {
     if (id){
+      setLoading(true);
       const fetchBranches = async () => {
         const response = await getAllBranchesByCompanyId();
         if (response.data) {
@@ -58,14 +61,15 @@ const ProductDetailsPage = () => {
         };
       }
       fetchBranches();
+      setLoading(false);
     }
-  }, [id]);
+  }, [id, loading]);
 
   React.useEffect(() => {
     if (!id) {
       router.push('/pages/account/admin/product-management');
     };
-  }, [id, router]);
+  }, [id, router, loading]);
 
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(
@@ -75,6 +79,10 @@ const ProductDetailsPage = () => {
   if (accessCheckFailed) {
     return accessCheckFailed;
   };
+
+  if (loading){
+    return <Spinner />;
+  }
 
   return (
     <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
@@ -91,7 +99,6 @@ const ProductDetailsPage = () => {
           setProductData={setProductData}
           branches={branches}
           setBranches={setBranches}
-          companyData={companyData}
         />
       </div>
     </div>

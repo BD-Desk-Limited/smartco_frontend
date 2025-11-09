@@ -1,28 +1,46 @@
-import Image from 'next/image';
 import React from 'react'
 
-const ProductAvailabilityDetails = ({ branches, setBranches, branchesProductIsAvailableIn, setProductData }) => {
+const ProductAvailabilityDetails = ({ 
+    branches,
+    selectedBranches,
+    setSelectedBranches,
+    branchesAvailabilityStatus,
+    setProductAvailabilityAction,
+    setOpenUpdateProductAvailabilityModal,
+}) => {
 
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [filteredBranches, setFilteredBranches] = React.useState(branches);
     const [selectedFilter, setSelectedFilter] = React.useState('all');
-    const [selectedBranches, setSelectedBranches] = React.useState([]);
 
-    React.useEffect(() => {
-        let filtered = branches.filter(branch => 
-            branch.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    // Memoize availability lookup for stability and performance
+    const availabilityMap = React.useMemo(() => {
+        const list = Array.isArray(branchesAvailabilityStatus) ? branchesAvailabilityStatus : [];
+        const map = new Map();
+        for (const item of list) {
+            if (!item) continue;
+            map.set(item.branch?._id, !!item.madeAvailable);
+        }
+        return map;
+    }, [branchesAvailabilityStatus]);
 
-        if (selectedFilter === 'all') {
-            filtered = filtered;
-        } else if (selectedFilter === 'available'){
-            filtered = filtered.filter(branch => branch._id && branchesProductIsAvailableIn.map(branch => branch.branch).includes(branch._id)) || [];
-        } else if (selectedFilter === 'unavailable'){
-            filtered = filtered.filter(branch => branch._id && !branchesProductIsAvailableIn.map(branch => branch.branch).includes(branch._id)) || [];
+    const isAvailableInBranch = React.useCallback((branchId) => {
+        return availabilityMap.get(branchId) || false;
+    }, [availabilityMap]);
+
+    // Derive filtered branches without setState to avoid render loops
+    const filteredBranches = React.useMemo(() => {
+        const base = Array.isArray(branches) ? branches : [];
+        const term = searchTerm.toLowerCase();
+        let filtered = base.filter(branch => (branch?.name || '').toLowerCase().includes(term));
+
+        if (selectedFilter === 'available') {
+            filtered = filtered.filter(branch => branch?._id && isAvailableInBranch(branch._id));
+        } else if (selectedFilter === 'unavailable') {
+            filtered = filtered.filter(branch => branch?._id && !isAvailableInBranch(branch._id));
         }
 
-        setFilteredBranches(filtered);
-    }, [searchTerm, branches, selectedFilter, branchesProductIsAvailableIn]);
+        return filtered;
+    }, [branches, searchTerm, selectedFilter, isAvailableInBranch]);
     
     const filterOptions = ['all', 'available', 'unavailable'];
 
@@ -40,11 +58,20 @@ const ProductAvailabilityDetails = ({ branches, setBranches, branchesProductIsAv
         setSelectedBranches(updatedSelectedBranches);
     };
 
+    const handleOpenAvailabilityModal = (branchCount, actionType, actionText) => {
+        setProductAvailabilityAction(prev => ({
+            type: actionType,
+            text: actionText,
+            count: branchCount,
+        }));
+        setOpenUpdateProductAvailabilityModal(true);
+    };
+
   return (
     <div>
         <h3 className='flex flex-row justify-between items-center'>
           <span className='text-brand-blue font-semibold'>Availability</span>
-          <span className='text-sm text-text-gray'>{branches.length || 0} {branches.length === 1 ? 'branch' : 'branches'}</span>
+          <span className='text-sm text-text-gray'>{(branches?.length) || 0} {(branches?.length) === 1 ? 'branch' : 'branches'}</span>
         </h3>
 
         <input
@@ -73,8 +100,18 @@ const ProductAvailabilityDetails = ({ branches, setBranches, branchesProductIsAv
 
         {/* Quick actions for selected branches */}
         <div className='bg-text-white rounded-lg shadow-md text-sm text-text-gray flex flex-col gap-1 p-2 my-2'>
-            <button className='hover:underline text-brand-blue'>Make available in all branches</button>
-            <button className='hover:underline text-error'>Make unavailable in all branches</button>
+            <button 
+                onClick={() => handleOpenAvailabilityModal('all', 'makeAvailable', 'Make Product Available')}
+                className='hover:underline text-brand-blue'
+            >
+                Make available in all branches
+            </button>
+            <button 
+                onClick={() => handleOpenAvailabilityModal('all', 'makeUnavailable', 'Make Product Unavailable')}
+                className='hover:underline text-error'
+            >
+                Make unavailable in all branches
+            </button>
             
             <hr className='my-2 border border-gray-shadow5'/>
             {selectedBranches.length > 0 && (
@@ -82,8 +119,14 @@ const ProductAvailabilityDetails = ({ branches, setBranches, branchesProductIsAv
                     <div className='absolute top-[-20px] right-0 bg-error text-text-white rounded-full px-2 py-1 text-xs font-semibold'>
                         {selectedBranches.length} branch{selectedBranches.length !== 1 ? 'es' : ''} selected
                     </div>
-                    <button className='hover:underline text-brand-blue'>Make available in selected branches</button>
-                    <button className='hover:underline text-error'>Make unavailable in selected branches</button>
+                    <button 
+                        onClick={() => handleOpenAvailabilityModal(selectedBranches?.length, 'makeAvailable', 'Make Product Available')}
+                        className='hover:underline text-brand-blue'
+                    >Make available in selected branches</button>
+                    <button 
+                        onClick={() => handleOpenAvailabilityModal(selectedBranches?.length, 'makeUnavailable', 'Make Product Unavailable')}
+                        className='hover:underline text-error'
+                    >Make unavailable in selected branches</button>
                 </div>
             )}
         </div>
@@ -103,16 +146,22 @@ const ProductAvailabilityDetails = ({ branches, setBranches, branchesProductIsAv
                         />
                         {branch.name}
                     </span>
-                    <span className={`text-xs ${branchesProductIsAvailableIn.map(branch => branch.branch).includes(branch._id) ? 'bg-success' : 'bg-error'} text-text-white rounded-full px-2 py-1`}>
-                        {branchesProductIsAvailableIn.map(branch => branch.branch).includes(branch._id) ? 'Available' : 'Unavailable'}
+                    <span className={`text-xs ${isAvailableInBranch(branch._id) ? 'bg-success' : 'bg-error'} text-text-white rounded-full px-2 py-1`}>
+                        {isAvailableInBranch(branch._id) ? 'Available' : 'Unavailable'}
                     </span>
                 </li>
             )) : (
-                <li className='text-sm text-text-gray py-10'>No branches found.</li>
+                <li className='text-sm py-10 text-center'>
+                    {
+                        selectedFilter === 'unavailable' ? 'There are no branches where this product is unavailable.' : 
+                        selectedFilter === 'available' ? 'There are no branches where this product is available.' :
+                        'No branches found.'
+                    }
+                </li>
             )}
         </ul>
     </div>
   )
 }
 
-export default ProductAvailabilityDetails
+export default ProductAvailabilityDetails;
