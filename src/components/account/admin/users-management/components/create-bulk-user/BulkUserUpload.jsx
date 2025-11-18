@@ -245,7 +245,7 @@ const BulkUserUpload = ({pageDescription}) => {
   };
 
   return (
-    <div>
+    <div className=''>
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
@@ -265,7 +265,7 @@ const BulkUserUpload = ({pageDescription}) => {
                 <div className='bg-text-white p-5 rounded-md min-h-[50vh] w-[40vw] flex flex-col justify-center items-center gap-2'>
                   <h1 className='text-base font-bold'>Bulk Upload users</h1>
                   <span className='text-text-gray text-sm'>create user accounts within your organisation in bulk</span>
-                  <span className='text-success font-semibold my-2 text-xs'>Upload your filled excel template</span>
+                  <span className='text-error text-center font-semibold my-2 text-sm'>Please check your downloads folder for the template. Fill the template, and upload your filled excel template</span>
       
                   <div 
                     className="border-2 border-dashed border-gray-border rounded-lg p-6 text-center w-full" 

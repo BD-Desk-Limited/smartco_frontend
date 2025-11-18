@@ -19,9 +19,15 @@ export const PageAccessRequirement = (requiredRole, requiredAccess) => {
   const conditionsToShowPage = (
     user?.role === requiredRole &&
     (
-      allActiveUserAccess.map((access) => access.accessName).includes(requiredAccess) || 
-      user?.superAdmin || 
-      user?.accessLevel.map((access) => access.accessName).includes('All_Access')
+      user?.superAdmin ||
+      (  
+        user?.accessLevel?.map(access => access.accessName).includes('All_Access') &&
+        user?.accessLevel?.find(access => access.accessName === 'All_Access').accessGranted
+      ) ||
+      (
+        allActiveUserAccess.map((access) => access.accessName).includes(requiredAccess) &&
+        allActiveUserAccess.find((access) => access.accessName === requiredAccess).accessGranted
+      )
     )
   );
 
@@ -53,7 +59,9 @@ const PageAccessDenied = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen bg-background-1 gap-5">
       <h1 className="text-l font-bold text-center text-error">
-        You do not have permission to view this page!!!
+        You do not have permission to view this part of the business!!!
+        <p className='text-amber-500'>Please contact your administrator to request access.</p>
+
       </h1>
       <Button text={'Back'} onClick={() => (window.location.href = whereToRedirect())} />
     </div>

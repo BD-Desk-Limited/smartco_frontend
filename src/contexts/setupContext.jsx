@@ -25,7 +25,7 @@ export const useSetup = () => {
 };
 
 export const SetupProvider = ({ children }) => {
-    const [setupComplete, setSetupComplete] = useState(false);
+    const [setupComplete, setSetupComplete] = useState(null);
     const [setupProgress, setSetupProgress] = useState({});
     const [isSetUpAdmin, setIsSetUpAdmin] = useState(null); 
     const [adminStatusChecked, setAdminStatusChecked] = useState(false);
@@ -35,7 +35,7 @@ export const SetupProvider = ({ children }) => {
     const router = useRouter();
     const pathname = usePathname();
 
-    // Function to get allowed pages from sessionStorage
+    //Helper Function to get allowed pages from sessionStorage
     const getAllowedPages = useCallback(() => {
       if (typeof window !== 'undefined') {
         try {
@@ -79,7 +79,7 @@ export const SetupProvider = ({ children }) => {
         const response = await checkCompanySetupCompletionService();
 
         if (response.data) {
-           setSetupComplete(response.data.isMandatorySetUpComplete);
+           setSetupComplete(Boolean(response.data.isMandatorySetUpComplete));
            setSetupProgress(response.data);
         }
       } catch (error) {
@@ -88,7 +88,7 @@ export const SetupProvider = ({ children }) => {
       } finally {
         setLoading(false);
       }
-    }, []);
+    }, [setSetupComplete, setSetupProgress, setLoading, setError]);
 
     // Check if user is admin and has required access to perform setup. If so, check setup status.
     useEffect(() => {
@@ -105,12 +105,8 @@ export const SetupProvider = ({ children }) => {
 
         setIsSetUpAdmin(hasAdminAccess);
         
-        if (hasAdminAccess) {
-          // Only check setup if user is admin
-          checkSetupStatus();
-        } else {
-          setLoading(false);
-        }
+        checkSetupStatus();
+        setLoading(false);
 
         setAdminStatusChecked(true);
       };
@@ -121,7 +117,12 @@ export const SetupProvider = ({ children }) => {
     // Redirect logic based on setup status and allowed pages to track which pages can be accessed during setup by authorized admins
     useEffect(() => {
       // Don't redirect if still loading or user not loaded
-      if (loading || !user || !adminStatusChecked) {
+      if (loading || !user || !adminStatusChecked || setupComplete === null) {
+        return;
+      }
+
+      // If setup is complete, allow all pages
+      if (setupComplete) {
         return;
       }
 
@@ -131,13 +132,9 @@ export const SetupProvider = ({ children }) => {
         return;
       }
 
-      // If setup is complete, allow all pages
-      if (setupComplete) {
-        return;
-      }
-
       // If mandatory setup is not complete, check if current page is allowed
-      if (!setupComplete && !isPageAllowed(pathname)) {
+      if (adminStatusChecked && !setupComplete && !isPageAllowed(pathname)) {
+        console.log('Non-admin or exempt role trying to access during setup.', 'pathAllowed:', isPageAllowed(pathname), 'AdminStatusChecked:', adminStatusChecked, 'isSetupComplete:', setupComplete, 'isSetUpAdmin:', isSetUpAdmin, 'userRole:', user.role);
         router.push('/pages/account/admin');
         return;
       }

@@ -172,7 +172,7 @@ const SignUp = () => {
       {!success ? (
         <form className="w-full flex-col flex gap-3" onSubmit={handleSubmit}>
           <h1 className="text-lg font-bold mb-2 text-brand-blue text-center">SIGN UP YOUR BUSINESS</h1>
-          <div className="flex flex-col gap-3 w-full max-h-[80vh] overflow-y-auto">
+          <div className="flex flex-col gap-3 w-full max-h-[70vh] overflow-y-auto scrollbar-thin">
             {/* Full Name Input */}
             <div className="flex flex-col gap-0.5 w-full">
               <label htmlFor="fullName" className={labelStyle}>
