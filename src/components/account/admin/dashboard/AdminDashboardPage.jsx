@@ -44,7 +44,7 @@ const AdminDashboardPage = () => {
 
   return (
     <>
-      {setupComplete === true ? (
+      {setupComplete === true? (
         <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
           <div className='h-full'>
             <AdminSideBar
@@ -58,11 +58,16 @@ const AdminDashboardPage = () => {
           </div>
         </div> 
       ) : (
-        <SetUps 
-          setupProgress={setupProgress}
-          loading={loading}
-          isSetUpAdmin={isSetUpAdmin}
-        />
+        setupComplete === false ?
+        (
+          <SetUps 
+            setupProgress={setupProgress}
+            loading={loading}
+            isSetUpAdmin={isSetUpAdmin}
+          />
+        ):(
+          <Spinner />
+        )
       )}
     </>
   );

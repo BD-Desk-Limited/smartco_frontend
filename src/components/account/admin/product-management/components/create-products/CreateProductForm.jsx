@@ -108,8 +108,8 @@ const CreateProductForm = ({
   };
     
   return (
-    <div className='h-full bg-white rounded-lg p-3 text-text-gray'>
-        <span className='font-semibold text-sm'>Create New Product</span>
+  <div className='h-full bg-white rounded-lg p-3 text-text-gray'>
+    <span className='font-semibold text-sm'>Create New Product</span>
 
         {/* Form Fields */}
         <form className="flex flex-col my-5">

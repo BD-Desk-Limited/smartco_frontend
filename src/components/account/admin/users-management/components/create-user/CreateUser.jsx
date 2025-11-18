@@ -13,6 +13,7 @@ import ErrorInterface from '@/components/account/errorInterface';
 import { createUserService } from '@/services/usersServices';
 import SuccessModal from '@/components/account/SuccessModal';
 import SelectUserTeam from './SelectUserTeam';
+import BulkUserUploadModal from '../create-bulk-user/BulkUserUploadModal';
 
 const CreateUser = ({pageDescription}) => {
 
@@ -36,14 +37,15 @@ const CreateUser = ({pageDescription}) => {
   const [error, setError] = React.useState(null);
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [openModal, setOpenModal] = React.useState(false);
+  const [openConfirmationModal, setopenConfirmationModal] = React.useState(false);
+  const [openbulkUserUploadModal, setOpenbulkUserUploadModal] = React.useState(false);
   const roles = [
     {name: 'seller', style: `bg-brand-blue`},
     {name: 'manager', style: `bg-brand-green`},
     {name: 'admin', style: `bg-error`},
   ];
 
-  const handleOpenModal = () => {
+  const handleopenConfirmationModal = () => {
 
     setError(null);
 
@@ -91,11 +93,11 @@ const CreateUser = ({pageDescription}) => {
 
     if (inputValidationErrors.length > 0) {
       setError(inputValidationErrors[0]);
-      setOpenModal(false);
+      setopenConfirmationModal(false);
       return;
     };
 
-    setOpenModal(true);
+    setopenConfirmationModal(true);
   };
 
   const handleCreateUser = async (e) => {
@@ -141,7 +143,7 @@ const CreateUser = ({pageDescription}) => {
     }
     finally{
       setLoading(false);
-      setOpenModal(false);
+      setopenConfirmationModal(false);
     }
   };
 
@@ -168,7 +170,7 @@ const CreateUser = ({pageDescription}) => {
               className='flex flex-col gap-1 w-52 absolute top-10 right-10'
             >
               <span 
-                onClick={() => window.location.href = '/pages/account/admin/users-management/create-bulk-user'}
+                onClick={() => setOpenbulkUserUploadModal(true)}
                 className='bg-brand-green hover:bg-green-shadow1 px-4 py-2 rounded-md shadow-md text-white text-center cursor-pointer'
               >
                 Create users in bulk
@@ -242,7 +244,7 @@ const CreateUser = ({pageDescription}) => {
               <Button 
                 text={'Create User'}
                 buttonStyle={`mx-5`}
-                onClick={handleOpenModal}
+                onClick={handleopenConfirmationModal}
                 loading={loading}
                 loadingText={'Creating User...'}
                 type={'submit'}
@@ -254,7 +256,7 @@ const CreateUser = ({pageDescription}) => {
       </div>
 
       {/* Modal for confirmation of user creation */}
-      {openModal &&
+      {openConfirmationModal &&
         <div className='inset-0 z-50 flex justify-center items-center absolute bg-black bg-opacity-80'>
         <WarningModal
           title={`Create new user?`}
@@ -264,7 +266,7 @@ const CreateUser = ({pageDescription}) => {
           button1Text={`Create User`}
           button2Text={`Cancel`}
           onClick={handleCreateUser}
-          onClose={() => setOpenModal(false)}
+          onClose={() => setopenConfirmationModal(false)}
           subText={`This action cannot be undone. Please ensure that all information is correct before proceeding.`}
           loading={loading}
           loadingText={`Creating User...`}
@@ -282,11 +284,25 @@ const CreateUser = ({pageDescription}) => {
             buttonStyle={`bg-brand-blue hover:bg-blue-shadow1 text-white`}
             onClose={() => {
               setSuccess(false);
-              setOpenModal(false);
+              setopenConfirmationModal(false);
             }}
           />
         </div>
       }
+
+      {/* Bulk Material Upload Modal */}
+      {openbulkUserUploadModal && (
+        <div className="inset-0 bg-black bg-opacity-70 fixed z-50 flex justify-center items-center flex-col">
+          <div
+            className="bg-gray-shadow2 text-text-white cursor-pointer py-3 px-5 m-1 rounded-[100%] hover:bg-gray-shadow5"
+            onClick={() => setOpenbulkUserUploadModal(false)}
+            title="close"
+          >
+            X
+          </div>
+          <BulkUserUploadModal />
+        </div>
+      )}
     </div>
   )
 }

@@ -29,7 +29,7 @@ const CreateUserPage = () => {
   };
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1 no-scrollbar max-h-screen overflow-y-auto">
+    <div className="flex flex-row gap-0 bg-background-1 no-scrollbar h-screen overflow-hidden">
         <div>
           <AdminSideBar
             selectedMenu={selectedMenu}

@@ -5,7 +5,7 @@ import CreateUserPage from '@/components/account/admin/users-management/CreateUs
 const page = () => {
   return (
     <div>
-        <CreateUserPage/>
+        <CreateUserPage />
     </div>
   )
 }

@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PageDescription from '@/components/account/PageDescription';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/authContext'; 
 import ProductManagementSidebar from './ProductManagementSidebar';
 import Spinner from '@/components/account/Spinner';
 import DeleteModal from '@/components/account/DeleteModal';
