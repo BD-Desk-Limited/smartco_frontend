@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Check for token in sessionStorage (used by all users now)
     const token = sessionStorage.getItem('token');
     console.log('Token:', token);
 

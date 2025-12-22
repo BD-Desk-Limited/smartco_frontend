@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { salesPointLoginService } from '@/services/authServices';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
 import ErrorModal from '../commons/ErrorModal';
+import { useInternetStatus } from '@/contexts/internetStatusContext';
+import { login } from './loginFunctions';
 
 const LoginNew = () => {
   const [form, setForm] = useState({ staffId: '', pin: '' });
@@ -14,69 +14,31 @@ const LoginNew = () => {
   const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
   const { companyData } = useCompanyData();
+  const { toggleUserMode } = useInternetStatus();
   const router = useRouter();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    const body = {
-      pin: form.pin,
-      staffId: form?.staffId,
-      deviceAuthorization: companyData?.authorizationToken,
-    };
-
-    if (form.pin.length < 4) {
-      setError('Pin must be at least 4 digits');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await salesPointLoginService(body);
-      if (response.error) {
-        setError(response?.error);
-        return;
-      }
-
-      if (response?.data) {
-        setUser(response?.data?.user);
-        localStorage.setItem('token', response?.data?.token);
-
-        //update sellers info in local storage
-        const sellersInfo = JSON.parse(localStorage.getItem('sellersInfo'));
-
-        //add new seller to the list
-        const newSeller = {
-          staffId: form.staffId,
-          imageURL: response?.data?.user?.profilePictureUrl,
-          name: response?.data?.user?.fullName,
-          companyId: companyData?.id,
-        };
-        //check if the seller already exists
-        const sellerIndex = sellersInfo.findIndex(
-          (seller) => seller.staffId === form.staffId
-        );
-        if (sellerIndex === -1) {
-          sellersInfo.push(newSeller);
-        } else {
-          sellersInfo[sellerIndex] = newSeller;
-        }
-        localStorage.setItem('sellersInfo', JSON.stringify(sellersInfo));
-
-        router.push('/pages/account/sales-point');
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
+  const body = {
+    pin: form.pin,
+    staffId: form?.staffId,
+    deviceAuthorization: companyData?.authorizationToken,
   };
+
+  const handleLogin = async (e) =>
+    await login(
+      e,
+      body,
+      setError,
+      setLoading,
+      setUser,
+      router,
+      companyData,
+      toggleUserMode
+    );
 
   return (
     <div className="w-full items-center justify-center flex flex-col gap-8 rounded-lg shadow-lg p-10 relative">
-
       {/* select from esisting users */}
-      <div 
+      <div
         onClick={() => router.push('/pages/auth/login/sales-point')}
         className="flex text-left items-center pr-3 rounded-md gap-1 absolute top-0 left-0 hover:bg-gray-shadow10 cursor-pointer"
       >
@@ -97,7 +59,7 @@ const LoginNew = () => {
       <h1 className="text-2xl text-brand-green w-full text-center font-semibold">
         Login to sales point
       </h1>
-      
+
       <form onSubmit={handleLogin} className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="email" className="w-full text-left text-base">
