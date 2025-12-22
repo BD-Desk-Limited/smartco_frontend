@@ -1,8 +1,7 @@
-import next from 'next';
 import {
   PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_BUILD,
-} from 'next/constants.js'; //importing constants from next js to use in the next.config.js file
+} from 'next/constants.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -35,18 +34,23 @@ const nextConfig = {
 };
 
 //function to return the nextConfig object based on the phase of the application build process
+
+import withPWA from 'next-pwa';
+
+const pwaConfig = withPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  fallbacks: {
+    document: '/offline.html',
+  },
+});
+
 const nextConfigFunction = async (phase, { defaultConfig }) => {
   if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_BUILD) {
-    const withPWA = (await import('@ducanh2912/next-pwa')).default({
-      dest: 'public', //directory to store the pwa files
-    });
-
-    //returning the nextConfig object enhanced with the pwa configuration
-    return withPWA(nextConfig);
+    return pwaConfig(nextConfig);
   }
-
-  // Returning the default nextConfig object if the phase is not development or production
   return nextConfig;
 };
 
-export default nextConfigFunction; //exporting the nextConfigFunction to be used in the next js build process
+export default nextConfigFunction;
