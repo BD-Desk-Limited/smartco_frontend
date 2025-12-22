@@ -30,7 +30,7 @@ const PictureCarousel = () => {
         className="rounded-[10%] z-20"
       />
       <div className="absolute inset-0 bg-brand-blue opacity-[73%] rounded-[10%] z-30"></div>
-      <div className="absolute inset-0 flex items-center justify-center z-50">
+      <div className="absolute inset-0 flex items-center justify-center z-40">
         <Image
           src="/assets/logo_white.png"
           alt="Logo"

@@ -13,7 +13,7 @@ export const CreateProductsProvider = ({ children }) => {
     category: '', 
     image: null, 
     pricing: [], 
-    productTax: [] 
+    productTax: []
   }), []); // Define the structure of an empty product form
   const [products, setProducts] = useState([emptyForm]);
 

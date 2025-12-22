@@ -50,10 +50,10 @@ export const enableOrDisableProductService = async (productIds, status) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           product_ids: productIds,
           status: status,
-         }),
+        }),
       }
     );
 
@@ -73,70 +73,69 @@ export const enableOrDisableProductService = async (productIds, status) => {
 
 //delete product(s)
 export const deleteProductsService = async (product_ids) => {
-    const token = getToken();
-    try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/products`,
-            {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ product_ids }),
-            }
-        );
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ product_ids }),
+      }
+    );
 
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log('Delete Response Data:', responseData);
-            return { data: responseData.data };
-        } else {
-            const errorData = await response.json();
-            const errorMessage = errorData.message;
-            return { error: errorMessage };
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        return { error: 'error deleting products, please try again' };
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log('Delete Response Data:', responseData);
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
     }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error deleting products, please try again' };
+  }
 };
 
 //get product by id
 export const getProductByIdService = async (productId) => {
-    const token = getToken();
-    try {
-        const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`,
-        {
-            method: 'GET',
-            headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            },
-        }
-        );
-    
-        if (response.ok) {
-        const responseData = await response.json();
-        return { data: responseData.data };
-        } else {
-        const errorData = await response.json();
-        const errorMessage = errorData.message;
-        return { error: errorMessage };
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        return { error: 'error fetching product, please try again' };
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
     }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching product, please try again' };
+  }
 };
 
 //create or update product
 export const createOrUpdateProductService = async (productData) => {
   const token = getToken();
-  
-  try {
 
+  try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products`,
       {
@@ -144,8 +143,8 @@ export const createOrUpdateProductService = async (productData) => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        
-        body: productData
+
+        body: productData,
       }
     );
 
@@ -193,31 +192,35 @@ export const getAllProductCategoriesByCompanyIdService = async () => {
 };
 
 // update product availability in specified branches by product id
-export const updateProductAvailabilityInBranchesService = async (productId, branchIds, action) => {
+export const updateProductAvailabilityInBranchesService = async (
+  productId,
+  branchIds,
+  action
+) => {
   const token = getToken();
   try {
-      const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/products/availability`,
-          {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ productId, branchIds, action }),
-          }
-      );
-      if (response.ok) {
-          const responseData = await response.json();
-          return { data: responseData.data };
-      } else {
-          const errorData = await response.json();
-          const errorMessage = errorData.message;
-          return { error: errorMessage };
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/availability`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId, branchIds, action }),
       }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
   } catch (error) {
-      console.error('Error:', error);
-      return { error: 'error updating product availability, please try again' };
+    console.error('Error:', error);
+    return { error: 'error updating product availability, please try again' };
   }
 };
 
@@ -225,28 +228,30 @@ export const updateProductAvailabilityInBranchesService = async (productId, bran
 export const activateProductInAllBranchesService = async (productId) => {
   const token = getToken();
   try {
-      const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/products/availability/make-all-available`,
-          {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ productId }),
-          }
-      );
-      if (response.ok) {
-          const responseData = await response.json();
-          return { data: responseData.data };
-      } else {
-          const errorData = await response.json();
-          const errorMessage = errorData.message;
-          return { error: errorMessage };
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/availability/make-all-available`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId }),
       }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
   } catch (error) {
-      console.error('Error:', error);
-      return { error: 'error activating product in all branches, please try again' };
+    console.error('Error:', error);
+    return {
+      error: 'error activating product in all branches, please try again',
+    };
   }
 };
 
@@ -254,27 +259,29 @@ export const activateProductInAllBranchesService = async (productId) => {
 export const deactivateProductInAllBranchesService = async (productId) => {
   const token = getToken();
   try {
-      const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/products/availability/make-all-unavailable`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ productId }),
-          }
-      );
-      if (response.ok) {
-          const responseData = await response.json();
-          return { data: responseData.data };
-      } else {
-          const errorData = await response.json();
-          const errorMessage = errorData.message;
-          return { error: errorMessage };
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/availability/make-all-unavailable`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId }),
       }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
   } catch (error) {
-      console.error('Error:', error);
-      return { error: 'error deactivating product in all branches, please try again' };
+    console.error('Error:', error);
+    return {
+      error: 'error deactivating product in all branches, please try again',
+    };
   }
 };

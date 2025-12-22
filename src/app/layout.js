@@ -6,6 +6,8 @@ import { BulkbranchUploadProvider } from '@/contexts/bulkBranchUploadContext';
 import { BulkUserUploadProvider } from '@/contexts/bulkUserUploadContext';
 import { CreateProductsProvider } from '@/contexts/createProductsContext';
 import { SetupProvider } from '@/contexts/setupContext';
+import { InternetStatusProvider } from '@/contexts/internetStatusContext';
+import OfflineNotifier from '@/components/OfflineNotifier';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -41,6 +43,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
+          <InternetStatusProvider>
+            <OfflineNotifier />
             <SetupProvider>
               <BulkUserUploadProvider>
                 <BulkMaterialUploadProvider>
@@ -54,6 +58,7 @@ export default function RootLayout({ children }) {
                 </BulkMaterialUploadProvider>
               </BulkUserUploadProvider>
             </SetupProvider>
+          </InternetStatusProvider>
         </AuthProvider>
       </body>
     </html>

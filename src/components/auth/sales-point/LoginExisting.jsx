@@ -2,8 +2,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCompanyData } from '@/contexts/companyDataContext';
-import { salesPointLoginService } from '@/services/authServices';
+import { login } from './loginFunctions';
 import { useAuth } from '@/contexts/authContext';
+import { useInternetStatus } from '@/contexts/internetStatusContext';
 import ErrorModal from '../commons/ErrorModal';
 
 const LoginExisting = ({ seller, setSeller }) => {
@@ -14,37 +15,25 @@ const LoginExisting = ({ seller, setSeller }) => {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { toggleUserMode } = useInternetStatus();
 
-  const handleLogin = async () => {
-    setError('');
-    const body = {
-      pin: pin,
-      staffId: seller?.staffId,
-      deviceAuthorization: companyData?.authorizationToken,
-    };
-
-    if (pin.length < 4) {
-      setError('Pin must be at least 4 digits');
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await salesPointLoginService(body);
-      if (response.error) {
-        setError(response?.error);
-        return;
-      }
-      if (response?.data) {
-        setUser(response?.data?.user);
-        sessionStorage.setItem('token', response?.data?.token);
-        router.push('/pages/account/sales-point');
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
+  const body = {
+    pin: pin,
+    staffId: seller?.staffId,
+    deviceAuthorization: companyData?.authorizationToken,
   };
+
+  const handleLogin = async (e) =>
+    await login(
+      e,
+      body,
+      setError,
+      setLoading,
+      setUser,
+      router,
+      companyData,
+      toggleUserMode
+    );
 
   return (
     <div className="w-[85%] h-[80%] bg-white rounded-md shadow-md flex flex-col items-center justify-center p-5">
