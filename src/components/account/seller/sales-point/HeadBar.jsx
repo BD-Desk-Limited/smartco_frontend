@@ -69,13 +69,22 @@ const HeadBar = ({
       </nav>
 
       <div className="flex items-center space-x-4">
-        <Image
-          src={user?.profilePictureUrl || '/assets/user.png'}
-          alt="User Avatar"
-          width={40}
-          height={40}
-          className="object-contain rounded-full"
-        />
+        {user?.profilePictureUrl ? (
+          <Image
+            src={user?.profilePictureUrl}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="object-contain rounded-full"
+          />
+        ) : (
+          <span className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-bold border">
+            {user?.fullName
+              ? user.fullName?.split(' ')[0].charAt(0).toUpperCase() +
+                  user.fullName?.split(' ')[1]?.charAt(0).toUpperCase() || 'SU'
+              : 'SU'}
+          </span>
+        )}
         <span className="text-text-white text-sm font-semibold">
           {user?.fullName?.split(' ')[0] || 'Seller'}
         </span>
