@@ -8,17 +8,17 @@ import { useCompanyData } from '@/contexts/companyDataContext';
 import Spinner from '../account/Spinner';
 
 const Welcome = () => {
-
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { companyData } = useCompanyData();
+
   // wait for company data and component to load before checking authorization
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (isMounted && companyData) {
+    if (isMounted && companyData.isLoaded) {
       // Check if the company data is available
       const authorize = async () => {
         try {
@@ -65,7 +65,7 @@ const Welcome = () => {
   };
 
   // Check if the component is mounted before rendering
-  if (!isMounted) {
+  if (!isMounted || !companyData.isLoaded) {
     return <Spinner />;
   }
 

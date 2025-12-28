@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
     if (token !== null) {
       try {
         const decodedToken = jwtDecode(token);
-        console.log('Decoded Token:', decodedToken);
         const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp < currentTime) {
@@ -80,6 +79,14 @@ export const AuthProvider = ({ children }) => {
     router.push('/pages/splash/splash3');
   };
 
+  const logOutSalesPoint = () => {
+    sessionStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser(null);
+    sessionStorage.removeItem('work-branch');
+    router.push('/pages/auth/login/sales-point');
+  };
+
   if (
     !isAuthenticated &&
     pathname &&
@@ -90,7 +97,9 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setUser, logOut }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, setUser, logOut, logOutSalesPoint }}
+    >
       {children}
     </AuthContext.Provider>
   );

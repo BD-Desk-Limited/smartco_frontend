@@ -16,12 +16,12 @@ export const CompanyDataProvider = ({ children }) => {
       ? JSON.parse(storedCompanyData)
       : null;
 
-    SetCompanyData(fetchedData);
+    SetCompanyData({ ...fetchedData, isLoaded: true });
   }, []);
 
   const setCompanyData = (data) => {
     // Update the company data in state and localStorage
-    SetCompanyData(data);
+    SetCompanyData({ ...data, isLoaded: true });
     localStorage.setItem('companyData', JSON.stringify(data));
   };
   console.log('Company Data from Context:', companyData);

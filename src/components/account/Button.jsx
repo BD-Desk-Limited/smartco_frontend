@@ -6,9 +6,9 @@ const Button = ({ type, loading, loadingText, text, onClick, buttonStyle }) => {
       onClick={onClick}
       type={`${type || 'button'}`}
       disabled={loading}
-      className={`h-10 bg-brand-blue rounded-md text-md text-white px-2 ${
+      className={`h-10 rounded-md text-md text-white px-2 ${
         loading ? 'cursor-not-allowed' : 'hover:bg-blue-shadow1'
-      } items-center justify-center ${buttonStyle}`}
+      } items-center justify-center ${buttonStyle} shadow-md bg-brand-blue`}
     >
       {loading ? (
         <>

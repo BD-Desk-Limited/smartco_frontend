@@ -3,12 +3,11 @@ import React from 'react';
 import { useAuth } from '@/contexts/authContext';
 
 const HeadBar = ({
-  mode,
-  darkThemeStyle,
-  lightThemeStyle,
+  style,
   menuItems,
   activeMenuItem,
   setActiveMenuItem,
+  mode,
 }) => {
   const { user } = useAuth();
 
@@ -34,11 +33,9 @@ const HeadBar = ({
         <strong className="text-white">POS</strong>
       </div>
 
-      <nav
-        className={`rounded-xl ${mode === 'dark' ? darkThemeStyle : lightThemeStyle}`}
-      >
+      <nav className={`rounded-xl ${style}`}>
         <ul className="flex space-x-6">
-          {menuItems.map((item) => (
+          {(menuItems || []).map((item) => (
             <li
               key={item.name}
               className={`cursor-pointer font-bold flex items-center space-x-2 py-3 px-2${
