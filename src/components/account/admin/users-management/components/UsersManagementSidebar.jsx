@@ -1,22 +1,23 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const UsersManagementSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
-
   const submenus = [
     {
       name: 'Create New User',
       link: '/create-user',
     },
     {
-        name: 'View All Users',
-        link: '/',
+      name: 'View All Users',
+      link: '/',
     },
   ];
 
+  const router = useRouter();
   const handleSelectSubMenu = (submenu) => {
-    window.location.href = `/pages/account/admin/users-management${submenu.link}`;
+    router.push(`/pages/account/admin/users-management${submenu.link}`);
   };
 
   return (

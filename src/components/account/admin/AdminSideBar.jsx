@@ -108,25 +108,27 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     }
   }, [user]);
 
+  const router = useRouter();
   const handleMenuClick = (menu) => {
-    window.location.href = `/pages/account/admin${menu.link}`;
+    router.push(`/pages/account/admin${menu.link}`);
   };
-
 
   const hasAccessToMenu = (menu) => {
     // Check if the user meets the conditions to access the menu
     const requiredRole = 'admin';
-    const allActiveUserAccess = user?.accessLevel.length > 0 &&
-      user?.accessLevel.filter(access => access.accessGranted === true) || [];
+    const allActiveUserAccess =
+      (user?.accessLevel.length > 0 &&
+        user?.accessLevel.filter((access) => access.accessGranted === true)) ||
+      [];
 
-    const conditionsToShowMenu = (
+    const conditionsToShowMenu =
       user?.role === requiredRole &&
-      (
-        allActiveUserAccess.some((access) => access.accessName === menu?.requiredAccess || !menu?.requiredAccess) || // Check if the user has the required access level
+      (allActiveUserAccess.some(
+        (access) =>
+          access.accessName === menu?.requiredAccess || !menu?.requiredAccess
+      ) || // Check if the user has the required access level
         user?.superAdmin || // Check if the user is a super admin
-        user?.accessLevel.some((access) => access.accessName === 'All_Access') // Check if the user has "All Access" permission
-      )
-    );
+        user?.accessLevel.some((access) => access.accessName === 'All_Access')); // Check if the user has "All Access" permission
 
     // If the user is authenticated and meets the conditions to show the menu, return true
     if (user && conditionsToShowMenu) {
@@ -176,29 +178,28 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
               className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
               onClick={() => handleMenuClick(menu)}
             >
-              {(user?.superAdmin&& menu.forNonSuperAdmin) ? null : 
-                hasAccessToMenu(menu)? (
-                  <div
-                    className="flex flex-row items-center  py-2"
-                    title={!isOpen ? `${menu?.title}` : ''}
-                  >
-                    <Image
-                      src={
-                        selectedMenu?.name === menu.name
-                          ? menu.iconActive
-                          : menu.icon
-                      }
-                      alt={menu?.name}
-                      width={15}
-                      height={15}
-                      className={
-                        selectedMenu?.name === menu.name ? '' : 'bg-brand-blue'
-                      }
-                    />
-                    {isOpen && <p className="ml-2 text-sm">{menu?.name}</p>}
-                  </div>
-                ) : null
-              }
+              {user?.superAdmin &&
+              menu.forNonSuperAdmin ? null : hasAccessToMenu(menu) ? (
+                <div
+                  className="flex flex-row items-center  py-2"
+                  title={!isOpen ? `${menu?.title}` : ''}
+                >
+                  <Image
+                    src={
+                      selectedMenu?.name === menu.name
+                        ? menu.iconActive
+                        : menu.icon
+                    }
+                    alt={menu?.name}
+                    width={15}
+                    height={15}
+                    className={
+                      selectedMenu?.name === menu.name ? '' : 'bg-brand-blue'
+                    }
+                  />
+                  {isOpen && <p className="ml-2 text-sm">{menu?.name}</p>}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -235,7 +236,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             )}
           </div>
           <div>
-            <div className={`flex ${isOpen? " flex-row gap-3" : "flex-col gap-1"} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}>
+            <div
+              className={`flex ${isOpen ? ' flex-row gap-3' : 'flex-col gap-1'} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}
+            >
               <Image
                 src="/assets/profile.png"
                 alt="profile"

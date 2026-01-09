@@ -6,7 +6,15 @@ const InternetStatusContext = createContext(null);
 
 export const InternetStatusProvider = ({ children }) => {
   const [internetStatus, setInternetStatus] = useState('online');
-  const [userMode, setUserMode] = useState('online'); // 'online' or 'offline'
+  const [userMode, setUserMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedUserMode = localStorage.getItem('userMode');
+      if (savedUserMode === 'online' || savedUserMode === 'offline') {
+        return savedUserMode;
+      }
+    }
+    return 'online';
+  });
 
   useEffect(() => {
     // check if window is defined (to avoid issues during server-side rendering)
@@ -24,11 +32,7 @@ export const InternetStatusProvider = ({ children }) => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
 
-    // Load user mode preference from localStorage
-    const savedUserMode = localStorage.getItem('userMode');
-    if (savedUserMode === 'online' || savedUserMode === 'offline') {
-      setUserMode(savedUserMode);
-    }
+    // No effect to sync userMode from localStorage
 
     // Cleanup event listeners on unmount
     return () => {

@@ -1,22 +1,26 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useCompanyData } from '@/contexts/companyDataContext';
 
 export default function Home() {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useRef(false);
   const router = useRouter();
 
   const { companyData, setCompanyData } = useCompanyData();
 
   useEffect(() => {
-    setIsMounted(true);
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (isMounted && companyData.isLoaded) {
+    if (isMounted.current && companyData.isLoaded) {
+      let timer;
       if (companyData.id && companyData.authorizationToken) {
         const authorize = async () => {
           try {
@@ -24,8 +28,6 @@ export default function Home() {
               companyId: companyData.id,
               authorizationToken: companyData.authorizationToken,
             };
-
-            // Send the company id and the authorization token to the server to check if the device is authorized
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
               {
@@ -36,10 +38,8 @@ export default function Home() {
                 body: JSON.stringify(requestBody),
               }
             );
-
             const data = await response.json();
-
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
               if (companyData?.authorizationToken && data?.isAuthorized) {
                 const updatedData = {
                   id: data.companyData.id,
@@ -53,31 +53,22 @@ export default function Home() {
                 router.push('/pages/auth/login');
               }
             }, 5000);
-
-            return () => clearTimeout(timer);
           } catch (error) {
             console.error(error);
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
               router.push('/pages/auth/login');
             }, 5000);
-
-            return () => clearTimeout(timer);
           }
         };
-
         authorize();
       } else {
-        console.log(
-          'Rendring splash page 2 f..............................................................'
-        );
-        const timer = setTimeout(() => {
+        timer = setTimeout(() => {
           router.push('/pages/auth/login');
         }, 5000);
-
-        return () => clearTimeout(timer);
       }
+      return () => clearTimeout(timer);
     }
-  }, [router, companyData, isMounted]);
+  }, [router, companyData, setCompanyData]);
 
   return (
     <div className="min-h-screen min-w-full bg-brand-blue flex items-center justify-center overflow-hidden relative">

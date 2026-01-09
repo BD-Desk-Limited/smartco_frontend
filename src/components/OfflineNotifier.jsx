@@ -1,40 +1,77 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useEffect, useRef } from 'react';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const OfflineNotifier = () => {
   const { internetStatus } = useInternetStatus();
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationType, setNotificationType] = useState('offline'); // 'offline' or 'online'
-  const [justWentOnline, setJustWentOnline] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const initialState = {
+    showNotification: false,
+    notificationType: 'offline', // 'offline' or 'online'
+    justWentOnline: false,
+    collapsed: false,
+  };
 
-  useEffect(() => {
-    if (internetStatus === 'offline') {
-      setNotificationType('offline');
-      setShowNotification(true);
-      setJustWentOnline(false);
-    } else if (internetStatus === 'online') {
-      // If we just came back online, show online notification briefly
-      if (showNotification) {
-        setNotificationType('online');
-        setJustWentOnline(true);
-        setCollapsed(false); // Always expand when coming back online
-        // Hide online notification after 3 seconds
-        const timer = setTimeout(() => {
-          setShowNotification(false);
-          setJustWentOnline(false);
-        }, 3000);
-
-        return () => clearTimeout(timer);
-      }
+  function reducer(state, action) {
+    switch (action.type) {
+      case 'OFFLINE':
+        return {
+          ...state,
+          showNotification: true,
+          notificationType: 'offline',
+          justWentOnline: false,
+          collapsed: false,
+        };
+      case 'ONLINE':
+        return {
+          ...state,
+          showNotification: true,
+          notificationType: 'online',
+          justWentOnline: true,
+          collapsed: false,
+        };
+      case 'COLLAPSE':
+        return { ...state, collapsed: true };
+      case 'EXPAND':
+        return { ...state, collapsed: false };
+      case 'CLOSE':
+        return { ...state, showNotification: false, justWentOnline: false };
+      default:
+        return state;
     }
-  }, [internetStatus, showNotification]);
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const prevStatus = useRef(internetStatus);
+
+  // Handle transitions in a single effect
+  useEffect(() => {
+    if (internetStatus === 'offline' && prevStatus.current !== 'offline') {
+      dispatch({ type: 'OFFLINE' });
+      prevStatus.current = 'offline';
+    } else if (
+      internetStatus === 'online' &&
+      prevStatus.current === 'offline'
+    ) {
+      dispatch({ type: 'ONLINE' });
+      prevStatus.current = 'online';
+    }
+  }, [internetStatus]);
+
+  // Auto-close online notification after 3s
+  useEffect(() => {
+    let timer;
+    if (state.notificationType === 'online' && state.showNotification) {
+      timer = setTimeout(() => {
+        dispatch({ type: 'CLOSE' });
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [state.notificationType, state.showNotification]);
 
   // If collapsed, show a floating round icon at top-left
   // Draggable collapsed icon state
-  const [iconPosition, setIconPosition] = useState({ x: 16, y: 16 }); // px from top-left
+  const [iconPosition, setIconPosition] = React.useState({ x: 16, y: 16 }); // px from top-left
   const iconRef = React.useRef(null);
   const dragging = React.useRef(false);
   const dragOffset = React.useRef({ x: 0, y: 0 });
@@ -78,15 +115,15 @@ const OfflineNotifier = () => {
 
   React.useEffect(() => {
     // Reset position if uncollapsed
-    if (!collapsed) setIconPosition({ x: 16, y: 16 });
-  }, [collapsed]);
+    if (!state.collapsed) setIconPosition({ x: 16, y: 16 });
+  }, [state.collapsed]);
 
-  if (collapsed && notificationType === 'offline') {
+  if (state.collapsed && state.notificationType === 'offline') {
     return (
       <button
         ref={iconRef}
         className="fixed z-50 bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors cursor-move"
-        onClick={() => setCollapsed(false)}
+        onClick={() => dispatch({ type: 'EXPAND' })}
         aria-label="Expand offline notification"
         style={{
           left: iconPosition.x,
@@ -116,14 +153,14 @@ const OfflineNotifier = () => {
 
   return (
     <AnimatePresence>
-      {showNotification && (
+      {state.showNotification && (
         <motion.div
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 shadow-lg ${
-            notificationType === 'offline'
+            state.notificationType === 'offline'
               ? 'bg-red-500 text-white'
               : 'bg-green-500 text-white'
           }`}
@@ -131,7 +168,7 @@ const OfflineNotifier = () => {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Icon */}
-              {notificationType === 'offline' ? (
+              {state.notificationType === 'offline' ? (
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -164,12 +201,12 @@ const OfflineNotifier = () => {
               {/* Message */}
               <div>
                 <p className="font-semibold">
-                  {notificationType === 'offline'
+                  {state.notificationType === 'offline'
                     ? 'You are offline'
                     : 'Back online'}
                 </p>
                 <p className="text-sm opacity-90">
-                  {notificationType === 'offline'
+                  {state.notificationType === 'offline'
                     ? 'Your changes will be saved locally and synced when reconnected'
                     : 'Connection restored. Syncing data...'}
                 </p>
@@ -177,9 +214,9 @@ const OfflineNotifier = () => {
             </div>
 
             {/* Collapse button for offline notification */}
-            {notificationType === 'offline' && (
+            {state.notificationType === 'offline' && (
               <button
-                onClick={() => setCollapsed(true)}
+                onClick={() => dispatch({ type: 'COLLAPSE' })}
                 className="p-1 hover:bg-white/20 rounded-full transition-colors ml-2"
                 aria-label="Collapse offline notification"
               >
@@ -200,12 +237,9 @@ const OfflineNotifier = () => {
             )}
 
             {/* Close button (only for online notification) */}
-            {justWentOnline && (
+            {state.justWentOnline && (
               <button
-                onClick={() => {
-                  setShowNotification(false);
-                  setJustWentOnline(false);
-                }}
+                onClick={() => dispatch({ type: 'CLOSE' })}
                 className="p-1 hover:bg-white/20 rounded-full transition-colors ml-2"
                 aria-label="Close notification"
               >

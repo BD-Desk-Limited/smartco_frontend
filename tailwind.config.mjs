@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -49,9 +49,9 @@ export default {
         'background-1': '#F8F8F8',
         'gray-border': '#D9D9D9',
         'text-gray': '#757575',
-        'error': '#F41F17',
+        error: '#F41F17',
         'error-hover': '#F50A06',
-        'success': '#11B364',
+        success: '#11B364',
       },
       fontFamily: {
         sans: ['Montserrat', 'Arial', 'Helvetica', 'sans-serif'],
@@ -71,3 +71,5 @@ export default {
   },
   plugins: [],
 };
+
+export default config;

@@ -10,7 +10,7 @@ export default function Index() {
     if (window.location.pathname === '/') {
       router.replace('/pages/splash/splash1');
     }
-  }, []);
+  }, [router]);
 
   return null;
 }

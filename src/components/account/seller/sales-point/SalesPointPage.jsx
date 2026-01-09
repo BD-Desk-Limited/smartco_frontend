@@ -9,57 +9,10 @@ import ErrorModal from '@/components/auth/commons/ErrorModal';
 import Spinner from '../../Spinner';
 import ShiftManagement from './shift-management/ShiftManagement';
 
-//const branchesAccessibleOnDeviceSample = [
-//  {
-//    _id: 'branch1',
-//    name: 'Main Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch2',
-//    name: 'Secondary Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch3',
-//    name: 'Warehouse Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch4',
-//    name: 'Outlet Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch5',
-//    name: 'Downtown Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch6',
-//    name: 'Uptown Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//  {
-//    _id: 'branch7',
-//    name: 'Suburban Branch',
-//    status: 'inactive',
-//    settings: { shiftCreationEnforced: true, inventoryCheckEnforced: false },
-//  },
-//];
 const SalesPointPage = () => {
   const router = useRouter();
   const { companyData } = useCompanyData();
   const { user, logOutSalesPoint } = useAuth();
-  const [branchesAccessibleOnDevice, setBranchesAccessibleOnDevice] =
-    React.useState([]);
-  const [initialized, setInitialized] = React.useState(false);
   const [mode, setMode] = React.useState('light');
   const [activeMenuItem, setActiveMenuItem] = React.useState('Dashboard');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
@@ -104,30 +57,14 @@ const SalesPointPage = () => {
       },
     },
   ];
+  // Memoized list of branches accessible on the device to avoid unnecessary rerenders
+  const branchesAccessibleOnDevice = React.useMemo(
+    () => companyData?.allowedBranches || [],
+    [companyData?.allowedBranches]
+  );
 
   const darkThemeStyle = `bg-[#242424] text-text-white`;
   const lightThemeStyle = `bg-white text-text-black`;
-
-  {
-    /*
-  Workflow:
-  
-  // check if the branch has shiftcreation enforcement enabled
-    --//if enabled, check if there is an active shift for the branch
-      ----//if no active shift, show a message telling the user they have not been invited to any shift yet
-      ----//else show the active shift details and allow the user to select it and proceed to the next step
-    ----//else proceed to the next step
-
-  //main sales point interface
-  */
-  }
-
-  useEffect(() => {
-    // Fetch branches accessible on this device from company data
-    if (companyData && companyData.allowedBranches) {
-      setBranchesAccessibleOnDevice(companyData.allowedBranches);
-    }
-  }, [companyData]);
 
   const handleWorkBranchSelect = (branch_obj) => {
     // check if user has access to the branch
@@ -140,31 +77,33 @@ const SalesPointPage = () => {
     }
   };
 
-  useEffect(() => {
-    setDeviceNotAuthorizedForAnyBranch(false);
-    // If no branches are accessible on this device, show error
-    if (
-      !branchesAccessibleOnDevice ||
-      branchesAccessibleOnDevice.length === 0
-    ) {
+  // Device authorization for branches check
+  const noBranches =
+    !branchesAccessibleOnDevice || branchesAccessibleOnDevice.length === 0;
+
+  React.useEffect(() => {
+    if (noBranches && !deviceNotAuthorizedForAnyBranch) {
       setDeviceNotAuthorizedForAnyBranch(true);
-      setInitialized(true);
-      return;
+    } else if (!noBranches && deviceNotAuthorizedForAnyBranch) {
+      setDeviceNotAuthorizedForAnyBranch(false);
     }
-    // If a work branch is stored, set it
-    if (branchesAccessibleOnDevice.length === 1 && !workBranch?._id) {
-      const onlyBranch = branchesAccessibleOnDevice[0];
-      handleWorkBranchSelect(onlyBranch);
-      setInitialized(true);
-      return;
+  }, [noBranches, deviceNotAuthorizedForAnyBranch]);
+
+  //if only one branch is accessible on the device, auto select it as workBranch if user has access
+  React.useEffect(() => {
+    if (branchesAccessibleOnDevice?.length === 1) {
+      const singleBranch = branchesAccessibleOnDevice[0];
+      if (user?.branch?.includes(singleBranch._id)) {
+        setWorkBranch(singleBranch);
+        sessionStorage.setItem('work-branch', singleBranch._id);
+      }
     }
-    // If multiple branches, wait for user selection
-    setInitialized(true);
-  }, [branchesAccessibleOnDevice, workBranch]);
+  }, [branchesAccessibleOnDevice, user]);
 
   console.log('workBranch', workBranch);
+  console.log('branchesAccessibleOnDevice', branchesAccessibleOnDevice);
 
-  if (!initialized) {
+  if (!companyData || !companyData.allowedBranches) {
     return <Spinner />;
   }
 
@@ -173,7 +112,7 @@ const SalesPointPage = () => {
       className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
       {/* Select Branch */}
-      {branchesAccessibleOnDevice.length > 1 && !workBranch?._id && (
+      {branchesAccessibleOnDevice.length > 0 && !workBranch?._id && (
         <div
           className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
         >

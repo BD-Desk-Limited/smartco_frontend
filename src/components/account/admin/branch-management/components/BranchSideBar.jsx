@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const BranchSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
-
   const submenus = [
     {
       name: 'View all branches',
@@ -15,8 +15,9 @@ const BranchSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
     },
   ];
 
+  const router = useRouter();
   const handleSelectSubMenu = (submenu) => {
-    window.location.href = `/pages/account/admin/branch-management${submenu.link}`;
+    router.push(`/pages/account/admin/branch-management${submenu.link}`);
   };
 
   return (

@@ -8,21 +8,19 @@ import { useCompanyData } from '@/contexts/companyDataContext';
 
 const SalesPoint = () => {
   const [selectedSeller, setSelectedSeller] = useState(null);
-  const [sellersInfo, setSellersInfo] = useState(null);
   const { companyData } = useCompanyData();
+  // Always derive sellersInfo from companyData and localStorage
+  let sellersInfo = null;
+  const storedSellersInfo =
+    typeof window !== 'undefined' ? localStorage.getItem('sellersInfo') : null;
+  if (storedSellersInfo && companyData?.id) {
+    const fetchedData = JSON.parse(storedSellersInfo);
+    sellersInfo = fetchedData.filter(
+      (seller) => seller.companyId === companyData.id
+    );
+  }
 
-  useEffect(() => {
-    //get the sellersInfo for the company
-    const storedSellersInfo = localStorage.getItem('sellersInfo');
-
-    // Parse the JSON string back into an array
-    const fetchedData = storedSellersInfo ? JSON.parse(storedSellersInfo) : [];
-
-    const companySellersInfo =
-      fetchedData &&
-      fetchedData?.filter((seller) => seller.companyId === companyData?.id);
-    setSellersInfo(companySellersInfo);
-  }, [companyData]);
+  // No need to sync sellersInfo state from companyData
 
   return (
     <div className="h-screen w-full bg-white text-text-black text-base flex items-center flex-row justify-center">

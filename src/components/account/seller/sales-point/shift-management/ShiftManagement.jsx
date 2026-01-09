@@ -4,16 +4,11 @@ import ShiftManagementSidebar from './ShiftManagementSidebar';
 import MovableCircle from './MovableCircle';
 
 const ShiftManagement = ({ onClose, style }) => {
-  const [loading, setLoading] = React.useState(true);
   const [minimized, setMinimized] = React.useState(true);
   const sidebarRef = useRef(null);
 
   useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (!minimized && !loading) {
+    if (!minimized) {
       const handleClickOutside = (event) => {
         if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
           setMinimized(true);
@@ -24,13 +19,13 @@ const ShiftManagement = ({ onClose, style }) => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [minimized, loading]);
+  }, [minimized]);
 
-  if (minimized && !loading) {
+  if (minimized) {
     return <MovableCircle setMinimized={setMinimized} />;
   }
 
-  if (!minimized && !loading) {
+  if (!minimized) {
     return (
       <div
         className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-95 flex items-center justify-end z-50`}
