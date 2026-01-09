@@ -16,32 +16,24 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check for token in sessionStorage (used by all users now)
     const token = sessionStorage.getItem('token');
-    console.log('Token:', token);
-
     if (token !== null) {
       try {
         const decodedToken = jwtDecode(token);
-        console.log('Decoded Token:', decodedToken);
         const currentTime = Date.now() / 1000;
-
         if (decodedToken.exp < currentTime) {
           // Token has expired
-          console.log('Token has expired');
           sessionStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
           router.push('/pages/splash/splash3');
         } else {
-          // Token is valid
           setIsAuthenticated(true);
-          // Set the user object if user is not set
           if (!user) {
             const getUser = async () => {
               const userData = await getUserService(token);
               if (userData.data) {
                 setUser(userData.data);
               } else {
-                console.error('Error getting user data:', userData.error);
                 sessionStorage.removeItem('token');
                 setIsAuthenticated(false);
                 setUser(null);
@@ -52,17 +44,14 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Invalid token:', error);
         sessionStorage.removeItem('token');
         setIsAuthenticated(false);
         setUser(null);
         router.push('/pages/splash/splash3');
       }
     } else {
-      // No token found
       setIsAuthenticated(false);
       setUser(null);
-
       if (
         pathname &&
         !pathname.startsWith('/pages/auth') &&
@@ -71,13 +60,23 @@ export const AuthProvider = ({ children }) => {
         router.push('/pages/splash/splash3');
       }
     }
-  }, [router, pathname, user]);
+    // Only run on mount and when router/pathname changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, pathname]);
 
   const logOut = () => {
     sessionStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
     router.push('/pages/splash/splash3');
+  };
+
+  const logOutSalesPoint = () => {
+    sessionStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser(null);
+    sessionStorage.removeItem('work-branch');
+    router.push('/pages/auth/login/sales-point');
   };
 
   if (
@@ -90,7 +89,9 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setUser, logOut }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, setUser, logOut, logOutSalesPoint }}
+    >
       {children}
     </AuthContext.Provider>
   );

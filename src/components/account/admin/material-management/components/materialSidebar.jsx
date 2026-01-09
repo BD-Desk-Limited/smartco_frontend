@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
-
   const submenus = [
     {
       name: 'Create ungrouped Material',
@@ -23,8 +23,9 @@ const MaterialSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
     },
   ];
 
+  const router = useRouter();
   const handleSelectSubMenu = (submenu) => {
-    window.location.href = `/pages/account/admin/manage-materials${submenu.link}`;
+    router.push(`/pages/account/admin/manage-materials${submenu.link}`);
   };
 
   return (

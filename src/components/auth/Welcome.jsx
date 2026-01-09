@@ -8,17 +8,21 @@ import { useCompanyData } from '@/contexts/companyDataContext';
 import Spinner from '../account/Spinner';
 
 const Welcome = () => {
-
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
+  const isMountedRef = React.useRef(false);
   const { companyData } = useCompanyData();
+  const [isMounted, setIsMounted] = useState(false);
+
   // wait for company data and component to load before checking authorization
   useEffect(() => {
-    setIsMounted(true);
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (isMounted && companyData) {
+    if (isMountedRef.current && companyData && companyData.isLoaded) {
       // Check if the company data is available
       const authorize = async () => {
         try {
@@ -53,7 +57,7 @@ const Welcome = () => {
 
       authorize();
     }
-  }, [router, companyData, isMounted]);
+  }, [router, companyData]);
 
   const divStyle = {
     backgroundImage: `url('/images/welcome.png')`,
@@ -65,7 +69,7 @@ const Welcome = () => {
   };
 
   // Check if the component is mounted before rendering
-  if (!isMounted) {
+  if (!isMounted || !companyData.isLoaded) {
     return <Spinner />;
   }
 

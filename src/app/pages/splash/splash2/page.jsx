@@ -1,72 +1,74 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useCompanyData } from '@/contexts/companyDataContext';
 
 export default function Home() {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useRef(false);
   const router = useRouter();
 
-  const { companyData } = useCompanyData();
+  const { companyData, setCompanyData } = useCompanyData();
 
   useEffect(() => {
-    setIsMounted(true);
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (companyData) {
-
-      const authorize = async () => {
-        try {
-          const requestBody = {
-            companyId: companyData.id,
-            authorizationToken: companyData.authorizationToken,
-          };
-
-          // Send the company id and the authorization token to the server to check if the device is authorized
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(requestBody),
-            }
-          );
-
-          const data = await response.json();
-
-          const timer = setTimeout(() => {
-            if (companyData?.authorizationToken && data?.isAuthorized) {
-              router.push('/pages/splash/splash3');
-            } else {
+    if (isMounted.current && companyData.isLoaded) {
+      let timer;
+      if (companyData.id && companyData.authorizationToken) {
+        const authorize = async () => {
+          try {
+            const requestBody = {
+              companyId: companyData.id,
+              authorizationToken: companyData.authorizationToken,
+            };
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+              }
+            );
+            const data = await response.json();
+            timer = setTimeout(() => {
+              if (companyData?.authorizationToken && data?.isAuthorized) {
+                const updatedData = {
+                  id: data.companyData.id,
+                  authorizationToken: data.companyData.authorizationToken,
+                  allowedBranches: data.companyData.allowedBranches,
+                  isLoaded: true,
+                };
+                setCompanyData(updatedData);
+                router.push('/pages/splash/splash3');
+              } else {
+                router.push('/pages/auth/login');
+              }
+            }, 5000);
+          } catch (error) {
+            console.error(error);
+            timer = setTimeout(() => {
               router.push('/pages/auth/login');
-            }
-          }, 5000);
-
-          return () => clearTimeout(timer);
-        } catch (error) {
-          console.error(error);
-          const timer = setTimeout(() => {
-            router.push('/pages/auth/login');
-          }, 5000);
-
-          return () => clearTimeout(timer);
-        }
-      };
-
-      authorize();
-    } else {
-      const timer = setTimeout(() => {
-        router.push('/pages/auth/login');
-      }, 5000);
-
+            }, 5000);
+          }
+        };
+        authorize();
+      } else {
+        timer = setTimeout(() => {
+          router.push('/pages/auth/login');
+        }, 5000);
+      }
       return () => clearTimeout(timer);
     }
-  }, [router, companyData]);
+  }, [router, companyData, setCompanyData]);
 
   return (
     <div className="min-h-screen min-w-full bg-brand-blue flex items-center justify-center overflow-hidden relative">

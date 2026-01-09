@@ -7,16 +7,43 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { motion } from 'framer-motion';
+import { getAllBranchesByCompanyId } from '@/services/branchServices';
 
 const LoginAuthorize = () => {
   const [error, setError] = useState(false);
   const [deviceName, setDeviceName] = useState('');
+  const [deviceBranches, setDeviceBranches] = useState([
+    { _id: '-1', name: 'All Branches' },
+  ]);
+  const [allBranches, setAllBranches] = useState([]);
+  const [branchList, setBranchList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState('');
   const { user } = useAuth();
   const { setCompanyData } = useCompanyData();
   const router = useRouter();
+
+  //fetch all branches for the user's company
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await getAllBranchesByCompanyId();
+        if (response?.data) {
+          setAllBranches(response.data);
+          setBranchList(response.data);
+        } else if (response?.error) {
+          console.error('Error fetching branches:', response.error);
+        }
+      } catch (error) {
+        console.error('Error fetching branches:', error);
+      }
+    };
+
+    if (user && user.company) {
+      fetchBranches();
+    }
+  }, [user]);
 
   const handleDeviceAuthorization = async (e) => {
     e.preventDefault();
@@ -25,6 +52,11 @@ const LoginAuthorize = () => {
     const nameValidation = verifyName(deviceName);
     if (!nameValidation.passed) {
       setError(nameValidation.message);
+      return;
+    }
+
+    if (deviceBranches.length === 0) {
+      setError('Please select at least one branch for the device to access');
       return;
     }
     setLoading(true);
@@ -37,6 +69,7 @@ const LoginAuthorize = () => {
         },
         deviceId: deviceId,
         deviceName: deviceName,
+        deviceBranches: deviceBranches?.map((branch) => branch._id) || [],
       };
 
       const response = await authorizeDeviceService(body);
@@ -52,6 +85,7 @@ const LoginAuthorize = () => {
         const companydata = {
           id: user.company,
           authorizationToken: response?.data?.deviceId,
+          allowedBranches: response?.data?.allowedBranches || [], //list of branches the device can access
         };
 
         setCompanyData(companydata);
@@ -76,6 +110,59 @@ const LoginAuthorize = () => {
       </div>
     );
   }
+
+  const handleAddToDeviceBranches = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const branchId = e.target.value;
+    console.log('Selected branchId:', branchId);
+
+    if (branchId == '-1') {
+      setDeviceBranches([{ _id: '-1', name: 'All Branches' }]);
+      setBranchList(allBranches);
+      return;
+    }
+
+    const selectedBranch = allBranches.find(
+      (branch) => branch._id === branchId
+    );
+
+    if (selectedBranch) {
+      // Remove "All Branches" if it's already selected
+      const updatedBranches = deviceBranches.filter(
+        (branch) => branch._id !== '-1'
+      );
+      // Add the selected branch if not already added
+      if (
+        !updatedBranches.some((branch) => branch._id === selectedBranch._id)
+      ) {
+        updatedBranches.push(selectedBranch);
+        setDeviceBranches(updatedBranches);
+        // update branch list to remove branches already selected
+        const newBranchList = allBranches.filter(
+          (branch) =>
+            !updatedBranches.some((selected) => selected._id === branch._id)
+        );
+        setBranchList(newBranchList);
+      } else {
+        setBranchList(allBranches);
+      }
+    }
+  };
+
+  const handleUnselectBranch = (e, branchId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const updatedBranches = deviceBranches.filter(
+      (branch) => branch._id !== branchId
+    );
+
+    // If no branches left, default to "All Branches"
+    if (updatedBranches.length === 0) {
+      updatedBranches.push({ _id: '-1', name: 'All Branches' });
+    }
+    setDeviceBranches(updatedBranches);
+  };
 
   return (
     <>
@@ -119,6 +206,61 @@ const LoginAuthorize = () => {
               error ? 'border-2 border-error' : 'border-brand-blue'
             }`}
           />
+
+          <label
+            htmlFor=""
+            className="w-full text-left text-text-black font-semibold text-base"
+          >
+            Select Device Branch(es)
+          </label>
+          {/* Display selected branches */}
+          {deviceBranches.length > 0 &&
+            !deviceBranches.map((b) => b.name).includes('All Branches') && (
+              <div className="w-full border border-border-gray rounded-md px-4 h-10 grid grid-cols-4 gap-2">
+                {deviceBranches.map((branch) => (
+                  <span
+                    key={branch.name}
+                    className="bg-blue-shadow5 text-white p-1 rounded-full text-sm flex items-center justify-center text-center"
+                  >
+                    <span
+                      onClick={(e) => handleUnselectBranch(e, branch._id)}
+                      value={branch._id}
+                      className="mr-2 font-bold bg-error w-4 h-4 flex items-center justify-center rounded-full text-white text-sm cursor-pointer"
+                      type="button"
+                      title={`Remove ${branch.name} from selection`}
+                    >
+                      &times;
+                    </span>
+                    {branch.name}
+                  </span>
+                ))}
+              </div>
+            )}
+
+          <select
+            className={`w-full border rounded-md px-4 h-10 items-center shadow-sm focus:outline-none text-base ${
+              error ? 'border-2 border-error' : 'border-brand-blue'
+            }`}
+            onChange={(e) => handleAddToDeviceBranches(e)}
+          >
+            <option value=" " className="cursor-not-allowed">
+              --- Select Branches ---
+            </option>
+            <option value="-1">All Branches</option>
+            {/* display all branches not already selected */}
+            {branchList?.length > 0 &&
+              branchList
+                .filter(
+                  (branch) =>
+                    !deviceBranches.includes(branch._id) &&
+                    branch.name !== 'All Branches'
+                )
+                .map((branch) => (
+                  <option key={branch._id} value={branch._id}>
+                    {branch.name}
+                  </option>
+                ))}
+          </select>
 
           <button
             onClick={handleDeviceAuthorization}

@@ -1,14 +1,13 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const ProductManagementSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
-
   const submenus = [
-    
     {
-        name: 'View All Products',
-        link: '/',
+      name: 'View All Products',
+      link: '/',
     },
     {
       name: 'Create New Product',
@@ -16,8 +15,9 @@ const ProductManagementSidebar = ({ selectedSubMenu, isOpen, setIsOpen }) => {
     },
   ];
 
+  const router = useRouter();
   const handleSelectSubMenu = (submenu) => {
-    window.location.href = `/pages/account/admin/product-management${submenu.link}`;
+    router.push(`/pages/account/admin/product-management${submenu.link}`);
   };
 
   return (

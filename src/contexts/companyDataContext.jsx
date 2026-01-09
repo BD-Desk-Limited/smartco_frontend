@@ -5,25 +5,27 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 const CompanyDataContext = createContext(null);
 
 export const CompanyDataProvider = ({ children }) => {
-  const [companyData, SetCompanyData] = useState(null);
+  const [companyData, SetCompanyDataState] = useState(null);
 
   useEffect(() => {
     // Retrieve the JSON string from localStorage
     const storedCompanyData = localStorage.getItem('companyData');
-
     // Parse the JSON string back into an object
     const fetchedData = storedCompanyData
       ? JSON.parse(storedCompanyData)
       : null;
-
-    SetCompanyData(fetchedData);
-  }, []);
+    const newCompanyData = { ...fetchedData, isLoaded: true };
+    if (JSON.stringify(companyData) !== JSON.stringify(newCompanyData)) {
+      SetCompanyDataState(newCompanyData);
+    }
+  }, [SetCompanyDataState, companyData]);
 
   const setCompanyData = (data) => {
     // Update the company data in state and localStorage
-    SetCompanyData(data);
+    SetCompanyDataState({ ...data, isLoaded: true });
     localStorage.setItem('companyData', JSON.stringify(data));
   };
+  console.log('Company Data from Context:', companyData);
 
   return (
     <CompanyDataContext.Provider value={{ companyData, setCompanyData }}>
