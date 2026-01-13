@@ -120,7 +120,21 @@ const SignUp = () => {
       !formData.currency.symbol ||
       !formData.currency.name
     ) {
-      setError('All fields are required');
+      const missingFields = [];
+      if (!formData.fullName) missingFields.push('Full Name');
+      if (!formData.businessName) missingFields.push('Business Name');
+      if (!formData.businessEmail) missingFields.push('Business Email');
+      if (!formData.businessAddress) missingFields.push('Business Address');
+      if (!formData.phoneNumber) missingFields.push('Phone Number');
+      if (!formData.password) missingFields.push('Password');
+      if (!formData.confirmPassword) missingFields.push('Confirm Password');
+      if (!formData.currency.code) missingFields.push('Currency Code');
+      if (!formData.currency.symbol) missingFields.push('Currency Symbol');
+      if (!formData.currency.name) missingFields.push('Currency Name');
+
+      setError(
+        `Please fill in the following fields: ${missingFields.join(', ')}`
+      );
       setLoading(false);
       return;
     }
