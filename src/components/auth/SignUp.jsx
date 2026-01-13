@@ -64,23 +64,6 @@ const SignUp = () => {
       return;
     }
 
-    if (
-      !formData.fullName ||
-      !formData.businessName ||
-      !formData.businessEmail ||
-      !formData.businessAddress ||
-      !formData.phoneNumber ||
-      !formData.password ||
-      !formData.confirmPassword ||
-      !formData.currency.code ||
-      !formData.currency.symbol ||
-      !formData.currency.name
-    ) {
-      setError('All fields are required');
-      setLoading(false);
-      return;
-    }
-
     if (!verifyPhoneNumber(formData.phoneNumber).passed) {
       setError(verifyPhoneNumber(formData.phoneNumber).message);
       setLoading(false);
@@ -100,7 +83,9 @@ const SignUp = () => {
     }
 
     if (!verifyInputText(formData.businessAddress).passed) {
-      setError(verifyInputText(formData.businessAddress).message + ' (Invalid address)');
+      setError(
+        verifyInputText(formData.businessAddress).message + ' (Invalid address)'
+      );
       setLoading(false);
       return;
     }
@@ -123,8 +108,38 @@ const SignUp = () => {
       return;
     }
 
-    try {
+    if (
+      !formData.fullName ||
+      !formData.businessName ||
+      !formData.businessEmail ||
+      !formData.businessAddress ||
+      !formData.phoneNumber ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      !formData.currency.code ||
+      !formData.currency.symbol ||
+      !formData.currency.name
+    ) {
+      const missingFields = [];
+      if (!formData.fullName) missingFields.push('Full Name');
+      if (!formData.businessName) missingFields.push('Business Name');
+      if (!formData.businessEmail) missingFields.push('Business Email');
+      if (!formData.businessAddress) missingFields.push('Business Address');
+      if (!formData.phoneNumber) missingFields.push('Phone Number');
+      if (!formData.password) missingFields.push('Password');
+      if (!formData.confirmPassword) missingFields.push('Confirm Password');
+      if (!formData.currency.code) missingFields.push('Currency Code');
+      if (!formData.currency.symbol) missingFields.push('Currency Symbol');
+      if (!formData.currency.name) missingFields.push('Currency Name');
 
+      setError(
+        `Please fill in the following fields: ${missingFields.join(', ')}`
+      );
+      setLoading(false);
+      return;
+    }
+
+    try {
       setLoading(true);
 
       const body = {
@@ -171,7 +186,9 @@ const SignUp = () => {
     <div className="w-full h-full flex flex-col items-center justify-center text-text-gray">
       {!success ? (
         <form className="w-full flex-col flex gap-3" onSubmit={handleSubmit}>
-          <h1 className="text-lg font-bold mb-2 text-brand-blue text-center">SIGN UP YOUR BUSINESS</h1>
+          <h1 className="text-lg font-bold mb-2 text-brand-blue text-center">
+            SIGN UP YOUR BUSINESS
+          </h1>
           <div className="flex flex-col gap-3 w-full max-h-[70vh] overflow-y-auto scrollbar-thin">
             {/* Full Name Input */}
             <div className="flex flex-col gap-0.5 w-full">
@@ -225,7 +242,7 @@ const SignUp = () => {
                 name="businessAddress"
                 value={formData.businessAddress}
                 onChange={handleChange}
-                placeholder='Enter your business address...'
+                placeholder="Enter your business address..."
                 className={`w-full border-2 p-2 items-center drop-shadow-md focus:outline-brand-blue text-md border-[#DDDDDD] h-24 font-mono rounded-md ${formData.businessAddress?.length ? 'border-brand-blue' : ''} focus-within:border-brand-blue`}
               />
             </div>

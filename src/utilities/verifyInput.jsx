@@ -1,10 +1,14 @@
 //function to verify name input
 export function verifyName(name) {
   const verified = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/.test(name);
-  if (verified) {
+  if (verified && name !== null && name !== undefined && name !== '') {
     return { passed: true, message: 'Name is valid.' };
   } else {
-    return { passed: false, message: 'Invalid character in name format.' };
+    return {
+      passed: false,
+      message:
+        'Invalid character in name format.  Please ensure the name contains only letters, spaces, and common punctuation.',
+    };
   }
 }
 
@@ -13,17 +17,25 @@ export function verifyEmail(email) {
   const verified = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
     email
   );
-  if (verified) {
+  if (verified && email !== null && email !== undefined && email !== '') {
     return { passed: true, message: 'Email is valid.' };
   } else {
-    return { passed: false, message: 'Invalid email format.' };
+    return {
+      passed: false,
+      message: 'Invalid email format. Please enter a valid email address.',
+    };
   }
 }
 
 //function to verify international phone number input
 export function verifyPhoneNumber(phoneNumber) {
   const verified = /^\+(?:[0-9] ?){6,14}[0-9]$/.test(phoneNumber);
-  if (verified) {
+  if (
+    verified &&
+    phoneNumber !== null &&
+    phoneNumber !== undefined &&
+    phoneNumber !== ''
+  ) {
     return { passed: true, message: 'International phone number is valid.' };
   } else {
     return {
@@ -55,14 +67,14 @@ export function verifyPassword(password) {
           ? 'Password must contain at least one special character.'
           : 'Password is valid.',
   };
-};
+}
 
 //function to verify input text
 export function verifyInputText(inputText) {
   if (inputText === null || inputText === undefined) {
     return { passed: false, message: 'Input is required.' };
   }
-  
+
   const value = String(inputText).trim();
   if (value.length === 0) {
     return { passed: false, message: 'Input cannot be empty.' };
@@ -77,18 +89,15 @@ export function verifyInputText(inputText) {
   //  const invalidChars = value.split('')
   //    .filter(char => !char.match(allowed))
   //    .join('');
-  //  
+  //
   //  console.log('Invalid characters found:', invalidChars);
   //  console.log('Full input:', value);
   //}
 
   return {
     passed: verified,
-    message: verified 
-      ? 'Input text is valid.' 
-      : 'Invalid character in text input. Only letters, numbers, spaces, and common punctuation allowed.'
+    message: verified
+      ? 'Input text is valid.'
+      : 'Invalid character in text input. Only letters, numbers, spaces, and common punctuation allowed.',
   };
 }
-
-
-
