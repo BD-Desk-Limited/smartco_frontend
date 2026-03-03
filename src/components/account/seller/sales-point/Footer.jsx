@@ -6,7 +6,7 @@ const Footer = ({ style, mode, setMode }) => {
   const { logOutSalesPoint } = useAuth();
   return (
     <div
-      className={`${style} border-t-2 border-[#454545] flex items-center justify-start p-3 flex-row w-full px-10 gap-5`}
+      className={`${style} border-t-2 border-gray-border flex items-center justify-start p-3 flex-row w-full px-10 gap-5`}
     >
       {/* Switch Theme */}
       <div className="flex flex-row justify-center items-center space-x-2 bg-gray-shadow6 rounded-lg p-1">

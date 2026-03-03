@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check for token in sessionStorage (used by all users now)
@@ -25,11 +26,12 @@ export const AuthProvider = ({ children }) => {
           sessionStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
+          setIsLoading(false);
           router.push('/pages/splash/splash3');
         } else {
           setIsAuthenticated(true);
-          if (!user) {
-            const getUser = async () => {
+          const getUser = async () => {
+            try {
               const userData = await getUserService(token);
               if (userData.data) {
                 setUser(userData.data);
@@ -39,19 +41,29 @@ export const AuthProvider = ({ children }) => {
                 setUser(null);
                 router.push('/pages/splash/splash3');
               }
-            };
-            getUser();
-          }
+            } catch (error) {
+              console.error('Error fetching user:', error);
+              sessionStorage.removeItem('token');
+              setIsAuthenticated(false);
+              setUser(null);
+              router.push('/pages/splash/splash3');
+            } finally {
+              setIsLoading(false);
+            }
+          };
+          getUser();
         }
       } catch (error) {
         sessionStorage.removeItem('token');
         setIsAuthenticated(false);
         setUser(null);
+        setIsLoading(false);
         router.push('/pages/splash/splash3');
       }
     } else {
       setIsAuthenticated(false);
       setUser(null);
+      setIsLoading(false);
       if (
         pathname &&
         !pathname.startsWith('/pages/auth') &&
@@ -90,7 +102,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, setUser, logOut, logOutSalesPoint }}
+      value={{
+        isAuthenticated,
+        user,
+        setUser,
+        logOut,
+        logOutSalesPoint,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

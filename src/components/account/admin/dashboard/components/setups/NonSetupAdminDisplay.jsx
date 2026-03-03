@@ -31,11 +31,20 @@ const NonSetupAdminDisplay = ({ loading }) => {
             System Setup Required
           </h1>
           <p className="text-gray-600 text-lg mb-6">
-            Hi {user?.fullName || 'there'}! Your business account needs to be configured before you can access your account dashboard.
+            Hi {user?.fullName || 'there'}! Your business account needs to be
+            configured before you can access your account dashboard.
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <button
+              onClick={() => window.location.reload()}
+              className="mb-4 px-4 py-2 bg-brand-green text-white rounded-md hover:bg-green-shadow1 transition-colors"
+            >
+              I am an Admin, Proceed to Setup
+            </button>
             <p className="text-yellow-800">
-              <strong>Action Required:</strong> Please contact your system administrator to complete the initial setup process.
+              <strong>Action Required:</strong> If you are not an admin, please
+              contact your system administrator to complete the initial setup
+              process.
             </p>
           </div>
         </div>
@@ -46,11 +55,16 @@ const NonSetupAdminDisplay = ({ loading }) => {
           <div className="space-y-2 text-sm text-gray-600">
             <p>Contact your administrator or our support team:</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
-              <a 
+              <a
                 href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
               >
-                <Image src="/assets/email.png" alt="Email" width={16} height={16} />
+                <Image
+                  src="/assets/email.png"
+                  alt="Email"
+                  width={16}
+                  height={16}
+                />
                 Contact Smartco Support team
               </a>
             </div>
@@ -59,7 +73,7 @@ const NonSetupAdminDisplay = ({ loading }) => {
 
         {/* Logout Option */}
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <button 
+          <button
             onClick={() => logOut()}
             className="text-gray-500 hover:text-gray-700 text-sm underline"
           >

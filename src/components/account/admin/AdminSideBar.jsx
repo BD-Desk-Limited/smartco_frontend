@@ -3,10 +3,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 import { useRouter } from 'next/navigation';
+import Spinner from '../Spinner';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const [isOpen, setIsOpen] = useState(openSideBar || false);
-  const { user, logOut } = useAuth();
+  const { user, logOut, isLoading } = useAuth();
   const [userRole, setUserRole] = useState('');
 
   const menuList = [
@@ -16,7 +17,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       iconActive: '/assets/dashboard_active.png',
       link: '/',
       title: 'Dashboard',
-      requiredAccess: '',
+      requiredAccess: null,
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Branch Management',
@@ -25,6 +28,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/branch-management',
       title: 'Branch Management',
       requiredAccess: 'Branch_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Products',
@@ -33,6 +38,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/product-management',
       title: 'Product Management',
       requiredAccess: 'Product_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Purchases',
@@ -41,6 +48,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/purchases',
       title: 'Purchases',
       requiredAccess: 'Purchases',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Materials Management',
@@ -49,6 +58,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/manage-materials',
       title: 'Manage Materials',
       requiredAccess: 'Materials_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Reports',
@@ -57,6 +68,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/reports',
       title: 'Reports',
       requiredAccess: 'Reports',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Users Management',
@@ -65,6 +78,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/users-management',
       title: 'Users Management',
       requiredAccess: 'Users_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'My team',
@@ -72,8 +87,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       iconActive: '/assets/team_active.png',
       link: '/my-team',
       title: 'My Team',
-      forNonSuperAdmin: true,
       requiredAccess: 'Team_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: true,
     },
     {
       name: 'My Customers',
@@ -82,6 +98,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       link: '/my-customers',
       title: 'My Customers',
       requiredAccess: 'Customer_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'My Profile',
@@ -89,6 +107,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       iconActive: '/assets/profile_active.png',
       link: '/my-profile',
       title: 'My Profile',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
     {
       name: 'Settings',
@@ -96,6 +116,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       iconActive: '/assets/settings_active.png',
       link: '/settings',
       title: 'Settings',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
     },
   ];
 
@@ -138,6 +160,30 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     return false;
   };
 
+  const hasRequiredRole = (menu) => {
+    const requiredRole = 'admin';
+    const requiresSuperAdmin = menu?.superAdminOnly === true;
+    const forNonSuperAdmin = menu?.nonSuperAdminOnly === true;
+
+    if (user?.role !== requiredRole) {
+      return false;
+    }
+
+    if (requiresSuperAdmin && !user?.superAdmin) {
+      return false;
+    }
+
+    if (forNonSuperAdmin && user?.superAdmin) {
+      return false;
+    }
+
+    return true;
+  };
+
+  if (!user || isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <div
       className={`bg-brand-blue h-screen flex flex-col ${isOpen ? 'w-48' : 'w-20'}`}
@@ -178,8 +224,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
               className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
               onClick={() => handleMenuClick(menu)}
             >
-              {user?.superAdmin &&
-              menu.forNonSuperAdmin ? null : hasAccessToMenu(menu) ? (
+              {hasAccessToMenu(menu) && hasRequiredRole(menu) ? (
                 <div
                   className="flex flex-row items-center  py-2"
                   title={!isOpen ? `${menu?.title}` : ''}

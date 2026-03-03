@@ -1,6 +1,7 @@
 import React from 'react';
 import HeadBar from './HeadBar';
 import Footer from './Footer';
+import SalesPointContent from './SalesPointContent';
 
 const SalesPoint = ({
   mode,
@@ -12,7 +13,7 @@ const SalesPoint = ({
   darkThemeStyle,
 }) => {
   return (
-    <div className="h-screen flex flex-col justify-between items-center relative">
+    <div className="h-screen overflow-y-auto no-scrollbar flex flex-col items-center relative">
       <HeadBar
         mode={mode}
         menuItems={menuItems}
@@ -20,6 +21,15 @@ const SalesPoint = ({
         setActiveMenuItem={setActiveMenuItem}
         style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
       />
+      <div className="h-[calc(100vh-120px)] overflow-y-auto no-scrollbar w-full flex items-center justify-center relative">
+        <SalesPointContent
+          mode={mode}
+          activeMenuItem={activeMenuItem}
+          lightThemeStyle={lightThemeStyle}
+          darkThemeStyle={darkThemeStyle}
+        />
+      </div>
+
       <Footer
         mode={mode}
         setMode={setMode}

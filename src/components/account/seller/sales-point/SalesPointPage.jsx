@@ -12,9 +12,9 @@ import ShiftManagement from './shift-management/ShiftManagement';
 const SalesPointPage = () => {
   const router = useRouter();
   const { companyData } = useCompanyData();
-  const { user, logOutSalesPoint } = useAuth();
+  const { user, logOutSalesPoint, isLoading } = useAuth();
   const [mode, setMode] = React.useState('light');
-  const [activeMenuItem, setActiveMenuItem] = React.useState('Dashboard');
+  const [activeMenuItem, setActiveMenuItem] = React.useState('Sales Items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
     React.useState(false);
   const [userBranchAccessWarningBranch, setUserBranchAccessWarningBranch] =
@@ -24,7 +24,7 @@ const SalesPointPage = () => {
   const [workBranch, setWorkBranch] = React.useState(null);
   const menuItems = [
     {
-      name: 'Dashboard',
+      name: 'Sales Items',
       component: null,
       iconPath: {
         light: '/assets/window_white.png',
@@ -98,10 +98,7 @@ const SalesPointPage = () => {
         sessionStorage.setItem('work-branch', singleBranch._id);
       }
     }
-  }, [branchesAccessibleOnDevice, user]);
-
-  console.log('workBranch', workBranch);
-  console.log('branchesAccessibleOnDevice', branchesAccessibleOnDevice);
+  }, [branchesAccessibleOnDevice, user, isLoading]);
 
   if (!companyData || !companyData.allowedBranches) {
     return <Spinner />;
@@ -173,12 +170,12 @@ const SalesPointPage = () => {
       )}
 
       {/* Shift Creation Enforcement Check */}
-      {workBranch && workBranch.settings.shiftCreationEnforced && (
+      {/*workBranch && workBranch.settings.shiftCreationEnforced && (
         <ShiftManagement
           onClose={logOutSalesPoint}
           style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
         />
-      )}
+      )*/}
 
       {/* Main Sales Point Interface */}
       <SalesPoint
