@@ -1,39 +1,28 @@
 import React from 'react';
-import SalesPointProducts from './SalesPointProducts';
-import { fetchProductsFromAPI, loadProducts } from './productFetchManagement';
+import SalesPointProducts from '../sales-items/SalesPointProducts';
+import { fetchProductsFromAPI, loadProducts } from '../productFetchManagement';
+import Cart from '../cart/Cart';
 
 const SalesPointContent = ({
   mode,
   activeMenuItem,
   lightThemeStyle,
   darkThemeStyle,
+  loading,
+  setLoading,
+  selectedProduct,
+  setSelectedProduct,
+  error,
+  setError,
+  products,
+  setProducts,
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [filterValue, setFilterValue] = React.useState('All Products');
-  const [products, setProducts] = React.useState([]);
   const [filteredProducts, setFilteredProducts] = React.useState([]);
   const [productCategories, setProductCategories] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState('All');
   const [refreshingProducts, setRefreshingProducts] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const loadedProducts = await loadProducts();
-        setProducts(loadedProducts);
-      } catch (err) {
-        setError('Failed to load products. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
 
   // Filter products based on search term and selected filter
   React.useEffect(() => {
@@ -123,21 +112,29 @@ const SalesPointContent = ({
       {/* Sales point products */}
       <div className="flex-1 p-4">
         <div className="w-full h-full rounded-md p-4">
-          <SalesPointProducts
-            products={products}
-            filteredProducts={filteredProducts}
-            productCategories={productCategories}
-            setProductCategories={setProductCategories}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            handleRefreshProducts={handleRefreshProducts}
-            refreshingProducts={refreshingProducts}
-            loading={loading}
-            error={error}
-            mode={mode}
-            lightThemeStyle={lightThemeStyle}
-            darkThemeStyle={darkThemeStyle}
-          />
+          {activeMenuItem === 'Sales Items' && (
+            <SalesPointProducts
+              products={products}
+              filteredProducts={filteredProducts}
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              productCategories={productCategories}
+              setProductCategories={setProductCategories}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              handleRefreshProducts={handleRefreshProducts}
+              refreshingProducts={refreshingProducts}
+              loading={loading}
+              error={error}
+              mode={mode}
+              lightThemeStyle={lightThemeStyle}
+              darkThemeStyle={darkThemeStyle}
+            />
+          )}
+
+          {activeMenuItem === 'Cart' && <Cart />}
+
+          {activeMenuItem === 'Orders' && <div>Orders</div>}
         </div>
       </div>
     </div>

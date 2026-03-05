@@ -10,13 +10,11 @@ const SelectWorkBranch = ({
   const [selectedBranch, setSelectedBranch] = React.useState(null);
 
   const handleBranchSelect = (branchID) => {
-    const branch = branchesAccessibleOnDevice.find(
+    const branch = branchesAccessibleOnDevice?.find(
       (branch) => branch._id === branchID
     );
     setSelectedBranch(branch);
   };
-
-  console.log('Selected Branch:', selectedBranch);
 
   return (
     <div

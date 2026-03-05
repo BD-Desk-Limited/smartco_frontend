@@ -17,7 +17,8 @@ const sampleProducts = [
   {
     _id: 2,
     name: 'Product 2',
-    description: 'Description of Product 2',
+    description:
+      'Description of Product 2 ugeoigwelug weuikehdfolukdhwol weuhldfuhldkwhedweh woehdlkeuhwloeihwpefi w;hfeiohwlkhfwlefhwleh',
     category: 'Electronics',
     imageURL:
       'https://www.flavourtownbakery.co.uk/cdn/shop/files/Bakers-Mixed-Dozen-Cupcakes-Flavourtown-Bakery.jpg?v=1699965589',
@@ -30,7 +31,7 @@ const sampleProducts = [
   },
   {
     _id: 3,
-    name: 'Product 3',
+    name: 'Product 3 ugeoigwelug weuikehdfolukdhwol weuhldfuhldkwhedweh woehdlkeuhwloeihwpefi w;hfeiohwlkhfwlefhwleh lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     description: 'Description of Product 3',
     category: 'Beverages',
     imageURL:

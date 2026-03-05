@@ -1,7 +1,7 @@
 import React, { use, useEffect } from 'react';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
-import SalesPoint from './SalesPoint';
+import SalesPoint from './sales-items/SalesPoint';
 import SelectWorkBranch from './SelectWorkBranch';
 import WarningModal from '../../WarningModal';
 import { useRouter } from 'next/navigation';
@@ -68,7 +68,7 @@ const SalesPointPage = () => {
 
   const handleWorkBranchSelect = (branch_obj) => {
     // check if user has access to the branch
-    if (!user?.branch?.includes(branch_obj._id)) {
+    if (!user?.branch?.includes(branch_obj?._id)) {
       setUserBranchAccessWarning(true);
       setUserBranchAccessWarningBranch(branch_obj);
     } else {

@@ -1,7 +1,7 @@
 import React from 'react';
-import Spinner from '../../Spinner';
-import ErrorInterface from '../../errorInterface';
-import Button from '../../Button';
+import Spinner from '../../../Spinner';
+import ErrorInterface from '../../../errorInterface';
+import Button from '../../../Button';
 import Image from 'next/image';
 import {
   FaShoppingCart,
@@ -12,6 +12,8 @@ import {
 const SalesPointProducts = ({
   products,
   filteredProducts,
+  selectedProduct,
+  setSelectedProduct,
   loading,
   error,
   productCategories,
@@ -23,9 +25,9 @@ const SalesPointProducts = ({
   lightThemeStyle,
   darkThemeStyle,
 }) => {
-  const handleAddToCart = (product) => {
-    // Implement the logic to add the product to the cart
-    console.log('Adding to cart:', product);
+  const handleProductClick = (product) => {
+    if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
+    setSelectedProduct(product);
   };
 
   return (
@@ -79,25 +81,29 @@ const SalesPointProducts = ({
               {filteredProducts.map((product) => (
                 <li
                   key={product._id}
-                  className={` rounded-xl shadow-sm flex flex-col items-center p-0.5 cursor-pointer hover:border hover:border-brand-green ${mode === 'light' ? 'bg-gray-shadow9' : 'bg-gray-shadow1'} `}
+                  onClick={() => handleProductClick(product)}
+                  className={`max-h-72 max-w-52 rounded-xl shadow-sm flex flex-col items-center p-0.5 cursor-pointer hover:border hover:border-brand-green ${mode === 'light' ? 'bg-gray-shadow9' : 'bg-gray-shadow1'} `}
                 >
                   <div className={`w-full rounded-xl`}>
                     <Image
                       src={product.imageURL}
                       alt={product.name}
+                      title={product.name}
                       width={1000}
                       height={100}
                       className="w-full h-32 object-fill rounded-t-xl rounded-b-none"
                     />
                   </div>
                   <div
-                    className={`w-full rounded-b-xl px-1 ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+                    className={`w-full h-full rounded-b-xl px-1 ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
                   >
                     <span
                       className={`${mode === 'light' ? 'border-gray-shadow9' : 'border-gray-shadow1'} w-full flex flex-row justify-between text-sm py-2 border-b`}
                     >
-                      <span>{product?.name}</span>
-                      <span>
+                      <span className="">
+                        {product?.name?.substring(0, 25)}...
+                      </span>
+                      <span className="ml-5">
                         {product?.currency}
                         {product?.price}
                       </span>
@@ -122,7 +128,6 @@ const SalesPointProducts = ({
                     {/* Add to cart button */}
                     <div className="w-full flex justify-center mt-2">
                       <Button
-                        onClick={() => handleAddToCart(product)}
                         buttonStyle={` 
                           ${mode !== 'light' ? 'bg-gray-shadow1 hover:bg-gray-shadow2' : 'bg-white hover:bg-gray-shadow8'} 
                           rounded-md p-2 w-full mx-1 text-sm flex items-center justify-center mb-3 h-fit
