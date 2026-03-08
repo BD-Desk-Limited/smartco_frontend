@@ -1,15 +1,30 @@
 import Image from 'next/image';
-import React from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/authContext';
+import { motion } from 'framer-motion';
 
 const HeadBar = ({
   style,
   menuItems,
   activeMenuItem,
   setActiveMenuItem,
+  cartItems,
   mode,
 }) => {
   const { user } = useAuth();
+  const [isAnimating, setIsAnimating] = useState(false);
+  const previousCartCountRef = useRef(0);
+
+  useLayoutEffect(() => {
+    if (cartItems.length > previousCartCountRef.current) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 600);
+      previousCartCountRef.current = cartItems.length;
+      return () => clearTimeout(timer);
+    }
+  }, [cartItems.length]);
 
   return (
     <div className="bg-brand-green flex items-center justify-between p-3 flex-row w-full px-10">
@@ -36,9 +51,21 @@ const HeadBar = ({
       <nav className={`rounded-xl ${style}`}>
         <ul className="flex space-x-6">
           {(menuItems || []).map((item) => (
-            <li
+            <motion.div
+              animate={
+                isAnimating && item.name === 'Cart'
+                  ? {
+                      scale: [1, 1.5, 0.9, 1.1, 1],
+                      rotate: [0, -10, 10, -5, 0],
+                    }
+                  : {}
+              }
+              transition={{
+                duration: 0.6,
+                ease: 'easeInOut',
+              }}
               key={item.name}
-              className={`cursor-pointer font-bold flex items-center space-x-2 py-3 px-2${
+              className={`cursor-pointer font-bold flex items-center space-x-2 py-3 px-2 relative${
                 activeMenuItem === item.name
                   ? 'border border-2 border-brand-green text-brand-green px-2 rounded-md shadow-md'
                   : ''
@@ -46,21 +73,35 @@ const HeadBar = ({
               onClick={() => setActiveMenuItem(item.name)}
             >
               {item.iconPath && (
-                <Image
-                  src={
-                    activeMenuItem === item.name
-                      ? item.iconPath.active
-                      : mode === 'dark'
-                        ? item.iconPath.light
-                        : item.iconPath.dark
-                  }
-                  alt={`${item.name} icon`}
-                  width={25}
-                  height={25}
-                />
+                <div>
+                  <Image
+                    src={
+                      activeMenuItem === item.name
+                        ? item.iconPath.active
+                        : mode === 'dark'
+                          ? item.iconPath.light
+                          : item.iconPath.dark
+                    }
+                    alt={`${item.name} icon`}
+                    width={25}
+                    height={25}
+                  />
+                </div>
               )}
               <span>{item.name}</span>
-            </li>
+
+              {/* Cart Badge */}
+              {item.name === 'Cart' && cartItems.length > 0 && (
+                <motion.div
+                  className={`absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  key={cartItems.length}
+                >
+                  {cartItems.length}
+                </motion.div>
+              )}
+            </motion.div>
           ))}
         </ul>
       </nav>

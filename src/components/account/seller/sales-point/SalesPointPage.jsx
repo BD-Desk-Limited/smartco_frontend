@@ -57,6 +57,7 @@ const SalesPointPage = () => {
       },
     },
   ];
+
   // Memoized list of branches accessible on the device to avoid unnecessary rerenders
   const branchesAccessibleOnDevice = React.useMemo(
     () => companyData?.allowedBranches || [],
@@ -186,6 +187,7 @@ const SalesPointPage = () => {
         setActiveMenuItem={setActiveMenuItem}
         lightThemeStyle={lightThemeStyle}
         darkThemeStyle={darkThemeStyle}
+        workBranch={workBranch}
         logOutSalesPoint={logOutSalesPoint}
       />
     </div>

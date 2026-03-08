@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Spinner from '../../../Spinner';
 import ErrorInterface from '../../../errorInterface';
 import Button from '../../../Button';
@@ -14,17 +14,38 @@ const SalesPointProducts = ({
   filteredProducts,
   selectedProduct,
   setSelectedProduct,
+  quantity,
   loading,
   error,
   productCategories,
   selectedCategory,
   setSelectedCategory,
   handleRefreshProducts,
+  handleScan,
+  scannedId,
+  setScannedId,
   refreshingProducts,
+  scanMode,
+  searchRef,
+  filterRef,
+  workBranch,
   mode,
   lightThemeStyle,
   darkThemeStyle,
 }) => {
+  const inputRef = useRef(null);
+
+  // always focus scanMode
+  useEffect(() => {
+    if (scanMode && workBranch) {
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 500);
+    }
+  }, [scanMode, workBranch]);
+
   const handleProductClick = (product) => {
     if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
     setSelectedProduct(product);
@@ -40,32 +61,52 @@ const SalesPointProducts = ({
         </div>
       ) : (
         <div className="">
+          {/* Scanner input */}
+          <input
+            type="text"
+            value={scannedId}
+            onChange={(e) => setScannedId(e.target.value)}
+            onKeyDown={handleScan}
+            ref={inputRef}
+            onBlur={(e) => {
+              if (
+                scanMode &&
+                e.relatedTarget !== searchRef.current &&
+                e.relatedTarget !== filterRef.current
+              ) {
+                setTimeout(() => inputRef.current?.focus(), 0);
+              }
+            }}
+            style={{ position: 'absolute', left: '-9999px' }}
+          />
           {/* Product categories list */}
           <div className="w-full flex flex-row items-center justify-between px-4">
             {productCategories && productCategories.length > 0 && (
-              <div className="flex flex-row items-center gap-4 w-full overflow-x-auto scrollbar-none">
-                <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-row items-center gap-4 w-full overflow-x-auto no-scrollbar">
+                <div className="flex flex-row gap-2 mb-3">
                   <span
                     onClick={() => setSelectedCategory('All')}
-                    className={` ${selectedCategory === 'All' ? 'bg-green-shadow7 text-text-black' : ''} p-3 rounded-lg text-base font-semibold hover:bg-green-shadow8 cursor-pointer`}
+                    className={` ${selectedCategory === 'All' ? 'bg-green-shadow7' : ' '} text-text-black p-3 mr-3 rounded-lg text-base font-semibold hover:bg-green-shadow8 cursor-pointer sticky left-0 bg-gray-shadow9`}
                   >
                     All
                   </span>
-                  {productCategories.map((category) => (
-                    <span
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={` ${selectedCategory === category ? 'bg-green-shadow7 text-text-black' : ''} p-3 rounded-md text-base font-semibold hover:bg-green-shadow8 cursor-pointer`}
-                    >
-                      {category}
-                    </span>
-                  ))}
+                  <span className="flex flex-row items-center gap-2 text-nowrap">
+                    {productCategories.map((category) => (
+                      <span
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={` ${selectedCategory === category ? 'bg-green-shadow7 text-text-black' : ''} p-3 rounded-md text-base font-semibold hover:bg-green-shadow8 cursor-pointer`}
+                      >
+                        {category}
+                      </span>
+                    ))}
+                  </span>
                 </div>
               </div>
             )}
 
             {/* Refresh products button */}
-            <div className="bg-brand-green text-text-white rounded-r-xl rounded-l-none cursor-pointer text-nowrap">
+            <div className="bg-brand-green text-text-white rounded-r-xl rounded-l-none cursor-pointer text-nowrap  ml-3">
               <Button
                 text={refreshingProducts ? 'Refreshing...' : 'Refresh Products'}
                 onClick={handleRefreshProducts}
@@ -74,7 +115,6 @@ const SalesPointProducts = ({
               />
             </div>
           </div>
-
           {/* Product list */}
           {filteredProducts && filteredProducts.length > 0 ? (
             <ul className="w-full h-[calc(100vh-250px)] mb-10 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 scrollbar-thin overflow-y-auto">
@@ -100,7 +140,7 @@ const SalesPointProducts = ({
                     <span
                       className={`${mode === 'light' ? 'border-gray-shadow9' : 'border-gray-shadow1'} w-full flex flex-row justify-between text-sm py-2 border-b`}
                     >
-                      <span className="">
+                      <span className="font-semibold">
                         {product?.name?.substring(0, 25)}...
                       </span>
                       <span className="ml-5">

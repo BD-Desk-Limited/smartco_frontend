@@ -1,28 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SalesPointProducts from '../sales-items/SalesPointProducts';
 import { fetchProductsFromAPI, loadProducts } from '../productFetchManagement';
 import Cart from '../cart/Cart';
+import Customers from '../customers/Customers';
+import Payments from '../payments/Payments';
 
 const SalesPointContent = ({
   mode,
   activeMenuItem,
+  setActiveMenuItem,
   lightThemeStyle,
   darkThemeStyle,
   loading,
   setLoading,
   selectedProduct,
+  quantity,
+  setQuantity,
   setSelectedProduct,
   error,
-  setError,
   products,
   setProducts,
+  cartItems,
+  setCartItems,
+  handleAddToCart,
+  workBranch,
 }) => {
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [filterValue, setFilterValue] = React.useState('All Products');
-  const [filteredProducts, setFilteredProducts] = React.useState([]);
-  const [productCategories, setProductCategories] = React.useState([]);
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
-  const [refreshingProducts, setRefreshingProducts] = React.useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterValue, setFilterValue] = useState('All Products');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [productCategories, setProductCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [refreshingProducts, setRefreshingProducts] = useState(false);
+  const [scanMode, setScanMode] = useState(true);
+  const [scannedId, setScannedId] = React.useState('');
+  const searchRef = React.useRef(null);
+  const filterRef = React.useRef(null);
 
   // Filter products based on search term and selected filter
   React.useEffect(() => {
@@ -57,6 +69,29 @@ const SalesPointContent = ({
     setRefreshingProducts(false);
   };
 
+  //listen for barcode scanner
+  const handleScan = (e) => {
+    if (e.key === 'Enter') {
+      const product = products.find((p) => p._id === scannedId.trim());
+      if (product && !selectedProduct) {
+        const noOptions =
+          product.components?.length === 1 &&
+          product.components[0]?.materialChoices?.length === 1;
+
+        const singleChoice = product.components[0]?.materialChoices[0];
+
+        if (noOptions) {
+          handleAddToCart(product, [singleChoice], quantity);
+          setActiveMenuItem('Cart');
+        } else {
+          setSelectedProduct(product);
+          setActiveMenuItem('Sales Items');
+        }
+      }
+      setScannedId('');
+    }
+  };
+
   return (
     <div className="h-full w-full flex flex-col relative">
       {/*Top search Filters and tools */}
@@ -68,6 +103,9 @@ const SalesPointContent = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setScanMode(false)}
+            onBlur={() => setScanMode(true)}
+            ref={searchRef}
             placeholder="Search items name, category or description..."
             className={`w-80 p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
           />
@@ -76,6 +114,7 @@ const SalesPointContent = ({
           <select
             className={`ml-4 p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
             value={filterValue}
+            ref={filterRef}
             onChange={(e) => setFilterValue(e.target.value)}
           >
             <option value="All Products">All Products</option>
@@ -114,10 +153,19 @@ const SalesPointContent = ({
         <div className="w-full h-full rounded-md p-4">
           {activeMenuItem === 'Sales Items' && (
             <SalesPointProducts
+              scanMode={scanMode}
+              setScanMode={setScanMode}
+              handleScan={handleScan}
+              scannedId={scannedId}
+              setScannedId={setScannedId}
+              searchRef={searchRef}
+              filterRef={filterRef}
               products={products}
               filteredProducts={filteredProducts}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              quantity={quantity}
+              setQuantity={setQuantity}
               productCategories={productCategories}
               setProductCategories={setProductCategories}
               selectedCategory={selectedCategory}
@@ -129,12 +177,27 @@ const SalesPointContent = ({
               mode={mode}
               lightThemeStyle={lightThemeStyle}
               darkThemeStyle={darkThemeStyle}
+              workBranch={workBranch}
             />
           )}
 
-          {activeMenuItem === 'Cart' && <Cart />}
+          {activeMenuItem === 'Cart' && (
+            <Cart
+              cartItems={cartItems}
+              setCartItems={setCartItems}
+              handleScan={handleScan}
+              scannedId={scannedId}
+              setScannedId={setScannedId}
+              workBranch={workBranch}
+              scanMode={scanMode}
+              searchRef={searchRef}
+              filterRef={filterRef}
+            />
+          )}
 
-          {activeMenuItem === 'Orders' && <div>Orders</div>}
+          {activeMenuItem === 'Customers' && <Customers />}
+
+          {activeMenuItem === 'Payments' && <Payments />}
         </div>
       </div>
     </div>
