@@ -15,6 +15,7 @@ const SalesPointProducts = ({
   selectedProduct,
   setSelectedProduct,
   quantity,
+  cartItems,
   loading,
   error,
   productCategories,
@@ -28,6 +29,7 @@ const SalesPointProducts = ({
   scanMode,
   searchRef,
   filterRef,
+  searchCustomerRef,
   workBranch,
   mode,
   lightThemeStyle,
@@ -51,6 +53,28 @@ const SalesPointProducts = ({
     setSelectedProduct(product);
   };
 
+  const isProductInCart = (productId) => {
+    let checkResult = {
+      status: false,
+      quantity: 0,
+    };
+    const productIsInCart =
+      cartItems?.length > 0 &&
+      cartItems.filter((item) => item.product?._id === productId);
+    if (productIsInCart && productIsInCart.length > 0) {
+      //add quantities of the same product in cart
+      const totalQuantity = productIsInCart.reduce(
+        (total, item) => total + item.quantity,
+        0
+      );
+      checkResult = {
+        status: true,
+        quantity: totalQuantity,
+      };
+    }
+    return checkResult;
+  };
+
   return (
     <>
       {loading ? (
@@ -72,7 +96,8 @@ const SalesPointProducts = ({
               if (
                 scanMode &&
                 e.relatedTarget !== searchRef.current &&
-                e.relatedTarget !== filterRef.current
+                e.relatedTarget !== filterRef.current &&
+                e.relatedTarget !== searchCustomerRef.current
               ) {
                 setTimeout(() => inputRef.current?.focus(), 0);
               }
@@ -122,8 +147,20 @@ const SalesPointProducts = ({
                 <li
                   key={product._id}
                   onClick={() => handleProductClick(product)}
-                  className={`max-h-72 max-w-52 rounded-xl shadow-sm flex flex-col items-center p-0.5 cursor-pointer hover:border hover:border-brand-green ${mode === 'light' ? 'bg-gray-shadow9' : 'bg-gray-shadow1'} `}
+                  className={`
+                    max-h-72 max-w-52 rounded-xl shadow-sm flex flex-col items-center p-0.5 cursor-pointer hover:border hover:border-brand-green relative ${
+                      mode === 'light' ? 'bg-gray-shadow9' : 'bg-gray-shadow1'
+                    } 
+                  `}
                 >
+                  {/* if product is already in cart, show "In Cart" badge and quantity */}
+                  {isProductInCart(product._id).status && (
+                    <div className="absolute top-0 w-full bg-error text-text-white text-base px-2 py-1 rounded-t-lg flex items-center gap-1 animate-pulse">
+                      <FaCheckCircle className="text-base" />
+                      {isProductInCart(product._id).quantity} In Cart
+                    </div>
+                  )}
+
                   <div className={`w-full rounded-xl`}>
                     <Image
                       src={product.imageURL}

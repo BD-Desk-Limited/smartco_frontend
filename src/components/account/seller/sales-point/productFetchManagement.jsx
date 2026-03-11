@@ -1,14 +1,14 @@
 // TODO: Replace with actual API call to fetch products
 const sampleProducts = [
   {
-    _id: '4088600262109',
+    _id: 1,
     name: 'Apple juice',
     description:
       'A smooth blend of creamy tea with your choice of tea variety and milk',
     category: 'Beverages',
     imageURL:
       'https://images.unsplash.com/photo-1597318972412-6db3dd2acf10?w=400&h=400&fit=crop',
-    barcode: '1234567890',
+    barcode: '2K5C8AO0542974077',
     components: [
       {
         categoryName: 'Tea',
@@ -115,7 +115,7 @@ const sampleProducts = [
     category: 'Desserts',
     imageURL:
       'https://images.unsplash.com/photo-1599599810694-f3515314fdd0?w=400&h=400&fit=crop',
-    barcode: '0987654321',
+    barcode: '4088600577098',
     components: [
       {
         categoryName: 'Cake Flavour',
@@ -160,7 +160,7 @@ const sampleProducts = [
     category: 'Beverages',
     imageURL:
       'https://images.unsplash.com/photo-1559056199-641a0ac8b8d5?w=400&h=400&fit=crop',
-    barcode: '1112131415',
+    barcode: '070657679',
     components: [
       {
         categoryName: 'Roast Level',
@@ -205,13 +205,13 @@ const sampleProducts = [
     availabilityStatus: 'in Stock',
   },
   {
-    _id: '07065767989',
+    _id: 4,
     name: 'Egusi Dudu',
     description: 'Classic cappuccino with perfect foam ratio',
     category: 'Beverages',
     imageURL:
       'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=400&fit=crop',
-    barcode: '1516171819',
+    barcode: '07065767989',
     components: [
       {
         categoryName: 'Milk Foam Level',

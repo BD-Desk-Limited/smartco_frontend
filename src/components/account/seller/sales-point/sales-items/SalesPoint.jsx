@@ -60,9 +60,33 @@ const SalesPoint = ({
         choice: choice,
       })),
     };
-    console.log('choices:', choices);
 
-    setCartItems((prev) => [newProduct, ...prev]);
+    // check if product with same choices already exists in cart, if yes, increase quantity
+    const existingInCart = cartItems.find((item) => {
+      if (item.product._id !== newProduct.product._id) return false;
+
+      const checkChoices = (whatToCheck) =>
+        whatToCheck.choices
+          ?.map((c) => c.choice?.material?._id)
+          .sort()
+          .join(',');
+
+      const newChoices = checkChoices(newProduct);
+      const existingChoices = checkChoices(item);
+      return newChoices === existingChoices;
+    });
+
+    if (existingInCart) {
+      const updatedQuantity = existingInCart.quantity + newProduct.quantity;
+
+      // replace the existing item in cart with the updated one
+      setCartItems((prev) => {
+        const filtered = prev.filter((item) => item !== existingInCart);
+        return [...filtered, { ...existingInCart, quantity: updatedQuantity }];
+      });
+    } else {
+      setCartItems((prev) => [newProduct, ...prev]);
+    }
     onClose();
   };
   console.log('CART:', cartItems);

@@ -35,6 +35,7 @@ const SalesPointContent = ({
   const [scannedId, setScannedId] = React.useState('');
   const searchRef = React.useRef(null);
   const filterRef = React.useRef(null);
+  const searchCustomerRef = React.useRef(null);
 
   // Filter products based on search term and selected filter
   React.useEffect(() => {
@@ -72,7 +73,7 @@ const SalesPointContent = ({
   //listen for barcode scanner
   const handleScan = (e) => {
     if (e.key === 'Enter') {
-      const product = products.find((p) => p._id === scannedId.trim());
+      const product = products.find((p) => p.barcode === scannedId.trim());
       if (product && !selectedProduct) {
         const noOptions =
           product.components?.length === 1 &&
@@ -160,12 +161,14 @@ const SalesPointContent = ({
               setScannedId={setScannedId}
               searchRef={searchRef}
               filterRef={filterRef}
+              searchCustomerRef={searchCustomerRef}
               products={products}
               filteredProducts={filteredProducts}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
               quantity={quantity}
               setQuantity={setQuantity}
+              cartItems={cartItems}
               productCategories={productCategories}
               setProductCategories={setProductCategories}
               selectedCategory={selectedCategory}
@@ -190,8 +193,14 @@ const SalesPointContent = ({
               setScannedId={setScannedId}
               workBranch={workBranch}
               scanMode={scanMode}
+              setScanMode={setScanMode}
               searchRef={searchRef}
               filterRef={filterRef}
+              searchCustomerRef={searchCustomerRef}
+              setActiveMenuItem={setActiveMenuItem}
+              mode={mode}
+              lightThemeStyle={lightThemeStyle}
+              darkThemeStyle={darkThemeStyle}
             />
           )}
 
