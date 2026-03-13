@@ -37,6 +37,15 @@ const SalesPointContent = ({
   const filterRef = React.useRef(null);
   const searchCustomerRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (
+      workBranch &&
+      (activeMenuItem === 'Sales Items' || activeMenuItem === 'Cart')
+    ) {
+      setScanMode(true);
+    }
+  }, [activeMenuItem, setScanMode, workBranch]);
+
   // Filter products based on search term and selected filter
   React.useEffect(() => {
     const filtered = products.filter((product) => {
@@ -116,6 +125,8 @@ const SalesPointContent = ({
             className={`ml-4 p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
             value={filterValue}
             ref={filterRef}
+            onFocus={() => setScanMode(false)}
+            onBlur={() => setScanMode(true)}
             onChange={(e) => setFilterValue(e.target.value)}
           >
             <option value="All Products">All Products</option>
@@ -181,11 +192,13 @@ const SalesPointContent = ({
               lightThemeStyle={lightThemeStyle}
               darkThemeStyle={darkThemeStyle}
               workBranch={workBranch}
+              activeMenuItem={activeMenuItem}
             />
           )}
 
           {activeMenuItem === 'Cart' && (
             <Cart
+              products={products}
               cartItems={cartItems}
               setCartItems={setCartItems}
               handleScan={handleScan}

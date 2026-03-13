@@ -8,7 +8,7 @@ const sampleProducts = [
     category: 'Beverages',
     imageURL:
       'https://images.unsplash.com/photo-1597318972412-6db3dd2acf10?w=400&h=400&fit=crop',
-    barcode: '2K5C8AO0542974077',
+    barcode: '28116303288',
     components: [
       {
         categoryName: 'Tea',
@@ -115,7 +115,7 @@ const sampleProducts = [
     category: 'Desserts',
     imageURL:
       'https://images.unsplash.com/photo-1599599810694-f3515314fdd0?w=400&h=400&fit=crop',
-    barcode: '4088600577098',
+    barcode: 'X000NM2HDV',
     components: [
       {
         categoryName: 'Cake Flavour',
@@ -160,7 +160,7 @@ const sampleProducts = [
     category: 'Beverages',
     imageURL:
       'https://images.unsplash.com/photo-1559056199-641a0ac8b8d5?w=400&h=400&fit=crop',
-    barcode: '070657679',
+    barcode: '4061461655389',
     components: [
       {
         categoryName: 'Roast Level',

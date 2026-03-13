@@ -32,6 +32,7 @@ const SalesPointProducts = ({
   searchCustomerRef,
   workBranch,
   mode,
+  activeMenuItem,
   lightThemeStyle,
   darkThemeStyle,
 }) => {
@@ -39,14 +40,29 @@ const SalesPointProducts = ({
 
   // always focus scanMode
   useEffect(() => {
-    if (scanMode && workBranch) {
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 500);
+    if (
+      !scanMode ||
+      activeMenuItem !== 'Sales Items' ||
+      !workBranch ||
+      selectedProduct
+    ) {
+      return;
     }
-  }, [scanMode, workBranch]);
+
+    const focusScannerInput = () => {
+      window.requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    };
+
+    const timeoutId = window.setTimeout(focusScannerInput, 0);
+    window.addEventListener('focus', focusScannerInput);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('focus', focusScannerInput);
+    };
+  }, [scanMode, activeMenuItem, workBranch, selectedProduct, cartItems]);
 
   const handleProductClick = (product) => {
     if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
@@ -95,6 +111,7 @@ const SalesPointProducts = ({
             onBlur={(e) => {
               if (
                 scanMode &&
+                !selectedProduct &&
                 e.relatedTarget !== searchRef.current &&
                 e.relatedTarget !== filterRef.current &&
                 e.relatedTarget !== searchCustomerRef.current

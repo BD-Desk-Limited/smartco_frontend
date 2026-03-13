@@ -6,12 +6,14 @@ const sampleCustomers = [
     name: 'John Doe',
     phone: '123-456-7890',
     email: 'johndoe@example.com',
+    lastVisited: '2024-05-15T14:48:00.000Z',
+    imageUrl: 'https://via.placeholder.com/100',
     claims: [
       {
         type: 'cash-discount',
         offers: [
           {
-            id: 1,
+            _id: 1,
             type: 'Discount',
             description: '10% off on next purchase',
             expiryDate: '2024-12-31',
@@ -21,7 +23,7 @@ const sampleCustomers = [
             effectiveDate: '2024-01-01',
           },
           {
-            id: 2,
+            _id: 2,
             type: 'Cashback',
             description: ' £5 cashback on next purchase',
             expiryDate: '2024-12-31',
@@ -36,26 +38,26 @@ const sampleCustomers = [
         type: 'free-product',
         offers: [
           {
-            id: 3,
+            _id: 3,
             type: 'Free Product',
             description: 'Get a free coffee mug with your next purchase',
             expiryDate: '2024-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
-              id: 101,
+              _id: 3,
               quantity: 1,
             },
           },
           {
-            id: 4,
+            _id: 4,
             type: 'Free Product',
             description: 'Get a free tote bag with your next purchase',
             expiryDate: '2024-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
-              id: 102,
+              _id: 2,
               quantity: 1,
             },
           },
@@ -68,12 +70,14 @@ const sampleCustomers = [
     name: 'Jane Smith',
     phone: '987-654-3210',
     email: 'janesmith@example.com',
+    lastVisited: '2024-05-10T10:30:00.000Z',
+    imageUrl: 'https://via.placeholder.com/100',
     claims: [
       {
         type: 'cash-discount',
         offers: [
           {
-            id: 5,
+            _id: 5,
             type: 'Discount',
             description: '15% off on next purchase',
             expiryDate: '2024-12-31',
@@ -88,14 +92,14 @@ const sampleCustomers = [
         type: 'free-product',
         offers: [
           {
-            id: 6,
+            _id: 6,
             type: 'Free Product',
             description: 'Get a free keychain with your next purchase',
             expiryDate: '2024-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
-              id: 103,
+              _id: 3,
               quantity: 1,
             },
           },

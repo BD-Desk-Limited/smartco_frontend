@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaBarcode } from 'react-icons/fa';
 import CustomerLookUp from './CustomerLookUp';
-import { fetchCustomerData } from '../customers/sampleData';
+import { fetchCustomerData } from './sampleData';
 
 const Cart = ({
+  products,
   cartItems,
   setCartItems,
   setActiveMenuItem,
@@ -30,14 +31,28 @@ const Cart = ({
 
   // always focus scanMode
   useEffect(() => {
-    if (scanMode && workBranch) {
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 500);
-    }
-  }, [scanMode, workBranch]);
+    if (!scanMode || !workBranch) return;
+
+    const focusScannerInput = () => {
+      window.requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    };
+
+    const timeoutId = window.setTimeout(focusScannerInput, 0);
+    window.addEventListener('focus', focusScannerInput);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('focus', focusScannerInput);
+    };
+  }, [scanMode, workBranch, cartItems]);
+
+  useEffect(() => {
+    return () => {
+      setScanMode(true);
+    };
+  }, [setScanMode]);
 
   // if cart is empty, switch to sales items
   useEffect(() => {
@@ -80,6 +95,8 @@ const Cart = ({
   const handleOpenOverlayForScanning = () => {
     searchCustomerRef.current?.focus();
     setCustomerSearchTerm('');
+    setCustomerData({});
+    setCustomerFetchError('');
     setIsOpenCustomerOverlay(true);
     setAwaitingScanForCustomer(true);
   };
@@ -90,6 +107,7 @@ const Cart = ({
     setCustomerFetchError('');
     setCustomerData({});
     setCustomerSearchTerm('');
+    setScanMode(true);
   };
 
   console.log('CART:', cartItems);
@@ -140,6 +158,11 @@ const Cart = ({
                       value={customerSearchTerm}
                       onChange={(e) => setCustomerSearchTerm(e.target.value)}
                       onFocus={() => setScanMode(false)}
+                      onBlur={(e) => {
+                        if (!e.currentTarget.form?.contains(e.relatedTarget)) {
+                          setScanMode(true);
+                        }
+                      }}
                       ref={searchCustomerRef}
                       placeholder="Search customer ID, name or email..."
                       className={`w-80 bg-inherit p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green`}
@@ -183,6 +206,7 @@ const Cart = ({
           onClick={handleClose}
         >
           <CustomerLookUp
+            products={products}
             mode={mode}
             lightThemeStyle={lightThemeStyle}
             darkThemeStyle={darkThemeStyle}
