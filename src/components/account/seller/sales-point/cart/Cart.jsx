@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaBarcode } from 'react-icons/fa';
 import CustomerLookUp from './CustomerLookUp';
 import { fetchCustomerData } from './sampleData';
+import CartProductList from './CartProductList';
 
 const Cart = ({
   products,
@@ -28,6 +29,7 @@ const Cart = ({
   const [loading, setLoading] = useState(false);
   const [customerFetchError, setCustomerFetchError] = useState('');
   const [awaitingScanForCustomer, setAwaitingScanForCustomer] = useState(false);
+  const [appliedOffers, setAppliedOffers] = useState([]);
 
   // always focus scanMode
   useEffect(() => {
@@ -64,6 +66,12 @@ const Cart = ({
   const handleCustomerSearch = async (e) => {
     e.preventDefault();
     if (customerSearchTerm.trim() === '' || loading) return;
+
+    //if offline, show error message saying customer data cannot be fetched while offline
+    if (!navigator.onLine) {
+      setCustomerFetchError('Sorry, cannot fetch customer data while offline.');
+      return;
+    }
 
     try {
       //fetch customer data, using searchterm
@@ -111,6 +119,7 @@ const Cart = ({
   };
 
   console.log('CART:', cartItems);
+  console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
     <div className="h-full rounded-lg">
@@ -194,8 +203,19 @@ const Cart = ({
                   </span>
                 </button>
               </form>
+              <CartProductList
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                mode={mode}
+                lightThemeStyle={lightThemeStyle}
+                darkThemeStyle={darkThemeStyle}
+              />
             </div>
-            <div className="w-2/5 bg-text-white h-full rounded-lg mx-3">b</div>
+
+            {/* Bill summary and offers section */}
+            <div className="w-2/5 bg-text-white h-full rounded-lg mx-3">
+              {`bill with applied offers ${appliedOffers?.length}`}
+            </div>
           </div>
         )}
       </div>
@@ -213,6 +233,8 @@ const Cart = ({
             setIsOpenCustomerOverlay={setIsOpenCustomerOverlay}
             handleClose={handleClose}
             loading={loading}
+            appliedOffers={appliedOffers}
+            setAppliedOffers={setAppliedOffers}
             customerData={customerData}
             customerFetchError={customerFetchError}
             setCustomerData={setCustomerData}

@@ -1,4 +1,4 @@
-import React, { use, useEffect } from 'react';
+import React from 'react';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
 import SalesPoint from './sales-items/SalesPoint';
@@ -12,7 +12,7 @@ import ShiftManagement from './shift-management/ShiftManagement';
 const SalesPointPage = () => {
   const router = useRouter();
   const { companyData } = useCompanyData();
-  const { user, logOutSalesPoint, isLoading } = useAuth();
+  const { user, setUser, logOutSalesPoint, isLoading } = useAuth();
   const [mode, setMode] = React.useState('light');
   const [activeMenuItem, setActiveMenuItem] = React.useState('Sales Items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
@@ -22,6 +22,7 @@ const SalesPointPage = () => {
   const [deviceNotAuthorizedForAnyBranch, setDeviceNotAuthorizedForAnyBranch] =
     React.useState(false);
   const [workBranch, setWorkBranch] = React.useState(null);
+
   const menuItems = [
     {
       name: 'Sales Items',
@@ -64,17 +65,53 @@ const SalesPointPage = () => {
     [companyData?.allowedBranches]
   );
 
+  //generate work-branch key for localStorage based on user and device to prevent conflicts when user has access to same branch from multiple devices or multiple users use the same device
+  const workBranchKey = `workBranch_${user?._id}`;
+
+  const canUseBranch = (branchId) => {
+    if (!branchId) return false;
+
+    if (Array.isArray(user?.branch)) {
+      return user.branch?.includes(branchId);
+    }
+
+    return false;
+  };
+
+  // Sync auth state on component mount to handle cases where user might have logged in from another tab or refreshed the page
+  React.useEffect(() => {
+    if (isLoading) return; // Wait for auth state to finish loading
+
+    const checkWorkBranchInLocalStorage = () => {
+      const existingWorkBranch = localStorage.getItem(workBranchKey);
+      const parsedWorkBranch = existingWorkBranch
+        ? JSON.parse(existingWorkBranch)
+        : null;
+      if (
+        parsedWorkBranch &&
+        user.branch?.includes(parsedWorkBranch._id) &&
+        branchesAccessibleOnDevice?.some(
+          (branch) => branch._id === parsedWorkBranch._id
+        )
+      ) {
+        setWorkBranch(parsedWorkBranch);
+      }
+    };
+
+    checkWorkBranchInLocalStorage();
+  }, [user, isLoading, branchesAccessibleOnDevice, workBranchKey]);
+
   const darkThemeStyle = `bg-[#242424] text-text-white`;
   const lightThemeStyle = `bg-white text-text-black`;
 
   const handleWorkBranchSelect = (branch_obj) => {
     // check if user has access to the branch
-    if (!user?.branch?.includes(branch_obj?._id)) {
+    if (!canUseBranch(branch_obj?._id)) {
       setUserBranchAccessWarning(true);
       setUserBranchAccessWarningBranch(branch_obj);
     } else {
       setWorkBranch(branch_obj);
-      sessionStorage.setItem('work-branch', branch_obj._id);
+      localStorage.setItem(workBranchKey, JSON.stringify(branch_obj));
     }
   };
 
@@ -94,14 +131,23 @@ const SalesPointPage = () => {
   React.useEffect(() => {
     if (branchesAccessibleOnDevice?.length === 1) {
       const singleBranch = branchesAccessibleOnDevice[0];
-      if (user?.branch?.includes(singleBranch._id)) {
+      let userHasAccess = false;
+
+      if (Array.isArray(user?.branch)) {
+        userHasAccess = user.branch?.includes(singleBranch._id);
+      }
+
+      if (userHasAccess) {
         setWorkBranch(singleBranch);
-        sessionStorage.setItem('work-branch', singleBranch._id);
+        localStorage.setItem(workBranchKey, JSON.stringify(singleBranch));
+      } else {
+        setUserBranchAccessWarning(true);
+        setUserBranchAccessWarningBranch(singleBranch);
       }
     }
-  }, [branchesAccessibleOnDevice, user, isLoading]);
+  }, [branchesAccessibleOnDevice, user, workBranchKey]);
 
-  if (!companyData || !companyData.allowedBranches) {
+  if (!companyData || !companyData.allowedBranches || isLoading || !user) {
     return <Spinner />;
   }
 
@@ -110,7 +156,7 @@ const SalesPointPage = () => {
       className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
       {/* Select Branch */}
-      {branchesAccessibleOnDevice.length > 0 && !workBranch?._id && (
+      {branchesAccessibleOnDevice.length > 0 && !workBranch && (
         <div
           className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
         >

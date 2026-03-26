@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCompanyData } from '@/contexts/companyDataContext';
+import { useInternetStatus } from '@/contexts/internetStatusContext';
 import Spinner from '../account/Spinner';
 
 const Welcome = () => {
   const router = useRouter();
   const isMountedRef = React.useRef(false);
   const { companyData } = useCompanyData();
+  const { internetStatus } = useInternetStatus();
   const [isMounted, setIsMounted] = useState(false);
 
   // wait for company data and component to load before checking authorization
@@ -22,7 +24,16 @@ const Welcome = () => {
   }, []);
 
   useEffect(() => {
-    if (isMountedRef.current && companyData && companyData.isLoaded) {
+    if (isMountedRef.current && companyData?.isLoaded) {
+      if (!companyData?.authorizationToken) {
+        router.push('/pages/auth/login');
+        return;
+      }
+
+      if (internetStatus === 'offline') {
+        return;
+      }
+
       // Check if the company data is available
       const authorize = async () => {
         try {
@@ -50,14 +61,20 @@ const Welcome = () => {
 
           setIsMounted(true); //if the device is authorized, allow mounting the component
         } catch (error) {
-          console.error(error);
+          console.error(error, 'Error checking device authorization');
+
+          if (companyData?.authorizationToken) {
+            setIsMounted(true);
+            return;
+          }
+
           router.push('/pages/auth/login');
         }
       };
 
       authorize();
     }
-  }, [router, companyData]);
+  }, [router, companyData, internetStatus]);
 
   const divStyle = {
     backgroundImage: `url('/images/welcome.png')`,
@@ -68,8 +85,11 @@ const Welcome = () => {
     width: '100vw',
   };
 
+  const canRenderOffline =
+    internetStatus === 'offline' && !!companyData?.authorizationToken;
+
   // Check if the component is mounted before rendering
-  if (!isMounted || !companyData.isLoaded) {
+  if ((!isMounted && !canRenderOffline) || !companyData?.isLoaded) {
     return <Spinner />;
   }
 

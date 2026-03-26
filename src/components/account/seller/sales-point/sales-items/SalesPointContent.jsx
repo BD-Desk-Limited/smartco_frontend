@@ -214,6 +214,7 @@ const SalesPointContent = ({
               mode={mode}
               lightThemeStyle={lightThemeStyle}
               darkThemeStyle={darkThemeStyle}
+              handleAddToCart={handleAddToCart}
             />
           )}
 

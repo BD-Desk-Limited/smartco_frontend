@@ -11,6 +11,7 @@ const sampleProducts = [
     barcode: '28116303288',
     components: [
       {
+        _id: 1,
         categoryName: 'Tea',
         isOptional: false,
         materialChoices: [
@@ -47,6 +48,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Milk',
         isOptional: false,
         materialChoices: [
@@ -73,6 +75,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 3,
         categoryName: 'Sweetener',
         isOptional: true,
         materialChoices: [
@@ -118,6 +121,7 @@ const sampleProducts = [
     barcode: 'X000NM2HDV',
     components: [
       {
+        _id: 1,
         categoryName: 'Cake Flavour',
         isOptional: false,
         materialChoices: [
@@ -163,6 +167,7 @@ const sampleProducts = [
     barcode: '4061461655389',
     components: [
       {
+        _id: 1,
         categoryName: 'Roast Level',
         isOptional: false,
         materialChoices: [
@@ -214,6 +219,7 @@ const sampleProducts = [
     barcode: '07065767989',
     components: [
       {
+        _id: 1,
         categoryName: 'Milk Foam Level',
         isOptional: false,
         materialChoices: [
@@ -245,6 +251,7 @@ const sampleProducts = [
     barcode: '2021222324',
     components: [
       {
+        _id: 1,
         categoryName: 'Coffee Type',
         isOptional: false,
         materialChoices: [
@@ -286,6 +293,7 @@ const sampleProducts = [
     barcode: '2526272829',
     components: [
       {
+        _id: 1,
         categoryName: 'Filling',
         isOptional: true,
         materialChoices: [
@@ -337,6 +345,7 @@ const sampleProducts = [
     barcode: '3031323334',
     components: [
       {
+        _id: 1,
         categoryName: 'Protein',
         isOptional: false,
         materialChoices: [
@@ -373,6 +382,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Cheese',
         isOptional: true,
         materialChoices: [
@@ -414,6 +424,7 @@ const sampleProducts = [
     barcode: '3536373839',
     components: [
       {
+        _id: 1,
         categoryName: 'Protein Add-on',
         isOptional: true,
         materialChoices: [
@@ -440,6 +451,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Dressing',
         isOptional: false,
         materialChoices: [
@@ -481,6 +493,7 @@ const sampleProducts = [
     barcode: '4041424344',
     components: [
       {
+        _id: 1,
         categoryName: 'Meat Patty',
         isOptional: false,
         materialChoices: [
@@ -507,6 +520,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Toppings',
         isOptional: true,
         materialChoices: [
@@ -558,6 +572,7 @@ const sampleProducts = [
     barcode: '4546474849',
     components: [
       {
+        _id: 1,
         categoryName: 'Crust Type',
         isOptional: false,
         materialChoices: [
@@ -609,6 +624,7 @@ const sampleProducts = [
     barcode: '5051525354',
     components: [
       {
+        _id: 1,
         categoryName: 'Topping',
         isOptional: true,
         materialChoices: [
@@ -660,6 +676,7 @@ const sampleProducts = [
     barcode: '5556575859',
     components: [
       {
+        _id: 1,
         categoryName: 'Base Flavour',
         isOptional: false,
         materialChoices: [
@@ -711,6 +728,7 @@ const sampleProducts = [
     barcode: '6061626364',
     components: [
       {
+        _id: 1,
         categoryName: 'Syrup Type',
         isOptional: true,
         materialChoices: [
@@ -762,6 +780,7 @@ const sampleProducts = [
     barcode: '6566676869',
     components: [
       {
+        _id: 1,
         categoryName: 'Topping',
         isOptional: false,
         materialChoices: [
@@ -813,6 +832,7 @@ const sampleProducts = [
     barcode: '7071727374',
     components: [
       {
+        _id: 1,
         categoryName: 'Main Filling',
         isOptional: false,
         materialChoices: [
@@ -864,6 +884,7 @@ const sampleProducts = [
     barcode: '7576777879',
     components: [
       {
+        _id: 1,
         categoryName: 'Sweetness Level',
         isOptional: false,
         materialChoices: [
@@ -915,6 +936,7 @@ const sampleProducts = [
     barcode: '8081828384',
     components: [
       {
+        _id: 1,
         categoryName: 'Glazing Flavour',
         isOptional: false,
         materialChoices: [
@@ -956,6 +978,7 @@ const sampleProducts = [
     barcode: '8586878889',
     components: [
       {
+        _id: 1,
         categoryName: 'Tea Flavour',
         isOptional: false,
         materialChoices: [
@@ -1007,6 +1030,7 @@ const sampleProducts = [
     barcode: '9091929394',
     components: [
       {
+        _id: 1,
         categoryName: 'Cookie Type',
         isOptional: false,
         materialChoices: [
@@ -1048,6 +1072,7 @@ const sampleProducts = [
     barcode: '9596979899',
     components: [
       {
+        _id: 1,
         categoryName: 'Marshmallow Option',
         isOptional: true,
         materialChoices: [
@@ -1099,6 +1124,7 @@ const sampleProducts = [
     barcode: '0102030405',
     components: [
       {
+        _id: 1,
         categoryName: 'Bagel Type',
         isOptional: false,
         materialChoices: [
@@ -1135,6 +1161,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Spread',
         isOptional: false,
         materialChoices: [
@@ -1176,6 +1203,7 @@ const sampleProducts = [
     barcode: '0607080910',
     components: [
       {
+        _id: 1,
         categoryName: 'Flavour',
         isOptional: false,
         materialChoices: [
@@ -1227,6 +1255,7 @@ const sampleProducts = [
     barcode: '1112131415',
     components: [
       {
+        _id: 1,
         categoryName: 'Add-ons',
         isOptional: true,
         materialChoices: [
@@ -1278,6 +1307,7 @@ const sampleProducts = [
     barcode: '1617181920',
     components: [
       {
+        _id: 1,
         categoryName: 'Protein Add-on',
         isOptional: true,
         materialChoices: [
@@ -1329,6 +1359,7 @@ const sampleProducts = [
     barcode: '2122232425',
     components: [
       {
+        _id: 1,
         categoryName: 'Cheese Type',
         isOptional: false,
         materialChoices: [
@@ -1380,6 +1411,7 @@ const sampleProducts = [
     barcode: '2627282930',
     components: [
       {
+        _id: 1,
         categoryName: 'Portion Size',
         isOptional: false,
         materialChoices: [
@@ -1421,6 +1453,7 @@ const sampleProducts = [
     barcode: '3132333435',
     components: [
       {
+        _id: 1,
         categoryName: 'Chocolate Level',
         isOptional: false,
         materialChoices: [
@@ -1472,6 +1505,7 @@ const sampleProducts = [
     barcode: '3637383940',
     components: [
       {
+        _id: 1,
         categoryName: 'Dressing',
         isOptional: true,
         materialChoices: [
@@ -1523,6 +1557,7 @@ const sampleProducts = [
     barcode: '4142434445',
     components: [
       {
+        _id: 1,
         categoryName: 'Topping',
         isOptional: true,
         materialChoices: [
@@ -1574,6 +1609,7 @@ const sampleProducts = [
     barcode: '4647484950',
     components: [
       {
+        _id: 1,
         categoryName: 'Protein Type',
         isOptional: false,
         materialChoices: [
@@ -1610,6 +1646,7 @@ const sampleProducts = [
         ],
       },
       {
+        _id: 2,
         categoryName: 'Flavour',
         isOptional: false,
         materialChoices: [

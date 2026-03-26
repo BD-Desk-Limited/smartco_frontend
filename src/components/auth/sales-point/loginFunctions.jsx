@@ -92,13 +92,24 @@ const handleOnlineLogin = async (
     const response = await salesPointLoginService(body);
 
     if (response.error) {
+      const hasOfflineAccess = !!localStorage.getItem(`token_${body.staffId}`);
+      if (hasOfflineAccess) {
+        await handleOfflineLogin(
+          body,
+          setUser,
+          companyData,
+          router,
+          setError,
+          toggleUserMode
+        );
+        return;
+      }
       setError(response?.error);
       return;
     }
 
     if (response?.data) {
       setUser(response?.data?.user);
-
       const publicKey = response?.data?.publicKey;
 
       //save public key and token to local storage
@@ -144,6 +155,18 @@ const handleOnlineLogin = async (
       router.push('/pages/account/sales-point');
     }
   } catch (error) {
+    const hasOfflineAccess = !!localStorage.getItem(`token_${body.staffId}`);
+    if (hasOfflineAccess) {
+      await handleOfflineLogin(
+        body,
+        setUser,
+        companyData,
+        router,
+        setError,
+        toggleUserMode
+      );
+      return;
+    }
     setError(
       error?.message || 'An unexpected error occurred. Please try again.'
     );
@@ -190,6 +213,7 @@ const handleOfflineLogin = async (
       );
       return;
     }
+
     // Login success
     await setUserFromPayload(payload, body, setUser);
 
@@ -237,10 +261,13 @@ export const login = async (
     return;
   }
 
+  const isOnline = navigator.onLine;
+
   try {
     setLoading(true);
     //check if online or offline
-    if (navigator.onLine) {
+    if (isOnline) {
+      console.log('Attempting online login, its online', isOnline);
       await handleOnlineLogin(
         body,
         companyData,
@@ -250,6 +277,7 @@ export const login = async (
         toggleUserMode
       );
     } else {
+      console.log('Attempting offline login, its offline', isOnline);
       await handleOfflineLogin(
         body,
         setUser,

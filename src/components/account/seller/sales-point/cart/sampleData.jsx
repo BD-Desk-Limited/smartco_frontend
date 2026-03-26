@@ -10,11 +10,11 @@ const sampleCustomers = [
     imageUrl: 'https://via.placeholder.com/100',
     claims: [
       {
-        type: 'cash-discount',
+        type: 'cash',
         offers: [
           {
             _id: 1,
-            type: 'Discount',
+            type: 'discount',
             description: '10% off on next purchase',
             expiryDate: '2024-12-31',
             percentageDiscount: 10,
@@ -24,9 +24,9 @@ const sampleCustomers = [
           },
           {
             _id: 2,
-            type: 'Cashback',
+            type: 'cashback',
             description: ' £5 cashback on next purchase',
-            expiryDate: '2024-12-31',
+            expiryDate: '2026-12-31',
             percentageDiscount: 0,
             amountDiscount: 5,
             status: 'active',
@@ -35,30 +35,44 @@ const sampleCustomers = [
         ],
       },
       {
-        type: 'free-product',
+        type: 'product',
         offers: [
           {
             _id: 3,
-            type: 'Free Product',
-            description: 'Get a free coffee mug with your next purchase',
-            expiryDate: '2024-12-31',
+            description: 'Get a free expresso coffee with your next purchase',
+            expiryDate: '2026-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
               _id: 3,
               quantity: 1,
+              allowedComponents: [
+                {
+                  _id: 1,
+                  allowedMaterialChoices: [1, 2],
+                },
+              ],
             },
           },
           {
             _id: 4,
-            type: 'Free Product',
             description: 'Get a free tote bag with your next purchase',
             expiryDate: '2024-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
               _id: 2,
-              quantity: 1,
+              quantity: 2,
+              allowedComponents: [
+                {
+                  _id: 1,
+                  allowedMaterialChoices: [4, 5],
+                },
+                {
+                  _id: 6,
+                  allowedMaterialChoices: [6, 7],
+                },
+              ],
             },
           },
         ],
@@ -74,11 +88,10 @@ const sampleCustomers = [
     imageUrl: 'https://via.placeholder.com/100',
     claims: [
       {
-        type: 'cash-discount',
+        type: 'cash',
         offers: [
           {
             _id: 5,
-            type: 'Discount',
             description: '15% off on next purchase',
             expiryDate: '2024-12-31',
             percentageDiscount: 15,
@@ -89,18 +102,31 @@ const sampleCustomers = [
         ],
       },
       {
-        type: 'free-product',
+        type: 'product',
         offers: [
           {
             _id: 6,
-            type: 'Free Product',
             description: 'Get a free keychain with your next purchase',
             expiryDate: '2024-12-31',
             status: 'active',
             effectiveDate: '2024-01-01',
             freeProduct: {
-              _id: 3,
+              _id: 2,
               quantity: 1,
+              allowedComponents: [
+                {
+                  _id: 1,
+                  allowedMaterialChoices: [99, 2, 3],
+                },
+                {
+                  _id: 2,
+                  allowedMaterialChoices: [4, 5],
+                },
+                {
+                  _id: 6,
+                  allowedMaterialChoices: [6, 7],
+                },
+              ],
             },
           },
         ],

@@ -51,9 +51,16 @@ const SalesPoint = ({
     setOpenSelectProductComponents(false);
   };
 
-  const handleAddToCart = (product, choices, quantity) => {
+  const handleAddToCart = (
+    product,
+    choices,
+    quantity,
+    isPromoOffer = false
+  ) => {
     // construct cart
     const newProduct = {
+      cartItemId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      isPromo: isPromoOffer || false,
       product: product,
       quantity: quantity,
       choices: Object.entries(choices).map(([_, choice]) => ({
@@ -82,7 +89,7 @@ const SalesPoint = ({
       // replace the existing item in cart with the updated one
       setCartItems((prev) => {
         const filtered = prev.filter((item) => item !== existingInCart);
-        return [...filtered, { ...existingInCart, quantity: updatedQuantity }];
+        return [{ ...existingInCart, quantity: updatedQuantity }, ...filtered];
       });
     } else {
       setCartItems((prev) => [newProduct, ...prev]);

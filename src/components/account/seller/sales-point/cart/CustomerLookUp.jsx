@@ -7,15 +7,19 @@ import {
   FaArrowDown,
   FaArrowLeft,
   FaCreditCard,
+  FaExclamationCircle,
   FaGift,
   FaUserCircle,
 } from 'react-icons/fa';
+import SelectOfferComponent from './SelectOfferComponent';
 
 const CustomerLookUp = ({
   products,
   mode,
   lightThemeStyle,
   darkThemeStyle,
+  appliedOffers,
+  setAppliedOffers,
   customerData,
   customerFetchError,
   setCustomerFetchError,
@@ -27,6 +31,9 @@ const CustomerLookUp = ({
   loading,
 }) => {
   const [tabs, setTabs] = useState({});
+  const [openSelectOfferComponent, setOpenSelectOfferComponent] =
+    useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   const handleCloseIfNotScanning = (e) => {
     e.stopPropagation();
@@ -35,6 +42,9 @@ const CustomerLookUp = ({
       setIsOpenCustomerOverlay(false);
       setCustomerFetchError('');
       setCustomerData({});
+      setOpenSelectOfferComponent(false);
+      setSelectedOffer(null);
+      setAppliedOffers([]);
     }
   };
 
@@ -44,14 +54,44 @@ const CustomerLookUp = ({
 
   const handleLinkCustomerAndClaim = () => {
     // TODO: Function to link customer to current sale and apply any relevant claims
-    alert(`Customer ${customerData.name} linked to sale!`);
+    alert(`Customer ${customerData?.name} linked to sale!`);
     handleClose();
   };
 
-  const handleApplyOffer = (offer) => {
-    // TODO: Function to apply offer to current sale
-    alert(`Applied offer: ${offer.description}`);
+  const offerIsExpired = (offer) => {
+    const currentDate = new Date();
+    const expiryDate = new Date(offer.expiryDate);
+    return currentDate > expiryDate;
   };
+
+  const handleApplyOffer = (offer, type, productDetails = {}) => {
+    if (type === 'cash') {
+      if (appliedOffers.some((o) => o._id === offer._id)) {
+        return;
+      } else {
+        setAppliedOffers((prev) => [...prev, { ...offer, type }]);
+      }
+    } else if (type === 'product') {
+      if (appliedOffers.some((o) => o._id === offer._id)) {
+        return;
+      } else {
+        setAppliedOffers((prev) => [
+          ...prev,
+          { ...offer, type, productDetails },
+        ]);
+      }
+    }
+  };
+
+  const handleRemoveAppliedOffer = (offerId) => {
+    setAppliedOffers((prev) => prev.filter((offer) => offer._id !== offerId));
+  };
+
+  const handleOpenSelectProductOfferComponent = (offer, type) => {
+    setOpenSelectOfferComponent(true);
+    setSelectedOffer({ ...offer, type });
+  };
+  console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
     <div
@@ -189,7 +229,7 @@ const CustomerLookUp = ({
                                 )}
                                 <div className="flex flex-col gap-1">
                                   <span className="font-semibold">
-                                    {offer.type}
+                                    {claim?.type}
                                   </span>
                                   <p>{offer.description}</p>
                                   <p className="text-sm text-text-gray">
@@ -200,11 +240,68 @@ const CustomerLookUp = ({
                                   </p>
                                 </div>
 
-                                <span
-                                  className="bg-green-shadow7 font-thin hover:bg-green-shadow3 text-brand-green transition-colors duration-200 p-1 rounded-md cursor-pointer"
-                                  onClick={() => handleApplyOffer(offer)}
-                                >
-                                  Apply
+                                <span className="flex flex-col items-end gap-2">
+                                  {/* Apply Offer Button */}
+                                  {offerIsExpired(offer) ? (
+                                    <span className="text-red-500 flex items-center">
+                                      <FaExclamationCircle
+                                        className={`${mode !== 'light' ? 'text-text-white' : 'text-error'} mr-1`}
+                                      />
+                                      Expired
+                                    </span>
+                                  ) : (
+                                    <>
+                                      <span
+                                        className={`bg-green-shadow7 font-thin hover:bg-green-shadow3 text-brand-green transition-colors duration-200 p-1 rounded-md  ${
+                                          appliedOffers.some(
+                                            (o) => o._id === offer._id
+                                          )
+                                            ? 'cursor-not-allowed opacity-50'
+                                            : 'cursor-pointer'
+                                        }`}
+                                        onClick={
+                                          appliedOffers.some(
+                                            (o) => o._id === offer._id
+                                          )
+                                            ? null
+                                            : claim?.type === 'product'
+                                              ? () =>
+                                                  handleOpenSelectProductOfferComponent(
+                                                    offer,
+                                                    claim?.type
+                                                  )
+                                              : () =>
+                                                  handleApplyOffer(
+                                                    offer,
+                                                    claim?.type
+                                                  )
+                                        }
+                                        disabled={appliedOffers.some(
+                                          (o) => o._id === offer._id
+                                        )}
+                                      >
+                                        {appliedOffers.some(
+                                          (o) => o._id === offer._id
+                                        )
+                                          ? 'Applied..'
+                                          : 'Apply'}
+                                      </span>
+                                    </>
+                                  )}
+
+                                  {/* Remove applied offer button */}
+                                  {appliedOffers.some(
+                                    (o) => o._id === offer._id
+                                  ) && (
+                                    <button
+                                      className="text-sm text-error hover:font-semibold transition-colors duration-200 p-1 rounded-md"
+                                      onClick={() =>
+                                        handleRemoveAppliedOffer(offer._id)
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  )}
                                 </span>
                               </div>
                             ))}
@@ -230,6 +327,24 @@ const CustomerLookUp = ({
             <FaCreditCard className="mr-2 text-9xl" />
             <span className="animate-pulse">Waiting for card scan...</span>
           </span>
+        </div>
+      )}
+
+      {/* if offer is a product offer, allow user select allowed product components. Overlay */}
+      {openSelectOfferComponent && selectedOffer && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 flex items-center justify-center z-50 rounded-lg">
+          <SelectOfferComponent
+            onClose={() => setOpenSelectOfferComponent(false)}
+            products={products}
+            selectedOffer={selectedOffer}
+            offerType={'product'}
+            handleApplyOffer={handleApplyOffer}
+            appliedOffers={appliedOffers}
+            setAppliedOffers={setAppliedOffers}
+            mode={mode}
+            lightThemeStyle={lightThemeStyle}
+            darkThemeStyle={darkThemeStyle}
+          />
         </div>
       )}
 
