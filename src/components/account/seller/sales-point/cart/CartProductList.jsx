@@ -3,6 +3,7 @@ import React from 'react';
 import {
   FaExpeditedssl,
   FaMinus,
+  FaMoneyCheckAlt,
   FaPlus,
   FaShoppingBag,
   FaTrashAlt,
@@ -11,30 +12,14 @@ import {
 const CartProductList = ({
   cartItems,
   setCartItems,
+  itemTotalCost,
+  itemUnitCost,
+  productItemTax,
+  taxfreeProduct,
   mode,
   lightThemeStyle,
   darkThemeStyle,
 }) => {
-  const handleOptionAdditionalCost = (item) => {
-    const optionAdditionalCost = item?.choices?.reduce((acc, obj) => {
-      const additionalCost = obj.choice?.additionalPrice || 0;
-      return acc + additionalCost;
-    }, 0);
-    return optionAdditionalCost;
-  };
-
-  const itemUnitCost = (item) => {
-    const basePrice = item?.product?.price || 0;
-    const itemTotalPrice = basePrice + handleOptionAdditionalCost(item);
-    return itemTotalPrice;
-  };
-
-  const itemTotalCost = (item) => {
-    const unitCost = itemUnitCost(item);
-    const totalCost = unitCost * item.quantity;
-    return totalCost.toFixed(2);
-  };
-
   const handleQuantityIncrease = (item) => {
     setCartItems((prev) =>
       prev.map((cartItem) =>
@@ -58,14 +43,15 @@ const CartProductList = ({
 
   return (
     <div
-      className={`p-1 flex-1 overflow-y-auto max-h-[50vh] scrollbar-thin ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      className={`p-1 ml-5 flex-1 overflow-y-auto max-h-[50vh] scrollbar-thin ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
-      {/* List of cart items, using combination of _id and isPromo flag as key to avoid key conflicts for promo items that are also same as a regular item in the cart */}
-      {cartItems?.map((item) => (
+      {/* List of cart items */}
+      {cartItems?.map((item, index) => (
         <div
           key={item.cartItemId}
-          className={`mb-2 rounded-sm p-1 flex items-center gap-2 shadow-md ${mode === 'light' ? 'bg-gray-shadow10' : 'bg-gray-shadow1'}`}
+          className={`mb-2 border-y rounded-sm p-1 flex items-center gap-2 ${mode === 'light' ? 'bg-gray-shadow10' : 'bg-gray-shadow1'}`}
         >
+          <span className="text-sm pr-2">{index + 1}</span>
           <div className="flex items-center gap-4">
             {item.product?.imageURL ? (
               <Image
@@ -97,7 +83,7 @@ const CartProductList = ({
               <span className="text-sm font-semibold">Quantity</span>
               <button
                 className="hover:bg-green-shadow1 transition-colors duration-200 bg-brand-green rounded-md px-1 py-1"
-                onClick={() => handleQuantityDecrease(item)}
+                onClick={() => handleQuantityDecrease(item)?.toFixed(2)}
               >
                 <FaMinus className={`text-sm text-white`} />
               </button>
@@ -106,7 +92,7 @@ const CartProductList = ({
               </span>
               <button
                 className="hover:bg-green-shadow1 transition-colors duration-200 bg-brand-green rounded-md px-1 py-1"
-                onClick={() => handleQuantityIncrease(item)}
+                onClick={() => handleQuantityIncrease(item)?.toFixed(2)}
               >
                 <FaPlus className={`text-sm text-white`} />
               </button>
@@ -116,16 +102,30 @@ const CartProductList = ({
           <div className="flex flex-col items-center gap-1">
             <p className="font-bold">
               {item?.product?.currency}
-              {itemTotalCost(item)}
+              {itemTotalCost(item)?.toFixed(2)}
             </p>
             <p className="text-sm">
               {item.quantity} x {item?.product?.currency}
-              {itemUnitCost(item)}
+              {itemUnitCost(item)?.toFixed(2)}
             </p>
+            {productItemTax(item) > 0 && !taxfreeProduct(item) && (
+              <p className="text-sm">
+                product tax: {` `}
+                {item.quantity} x {item?.product?.currency}
+                {productItemTax(item)?.toFixed(2)}
+              </p>
+            )}
+
+            {taxfreeProduct(item) && (
+              <p className="text-sm text-brand-green font-semibold flex items-center gap-1">
+                <FaMoneyCheckAlt className="text-brand-green" /> Tax Free
+              </p>
+            )}
 
             {/* Delete button */}
             <button className="hover:animate-pulse cursor-pointer p-1 hover:bg-gray-shadow7 rounded transition-colors duration-200">
               <FaTrashAlt
+                title="remove from cart"
                 className={` text-error transition-transform duration-100`}
                 onClick={() =>
                   setCartItems((prev) =>

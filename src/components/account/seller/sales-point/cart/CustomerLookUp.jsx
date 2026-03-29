@@ -12,6 +12,7 @@ import {
   FaUserCircle,
 } from 'react-icons/fa';
 import SelectOfferComponent from './SelectOfferComponent';
+import LinkedCustomer from './LinkedCustomer';
 
 const CustomerLookUp = ({
   products,
@@ -24,9 +25,11 @@ const CustomerLookUp = ({
   customerFetchError,
   setCustomerFetchError,
   setCustomerData,
+  setLinkedCustomerData,
   setIsOpenCustomerOverlay,
   awaitingScanForCustomer,
   setAwaitingScanForCustomer,
+  linkedCustomerData,
   handleClose,
   loading,
 }) => {
@@ -53,9 +56,9 @@ const CustomerLookUp = ({
   };
 
   const handleLinkCustomerAndClaim = () => {
-    // TODO: Function to link customer to current sale and apply any relevant claims
-    alert(`Customer ${customerData?.name} linked to sale!`);
-    handleClose();
+    //Function to link customer to current sale and apply any relevant claims
+    setLinkedCustomerData({ ...customerData, appliedOffers: appliedOffers });
+    setIsOpenCustomerOverlay(false);
   };
 
   const offerIsExpired = (offer) => {
@@ -91,6 +94,17 @@ const CustomerLookUp = ({
     setOpenSelectOfferComponent(true);
     setSelectedOffer({ ...offer, type });
   };
+
+  // update applied offers in linked customer data when appliedOffers state changes
+  React.useEffect(() => {
+    if (
+      linkedCustomerData?._id === customerData._id &&
+      linkedCustomerData?.appliedOffers !== appliedOffers
+    ) {
+      setLinkedCustomerData((prev) => ({ ...prev, appliedOffers }));
+    }
+  }, [appliedOffers, customerData, linkedCustomerData, setLinkedCustomerData]);
+
   console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
@@ -124,7 +138,7 @@ const CustomerLookUp = ({
                   <span>
                     <p className="font-semibold text-lg">{customerData.name}</p>
                     <p className="text-sm p-1 bg-gray-shadow7 rounded-lg font-mono w-fit bg-opacity-50">
-                      {customerData._id}
+                      {customerData?.customerNumber}
                     </p>
                     <p className="">
                       {customerData.lastVisited ? (
@@ -147,9 +161,14 @@ const CustomerLookUp = ({
                   </span>
                 </span>
                 <Button
-                  text="Link order"
+                  text={
+                    linkedCustomerData?._id === customerData._id &&
+                    linkedCustomerData?.appliedOffers !== appliedOffers
+                      ? 'Update'
+                      : 'Link order'
+                  }
                   onClick={handleLinkCustomerAndClaim}
-                  buttonStyle={`bg-brand-green h-full font-semibold hover:bg-green-shadow3 transition-colors duration-200`}
+                  buttonStyle={`bg-brand-green h-full font-semibold hover:bg-green-shadow3 transition-colors duration-200 `}
                 />
               </div>
               <span className="text-brand-green my-2 flex flex-row items-baseline gap-2">

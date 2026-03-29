@@ -234,6 +234,7 @@ const SalesPointPage = () => {
         lightThemeStyle={lightThemeStyle}
         darkThemeStyle={darkThemeStyle}
         workBranch={workBranch}
+        workBranchKey={workBranchKey}
         logOutSalesPoint={logOutSalesPoint}
       />
     </div>

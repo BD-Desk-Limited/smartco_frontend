@@ -3,6 +3,9 @@ import { FaSearch, FaBarcode } from 'react-icons/fa';
 import CustomerLookUp from './CustomerLookUp';
 import { fetchCustomerData } from './sampleData';
 import CartProductList from './CartProductList';
+import CustomerLinkForm from './CustomerLinkForm';
+import LinkedCustomer from './LinkedCustomer';
+import BillAndSummary from './BillAndSummary';
 
 const Cart = ({
   products,
@@ -25,11 +28,16 @@ const Cart = ({
   const inputRef = useRef(null);
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [customerData, setCustomerData] = useState({});
+  const [linkedCustomerData, setLinkedCustomerData] = useState({});
   const [isOpenCustomerOverlay, setIsOpenCustomerOverlay] = useState(false);
   const [loading, setLoading] = useState(false);
   const [customerFetchError, setCustomerFetchError] = useState('');
   const [awaitingScanForCustomer, setAwaitingScanForCustomer] = useState(false);
   const [appliedOffers, setAppliedOffers] = useState([]);
+  const workBranchVATRate =
+    workBranch && workBranch.taxBand?.rates[0]?.rate
+      ? workBranch.taxBand.rates[0].rate
+      : 0;
 
   // always focus scanMode
   useEffect(() => {
@@ -56,7 +64,7 @@ const Cart = ({
     };
   }, [setScanMode]);
 
-  // if cart is empty, switch to sales items
+  // if cart is empty, switch to sales items tab
   useEffect(() => {
     if (cartItems.length === 0) {
       setActiveMenuItem('Sales Items');
@@ -113,11 +121,59 @@ const Cart = ({
     setAwaitingScanForCustomer(false);
     setIsOpenCustomerOverlay(false);
     setCustomerFetchError('');
-    setCustomerData({});
     setCustomerSearchTerm('');
     setScanMode(true);
   };
 
+  const handleUnlinkCustomer = () => {
+    setCustomerData({});
+    setLinkedCustomerData({});
+    setCustomerFetchError('');
+    setAppliedOffers([]);
+  };
+
+  const handleOptionAdditionalCost = (item) => {
+    const optionAdditionalCost = item?.choices?.reduce((acc, obj) => {
+      const additionalCost = obj.choice?.additionalPrice || 0;
+      return acc + additionalCost;
+    }, 0);
+    return optionAdditionalCost;
+  };
+
+  const itemUnitCost = (item) => {
+    const basePrice = item?.product?.price || 0;
+    const itemTotalPrice = basePrice + handleOptionAdditionalCost(item);
+    return itemTotalPrice;
+  };
+
+  const itemTotalCost = (item) => {
+    const unitCost = itemUnitCost(item);
+    const totalCost = unitCost * item?.quantity;
+    return totalCost;
+  };
+
+  const productItemTax = (item) => {
+    const taxableTaxRate = item?.product?.productTax?.baseTax || 0;
+    const additionalTaxAmount =
+      item?.product?.productTax?.additionalTaxAmount || 0;
+    const unitCost = itemUnitCost(item);
+    const taxAmount = (unitCost * taxableTaxRate) / 100;
+    return taxAmount + additionalTaxAmount;
+  };
+
+  const productsTax = cartItems?.reduce((acc, item) => {
+    return acc + productItemTax(item) * item.quantity;
+  }, 0);
+
+  const subtotal = cartItems?.reduce((acc, item) => {
+    return acc + itemTotalCost(item);
+  }, 0);
+
+  const taxfreeProduct = (item) => {
+    return item?.product?.productTax?.isTaxExcluded || false;
+  };
+
+  console.log('workBranch:', workBranch);
   console.log('CART:', cartItems);
   console.log('APPLIED OFFERS:', appliedOffers);
 
@@ -143,7 +199,9 @@ const Cart = ({
         style={{ position: 'absolute', left: '-9999px' }}
       />
 
-      <div>
+      <div
+        className={`h-full w-full rounded-lg ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      >
         {cartItems.length === 0 ? (
           <div
             className={`w-full h-full flex flex-col items-center justify-center ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
@@ -155,67 +213,56 @@ const Cart = ({
             {/* Cart items list */}
             <div className="w-3/5 h-full rounded-lg mx-3 flex flex-col relative">
               {/* Customer look-up/linking section */}
-              <form
-                onSubmit={handleCustomerSearch}
-                className="p-2 border-b border-gray-border w-full flex flex-row gap-5 items-center sticky top-0 z-10 bg-opacity-95 backdrop-blur-lg"
-              >
-                <div className="flex flex-col font-semibold">
-                  <span>Link a customer to this order</span>
-                  <p className={`w-full flex flex-row items-center py-1`}>
-                    <input
-                      type="text"
-                      value={customerSearchTerm}
-                      onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                      onFocus={() => setScanMode(false)}
-                      onBlur={(e) => {
-                        if (!e.currentTarget.form?.contains(e.relatedTarget)) {
-                          setScanMode(true);
-                        }
-                      }}
-                      ref={searchCustomerRef}
-                      placeholder="Search customer ID, name or email..."
-                      className={`w-80 bg-inherit p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green`}
-                    />
-                    <button
-                      type="submit"
-                      className="bg-gray-shadow6 rounded-md p-3 ml-2 flex items-center justify-center hover:bg-gray-shadow5 transition-colors duration-200"
-                    >
-                      <FaSearch className="text-lg" />
-                    </button>
-                  </p>
-                </div>
-                <span>or</span>
-
-                {/* scan customer card button */}
-                <button
-                  type="submit"
-                  className={`p-2 border border-gray-border rounded-md ${mode === 'light' ? lightThemeStyle : darkThemeStyle} hover:bg-gray-shadow8 transition-colors duration-200 flex flex-col items-center justify-center`}
-                  onClick={handleOpenOverlayForScanning}
-                >
-                  <span className="flex flex-row items-center gap-1 mb-1 scale-105 w-full justify-center">
-                    <FaBarcode className="text-lg" />
-                    <FaBarcode className="text-lg" />
-                    <FaBarcode className="text-lg" />
-                    <FaBarcode className="text-lg" />
-                  </span>
-                  <span className="text-text-gray font-semi-bold">
-                    Scan customer card
-                  </span>
-                </button>
-              </form>
+              {linkedCustomerData &&
+              Object.keys(linkedCustomerData).length > 0 &&
+              linkedCustomerData._id ? (
+                <LinkedCustomer
+                  handleUnlinkCustomer={handleUnlinkCustomer}
+                  linkedCustomerData={linkedCustomerData}
+                  setIsOpenCustomerOverlay={setIsOpenCustomerOverlay}
+                  mode={mode}
+                  lightThemeStyle={lightThemeStyle}
+                  darkThemeStyle={darkThemeStyle}
+                />
+              ) : (
+                <CustomerLinkForm
+                  handleCustomerSearch={handleCustomerSearch}
+                  customerSearchTerm={customerSearchTerm}
+                  setCustomerSearchTerm={setCustomerSearchTerm}
+                  setScanMode={setScanMode}
+                  searchCustomerRef={searchCustomerRef}
+                  mode={mode}
+                  lightThemeStyle={lightThemeStyle}
+                  darkThemeStyle={darkThemeStyle}
+                  handleOpenOverlayForScanning={handleOpenOverlayForScanning}
+                />
+              )}
               <CartProductList
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 mode={mode}
                 lightThemeStyle={lightThemeStyle}
                 darkThemeStyle={darkThemeStyle}
+                productItemTax={productItemTax}
+                itemTotalCost={itemTotalCost}
+                itemUnitCost={itemUnitCost}
+                taxfreeProduct={taxfreeProduct}
               />
             </div>
 
             {/* Bill summary and offers section */}
-            <div className="w-2/5 bg-text-white h-full rounded-lg mx-3">
-              {`bill with applied offers ${appliedOffers?.length}`}
-            </div>
+            <BillAndSummary
+              linkedCustomerData={linkedCustomerData}
+              productsTax={productsTax}
+              subtotal={subtotal}
+              cartItems={cartItems}
+              workBranchVATRate={workBranchVATRate}
+              taxfreeProduct={taxfreeProduct}
+              itemUnitCost={itemUnitCost}
+              mode={mode}
+              lightThemeStyle={lightThemeStyle}
+              darkThemeStyle={darkThemeStyle}
+            />
           </div>
         )}
       </div>
@@ -236,6 +283,8 @@ const Cart = ({
             appliedOffers={appliedOffers}
             setAppliedOffers={setAppliedOffers}
             customerData={customerData}
+            linkedCustomerData={linkedCustomerData}
+            setLinkedCustomerData={setLinkedCustomerData}
             customerFetchError={customerFetchError}
             setCustomerData={setCustomerData}
             setCustomerFetchError={setCustomerFetchError}

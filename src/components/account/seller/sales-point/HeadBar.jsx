@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { motion } from 'framer-motion';
 
@@ -15,15 +15,28 @@ const HeadBar = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const previousCartCountRef = useRef(0);
 
-  useLayoutEffect(() => {
-    if (cartItems.length > previousCartCountRef.current) {
-      setIsAnimating(true);
-      const timer = setTimeout(() => {
-        setIsAnimating(false);
-      }, 600);
+  useEffect(() => {
+    const hasIncreased = cartItems.length > previousCartCountRef.current;
+
+    if (!hasIncreased) {
       previousCartCountRef.current = cartItems.length;
-      return () => clearTimeout(timer);
+      return;
     }
+
+    const startTimer = setTimeout(() => {
+      setIsAnimating(true);
+    }, 0);
+
+    const stopTimer = setTimeout(() => {
+      setIsAnimating(false);
+    }, 600);
+
+    previousCartCountRef.current = cartItems.length;
+
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(stopTimer);
+    };
   }, [cartItems.length]);
 
   return (

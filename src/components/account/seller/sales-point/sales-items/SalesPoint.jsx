@@ -16,6 +16,7 @@ const SalesPoint = ({
   lightThemeStyle,
   darkThemeStyle,
   workBranch,
+  workBranchKey,
 }) => {
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
@@ -135,6 +136,7 @@ const SalesPoint = ({
           setCartItems={setCartItems}
           handleAddToCart={handleAddToCart}
           workBranch={workBranch}
+          workBranchKey={workBranchKey}
         />
       </div>
 

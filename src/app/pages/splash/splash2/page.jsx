@@ -51,6 +51,7 @@ export default function Home() {
             timer = setTimeout(() => {
               if (companyData?.authorizationToken && data?.isAuthorized) {
                 const updatedData = {
+                  ...data.companyData,
                   id: data.companyData.id,
                   authorizationToken: data.companyData.authorizationToken,
                   allowedBranches: data.companyData.allowedBranches,

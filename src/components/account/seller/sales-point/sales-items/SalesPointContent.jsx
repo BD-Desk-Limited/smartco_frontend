@@ -24,6 +24,7 @@ const SalesPointContent = ({
   setCartItems,
   handleAddToCart,
   workBranch,
+  workBranchKey,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterValue, setFilterValue] = useState('All Products');
@@ -215,6 +216,7 @@ const SalesPointContent = ({
               lightThemeStyle={lightThemeStyle}
               darkThemeStyle={darkThemeStyle}
               handleAddToCart={handleAddToCart}
+              workBranchKey={workBranchKey}
             />
           )}
 
