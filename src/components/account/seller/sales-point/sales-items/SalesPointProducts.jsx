@@ -14,8 +14,7 @@ const SalesPointProducts = ({
   filteredProducts,
   selectedProduct,
   setSelectedProduct,
-  quantity,
-  cartItems,
+  cart,
   loading,
   error,
   productCategories,
@@ -62,7 +61,7 @@ const SalesPointProducts = ({
       window.clearTimeout(timeoutId);
       window.removeEventListener('focus', focusScannerInput);
     };
-  }, [scanMode, activeMenuItem, workBranch, selectedProduct, cartItems]);
+  }, [scanMode, activeMenuItem, workBranch, selectedProduct, cart?.items]);
 
   const handleProductClick = (product) => {
     if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
@@ -75,8 +74,8 @@ const SalesPointProducts = ({
       quantity: 0,
     };
     const productIsInCart =
-      cartItems?.length > 0 &&
-      cartItems.filter((item) => item.product?._id === productId);
+      cart?.items?.length > 0 &&
+      cart?.items?.filter((item) => item.product?._id === productId);
     if (productIsInCart && productIsInCart.length > 0) {
       //add quantities of the same product in cart
       const totalQuantity = productIsInCart.reduce(

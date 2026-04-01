@@ -10,8 +10,8 @@ import {
 } from 'react-icons/fa';
 
 const CartProductList = ({
-  cartItems,
-  setCartItems,
+  cart,
+  setCart,
   itemTotalCost,
   itemUnitCost,
   productItemTax,
@@ -21,24 +21,26 @@ const CartProductList = ({
   darkThemeStyle,
 }) => {
   const handleQuantityIncrease = (item) => {
-    setCartItems((prev) =>
-      prev.map((cartItem) =>
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.map((cartItem) =>
         cartItem.cartItemId === item.cartItemId
           ? { ...cartItem, quantity: Number(cartItem.quantity) + 1 }
           : cartItem
-      )
-    );
+      ),
+    }));
   };
 
   const handleQuantityDecrease = (item) => {
     if (item.quantity === 1) return; // prevent quantity from going below 1
-    setCartItems((prev) =>
-      prev.map((cartItem) =>
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.map((cartItem) =>
         cartItem.cartItemId === item.cartItemId
           ? { ...cartItem, quantity: Number(cartItem.quantity) - 1 }
           : cartItem
-      )
-    );
+      ),
+    }));
   };
 
   return (
@@ -46,7 +48,7 @@ const CartProductList = ({
       className={`p-1 ml-5 flex-1 overflow-y-auto max-h-[50vh] scrollbar-thin ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
       {/* List of cart items */}
-      {cartItems?.map((item, index) => (
+      {cart?.items?.map((item, index) => (
         <div
           key={item.cartItemId}
           className={`mb-2 border-y rounded-sm p-1 flex items-center gap-2 ${mode === 'light' ? 'bg-gray-shadow10' : 'bg-gray-shadow1'}`}
@@ -128,9 +130,10 @@ const CartProductList = ({
                 title="remove from cart"
                 className={` text-error transition-transform duration-100`}
                 onClick={() =>
-                  setCartItems((prev) =>
-                    prev.filter((cartItem) => cartItem !== item)
-                  )
+                  setCart((prev) => ({
+                    ...prev,
+                    items: prev.items.filter((cartItem) => cartItem !== item),
+                  }))
                 }
               />
             </button>

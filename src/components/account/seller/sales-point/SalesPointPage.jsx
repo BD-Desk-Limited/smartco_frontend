@@ -12,7 +12,8 @@ import ShiftManagement from './shift-management/ShiftManagement';
 const SalesPointPage = () => {
   const router = useRouter();
   const { companyData } = useCompanyData();
-  const { user, setUser, logOutSalesPoint, isLoading } = useAuth();
+  const { user, logOutSalesPoint, isLoading } = useAuth();
+
   const [mode, setMode] = React.useState('light');
   const [activeMenuItem, setActiveMenuItem] = React.useState('Sales Items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =

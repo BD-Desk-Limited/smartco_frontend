@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import SalesPointProducts from '../sales-items/SalesPointProducts';
 import { fetchProductsFromAPI, loadProducts } from '../productFetchManagement';
 import Cart from '../cart/Cart';
@@ -20,8 +21,16 @@ const SalesPointContent = ({
   error,
   products,
   setProducts,
-  cartItems,
-  setCartItems,
+  cart,
+  setCart,
+  pendingOrders,
+  setPendingOrders,
+  pendingCustomerRegistration,
+  setPendingCustomerRegistration,
+  pendingOrderSchedule,
+  setPendingOrderSchedule,
+  pendingError,
+  setPendingError,
   handleAddToCart,
   workBranch,
   workBranchKey,
@@ -37,6 +46,8 @@ const SalesPointContent = ({
   const searchRef = React.useRef(null);
   const filterRef = React.useRef(null);
   const searchCustomerRef = React.useRef(null);
+
+  const MAX_ALLOWED_PENDING_ORDERS = 5; // Maximum number of pending orders allowed, can be adjusted as needed
 
   React.useEffect(() => {
     if (
@@ -103,6 +114,29 @@ const SalesPointContent = ({
     }
   };
 
+  // Handle creating pending order
+  const handlePendOrder = () => {
+    // create a unique ID for the pending order using timestamp and random string
+    const pendingOrderId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    if (cart?.items?.length > 0) {
+      if (pendingOrders?.length >= MAX_ALLOWED_PENDING_ORDERS) {
+        setPendingError(
+          'You have reached the maximum limit of 5 pending orders. Please complete or clear existing pending orders before creating new ones.'
+        );
+        return;
+      }
+      setPendingOrders((prev) => [
+        {
+          id: pendingOrderId,
+          items: cart?.items,
+          linkedCustomer: cart?.linkedCustomer,
+        },
+        ...prev,
+      ]);
+      setCart((prev) => ({ ...prev, items: [], linkedCustomer: null })); // Clear cart after creating pending order
+    }
+  };
+
   return (
     <div className="h-full w-full flex flex-col relative">
       {/*Top search Filters and tools */}
@@ -149,11 +183,22 @@ const SalesPointContent = ({
 
         {/* action buttons */}
         <div className="inline-flex ml-4 space-x-2">
-          <button className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue/80">
-            Pending Orders
+          <button className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue/80 relative">
+            <span>Pending Orders</span>
+            {/* Pending Orders Badge */}
+            {pendingOrders?.length > 0 && (
+              <motion.div
+                className={`absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                key={pendingOrders?.length}
+              >
+                {pendingOrders?.length}
+              </motion.div>
+            )}
           </button>
           <button className="px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300">
-            Pending Registrations
+            <span>Pending Registrations</span>
           </button>
           <button className="px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300">
             Order Schedule
@@ -180,7 +225,7 @@ const SalesPointContent = ({
               setSelectedProduct={setSelectedProduct}
               quantity={quantity}
               setQuantity={setQuantity}
-              cartItems={cartItems}
+              cart={cart}
               productCategories={productCategories}
               setProductCategories={setProductCategories}
               selectedCategory={selectedCategory}
@@ -200,9 +245,10 @@ const SalesPointContent = ({
           {activeMenuItem === 'Cart' && (
             <Cart
               products={products}
-              cartItems={cartItems}
-              setCartItems={setCartItems}
+              cart={cart}
+              setCart={setCart}
               handleScan={handleScan}
+              handlePendOrder={handlePendOrder}
               scannedId={scannedId}
               setScannedId={setScannedId}
               workBranch={workBranch}

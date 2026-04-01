@@ -9,10 +9,11 @@ import BillAndSummary from './BillAndSummary';
 
 const Cart = ({
   products,
-  cartItems,
-  setCartItems,
+  cart,
+  setCart,
   setActiveMenuItem,
   handleScan,
+  handlePendOrder,
   scannedId,
   setScannedId,
   scanMode,
@@ -56,7 +57,7 @@ const Cart = ({
       window.clearTimeout(timeoutId);
       window.removeEventListener('focus', focusScannerInput);
     };
-  }, [scanMode, workBranch, cartItems]);
+  }, [scanMode, workBranch, cart?.items]);
 
   useEffect(() => {
     return () => {
@@ -66,10 +67,10 @@ const Cart = ({
 
   // if cart is empty, switch to sales items tab
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cart?.items?.length === 0) {
       setActiveMenuItem('Sales Items');
     }
-  }, [cartItems, setActiveMenuItem]);
+  }, [cart?.items, setActiveMenuItem]);
 
   const handleCustomerSearch = async (e) => {
     e.preventDefault();
@@ -125,9 +126,14 @@ const Cart = ({
     setScanMode(true);
   };
 
+  //update linked customer state whenever cart's linkedCustomer changes
+  useEffect(() => {
+    setLinkedCustomerData(cart.linkedCustomer || {});
+  }, [cart.linkedCustomer]);
+
   const handleUnlinkCustomer = () => {
     setCustomerData({});
-    setLinkedCustomerData({});
+    setCart((prevCart) => ({ ...prevCart, linkedCustomer: null }));
     setCustomerFetchError('');
     setAppliedOffers([]);
   };
@@ -161,20 +167,17 @@ const Cart = ({
     return taxAmount + additionalTaxAmount;
   };
 
-  const productsTax = cartItems?.reduce((acc, item) => {
+  const productsTax = cart?.items?.reduce((acc, item) => {
     return acc + productItemTax(item) * item.quantity;
   }, 0);
 
-  const subtotal = cartItems?.reduce((acc, item) => {
+  const subtotal = cart?.items?.reduce((acc, item) => {
     return acc + itemTotalCost(item);
   }, 0);
 
   const taxfreeProduct = (item) => {
     return item?.product?.productTax?.isTaxExcluded || false;
   };
-
-  console.log('workBranch:', workBranch);
-  console.log('CART:', cartItems);
   console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
@@ -202,7 +205,7 @@ const Cart = ({
       <div
         className={`h-full w-full rounded-lg ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
       >
-        {cartItems.length === 0 ? (
+        {cart?.items?.length === 0 ? (
           <div
             className={`w-full h-full flex flex-col items-center justify-center ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
           >
@@ -238,8 +241,8 @@ const Cart = ({
                 />
               )}
               <CartProductList
-                cartItems={cartItems}
-                setCartItems={setCartItems}
+                cart={cart}
+                setCart={setCart}
                 mode={mode}
                 lightThemeStyle={lightThemeStyle}
                 darkThemeStyle={darkThemeStyle}
@@ -255,7 +258,8 @@ const Cart = ({
               linkedCustomerData={linkedCustomerData}
               productsTax={productsTax}
               subtotal={subtotal}
-              cartItems={cartItems}
+              cart={cart}
+              handlePendOrder={handlePendOrder}
               workBranchVATRate={workBranchVATRate}
               taxfreeProduct={taxfreeProduct}
               itemUnitCost={itemUnitCost}
@@ -274,6 +278,8 @@ const Cart = ({
         >
           <CustomerLookUp
             products={products}
+            cart={cart}
+            setCart={setCart}
             mode={mode}
             lightThemeStyle={lightThemeStyle}
             darkThemeStyle={darkThemeStyle}
@@ -284,7 +290,6 @@ const Cart = ({
             setAppliedOffers={setAppliedOffers}
             customerData={customerData}
             linkedCustomerData={linkedCustomerData}
-            setLinkedCustomerData={setLinkedCustomerData}
             customerFetchError={customerFetchError}
             setCustomerData={setCustomerData}
             setCustomerFetchError={setCustomerFetchError}

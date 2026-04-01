@@ -1,13 +1,8 @@
 import { CompanyDataProvider } from '@/contexts/companyDataContext';
 import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
-import { BulkMaterialUploadProvider } from '@/contexts/bulkMaterialUploadContext';
-import { BulkbranchUploadProvider } from '@/contexts/bulkBranchUploadContext';
-import { BulkUserUploadProvider } from '@/contexts/bulkUserUploadContext';
-import { CreateProductsProvider } from '@/contexts/createProductsContext';
-import { SetupProvider } from '@/contexts/setupContext';
 import { InternetStatusProvider } from '@/contexts/internetStatusContext';
-import OfflineNotifier from '@/components/OfflineNotifier';
+import { SetupProvider } from '@/contexts/setupContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -44,19 +39,8 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
         <AuthProvider>
           <InternetStatusProvider>
-            <OfflineNotifier />
             <SetupProvider>
-              <BulkUserUploadProvider>
-                <BulkMaterialUploadProvider>
-                  <BulkbranchUploadProvider>
-                    <CompanyDataProvider>
-                      <CreateProductsProvider>
-                        {children}
-                      </CreateProductsProvider>
-                    </CompanyDataProvider>
-                  </BulkbranchUploadProvider>
-                </BulkMaterialUploadProvider>
-              </BulkUserUploadProvider>
+              <CompanyDataProvider>{children}</CompanyDataProvider>
             </SetupProvider>
           </InternetStatusProvider>
         </AuthProvider>

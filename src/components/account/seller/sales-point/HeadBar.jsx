@@ -8,7 +8,7 @@ const HeadBar = ({
   menuItems,
   activeMenuItem,
   setActiveMenuItem,
-  cartItems,
+  cart,
   mode,
 }) => {
   const { user } = useAuth();
@@ -16,10 +16,10 @@ const HeadBar = ({
   const previousCartCountRef = useRef(0);
 
   useEffect(() => {
-    const hasIncreased = cartItems.length > previousCartCountRef.current;
+    const hasIncreased = cart?.items?.length > previousCartCountRef.current;
 
     if (!hasIncreased) {
-      previousCartCountRef.current = cartItems.length;
+      previousCartCountRef.current = cart?.items?.length;
       return;
     }
 
@@ -31,13 +31,13 @@ const HeadBar = ({
       setIsAnimating(false);
     }, 600);
 
-    previousCartCountRef.current = cartItems.length;
+    previousCartCountRef.current = cart?.items?.length;
 
     return () => {
       clearTimeout(startTimer);
       clearTimeout(stopTimer);
     };
-  }, [cartItems.length]);
+  }, [cart?.items?.length]);
 
   return (
     <div className="bg-brand-green flex items-center justify-between p-3 flex-row w-full px-10">
@@ -104,14 +104,14 @@ const HeadBar = ({
               <span>{item.name}</span>
 
               {/* Cart Badge */}
-              {item.name === 'Cart' && cartItems.length > 0 && (
+              {item.name === 'Cart' && cart?.items?.length > 0 && (
                 <motion.div
                   className={`absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center`}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  key={cartItems.length}
+                  key={cart?.items.length}
                 >
-                  {cartItems.length}
+                  {cart?.items.length}
                 </motion.div>
               )}
             </motion.div>

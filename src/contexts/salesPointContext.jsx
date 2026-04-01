@@ -1,5 +1,4 @@
 'use client';
-// TODO: this is just a boilerplate for now, we will add more state and logic to it as we build out the sales point features. For now, it just provides a place to store the cart and pending order data, and persist it across page reloads within the same session.
 
 import React, {
   createContext,
@@ -12,21 +11,24 @@ import React, {
 
 const SalesPointContext = createContext(null);
 
+const withholdHours = 2; // Number of hours to withhold sales point data before it can be cleared, can be adjusted as needed. This is to prevent accidental data loss if a user leaves the sales point page and comes back within a short period of time.
+const maxWithholdTime = withholdHours * 60 * 60 * 1000; // Convert hours to milliseconds for easier time comparisons
+
 const SALES_POINT_STORAGE_KEY = 'sales_point_state_v1';
 
-const salesPointStateKeys = [
-  'cart',
-  'pending_order',
-  'pending_customer_registration',
-  'pending_order_schedule',
-];
-
+// Initial state structure for the sales point context, initiates with empty arrays for each state key and a null seller.
 const initialSalesPointState = {
-  cart: [],
-  pending_order: null,
-  pending_customer_registration: null,
-  pending_order_schedule: null,
+  seller: null,
+  states: {
+    cart: {},
+    pending_orders: [],
+    pending_customer_registration: [],
+    pending_order_schedule: [],
+  },
+  lastUpdated: Date.now(),
 };
+
+const salesPointStateKeys = Object.keys(initialSalesPointState.states);
 
 export const useSalesPoint = () => {
   const context = useContext(SalesPointContext);
@@ -39,11 +41,21 @@ export const useSalesPoint = () => {
 };
 
 export const SalesPointProvider = ({ children }) => {
-  const [salesPointState, setSalesPointState] = useState(
-    initialSalesPointState
-  );
+  const [salesPointState, SetSalesPointState] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  const clearStateByWithholdTime = useCallback(() => {
+    SetSalesPointState((prev) => {
+      const updatedState = prev?.filter((sellerState) => {
+        if (!sellerState.lastUpdated) return false; // If we don't have a timestamp, we can't determine if it should be cleared, so we remove it since it's safer to clear potentially stale data than to risk keeping it indefinitely.
+        return Date.now() - sellerState.lastUpdated < maxWithholdTime;
+      });
+
+      return updatedState;
+    });
+  }, []);
+
+  // Hydrate from sessionStorage on mount to restore state across page reloads within the same session
   const hydrateFromSession = useCallback(() => {
     if (typeof window === 'undefined') return;
 
@@ -55,11 +67,9 @@ export const SalesPointProvider = ({ children }) => {
       }
 
       const parsed = JSON.parse(stored);
+      const parsedState = Array.isArray(parsed) ? parsed : [];
 
-      setSalesPointState((prev) => ({
-        ...prev,
-        ...parsed,
-      }));
+      SetSalesPointState(parsedState);
     } catch (error) {
       console.error(
         'Failed to hydrate sales point state from sessionStorage',
@@ -70,10 +80,18 @@ export const SalesPointProvider = ({ children }) => {
     }
   }, []);
 
+  // Only run the hydration effect once on mount
   useEffect(() => {
     hydrateFromSession();
   }, [hydrateFromSession]);
 
+  // After hydration, clear stale entries from persisted data.
+  useEffect(() => {
+    if (!isHydrated) return;
+    clearStateByWithholdTime();
+  }, [isHydrated, clearStateByWithholdTime]);
+
+  // Persist to sessionStorage whenever salesPointState changes
   useEffect(() => {
     if (typeof window === 'undefined' || !isHydrated) return;
 
@@ -90,38 +108,58 @@ export const SalesPointProvider = ({ children }) => {
     }
   }, [salesPointState, isHydrated]);
 
-  const setStateByKey = useCallback((key, valueOrUpdater) => {
-    if (!salesPointStateKeys.includes(key)) {
-      throw new Error(`Invalid SalesPoint state key: ${key}`);
-    }
+  const handleUpdateSalesPointState = useCallback(
+    (currentSellerId, keyToUpdate, updateValue) => {
+      try {
+        if (!salesPointStateKeys.includes(keyToUpdate)) {
+          console.warn(
+            `Attempted to update invalid sales point state key: ${keyToUpdate}`
+          );
+          return;
+        }
 
-    setSalesPointState((prev) => {
-      const current = prev[key];
-      const nextValue =
-        typeof valueOrUpdater === 'function'
-          ? valueOrUpdater(current)
-          : valueOrUpdater;
+        SetSalesPointState((prev) => {
+          // Find the current seller's state object
+          const currentSellerObj = prev?.find(
+            (s) => s.seller === currentSellerId
+          );
+          // If the seller doesn't exist yet, create a new one with the updated state
+          if (!currentSellerObj) {
+            const newSellerObj = {
+              seller: currentSellerId,
+              states: {
+                ...initialSalesPointState.states,
+                [keyToUpdate]: updateValue,
+              },
+              lastUpdated: Date.now(),
+            };
+            // Append the new seller object to the existing state array
+            return [...(prev || []), newSellerObj];
+          } else {
+            // If the seller exists, update the specific key in their states
+            const updatedSellerObj = {
+              ...currentSellerObj,
+              states: {
+                ...currentSellerObj.states,
+                [keyToUpdate]: updateValue,
+              },
+              lastUpdated: Date.now(),
+            };
+            // Replace the old seller object with the updated one in the state array
+            const otherSellers =
+              prev?.filter((s) => s.seller !== currentSellerId) || [];
+            return [...otherSellers, updatedSellerObj];
+          }
+        });
+      } catch (error) {
+        console.error('Failed to update sales point state by seller', error);
+      }
+    },
+    []
+  );
 
-      return {
-        ...prev,
-        [key]: nextValue,
-      };
-    });
-  }, []);
-
-  const clearStateByKey = useCallback((key) => {
-    if (!salesPointStateKeys.includes(key)) {
-      throw new Error(`Invalid SalesPoint state key: ${key}`);
-    }
-
-    setSalesPointState((prev) => ({
-      ...prev,
-      [key]: initialSalesPointState[key],
-    }));
-  }, []);
-
-  const resetSalesPointState = useCallback(() => {
-    setSalesPointState(initialSalesPointState);
+  const reSetSalesPointStates = useCallback(() => {
+    SetSalesPointState([]);
 
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(SALES_POINT_STORAGE_KEY);
@@ -131,19 +169,15 @@ export const SalesPointProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       salesPointState,
-      salesPointStateKeys,
-      setSalesPointState,
-      setStateByKey,
-      clearStateByKey,
-      resetSalesPointState,
-      isHydrated,
+      handleUpdateSalesPointState,
+      reSetSalesPointStates,
+      loadingContext: !isHydrated,
     }),
     [
       salesPointState,
-      setStateByKey,
-      clearStateByKey,
-      resetSalesPointState,
+      handleUpdateSalesPointState,
       isHydrated,
+      reSetSalesPointStates,
     ]
   );
 
@@ -153,5 +187,3 @@ export const SalesPointProvider = ({ children }) => {
     </SalesPointContext.Provider>
   );
 };
-
-export { initialSalesPointState, salesPointStateKeys, SALES_POINT_STORAGE_KEY };

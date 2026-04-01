@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import HeadBar from '../HeadBar';
 import Footer from '../Footer';
 import { motion } from 'framer-motion';
+import { useSalesPoint } from '@/contexts/salesPointContext';
+import { useAuth } from '@/contexts/authContext';
 import SalesPointContent from './SalesPointContent';
 import { loadProducts } from '../productFetchManagement';
 import SelectedProductCard from './SelectedProductCard';
@@ -18,16 +20,49 @@ const SalesPoint = ({
   workBranch,
   workBranchKey,
 }) => {
+  const { salesPointState, handleUpdateSalesPointState, loadingContext } =
+    useSalesPoint();
+  const { user, isLoading } = useAuth();
+  const hydratedFromContextRef = React.useRef(false);
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [selectedChoices, setSelectedChoices] = React.useState({}); //select options for products that have multiple option components
-  const [cartItems, setCartItems] = React.useState([]);
+  const [cart, setCart] = React.useState({});
+  const [pendingOrders, setPendingOrders] = React.useState([]);
+  const [pendingCustomerRegistration, setPendingCustomerRegistration] =
+    React.useState([]);
+  const [pendingOrderSchedule, setPendingOrderSchedule] = React.useState([]);
   const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [pendingError, setPendingError] = React.useState(null);
   const [openSelectProductComponents, setOpenSelectProductComponents] =
     React.useState(false);
 
+  // Map sales point state keys to local state setters and current values.
+  const SALES_POINT_STATE_BY_KEY = useMemo(
+    () => ({
+      cart: {
+        value: cart,
+        setValue: setCart,
+      },
+      pending_orders: {
+        value: pendingOrders,
+        setValue: setPendingOrders,
+      },
+      pending_customer_registration: {
+        value: pendingCustomerRegistration,
+        setValue: setPendingCustomerRegistration,
+      },
+      pending_order_schedule: {
+        value: pendingOrderSchedule,
+        setValue: setPendingOrderSchedule,
+      },
+    }),
+    [cart, pendingOrders, pendingCustomerRegistration, pendingOrderSchedule]
+  );
+
+  // Load products on component mount and whenever the sales point is reset.
   React.useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -44,6 +79,64 @@ const SalesPoint = ({
 
     fetchProducts();
   }, []);
+
+  // Reset hydration marker when switching users to ensure fresh state is loaded.
+  React.useEffect(() => {
+    hydratedFromContextRef.current = false;
+  }, [user?._id]);
+
+  // Load persisted user sales point state once per user.
+  React.useEffect(() => {
+    if (
+      isLoading ||
+      loadingContext ||
+      !user?._id ||
+      hydratedFromContextRef.current
+    )
+      return;
+
+    const existingSellerState = salesPointState?.find(
+      (sellerState) => sellerState.seller === user?._id
+    );
+
+    if (existingSellerState?.states) {
+      // Hydrate local state from persisted context state.
+      Object.entries(existingSellerState.states).forEach(([key, value]) => {
+        if (SALES_POINT_STATE_BY_KEY[key]) {
+          SALES_POINT_STATE_BY_KEY[key].setValue(value);
+        }
+      });
+    }
+
+    hydratedFromContextRef.current = true;
+  }, [
+    isLoading,
+    loadingContext,
+    user?._id,
+    salesPointState,
+    SALES_POINT_STATE_BY_KEY,
+  ]);
+
+  // Sync local state changes into persisted context state.
+  React.useEffect(() => {
+    if (
+      isLoading ||
+      loadingContext ||
+      !user?._id ||
+      !hydratedFromContextRef.current
+    )
+      return;
+
+    Object.entries(SALES_POINT_STATE_BY_KEY).forEach(([key, stateConfig]) => {
+      handleUpdateSalesPointState(user._id, key, stateConfig.value);
+    });
+  }, [
+    isLoading,
+    loadingContext,
+    user?._id,
+    handleUpdateSalesPointState,
+    SALES_POINT_STATE_BY_KEY,
+  ]);
 
   const onClose = () => {
     setSelectedProduct(null);
@@ -70,7 +163,7 @@ const SalesPoint = ({
     };
 
     // check if product with same choices already exists in cart, if yes, increase quantity
-    const existingInCart = cartItems.find((item) => {
+    const existingInCart = cart?.items?.find((item) => {
       if (item.product._id !== newProduct.product._id) return false;
 
       const checkChoices = (whatToCheck) =>
@@ -88,16 +181,31 @@ const SalesPoint = ({
       const updatedQuantity = existingInCart.quantity + newProduct.quantity;
 
       // replace the existing item in cart with the updated one
-      setCartItems((prev) => {
-        const filtered = prev.filter((item) => item !== existingInCart);
-        return [{ ...existingInCart, quantity: updatedQuantity }, ...filtered];
+      setCart((prev) => {
+        const filteredItems = prev?.items?.filter(
+          (item) => item !== existingInCart
+        );
+        return {
+          ...prev,
+          items: [
+            { ...existingInCart, quantity: updatedQuantity },
+            ...filteredItems,
+          ],
+        };
       });
     } else {
-      setCartItems((prev) => [newProduct, ...prev]);
+      setCart((prev) => ({
+        ...prev,
+        items: [...(prev?.items || []), newProduct],
+      }));
     }
     onClose();
   };
-  console.log('CART:', cartItems);
+
+  console.log(
+    'Pending orders from context:',
+    salesPointState?.find((s) => s.seller === user?._id)?.states?.pending_orders
+  );
 
   const handleSelectComponents = () => {
     if (selectedProduct?.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
@@ -109,8 +217,7 @@ const SalesPoint = ({
       <HeadBar
         mode={mode}
         menuItems={menuItems}
-        cartItems={cartItems}
-        setCartItems={setCartItems}
+        cart={cart}
         activeMenuItem={activeMenuItem}
         setActiveMenuItem={setActiveMenuItem}
         style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
@@ -132,8 +239,16 @@ const SalesPoint = ({
           setError={setError}
           products={products}
           setProducts={setProducts}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
+          cart={cart}
+          setCart={setCart}
+          pendingOrders={pendingOrders}
+          setPendingOrders={setPendingOrders}
+          pendingCustomerRegistration={pendingCustomerRegistration}
+          setPendingCustomerRegistration={setPendingCustomerRegistration}
+          pendingOrderSchedule={pendingOrderSchedule}
+          setPendingOrderSchedule={setPendingOrderSchedule}
+          pendingError={pendingError}
+          setPendingError={setPendingError}
           handleAddToCart={handleAddToCart}
           workBranch={workBranch}
           workBranchKey={workBranchKey}

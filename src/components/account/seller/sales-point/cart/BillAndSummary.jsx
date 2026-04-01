@@ -19,7 +19,8 @@ const BillAndSummary = ({
   productsTax,
   itemUnitCost,
   taxfreeProduct,
-  cartItems,
+  cart,
+  handlePendOrder,
   subtotal,
   mode,
   lightThemeStyle,
@@ -62,7 +63,7 @@ const BillAndSummary = ({
   };
 
   const getVATAmount = () => {
-    const taxableSubTotal = cartItems?.reduce((acc, item) => {
+    const taxableSubTotal = cart?.items?.reduce((acc, item) => {
       if (taxfreeProduct(item)) return acc; // skip tax calculation for tax-free products
       const costPerItem = itemUnitCost(item) * item.quantity;
       return acc + costPerItem;
@@ -210,7 +211,10 @@ const BillAndSummary = ({
             Schedule Order
           </button>
 
-          <button className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit">
+          <button
+            className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit"
+            onClick={handlePendOrder}
+          >
             <FaRegClock className="inline-block mr-1" />
             Pend Order
           </button>

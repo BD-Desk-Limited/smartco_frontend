@@ -12,10 +12,10 @@ import {
   FaUserCircle,
 } from 'react-icons/fa';
 import SelectOfferComponent from './SelectOfferComponent';
-import LinkedCustomer from './LinkedCustomer';
 
 const CustomerLookUp = ({
   products,
+  setCart,
   mode,
   lightThemeStyle,
   darkThemeStyle,
@@ -25,12 +25,10 @@ const CustomerLookUp = ({
   customerFetchError,
   setCustomerFetchError,
   setCustomerData,
-  setLinkedCustomerData,
+  linkedCustomerData,
   setIsOpenCustomerOverlay,
   awaitingScanForCustomer,
   setAwaitingScanForCustomer,
-  linkedCustomerData,
-  handleClose,
   loading,
 }) => {
   const [tabs, setTabs] = useState({});
@@ -57,7 +55,8 @@ const CustomerLookUp = ({
 
   const handleLinkCustomerAndClaim = () => {
     //Function to link customer to current sale and apply any relevant claims
-    setLinkedCustomerData({ ...customerData, appliedOffers: appliedOffers });
+    const dataToLink = { ...customerData, appliedOffers: appliedOffers };
+    setCart((prevCart) => ({ ...prevCart, linkedCustomer: dataToLink }));
     setIsOpenCustomerOverlay(false);
   };
 
@@ -101,9 +100,12 @@ const CustomerLookUp = ({
       linkedCustomerData?._id === customerData._id &&
       linkedCustomerData?.appliedOffers !== appliedOffers
     ) {
-      setLinkedCustomerData((prev) => ({ ...prev, appliedOffers }));
+      setCart((prev) => ({
+        ...prev,
+        linkedCustomer: { ...prev.linkedCustomer, appliedOffers },
+      }));
     }
-  }, [appliedOffers, customerData, linkedCustomerData, setLinkedCustomerData]);
+  }, [appliedOffers, customerData, linkedCustomerData, setCart]);
 
   console.log('APPLIED OFFERS:', appliedOffers);
 
