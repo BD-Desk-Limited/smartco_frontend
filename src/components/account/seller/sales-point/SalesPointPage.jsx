@@ -1,7 +1,8 @@
 import React from 'react';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
-import SalesPoint from './sales-items/SalesPoint';
+import { NotificationProvider } from '@/contexts/notificationContext';
+import SalesPoint from './SalesPoint';
 import SelectWorkBranch from './SelectWorkBranch';
 import WarningModal from '../../WarningModal';
 import { useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ const SalesPointPage = () => {
   const { user, logOutSalesPoint, isLoading } = useAuth();
 
   const [mode, setMode] = React.useState('light');
-  const [activeMenuItem, setActiveMenuItem] = React.useState('Sales Items');
+  const [activeMenuItem, setActiveMenuItem] = React.useState('sales-items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
     React.useState(false);
   const [userBranchAccessWarningBranch, setUserBranchAccessWarningBranch] =
@@ -26,8 +27,8 @@ const SalesPointPage = () => {
 
   const menuItems = [
     {
-      name: 'Sales Items',
-      component: null,
+      name: 'sales-items',
+      label: 'Sales Items',
       iconPath: {
         light: '/assets/window_white.png',
         dark: '/assets/window_dark.png',
@@ -35,7 +36,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'Cart',
+      name: 'cart',
+      label: 'Cart',
       iconPath: {
         light: '/assets/cart_white.png',
         dark: '/assets/cart_dark.png',
@@ -43,7 +45,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'Customers',
+      name: 'customers',
+      label: 'Customers',
       iconPath: {
         light: '/assets/customers_white.png',
         dark: '/assets/customers_dark.png',
@@ -51,7 +54,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'Payments',
+      name: 'payments',
+      label: 'Payments',
       iconPath: {
         light: '/assets/card_white.png',
         dark: '/assets/card_dark.png',
@@ -153,9 +157,10 @@ const SalesPointPage = () => {
   }
 
   return (
-    <div
-      className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
-    >
+    <NotificationProvider>
+      <div
+        className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      >
       {/* Select Branch */}
       {branchesAccessibleOnDevice.length > 0 && !workBranch && (
         <div
@@ -238,7 +243,8 @@ const SalesPointPage = () => {
         workBranchKey={workBranchKey}
         logOutSalesPoint={logOutSalesPoint}
       />
-    </div>
+      </div>
+    </NotificationProvider>
   );
 };
 

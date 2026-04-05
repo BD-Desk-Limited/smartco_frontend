@@ -36,12 +36,20 @@ const SalesPointProducts = ({
   darkThemeStyle,
 }) => {
   const inputRef = useRef(null);
+  // Track whether the scanner has been focused at least once since mount.
+  // On the very first focus attempt the page may still be stabilising (products
+  // loading, context hydrating, branch modals closing), so we use a longer delay
+  // to let all that settle. Subsequent refocuses (e.g. returning from the search
+  // bar) use 0ms so they feel instant.
+  const hasFocusedRef = useRef(false);
 
   // always focus scanMode
   useEffect(() => {
     if (
+      loading ||
+      error ||
       !scanMode ||
-      activeMenuItem !== 'Sales Items' ||
+      activeMenuItem !== 'sales-items' ||
       !workBranch ||
       selectedProduct
     ) {
@@ -54,14 +62,25 @@ const SalesPointProducts = ({
       });
     };
 
-    const timeoutId = window.setTimeout(focusScannerInput, 0);
+    const delay = hasFocusedRef.current ? 0 : 300;
+    hasFocusedRef.current = true;
+
+    const timeoutId = window.setTimeout(focusScannerInput, delay);
     window.addEventListener('focus', focusScannerInput);
 
     return () => {
       window.clearTimeout(timeoutId);
       window.removeEventListener('focus', focusScannerInput);
     };
-  }, [scanMode, activeMenuItem, workBranch, selectedProduct, cart?.items]);
+  }, [
+    loading,
+    error,
+    scanMode,
+    activeMenuItem,
+    workBranch,
+    selectedProduct,
+    cart?.items,
+  ]);
 
   const handleProductClick = (product) => {
     if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock

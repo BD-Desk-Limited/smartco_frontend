@@ -1,16 +1,17 @@
 import React, { useMemo } from 'react';
-import HeadBar from '../HeadBar';
-import Footer from '../Footer';
+import HeadBar from './HeadBar';
+import Footer from './Footer';
 import { motion } from 'framer-motion';
 import { useSalesPoint } from '@/contexts/salesPointContext';
 import { useAuth } from '@/contexts/authContext';
 import { useNotification } from '@/contexts/notificationContext';
-import SalesPointContent from './SalesPointContent';
-import PendingOrder from '../pending-order/PendingOrder';
-import SalesPointNotification from '../notifications/SalesPointNotification';
-import { loadProducts } from '../productFetchManagement';
-import SelectedProductCard from './SelectedProductCard';
+import SalesPointContent from './sales-items/SalesPointContent';
+import PendingOrder from './pending-order/PendingOrder';
+import { loadProducts } from './productFetchManagement';
+import SelectedProductCard from './sales-items/SelectedProductCard';
 import { FaTimes } from 'react-icons/fa';
+import SubHeadbar from './SubHeadbar';
+import SalesPointNotification from './notifications/SalesPointNotification';
 
 const SalesPoint = ({
   mode,
@@ -39,9 +40,13 @@ const SalesPoint = ({
   const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const [pendingError, setPendingError] = React.useState(null);
   const [openSelectProductComponents, setOpenSelectProductComponents] =
     React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filterValue, setFilterValue] = React.useState('All Products');
+  const [scanMode, setScanMode] = React.useState(true);
+  const filterRef = React.useRef(null);
+  const searchRef = React.useRef(null);
 
   // Map sales point state keys to local state setters and current values.
   const SALES_POINT_STATE_BY_KEY = useMemo(
@@ -65,6 +70,8 @@ const SalesPoint = ({
     }),
     [cart, pendingOrders, pendingCustomerRegistration, pendingOrderSchedule]
   );
+
+  const MAX_ALLOWED_PENDING_ORDERS = 5; // Maximum number of pending orders allowed, can be adjusted as needed
 
   // Load products on component mount and whenever the sales point is reset.
   React.useEffect(() => {
@@ -206,6 +213,11 @@ const SalesPoint = ({
     onClose();
   };
 
+  console.log(
+    'Pending orders from context:',
+    salesPointState?.find((s) => s.seller === user?._id)?.states?.pending_orders
+  );
+
   const handleSelectComponents = () => {
     if (selectedProduct?.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
     setOpenSelectProductComponents(true);
@@ -217,6 +229,7 @@ const SalesPoint = ({
     setActiveMenuItem,
     lightThemeStyle,
     darkThemeStyle,
+    MAX_ALLOWED_PENDING_ORDERS,
     loading,
     setLoading,
     selectedProduct,
@@ -227,16 +240,23 @@ const SalesPoint = ({
     setError,
     products,
     setProducts,
+    filterRef,
+    filterValue,
+    setFilterValue,
+    searchRef,
+    searchTerm,
+    setSearchTerm,
+    scanMode,
+    setScanMode,
     cart,
     setCart,
     pendingOrders,
     setPendingOrders,
+    MAX_ALLOWED_PENDING_ORDERS,
     pendingCustomerRegistration,
     setPendingCustomerRegistration,
     pendingOrderSchedule,
     setPendingOrderSchedule,
-    pendingError,
-    setPendingError,
     handleAddToCart,
     workBranch,
     workBranchKey,
@@ -262,6 +282,22 @@ const SalesPoint = ({
         activeMenuItem={activeMenuItem}
         setActiveMenuItem={setActiveMenuItem}
         style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
+      />
+
+      {/* Top search and filter bar */}
+      <SubHeadbar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        setScanMode={setScanMode}
+        searchRef={searchRef}
+        filterValue={filterValue}
+        setFilterValue={setFilterValue}
+        filterRef={filterRef}
+        mode={mode}
+        lightThemeStyle={lightThemeStyle}
+        darkThemeStyle={darkThemeStyle}
+        pendingOrders={pendingOrders}
+        setActiveMenuItem={setActiveMenuItem}
       />
 
       {/* Content area with dynamic component based on active menu item */}

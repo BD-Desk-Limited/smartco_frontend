@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useNotification } from '@/contexts/notificationContext';
 import SalesPointProducts from '../sales-items/SalesPointProducts';
-import { fetchProductsFromAPI, loadProducts } from '../productFetchManagement';
+import { fetchProductsFromAPI } from '../productFetchManagement';
 import Cart from '../cart/Cart';
 import Customers from '../customers/Customers';
 import Payments from '../payments/Payments';
@@ -21,38 +21,33 @@ const SalesPointContent = ({
   error,
   products,
   setProducts,
+  filterRef,
+  filterValue,
+  searchRef,
+  searchTerm,
+  scanMode,
+  setScanMode,
   cart,
   setCart,
   pendingOrders,
   setPendingOrders,
-  pendingCustomerRegistration,
-  setPendingCustomerRegistration,
-  pendingOrderSchedule,
-  setPendingOrderSchedule,
-  pendingError,
-  setPendingError,
+  MAX_ALLOWED_PENDING_ORDERS,
   handleAddToCart,
   workBranch,
   workBranchKey,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterValue, setFilterValue] = useState('All Products');
+  const { showNotification } = useNotification();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [refreshingProducts, setRefreshingProducts] = useState(false);
-  const [scanMode, setScanMode] = useState(true);
   const [scannedId, setScannedId] = React.useState('');
-  const searchRef = React.useRef(null);
-  const filterRef = React.useRef(null);
   const searchCustomerRef = React.useRef(null);
-
-  const MAX_ALLOWED_PENDING_ORDERS = 5; // Maximum number of pending orders allowed, can be adjusted as needed
 
   React.useEffect(() => {
     if (
       workBranch &&
-      (activeMenuItem === 'Sales Items' || activeMenuItem === 'Cart')
+      (activeMenuItem === 'sales-items' || activeMenuItem === 'cart')
     ) {
       setScanMode(true);
     }
@@ -104,10 +99,10 @@ const SalesPointContent = ({
 
         if (noOptions) {
           handleAddToCart(product, [singleChoice], quantity);
-          setActiveMenuItem('Cart');
+          setActiveMenuItem('cart');
         } else {
           setSelectedProduct(product);
-          setActiveMenuItem('Sales Items');
+          setActiveMenuItem('sales-items');
         }
       }
       setScannedId('');
@@ -120,8 +115,11 @@ const SalesPointContent = ({
     const pendingOrderId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     if (cart?.items?.length > 0) {
       if (pendingOrders?.length >= MAX_ALLOWED_PENDING_ORDERS) {
-        setPendingError(
-          'You have reached the maximum limit of 5 pending orders. Please complete or clear existing pending orders before creating new ones.'
+        showNotification(
+          'error',
+          'Limit Reached',
+          'You have reached the maximum limit of 5 pending orders. Please complete or clear existing pending orders before creating new ones.',
+          4000
         );
         return;
       }
@@ -130,86 +128,28 @@ const SalesPointContent = ({
           id: pendingOrderId,
           items: cart?.items,
           linkedCustomer: cart?.linkedCustomer,
+          pendTime: new Date().toISOString(),
         },
         ...prev,
       ]);
       setCart((prev) => ({ ...prev, items: [], linkedCustomer: null })); // Clear cart after creating pending order
+
+      // Show success notification
+      showNotification(
+        'success',
+        'Order Pending',
+        `${cart?.items?.length} item(s) saved as pending order`,
+        3000
+      );
     }
   };
 
   return (
     <div className="h-full w-full flex flex-col relative">
-      {/*Top search Filters and tools */}
-      <div className="p-4 border-b border-gray-border w-full flex flex-row justify-between items-center sticky top-0 z-10 bg-opacity-95 backdrop-blur-lg">
-        {/* Top Search and filter bar */}
-        <div className="flex flex-row items-center">
-          {/* Search input */}
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={() => setScanMode(false)}
-            onBlur={() => setScanMode(true)}
-            ref={searchRef}
-            placeholder="Search items name, category or description..."
-            className={`w-80 p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
-          />
-
-          {/* Available products filter */}
-          <select
-            className={`ml-4 p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
-            value={filterValue}
-            ref={filterRef}
-            onFocus={() => setScanMode(false)}
-            onBlur={() => setScanMode(true)}
-            onChange={(e) => setFilterValue(e.target.value)}
-          >
-            <option value="All Products">All Products</option>
-            {['in Stock', 'out of Stock', 'low stock', 'discontinued'].map(
-              (option) => (
-                <option
-                  key={option}
-                  value={option}
-                  className={
-                    mode === 'light' ? lightThemeStyle : darkThemeStyle
-                  }
-                >
-                  {option}
-                </option>
-              )
-            )}
-          </select>
-        </div>
-
-        {/* action buttons */}
-        <div className="inline-flex ml-4 space-x-2">
-          <button className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue/80 relative">
-            <span>Pending Orders</span>
-            {/* Pending Orders Badge */}
-            {pendingOrders?.length > 0 && (
-              <motion.div
-                className={`absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center`}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                key={pendingOrders?.length}
-              >
-                {pendingOrders?.length}
-              </motion.div>
-            )}
-          </button>
-          <button className="px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300">
-            <span>Pending Registrations</span>
-          </button>
-          <button className="px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300">
-            Order Schedule
-          </button>
-        </div>
-      </div>
-
       {/* Sales point products */}
       <div className="flex-1 p-4">
         <div className="w-full h-full rounded-md p-4">
-          {activeMenuItem === 'Sales Items' && (
+          {activeMenuItem === 'sales-items' && (
             <SalesPointProducts
               scanMode={scanMode}
               setScanMode={setScanMode}
@@ -242,7 +182,7 @@ const SalesPointContent = ({
             />
           )}
 
-          {activeMenuItem === 'Cart' && (
+          {activeMenuItem === 'cart' && (
             <Cart
               products={products}
               cart={cart}
@@ -266,9 +206,9 @@ const SalesPointContent = ({
             />
           )}
 
-          {activeMenuItem === 'Customers' && <Customers />}
+          {activeMenuItem === 'customers' && <Customers />}
 
-          {activeMenuItem === 'Payments' && <Payments />}
+          {activeMenuItem === 'payments' && <Payments />}
         </div>
       </div>
     </div>

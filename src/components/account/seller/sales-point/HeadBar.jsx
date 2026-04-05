@@ -61,12 +61,13 @@ const HeadBar = ({
         <strong className="text-white">POS</strong>
       </div>
 
+      {/* Navigation Menu */}
       <nav className={`rounded-xl ${style}`}>
         <ul className="flex space-x-6">
           {(menuItems || []).map((item) => (
             <motion.div
               animate={
-                isAnimating && item.name === 'Cart'
+                isAnimating && item.name === 'cart'
                   ? {
                       scale: [1, 1.5, 0.9, 1.1, 1],
                       rotate: [0, -10, 10, -5, 0],
@@ -101,10 +102,10 @@ const HeadBar = ({
                   />
                 </div>
               )}
-              <span>{item.name}</span>
+              <span>{item.label}</span>
 
               {/* Cart Badge */}
-              {item.name === 'Cart' && cart?.items?.length > 0 && (
+              {item.name === 'cart' && cart?.items?.length > 0 && (
                 <motion.div
                   className={`absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center`}
                   initial={{ scale: 0 }}
@@ -119,6 +120,7 @@ const HeadBar = ({
         </ul>
       </nav>
 
+      {/* User Profile Section */}
       <div className="flex items-center space-x-4">
         {user?.profilePictureUrl ? (
           <Image

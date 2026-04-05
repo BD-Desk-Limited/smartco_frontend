@@ -10,18 +10,18 @@ import {
   FaGift,
   FaMoneyBillWaveAlt,
   FaRegClock,
-  FaTruckLoading,
 } from 'react-icons/fa';
 
 const BillAndSummary = ({
-  workBranchVATRate,
   linkedCustomerData,
   productsTax,
   itemUnitCost,
   taxfreeProduct,
-  cart,
+  workBranchVATRate,
+  cartItems,
   handlePendOrder,
   subtotal,
+  showButtons,
   mode,
   lightThemeStyle,
   darkThemeStyle,
@@ -56,21 +56,19 @@ const BillAndSummary = ({
       const discountValue = offer?.amountDiscount || 0;
       const discountPercentage = offer?.percentageDiscount || 0;
       const totalCashDiscount =
-        discountValue + (discountPercentage / 100) * subtotal;
+        discountValue + (discountPercentage / 100) * subtotal(cartItems);
       return total + totalCashDiscount;
     }, 0);
     return totalCashDiscount;
   };
 
   const getVATAmount = () => {
-    const taxableSubTotal = cart?.items?.reduce((acc, item) => {
+    const taxableSubTotal = cartItems?.reduce((acc, item) => {
       if (taxfreeProduct(item)) return acc; // skip tax calculation for tax-free products
       const costPerItem = itemUnitCost(item) * item.quantity;
       return acc + costPerItem;
     }, 0);
-
     const totalTaxable = taxableSubTotal - getTotalCashOfferDiscount(); // apply cash discounts before calculating VAT
-
     const vatAmount = (totalTaxable * workBranchVATRate) / 100;
     return vatAmount || 0;
   };
@@ -78,13 +76,16 @@ const BillAndSummary = ({
   const getTotal = () => {
     const vatAmount = getVATAmount();
     const total =
-      subtotal - getTotalCashOfferDiscount() + productsTax + vatAmount;
+      subtotal(cartItems) -
+      getTotalCashOfferDiscount() +
+      productsTax(cartItems) +
+      vatAmount;
     return total;
   };
 
   return (
     <div
-      className={`w-2/5 shadow-md bg-opacity-5 h-full rounded-md p-0 flex flex-col gap-4 ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      className={`shadow-md bg-opacity-5 h-full rounded-md p-0 flex flex-col gap-4 ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
       {/* Applied offer products */}
       {freeProductsOffers?.length > 0 && (
@@ -173,7 +174,8 @@ const BillAndSummary = ({
         <div className="mt-2 border-t pt-2">
           <h3 className="font-semibold mb-2">Bill Summary</h3>
           <p className="text-sm border-b flex flex-row justify-between">
-            <span>Sub-total:</span> <strong>{subtotal?.toFixed(2)}</strong>
+            <span>Sub-total:</span>{' '}
+            <strong>{subtotal(cartItems)?.toFixed(2)}</strong>
           </p>
           {getTotalCashOfferDiscount() > 0 && (
             <p className="text-sm border-b flex flex-row justify-between">
@@ -185,10 +187,10 @@ const BillAndSummary = ({
             </p>
           )}
 
-          {productsTax && productsTax > 0 && (
+          {productsTax(cartItems) && productsTax(cartItems) > 0 && (
             <p className="text-sm border-b flex flex-row justify-between">
               <span>Products Tax:</span>{' '}
-              <strong>{productsTax?.toFixed(2)}</strong>
+              <strong>{productsTax(cartItems)?.toFixed(2)}</strong>
             </p>
           )}
           {getVATAmount() && getVATAmount() > 0 && (
@@ -205,25 +207,27 @@ const BillAndSummary = ({
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-row justify-between items-baseline bottom-0 absolute bg-opacity-95 backdrop-blur-lg w-full text-sm">
-          <button className="px-1 py-2 bg-gray-shadow3 hover:bg-gray-shadow4 rounded-md text-white flex items-center gap-1 h-fit">
-            <FaBook className="inline-block mr-1" />
-            Schedule Order
-          </button>
+        {showButtons && (
+          <div className="flex flex-row justify-between items-baseline bottom-0 absolute bg-opacity-95 backdrop-blur-lg w-full text-sm">
+            <button className="px-1 py-2 bg-gray-shadow3 hover:bg-gray-shadow4 rounded-md text-white flex items-center gap-1 h-fit">
+              <FaBook className="inline-block mr-1" />
+              Schedule Order
+            </button>
 
-          <button
-            className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit"
-            onClick={handlePendOrder}
-          >
-            <FaRegClock className="inline-block mr-1" />
-            Pend Order
-          </button>
+            <button
+              className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit"
+              onClick={handlePendOrder}
+            >
+              <FaRegClock className="inline-block mr-1" />
+              Pend Order
+            </button>
 
-          <button className="p-4 bg-brand-green rounded-md hover:bg-green-shadow1 text-white flex items-center gap-1 text-base font-semibold">
-            <FaCheckDouble className="inline-block mr-1" />
-            Checkout
-          </button>
-        </div>
+            <button className="p-4 bg-brand-green rounded-md hover:bg-green-shadow1 text-white flex items-center gap-1 text-base font-semibold">
+              <FaCheckDouble className="inline-block mr-1" />
+              Checkout
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

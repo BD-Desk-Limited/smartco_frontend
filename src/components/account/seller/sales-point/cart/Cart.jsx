@@ -68,7 +68,7 @@ const Cart = ({
   // if cart is empty, switch to sales items tab
   useEffect(() => {
     if (cart?.items?.length === 0) {
-      setActiveMenuItem('Sales Items');
+      setActiveMenuItem('sales-items');
     }
   }, [cart?.items, setActiveMenuItem]);
 
@@ -167,18 +167,19 @@ const Cart = ({
     return taxAmount + additionalTaxAmount;
   };
 
-  const productsTax = cart?.items?.reduce((acc, item) => {
-    return acc + productItemTax(item) * item.quantity;
-  }, 0);
+  const productsTax = (cartItems) =>
+    cartItems?.reduce((acc, item) => {
+      return acc + productItemTax(item) * item.quantity;
+    }, 0);
 
-  const subtotal = cart?.items?.reduce((acc, item) => {
-    return acc + itemTotalCost(item);
-  }, 0);
+  const subtotal = (cartItems) =>
+    cartItems?.reduce((acc, item) => {
+      return acc + itemTotalCost(item);
+    }, 0);
 
   const taxfreeProduct = (item) => {
     return item?.product?.productTax?.isTaxExcluded || false;
   };
-  console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
     <div className="h-full rounded-lg">
@@ -254,19 +255,22 @@ const Cart = ({
             </div>
 
             {/* Bill summary and offers section */}
-            <BillAndSummary
-              linkedCustomerData={linkedCustomerData}
-              productsTax={productsTax}
-              subtotal={subtotal}
-              cart={cart}
-              handlePendOrder={handlePendOrder}
-              workBranchVATRate={workBranchVATRate}
-              taxfreeProduct={taxfreeProduct}
-              itemUnitCost={itemUnitCost}
-              mode={mode}
-              lightThemeStyle={lightThemeStyle}
-              darkThemeStyle={darkThemeStyle}
-            />
+            <div className="w-2/5 h-full">
+              <BillAndSummary
+                linkedCustomerData={linkedCustomerData}
+                productsTax={productsTax}
+                subtotal={subtotal}
+                cartItems={cart?.items}
+                handlePendOrder={handlePendOrder}
+                workBranchVATRate={workBranchVATRate}
+                taxfreeProduct={taxfreeProduct}
+                itemUnitCost={itemUnitCost}
+                showButtons={true}
+                mode={mode}
+                lightThemeStyle={lightThemeStyle}
+                darkThemeStyle={darkThemeStyle}
+              />
+            </div>
           </div>
         )}
       </div>

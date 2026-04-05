@@ -111,7 +111,7 @@ const CustomerLookUp = ({
 
   return (
     <div
-      className={`w-[640px] h-[70vh] flex justify-center items-center opacity-95 rounded-xl p-5 relative ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      className={`w-[640px] h-[90%] flex justify-center items-center opacity-95 rounded-xl p-5 relative ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
       onClick={handleCloseIfNotScanning}
     >
       {loading ? (
@@ -180,13 +180,13 @@ const CustomerLookUp = ({
                 <span className="">Available offers & claims</span>
               </span>
               {/* customer available claims */}
-              <div className="w-full h-[calc(95%-6rem)] flex flex-col items-center justify-center gap-4">
+              <div className="w-full h-[calc(95%-6rem)] flex flex-col items-center justify-center gap-4 pb-5">
                 {customerData.claims && customerData.claims.length > 0 ? (
                   <div className="w-full h-full overflow-y-auto scrollbar-thin">
                     {customerData.claims.map((claim, index) => (
                       <div
                         key={index}
-                        className="w-full h-auto p-2 border-y flex flex-col gap-2"
+                        className="w-full py-2 px-2 border-y flex flex-col gap-2"
                       >
                         {/* claim type header with toggle */}
                         <span className="font-semibold capitalize text-brand-green flex flex-row justify-between items-center w-full relative">
