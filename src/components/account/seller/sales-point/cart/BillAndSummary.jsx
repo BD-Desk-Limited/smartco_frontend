@@ -2,11 +2,7 @@ import Button from '@/components/account/Button';
 import Image from 'next/image';
 import React from 'react';
 import {
-  FaBook,
-  FaCheck,
   FaCheckDouble,
-  FaClock,
-  FaFileInvoiceDollar,
   FaGift,
   FaMoneyBillWaveAlt,
   FaRegClock,
@@ -21,10 +17,12 @@ const BillAndSummary = ({
   cartItems,
   handlePendOrder,
   subtotal,
+  setTotal,
   showButtons,
   mode,
   lightThemeStyle,
   darkThemeStyle,
+  handleCheckout,
 }) => {
   //helper function to get label for selected choices of an offer product
   const getSelectedChoicesLabel = (selectedChoices) => {
@@ -46,12 +44,13 @@ const BillAndSummary = ({
       (offer) => offer.type === 'product'
     ) || [];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cashDiscounts =
     linkedCustomerData?.appliedOffers?.filter(
       (offer) => offer.type === 'cash'
     ) || [];
 
-  const getTotalCashOfferDiscount = () => {
+  const getTotalCashOfferDiscount = React.useCallback(() => {
     const totalCashDiscount = cashDiscounts.reduce((total, offer) => {
       const discountValue = offer?.amountDiscount || 0;
       const discountPercentage = offer?.percentageDiscount || 0;
@@ -60,9 +59,9 @@ const BillAndSummary = ({
       return total + totalCashDiscount;
     }, 0);
     return totalCashDiscount;
-  };
+  }, [cashDiscounts, subtotal, cartItems]);
 
-  const getVATAmount = () => {
+  const getVATAmount = React.useCallback(() => {
     const taxableSubTotal = cartItems?.reduce((acc, item) => {
       if (taxfreeProduct(item)) return acc; // skip tax calculation for tax-free products
       const costPerItem = itemUnitCost(item) * item.quantity;
@@ -71,9 +70,15 @@ const BillAndSummary = ({
     const totalTaxable = taxableSubTotal - getTotalCashOfferDiscount(); // apply cash discounts before calculating VAT
     const vatAmount = (totalTaxable * workBranchVATRate) / 100;
     return vatAmount || 0;
-  };
+  }, [
+    cartItems,
+    getTotalCashOfferDiscount,
+    itemUnitCost,
+    taxfreeProduct,
+    workBranchVATRate,
+  ]);
 
-  const getTotal = () => {
+  const getTotal = React.useCallback(() => {
     const vatAmount = getVATAmount();
     const total =
       subtotal(cartItems) -
@@ -81,7 +86,18 @@ const BillAndSummary = ({
       productsTax(cartItems) +
       vatAmount;
     return total;
-  };
+  }, [
+    getVATAmount,
+    subtotal,
+    cartItems,
+    getTotalCashOfferDiscount,
+    productsTax,
+  ]);
+
+  React.useEffect(() => {
+    const calculatedTotal = getTotal();
+    setTotal(calculatedTotal);
+  }, [getTotal, setTotal]);
 
   return (
     <div
@@ -209,11 +225,6 @@ const BillAndSummary = ({
         {/* Buttons */}
         {showButtons && (
           <div className="flex flex-row justify-between items-baseline bottom-0 absolute bg-opacity-95 backdrop-blur-lg w-full text-sm">
-            <button className="px-1 py-2 bg-gray-shadow3 hover:bg-gray-shadow4 rounded-md text-white flex items-center gap-1 h-fit">
-              <FaBook className="inline-block mr-1" />
-              Schedule Order
-            </button>
-
             <button
               className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit"
               onClick={handlePendOrder}
@@ -222,7 +233,10 @@ const BillAndSummary = ({
               Pend Order
             </button>
 
-            <button className="p-4 bg-brand-green rounded-md hover:bg-green-shadow1 text-white flex items-center gap-1 text-base font-semibold">
+            <button
+              className="p-4 bg-brand-green rounded-md hover:bg-green-shadow1 text-white flex items-center gap-1 text-base font-semibold"
+              onClick={handleCheckout}
+            >
               <FaCheckDouble className="inline-block mr-1" />
               Checkout
             </button>

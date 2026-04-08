@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaSearch, FaBarcode } from 'react-icons/fa';
 import CustomerLookUp from './CustomerLookUp';
 import { fetchCustomerData } from './sampleData';
 import CartProductList from './CartProductList';
@@ -14,6 +13,7 @@ const Cart = ({
   setActiveMenuItem,
   handleScan,
   handlePendOrder,
+  handleCheckout,
   scannedId,
   setScannedId,
   scanMode,
@@ -27,6 +27,7 @@ const Cart = ({
   darkThemeStyle,
 }) => {
   const inputRef = useRef(null);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [customerData, setCustomerData] = useState({});
   const [linkedCustomerData, setLinkedCustomerData] = useState({});
@@ -35,6 +36,12 @@ const Cart = ({
   const [customerFetchError, setCustomerFetchError] = useState('');
   const [awaitingScanForCustomer, setAwaitingScanForCustomer] = useState(false);
   const [appliedOffers, setAppliedOffers] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   const workBranchVATRate =
     workBranch && workBranch.taxBand?.rates[0]?.rate
       ? workBranch.taxBand.rates[0].rate
@@ -181,6 +188,10 @@ const Cart = ({
     return item?.product?.productTax?.isTaxExcluded || false;
   };
 
+  if (!isHydrated) {
+    return null;
+  }
+
   return (
     <div className="h-full rounded-lg">
       {/*Hidden Scanner input */}
@@ -262,11 +273,13 @@ const Cart = ({
                 subtotal={subtotal}
                 cartItems={cart?.items}
                 handlePendOrder={handlePendOrder}
+                handleCheckout={handleCheckout}
                 workBranchVATRate={workBranchVATRate}
                 taxfreeProduct={taxfreeProduct}
                 itemUnitCost={itemUnitCost}
                 showButtons={true}
                 mode={mode}
+                setTotal={setTotal}
                 lightThemeStyle={lightThemeStyle}
                 darkThemeStyle={darkThemeStyle}
               />

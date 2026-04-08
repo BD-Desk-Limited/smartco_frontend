@@ -43,6 +43,20 @@ const CartProductList = ({
     }));
   };
 
+  const handleRemoveFromCart = (item) => {
+    if (cart?.items?.length === 1) {
+      setCart({
+        items: [],
+      }); // Clear cart if it's the last item
+      return;
+    }
+    // Remove the item from the cart if there are multiple items
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.filter((cartItem) => cartItem !== item),
+    }));
+  };
+
   return (
     <div
       className={`p-1 ml-5 flex-1 overflow-y-auto max-h-[50vh] scrollbar-thin ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
@@ -129,12 +143,7 @@ const CartProductList = ({
               <FaTrashAlt
                 title="remove from cart"
                 className={` text-error transition-transform duration-100`}
-                onClick={() =>
-                  setCart((prev) => ({
-                    ...prev,
-                    items: prev.items.filter((cartItem) => cartItem !== item),
-                  }))
-                }
+                onClick={() => handleRemoveFromCart(item)}
               />
             </button>
           </div>

@@ -14,36 +14,35 @@ const SubHeadbar = ({
   darkThemeStyle,
   pendingOrders,
   setActiveMenuItem,
+  activeMenuItem,
 }) => {
   //mapping utility buttons to their respective actions, values and styles for easier management and scalability
   const utilityButtons = [
+    // Note: Do not change the keys as they are used to determine which content to show in the main area. for Consistency across the application, only change the label and onClick actions as needed.
     {
       label: 'Pending Orders',
+      key: 'pending-orders',
       onClick: () => setActiveMenuItem('pending-orders'),
       showBadge: pendingOrders?.length > 0,
       badgeContent: pendingOrders?.length,
       badgeStyle:
         'absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center',
-      buttonStyle:
-        'px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-brand-blue/80 relative',
     },
     {
       label: 'Pending Registrations',
+      key: 'pending-registrations',
       onClick: () => setActiveMenuItem('pending-registrations'),
       showBadge: false,
       badgeContent: null,
       badgeStyle: '',
-      buttonStyle:
-        'px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300',
     },
     {
-      label: 'Order Schedule',
-      onClick: () => setActiveMenuItem('order-schedule'),
+      label: 'Scheduled Orders',
+      key: 'scheduled-orders',
+      onClick: () => setActiveMenuItem('scheduled-orders'),
       showBadge: false,
       badgeContent: null,
       badgeStyle: '',
-      buttonStyle:
-        'px-4 py-2 bg-gray-200 text-text-black rounded-md hover:bg-gray-300',
     },
   ];
 
@@ -99,7 +98,12 @@ const SubHeadbar = ({
         {utilityButtons.map((button) => (
           <button
             key={button.label}
-            className={button.buttonStyle}
+            className={`
+              px-2 py-2 rounded-md hover:border-brand-green hover:shadow-inner border-2 border-gray-border relative
+              ${
+                activeMenuItem === button.key ? 'bg-brand-green text-white' : ''
+              } transition-colors duration-200
+            `}
             onClick={button.onClick}
           >
             <span>{button.label}</span>

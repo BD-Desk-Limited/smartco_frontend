@@ -1,37 +1,13 @@
 import React from 'react';
-import { useNotification } from '@/contexts/notificationContext';
-import {
-  FaCartPlus,
-  FaChevronDown,
-  FaChevronLeft,
-  FaTrash,
-  FaUserCircle,
-} from 'react-icons/fa';
 import BillAndSummary from '../cart/BillAndSummary';
-import {
-  productsTax,
-  itemUnitCost,
-  subtotal,
-  taxfreeProduct,
-} from '../cart/CartBillCalculationFunctions';
-import Image from 'next/image';
+import { useNotification } from '@/contexts/notificationContext';
 
-const PendingOrder = ({
-  pendingOrders,
-  setPendingOrders,
-  handlePendOrder,
-  setCart,
-  setActiveMenuItem,
-  workBranch,
-  mode,
-  lightThemeStyle,
-  darkThemeStyle,
-}) => {
+const ScheduledOrdersForToday = ({ activeMenuItem }) => {
   const { showNotification } = useNotification();
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [selectedPendingOrder, setSelectedPendingOrder] = React.useState(null);
-  const [openDropdown, setOpenDropdown] = React.useState({});
-  const [total, setTotal] = React.useState(0);
+  const [selectedScheduledOrder, setSelectedScheduledOrder] =
+    React.useState(null);
+  {
+    /*const [openDropdown, setOpenDropdown] = React.useState({});
   const workBranchVATRate =
     workBranch && workBranch.taxBand?.rates[0]?.rate
       ? workBranch.taxBand.rates[0].rate
@@ -42,12 +18,12 @@ const PendingOrder = ({
 
     setCart((prev) => ({
       ...prev,
-      ...pendingOrder,
-      restoredFromPendAt: new Date().toISOString(),
+      items: pendingOrder?.items || [],
+      linkedCustomer: pendingOrder?.linkedCustomer || null,
     }));
 
     setPendingOrders((prev) =>
-      prev.filter((order) => order.orderId !== pendingOrder.orderId)
+      prev.filter((order) => order.id !== pendingOrder.id)
     );
 
     showNotification(
@@ -100,11 +76,14 @@ const PendingOrder = ({
       [orderId]: !prev[orderId],
     }));
   };
+  */
+  }
 
   return (
     <div className="h-full w-full p-1 flex flex-row justify-between relative">
+      Orders scheduled for today
       {/* back button */}
-      <button
+      {/*<button
         className="p-1 absolute top-1 left-1 z-10 text-brand-green hover:scale-105 transition-transform rounded-md"
         onClick={() => setActiveMenuItem('sales-items')}
       >
@@ -135,28 +114,28 @@ const PendingOrder = ({
           <div className="flex flex-col gap-3">
             {filteredOrders?.map((order) => (
               <div
-                key={order.orderId}
+                key={order.id}
                 onClick={(e) => {
                   setSelectedPendingOrder(order);
-                  handleToggleDropdown(e, order.orderId);
+                  handleToggleDropdown(e, order.id);
                 }}
                 className={`flex flex-col ${
                   mode === 'light'
                     ? `hover:bg-gray-shadow8 ${
-                        selectedPendingOrder?.orderId === order.orderId
+                        selectedPendingOrder?.id === order.id
                           ? 'bg-gray-shadow9 rounded-sm'
                           : ''
                       }`
                     : `hover:bg-gray-shadow2 ${
-                        selectedPendingOrder?.orderId === order.orderId
+                        selectedPendingOrder?.id === order.id
                           ? 'bg-gray-shadow1 rounded-sm'
                           : ''
                       }`
                 } cursor-pointer p-2 flex items-center justify-between transition-colors shadow-sm`}
               >
-                {/* Order list items */}
+                {//* Order list items }
                 <div className="w-full flex flex-row items-center justify-between">
-                  {/* Customer/order info with profile image or icon */}
+                  {//* Customer/order info with profile image or icon}
                   <div className="flex flex-row gap-2">
                     <span className="text-sm font-medium w-10 h-10 flex items-center justify-center bg-gray-200 rounded-sm overflow-hidden">
                       {order?.linkedCustomer?.imageUrl ? (
@@ -180,9 +159,7 @@ const PendingOrder = ({
                         {order.linkedCustomer?.name ||
                           `Order added ${new Date(order.pendTime).toLocaleString()}`}
                       </span>
-                      <span className="text-sm opacity-70">
-                        {order.orderId}
-                      </span>
+                      <span className="text-sm opacity-70">{order.id}</span>
                       <span className="text-sm opacity-70">{`Items in Order: ${order.items?.length || 0}`}</span>
                       {order.linkedCustomer && (
                         <span className="text-xs opacity-70">{`Order added ${new Date(order.pendTime).toLocaleString()}`}</span>
@@ -190,7 +167,7 @@ const PendingOrder = ({
                     </div>
                   </div>
 
-                  {/* Action buttons and dropdown arrow */}
+                  {//* Action buttons and dropdown arrow}
                   <div className="flex flex-row items-center gap-4">
                     <div className="flex items-center gap-4">
                       <button
@@ -202,9 +179,7 @@ const PendingOrder = ({
                       </button>
                       <button
                         className="text-error transition-colors p-1 rounded-md hover:border"
-                        onClick={(e) =>
-                          handleDeletePendingOrder(e, order.orderId)
-                        }
+                        onClick={(e) => handleDeletePendingOrder(e, order.id)}
                         title="Delete from list"
                       >
                         <FaTrash className="inline-block" />
@@ -229,7 +204,7 @@ const PendingOrder = ({
                   </div>
                 </div>
 
-                {/* Dropdown content */}
+                {//* Dropdown content}
                 {openDropdown[order.id] && (
                   <div className={`w-full mt-2 px-5 shadow-sm`}>
                     <span className="text-sm font-semibold">Order Items:</span>
@@ -264,13 +239,12 @@ const PendingOrder = ({
             </p>
           </div>
         )}
-      </div>
-
+      </div>*/}
       <div className="w-2/5 h-full p-3">
-        {selectedPendingOrder && (
+        {selectedScheduledOrder && (
           <BillAndSummary
-            cartItems={selectedPendingOrder?.items || []}
-            linkedCustomerData={selectedPendingOrder?.linkedCustomer || null}
+            cartItems={selectedScheduledOrder?.items || []}
+            linkedCustomerData={selectedScheduledOrder?.linkedCustomer || null}
             productsTax={productsTax}
             subtotal={subtotal}
             handlePendOrder={handlePendOrder}
@@ -278,7 +252,6 @@ const PendingOrder = ({
             taxfreeProduct={taxfreeProduct}
             itemUnitCost={itemUnitCost}
             showButtons={false}
-            setTotal={setTotal}
             mode={mode}
             lightThemeStyle={lightThemeStyle}
             darkThemeStyle={darkThemeStyle}
@@ -289,4 +262,4 @@ const PendingOrder = ({
   );
 };
 
-export default PendingOrder;
+export default ScheduledOrdersForToday;

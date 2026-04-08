@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNotification } from '@/contexts/notificationContext';
-import SalesPointProducts from '../sales-items/SalesPointProducts';
-import { fetchProductsFromAPI } from '../productFetchManagement';
-import Cart from '../cart/Cart';
-import Customers from '../customers/Customers';
-import Payments from '../payments/Payments';
+import SalesPointProducts from './sales-items/SalesPointProducts';
+import { fetchProductsFromAPI } from './productFetchManagement';
+import Cart from './cart/Cart';
+import Payment from './payment/Payment';
 
 const SalesPointContent = ({
   mode,
@@ -30,6 +29,7 @@ const SalesPointContent = ({
   cart,
   setCart,
   pendingOrders,
+  handleCheckout,
   setPendingOrders,
   MAX_ALLOWED_PENDING_ORDERS,
   handleAddToCart,
@@ -109,10 +109,10 @@ const SalesPointContent = ({
     }
   };
 
-  // Handle creating pending order
+  // Handle pending order
   const handlePendOrder = () => {
     // create a unique ID for the pending order using timestamp and random string
-    const pendingOrderId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const orderId = `ID-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     if (cart?.items?.length > 0) {
       if (pendingOrders?.length >= MAX_ALLOWED_PENDING_ORDERS) {
         showNotification(
@@ -125,14 +125,13 @@ const SalesPointContent = ({
       }
       setPendingOrders((prev) => [
         {
-          id: pendingOrderId,
-          items: cart?.items,
-          linkedCustomer: cart?.linkedCustomer,
-          pendTime: new Date().toISOString(),
+          ...cart,
+          orderId: cart?.orderId || orderId,
+          pendTime: cart?.pendTime || new Date().toISOString(),
         },
         ...prev,
       ]);
-      setCart((prev) => ({ ...prev, items: [], linkedCustomer: null })); // Clear cart after creating pending order
+      setCart({ items: [] }); // Clear cart after creating pending order
 
       // Show success notification
       showNotification(
@@ -141,74 +140,65 @@ const SalesPointContent = ({
         `${cart?.items?.length} item(s) saved as pending order`,
         3000
       );
+    } else {
+      showNotification('error', 'No Items in Cart', ' ', 3000);
     }
   };
+
+  const SHARED_PROPS = {
+    scanMode,
+    setScanMode,
+    handleScan,
+    scannedId,
+    setScannedId,
+    searchRef,
+    filterRef,
+    searchCustomerRef,
+    products,
+    filteredProducts,
+    selectedProduct,
+    setSelectedProduct,
+    quantity,
+    setQuantity,
+    productCategories,
+    setProductCategories,
+    selectedCategory,
+    setSelectedCategory,
+    handleRefreshProducts,
+    refreshingProducts,
+    loading,
+    error,
+    mode,
+    lightThemeStyle,
+    darkThemeStyle,
+    activeMenuItem,
+    cart,
+    setCart,
+    handlePendOrder,
+    handleCheckout,
+    workBranch,
+    setActiveMenuItem,
+    handleAddToCart,
+    workBranchKey,
+  };
+
+  // map active menu item to content component - if no match, default to sales point products to allow dynamic switching between numerous stages of sales point without losing state of products, cart, etc
+  const CONTENT_COMPONENT_MAP = {
+    'sales-items': SalesPointProducts,
+    cart: Cart,
+    payment: Payment,
+  };
+
+  const ActiveContentComponent =
+    CONTENT_COMPONENT_MAP[activeMenuItem] || SalesPointProducts;
 
   return (
     <div className="h-full w-full flex flex-col relative">
       {/* Sales point products */}
       <div className="flex-1 p-4">
         <div className="w-full h-full rounded-md p-4">
-          {activeMenuItem === 'sales-items' && (
-            <SalesPointProducts
-              scanMode={scanMode}
-              setScanMode={setScanMode}
-              handleScan={handleScan}
-              scannedId={scannedId}
-              setScannedId={setScannedId}
-              searchRef={searchRef}
-              filterRef={filterRef}
-              searchCustomerRef={searchCustomerRef}
-              products={products}
-              filteredProducts={filteredProducts}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              quantity={quantity}
-              setQuantity={setQuantity}
-              cart={cart}
-              productCategories={productCategories}
-              setProductCategories={setProductCategories}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              handleRefreshProducts={handleRefreshProducts}
-              refreshingProducts={refreshingProducts}
-              loading={loading}
-              error={error}
-              mode={mode}
-              lightThemeStyle={lightThemeStyle}
-              darkThemeStyle={darkThemeStyle}
-              workBranch={workBranch}
-              activeMenuItem={activeMenuItem}
-            />
-          )}
-
-          {activeMenuItem === 'cart' && (
-            <Cart
-              products={products}
-              cart={cart}
-              setCart={setCart}
-              handleScan={handleScan}
-              handlePendOrder={handlePendOrder}
-              scannedId={scannedId}
-              setScannedId={setScannedId}
-              workBranch={workBranch}
-              scanMode={scanMode}
-              setScanMode={setScanMode}
-              searchRef={searchRef}
-              filterRef={filterRef}
-              searchCustomerRef={searchCustomerRef}
-              setActiveMenuItem={setActiveMenuItem}
-              mode={mode}
-              lightThemeStyle={lightThemeStyle}
-              darkThemeStyle={darkThemeStyle}
-              handleAddToCart={handleAddToCart}
-              workBranchKey={workBranchKey}
-            />
-          )}
-
-          {activeMenuItem === 'customers' && <Customers />}
-
-          {activeMenuItem === 'payments' && <Payments />}
+          {/* Dynamically render the active content component based on the selected menu item */}
+          <ActiveContentComponent {...SHARED_PROPS} />
         </div>
       </div>
     </div>

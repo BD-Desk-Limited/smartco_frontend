@@ -11,7 +11,7 @@ const getVATAmount = (cartItems, cashDiscounts, workBranchVATRate) => {
 };
 
 const getTotalCashOfferDiscount = (cashDiscounts, cartItems) => {
-  const totalCashDiscount = cashDiscounts.reduce((total, offer) => {
+  const totalCashDiscount = cashDiscounts?.reduce((total, offer) => {
     const discountValue = offer?.amountDiscount || 0;
     const discountPercentage = offer?.percentageDiscount || 0;
     const totalCashDiscount =

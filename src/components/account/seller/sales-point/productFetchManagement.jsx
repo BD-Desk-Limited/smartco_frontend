@@ -1699,31 +1699,69 @@ const fetchProductsFromAPI = async () => {
   });
 };
 
-const fetchProductsFromIndexedDB = async () => {
+const fetchProductsDataFromIndexedDB = async () => {
+  // sample object to return
+  const result = {
+    success: true,
+    updatedAt: new Date().toISOString(),
+    products: sampleProducts,
+  };
+
   // Simulate fetching products from IndexedDB
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(sampleProducts);
+      resolve(result);
     }, 1000);
   });
 };
 
-const loadProducts = async () => {
+const updateProductsInIndexedDB = async (products) => {
+  //sample object to return
+  const result = {
+    updatedAt: new Date().toISOString(),
+    productsUpdated: products.length,
+    products: products,
+  };
+
+  // Simulate updating products in IndexedDB
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(result);
+    }, 1000);
+  });
+};
+
+const loadProducts = async (forceRefresh = false) => {
   try {
     // Load products from indexedDB or API based on last refresh time
-    const lastRefresh = localStorage.getItem('lastProductRefresh'); // Timestamp of last refresh
+    const DBData = await fetchProductsDataFromIndexedDB(); // Timestamp of last refresh
     const now = new Date().getTime(); // Current timestamp
     // If last refresh was more than 24 hours ago, fetch from API, otherwise load from indexedDB
-    if (!lastRefresh || now - lastRefresh > 24 * 60 * 60 * 1000) {
+    if (
+      forceRefresh ||
+      !DBData?.updatedAt ||
+      now - new Date(DBData.updatedAt).getTime() > 24 * 60 * 60 * 1000
+    ) {
       const fetchedProducts = await fetchProductsFromAPI();
-      localStorage.setItem('lastProductRefresh', now);
+      //update indexedDB with new products
+      await updateProductsInIndexedDB(fetchedProducts);
       return fetchedProducts;
     } else {
-      const indexedDBProducts = await fetchProductsFromIndexedDB();
-      return indexedDBProducts;
+      const indexedDBProducts = await fetchProductsDataFromIndexedDB();
+      return indexedDBProducts?.products || [];
     }
   } catch (err) {
     console.error('Error loading products:', err);
+    throw err;
+  }
+};
+
+const fetchProductsFromIndexedDB = async () => {
+  try {
+    const indexedDBProducts = await fetchProductsDataFromIndexedDB();
+    return indexedDBProducts?.products || [];
+  } catch (err) {
+    console.error('Error fetching products from IndexedDB:', err);
     throw err;
   }
 };

@@ -45,17 +45,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'customers',
-      label: 'Customers',
-      iconPath: {
-        light: '/assets/customers_white.png',
-        dark: '/assets/customers_dark.png',
-        active: '/assets/customers_green.png',
-      },
-    },
-    {
-      name: 'payments',
-      label: 'Payments',
+      name: 'payment',
+      label: 'Payment',
       iconPath: {
         light: '/assets/card_white.png',
         dark: '/assets/card_dark.png',
@@ -161,88 +152,88 @@ const SalesPointPage = () => {
       <div
         className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
       >
-      {/* Select Branch */}
-      {branchesAccessibleOnDevice.length > 0 && !workBranch && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
-        >
-          <SelectWorkBranch
-            branchesAccessibleOnDevice={branchesAccessibleOnDevice}
-            handleWorkBranchSelect={handleWorkBranchSelect}
-            logOutSalesPoint={logOutSalesPoint}
+        {/* Select Branch */}
+        {branchesAccessibleOnDevice.length > 0 && !workBranch && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
+          >
+            <SelectWorkBranch
+              branchesAccessibleOnDevice={branchesAccessibleOnDevice}
+              handleWorkBranchSelect={handleWorkBranchSelect}
+              logOutSalesPoint={logOutSalesPoint}
+              style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
+            />
+          </div>
+        )}
+
+        {/* User Branch Access Warning Modal */}
+        {userBranchAccessWarning && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <WarningModal
+              title="Access Denied"
+              message={`Sorry, you do not have access to ${userBranchAccessWarningBranch?.name}, kindly contact your admin for assistance`}
+              onClick={() => {
+                setWorkBranch(null);
+                setUserBranchAccessWarning(false);
+              }}
+              onClose={() => router.push(`/pages/auth/login/sales-point`)}
+              button1Text={`Choose another branch`}
+              button2Text={`Logout`}
+            />
+          </div>
+        )}
+
+        {/* No Branches Authorized for Device */}
+        {deviceNotAuthorizedForAnyBranch && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <ErrorModal
+              title="Unauthorized Device"
+              message={`Sorry, this device is not authorized for any branch use, kindly contact your admin for assistance`}
+              buttonStyle={`bg-error text-white`}
+              onClose={logOutSalesPoint}
+            />
+          </div>
+        )}
+
+        {/* check if the branch the user has logged into is active */}
+        {workBranch && workBranch.status !== 'active' && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <ErrorModal
+              title="Inactive Branch"
+              message={`Sorry, this branch is inactive, kindly contact your admin for assistance`}
+              buttonStyle={`bg-error text-white`}
+              onClose={logOutSalesPoint}
+            />
+          </div>
+        )}
+
+        {/* Shift Creation Enforcement Check */}
+        {/*workBranch && workBranch.settings.shiftCreationEnforced && (
+          <ShiftManagement
+            onClose={logOutSalesPoint}
             style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
           />
-        </div>
-      )}
+        )*/}
 
-      {/* User Branch Access Warning Modal */}
-      {userBranchAccessWarning && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <WarningModal
-            title="Access Denied"
-            message={`Sorry, you do not have access to ${userBranchAccessWarningBranch?.name}, kindly contact your admin for assistance`}
-            onClick={() => {
-              setWorkBranch(null);
-              setUserBranchAccessWarning(false);
-            }}
-            onClose={() => router.push(`/pages/auth/login/sales-point`)}
-            button1Text={`Choose another branch`}
-            button2Text={`Logout`}
-          />
-        </div>
-      )}
-
-      {/* No Branches Authorized for Device */}
-      {deviceNotAuthorizedForAnyBranch && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <ErrorModal
-            title="Unauthorized Device"
-            message={`Sorry, this device is not authorized for any branch use, kindly contact your admin for assistance`}
-            buttonStyle={`bg-error text-white`}
-            onClose={logOutSalesPoint}
-          />
-        </div>
-      )}
-
-      {/* check if the branch the user has logged into is active */}
-      {workBranch && workBranch.status !== 'active' && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <ErrorModal
-            title="Inactive Branch"
-            message={`Sorry, this branch is inactive, kindly contact your admin for assistance`}
-            buttonStyle={`bg-error text-white`}
-            onClose={logOutSalesPoint}
-          />
-        </div>
-      )}
-
-      {/* Shift Creation Enforcement Check */}
-      {/*workBranch && workBranch.settings.shiftCreationEnforced && (
-        <ShiftManagement
-          onClose={logOutSalesPoint}
-          style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
+        {/* Main Sales Point Interface */}
+        <SalesPoint
+          mode={mode}
+          setMode={setMode}
+          menuItems={menuItems}
+          activeMenuItem={activeMenuItem}
+          setActiveMenuItem={setActiveMenuItem}
+          lightThemeStyle={lightThemeStyle}
+          darkThemeStyle={darkThemeStyle}
+          workBranch={workBranch}
+          workBranchKey={workBranchKey}
+          logOutSalesPoint={logOutSalesPoint}
         />
-      )*/}
-
-      {/* Main Sales Point Interface */}
-      <SalesPoint
-        mode={mode}
-        setMode={setMode}
-        menuItems={menuItems}
-        activeMenuItem={activeMenuItem}
-        setActiveMenuItem={setActiveMenuItem}
-        lightThemeStyle={lightThemeStyle}
-        darkThemeStyle={darkThemeStyle}
-        workBranch={workBranch}
-        workBranchKey={workBranchKey}
-        logOutSalesPoint={logOutSalesPoint}
-      />
       </div>
     </NotificationProvider>
   );

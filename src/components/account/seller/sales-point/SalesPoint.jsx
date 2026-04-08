@@ -5,13 +5,14 @@ import { motion } from 'framer-motion';
 import { useSalesPoint } from '@/contexts/salesPointContext';
 import { useAuth } from '@/contexts/authContext';
 import { useNotification } from '@/contexts/notificationContext';
-import SalesPointContent from './sales-items/SalesPointContent';
+import SalesPointContent from './SalesPointContent';
 import PendingOrder from './pending-order/PendingOrder';
 import { loadProducts } from './productFetchManagement';
 import SelectedProductCard from './sales-items/SelectedProductCard';
 import { FaTimes } from 'react-icons/fa';
 import SubHeadbar from './SubHeadbar';
 import SalesPointNotification from './notifications/SalesPointNotification';
+import ScheduledOrdersForToday from './scheduled-orders-for-today/ScheduledOrdersForToday';
 
 const SalesPoint = ({
   mode,
@@ -210,12 +211,29 @@ const SalesPoint = ({
         items: [...(prev?.items || []), newProduct],
       }));
     }
+    //mark the time when the first product was added, to track how long each transaction takes from start to finish
+    const orderId = `ID-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    if (!cart?.orderStartTime || !cart?.orderId) {
+      setCart((prev) => ({
+        ...prev,
+        orderStartTime: prev.orderStartTime || new Date().toISOString(),
+        orderId: prev.orderId || orderId,
+      }));
+    }
     onClose();
   };
 
+  const handleCheckout = () => {
+    setCart((prev) => ({
+      ...prev,
+      checkoutInitiatedAt: prev.checkoutInitiatedAt || new Date().toISOString(),
+    }));
+    setActiveMenuItem('payment');
+  };
+
   console.log(
-    'Pending orders from context:',
-    salesPointState?.find((s) => s.seller === user?._id)?.states?.pending_orders
+    'Cart from context:',
+    salesPointState?.find((s) => s.seller === user?._id)?.states?.cart
   );
 
   const handleSelectComponents = () => {
@@ -258,6 +276,7 @@ const SalesPoint = ({
     pendingOrderSchedule,
     setPendingOrderSchedule,
     handleAddToCart,
+    handleCheckout,
     workBranch,
     workBranchKey,
   };
@@ -266,9 +285,12 @@ const SalesPoint = ({
   const CONTENT_COMPONENT_MAP = {
     'sales-items': SalesPointContent,
     cart: SalesPointContent,
+    payment: SalesPointContent,
     'pending-orders': PendingOrder,
+    'scheduled-orders-for-today': ScheduledOrdersForToday,
   };
 
+  // Determine which content component to render based on the active menu item. If the active menu item doesn't have a specific component, default to SalesPointContent.
   const ActiveContentComponent =
     CONTENT_COMPONENT_MAP[activeMenuItem] || SalesPointContent;
 
@@ -297,6 +319,7 @@ const SalesPoint = ({
         lightThemeStyle={lightThemeStyle}
         darkThemeStyle={darkThemeStyle}
         pendingOrders={pendingOrders}
+        activeMenuItem={activeMenuItem}
         setActiveMenuItem={setActiveMenuItem}
       />
 
@@ -312,7 +335,7 @@ const SalesPoint = ({
         style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
       />
 
-      {/* Global Notification */}
+      {/* Global Notification for Sales Point */}
       {notification && (
         <SalesPointNotification
           type={notification.type}
