@@ -64,7 +64,9 @@ const PendingOrder = ({
 
   const handleDeletePendingOrder = (e, orderId) => {
     e.stopPropagation(); // Prevent triggering parent onClick
-    setPendingOrders((prev) => prev.filter((order) => order.id !== orderId));
+    setPendingOrders((prev) =>
+      prev.filter((order) => order.orderId !== orderId)
+    );
     setSelectedPendingOrder(null); // Clear selected order if it's the one being deleted
     showNotification(
       'warning',
@@ -97,7 +99,7 @@ const PendingOrder = ({
     e.stopPropagation(); // Prevent triggering parent onClick
     setOpenDropdown((prev) => ({
       ...prev,
-      [orderId]: !prev[orderId],
+      [orderId]: prev[orderId] ? false : true, // Toggle off if already open, otherwise toggle on
     }));
   };
 
@@ -138,7 +140,7 @@ const PendingOrder = ({
                 key={order.orderId}
                 onClick={(e) => {
                   setSelectedPendingOrder(order);
-                  handleToggleDropdown(e, order.orderId);
+                  handleToggleDropdown(e, order?.orderId);
                 }}
                 className={`flex flex-col ${
                   mode === 'light'
@@ -212,16 +214,20 @@ const PendingOrder = ({
                     </div>
 
                     <span>
-                      {openDropdown[order.id] ? (
+                      {openDropdown[order?.orderId] ? (
                         <FaChevronDown
                           className={`ml-2 text-brand-green font-semibold`}
-                          onClick={(e) => handleToggleDropdown(e, order.id)}
+                          onClick={(e) =>
+                            handleToggleDropdown(e, order?.orderId)
+                          }
                           title="Close item details"
                         />
                       ) : (
                         <FaChevronLeft
                           className={`ml-2 text-brand-green font-semibold`}
-                          onClick={(e) => handleToggleDropdown(e, order.id)}
+                          onClick={(e) =>
+                            handleToggleDropdown(e, order?.orderId)
+                          }
                           title="see items in this order"
                         />
                       )}
@@ -230,7 +236,7 @@ const PendingOrder = ({
                 </div>
 
                 {/* Dropdown content */}
-                {openDropdown[order.id] && (
+                {openDropdown[order?.orderId] && (
                   <div className={`w-full mt-2 px-5 shadow-sm`}>
                     <span className="text-sm font-semibold">Order Items:</span>
                     {order?.items?.length > 0 ? (

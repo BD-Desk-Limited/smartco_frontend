@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import BillAndSummary from '../cart/BillAndSummary';
 import {
   productsTax,
@@ -16,9 +16,14 @@ import {
   FaPaypal,
 } from 'react-icons/fa';
 import Image from 'next/image';
+import CashPayment from './CashPayment';
+import CardPayment from './CardPayment';
+import BankTransfer from './BankTransfer';
+import POSPayment from './POSPayment';
 
 const Payment = ({
   cart,
+  setCart,
   setActiveMenuItem,
   handlePendOrder,
   mode,
@@ -28,14 +33,22 @@ const Payment = ({
   workBranch,
 }) => {
   const [isHydrated, setIsHydrated] = React.useState(false);
-  const [paymentType, setPaymentType] = React.useState('cash');
-  const [partialAmountPaid, setPartialAmountPaid] = React.useState(0);
-  const [total, setTotal] = React.useState(0);
-  const [selectedFulfillmentTime, setSelectedFulfillmentTime] =
-    React.useState('Now');
-  const [orderScheduledDateTime, setOrderScheduledDateTime] =
-    React.useState('');
-  const [selectedPaymentPlan, setSelectedPaymentPlan] = React.useState({});
+  const [paymentType, setPaymentType] = React.useState(
+    cart?.payment?.paymentType || 'cash'
+  );
+  const [partialAmountPaid, setPartialAmountPaid] = React.useState(
+    cart?.payment?.partialAmountPaid || 0
+  );
+  const [total, setTotal] = React.useState(cart?.payment?.total || 0);
+  const [selectedFulfillmentTime, setSelectedFulfillmentTime] = React.useState(
+    cart?.payment?.selectedFulfillmentTime || 'Now'
+  );
+  const [orderScheduledDateTime, setOrderScheduledDateTime] = React.useState(
+    cart?.payment?.orderScheduledDateTime || ''
+  );
+  const [selectedPaymentPlan, setSelectedPaymentPlan] = React.useState(
+    cart?.payment?.selectedPaymentPlan || 'full'
+  );
 
   const workBranchVATRate =
     workBranch && workBranch.taxBand?.rates[0]?.rate
@@ -59,6 +72,37 @@ const Payment = ({
     }
   }, [cart?.items, cart?.checkoutInitiatedAt, setActiveMenuItem]);
 
+  //tie payment info to cart, for persistency and sync with order.
+  React.useEffect(() => {
+    setCart((prevCart) => {
+      if (!prevCart) {
+        return prevCart;
+      }
+
+      const paymentData = {
+        paymentType,
+        partialAmountPaid,
+        selectedFulfillmentTime,
+        orderScheduledDateTime,
+        selectedPaymentPlan,
+        total,
+      };
+
+      return {
+        ...prevCart,
+        payment: paymentData,
+      };
+    });
+  }, [
+    paymentType,
+    partialAmountPaid,
+    selectedFulfillmentTime,
+    orderScheduledDateTime,
+    selectedPaymentPlan,
+    total,
+    setCart,
+  ]);
+
   const FulfilmentTimeOptions = [
     { label: 'Now', value: 'Now' },
     { label: 'Schedule for later', value: 'scheduled' },
@@ -80,18 +124,21 @@ const Payment = ({
       value: 'cash',
       icon: () => <FaMoneyBillAlt className="font-bold" />,
       image: '/assets/cash_payment.svg',
+      overlay: CashPayment,
     },
     {
       label: 'Card',
       value: 'card',
       icon: () => <FaCreditCard className="font-bold" />,
       image: '/assets/card_payment_method.png',
+      overlay: CardPayment,
     },
     {
       label: 'Bank Transfer',
       value: 'bank_transfer',
       icon: () => <FaMobile className="font-bold" />,
       image: '/assets/bank_payment_method.png',
+      overlay: BankTransfer,
     },
     {
       label: 'P.O.S',
@@ -99,6 +146,7 @@ const Payment = ({
       icon: () => <FaCashRegister className="font-bold" />,
       image:
         'https://www.golomtbank.com/wp-content/uploads/2020/06/V240M-1-1.png',
+      overlay: POSPayment,
     },
   ];
 
@@ -108,7 +156,7 @@ const Payment = ({
 
   return (
     <div
-      className={`flex flex-row justify-between gap-5 w-full h-full ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      className={`flex flex-row justify-between gap-5 w-full h-full relative ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
     >
       {/* Fulfilment time */}
       <div
@@ -121,7 +169,7 @@ const Payment = ({
           {FulfilmentTimeOptions.map((option) => (
             <li
               key={option.value}
-              className={`flex-1 text-center py-2 cursor-pointer rounded-t-lg ${selectedFulfillmentTime === option.value ? 'bg-brand-green' : 'border-t border-x'} hover:bg-green-shadow3 transition-colors`}
+              className={`flex-1 text-center py-2 cursor-pointer rounded-t-lg ${cart?.payment?.selectedFulfillmentTime === option.value ? 'bg-brand-green' : 'border-t border-x'} hover:bg-green-shadow3 transition-colors`}
               onClick={() => setSelectedFulfillmentTime(option.value)}
             >
               {option.label}
@@ -131,7 +179,7 @@ const Payment = ({
 
         {/* fulfillment time options content */}
         <div className="p-2 bg-background-2 rounded-lg border border-brand-green h-auto">
-          {selectedFulfillmentTime === 'Now' ? (
+          {cart?.payment?.selectedFulfillmentTime === 'Now' ? (
             <p className="py-10 text-text-gray">
               Order will be fulfilled as soon as possible...
             </p>
@@ -141,7 +189,7 @@ const Payment = ({
                 <p>Select order fulfillment date/time</p>
                 <input
                   type="datetime-local"
-                  value={orderScheduledDateTime}
+                  value={cart?.payment?.orderScheduledDateTime}
                   onChange={(e) => setOrderScheduledDateTime(e.target.value)}
                   className={`w-full p-1 border rounded-md mb-2 outline-brand-green ${
                     mode === 'light' ? '' : 'bg-gray-600'
@@ -156,7 +204,7 @@ const Payment = ({
                   <li
                     key={plan.value}
                     className={`cursor-pointer p-2 rounded-md ${
-                      selectedPaymentPlan.value === plan.value
+                      cart?.payment?.selectedPaymentPlan?.value === plan.value
                         ? 'text-brand-green'
                         : ' text-text-gray'
                     } gap-2 flex items-center`}
@@ -165,12 +213,15 @@ const Payment = ({
                     <input
                       type="checkbox"
                       className="accent-brand-green bg-white"
-                      checked={selectedPaymentPlan.value === plan.value}
+                      checked={
+                        cart?.payment?.selectedPaymentPlan?.value === plan.value
+                      }
                       readOnly
                     />
                     {plan.label}
                     {plan.value === 'partial' ? (
-                      selectedPaymentPlan.value === 'partial' && (
+                      cart?.payment?.selectedPaymentPlan?.value ===
+                        'partial' && (
                         <span className="ml-auto text-sm text-right flex flex-col items-center text-text-gray">
                           <span className="text-right w-full font-semibold">
                             Amount:{' '}
@@ -215,11 +266,11 @@ const Payment = ({
               <input
                 type="checkbox"
                 className="accent-brand-green bg-white"
-                checked={paymentType === option.value}
+                checked={cart?.payment?.paymentType === option.value}
                 readOnly
               />
               <div
-                className={`flex flex-row items-center gap-2 p-2 w-full rounded-md cursor-pointer ${paymentType === option.value ? 'border border-brand-green' : 'border border-gray-300'} hover:bg-green-shadow3 transition-colors`}
+                className={`flex flex-row items-center gap-2 p-2 w-full rounded-md cursor-pointer ${cart?.payment?.paymentType === option.value ? 'border border-brand-green' : 'border border-gray-300'} hover:bg-green-shadow3 transition-colors`}
               >
                 <span>{option.icon && <option.icon />}</span>
                 <div className="flex items-center gap-2">
@@ -269,6 +320,31 @@ const Payment = ({
           Confirm Payment
         </button>
       </div>
+
+      {/* Payment method overlay */}
+      {cart?.payment?.paymentType && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-10">
+          <div className="bg-white p-4 rounded-lg w-1/2">
+            {PAYMENT_METHOD_OPTIONS.find(
+              (option) => option.value === cart?.payment?.paymentType
+            )?.overlay ? (
+              React.createElement(
+                PAYMENT_METHOD_OPTIONS.find(
+                  (option) => option.value === cart?.payment?.paymentType
+                ).overlay
+              )
+            ) : (
+              <p>Payment method overlay not implemented yet</p>
+            )}
+            <button
+              onClick={() => setPaymentType('')}
+              className="mt-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

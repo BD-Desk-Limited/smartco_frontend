@@ -20,7 +20,7 @@ const SALES_POINT_STORAGE_KEY = 'sales_point_state_v1';
 const initialSalesPointState = {
   seller: null,
   states: {
-    cart: {},
+    cart: { items: [], linkedCustomer: null },
     pending_orders: [],
     pending_customer_registration: [],
     pending_order_schedule: [],

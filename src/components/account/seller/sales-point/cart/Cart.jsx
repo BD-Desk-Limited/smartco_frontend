@@ -74,7 +74,7 @@ const Cart = ({
 
   // if cart is empty, switch to sales items tab
   useEffect(() => {
-    if (cart?.items?.length === 0) {
+    if (cart?.items?.length === 0 || cart?.items === undefined) {
       setActiveMenuItem('sales-items');
     }
   }, [cart?.items, setActiveMenuItem]);
@@ -279,6 +279,7 @@ const Cart = ({
                 itemUnitCost={itemUnitCost}
                 showButtons={true}
                 mode={mode}
+                total={total}
                 setTotal={setTotal}
                 lightThemeStyle={lightThemeStyle}
                 darkThemeStyle={darkThemeStyle}

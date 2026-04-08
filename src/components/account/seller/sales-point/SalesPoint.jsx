@@ -33,7 +33,10 @@ const SalesPoint = ({
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [selectedChoices, setSelectedChoices] = React.useState({}); //select options for products that have multiple option components
-  const [cart, setCart] = React.useState({});
+  const [cart, setCart] = React.useState({
+    linkedCustomer: null,
+    items: [],
+  });
   const [pendingOrders, setPendingOrders] = React.useState([]);
   const [pendingCustomerRegistration, setPendingCustomerRegistration] =
     React.useState([]);

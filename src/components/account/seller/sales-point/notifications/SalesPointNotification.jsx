@@ -39,10 +39,10 @@ const SalesPointNotification = ({
       accentColor: 'bg-error',
     },
     warning: {
-      bgColor: 'bg-warning',
-      borderColor: 'border-warning',
+      bgColor: 'bg-amber-500',
+      borderColor: 'border-amber-500',
       icon: FaExclamationCircle,
-      accentColor: 'bg-warning',
+      accentColor: 'bg-amber-500',
     },
     info: {
       bgColor: 'bg-brand-blue',
