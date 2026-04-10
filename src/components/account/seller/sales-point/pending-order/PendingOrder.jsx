@@ -64,9 +64,27 @@ const PendingOrder = ({
 
   const handleDeletePendingOrder = (e, orderId) => {
     e.stopPropagation(); // Prevent triggering parent onClick
-    setPendingOrders((prev) =>
-      prev.filter((order) => order.orderId !== orderId)
+
+    //find the order
+    const orderToDelete = pendingOrders.find(
+      (order) => order.orderId === orderId
     );
+
+    // if item has been paid for, prevent removal and show alert
+    if (
+      orderToDelete?.payment?.paymentStatus?.amountPaid > 0 ||
+      orderToDelete?.payment?.paymentStatus?.value === 'success'
+    ) {
+      showNotification(
+        'warning',
+        'Item Removal',
+        'This item has been paid for and cannot be removed.',
+        3000
+      );
+      return;
+    }
+
+    setPendingOrders((prev) => prev.filter((order) => order !== orderToDelete)); // Remove the order from pending orders
     setSelectedPendingOrder(null); // Clear selected order if it's the one being deleted
     showNotification(
       'warning',

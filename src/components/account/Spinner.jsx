@@ -1,11 +1,16 @@
-import React from 'react'
+import React from 'react';
 
-const Spinner = () => {
+const Spinner = ({ size = 16, spaceHeight = '50vh', color = 'blue-500' }) => {
   return (
-    <div className="flex justify-center items-center h-[50vh]">
-      <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+    <div
+      className="flex justify-center items-center"
+      style={{ height: spaceHeight }}
+    >
+      <div
+        className={`w-${size} h-${size} border-4 border-${color} border-t-transparent border-solid rounded-full animate-spin`}
+      ></div>
     </div>
-  )
-}
+  );
+};
 
-export default Spinner
+export default Spinner;

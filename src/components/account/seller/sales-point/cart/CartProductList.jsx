@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
+import { useNotification } from '@/contexts/notificationContext';
 import {
   FaExpeditedssl,
   FaMinus,
@@ -8,6 +9,7 @@ import {
   FaShoppingBag,
   FaTrashAlt,
 } from 'react-icons/fa';
+import { warning } from 'framer-motion';
 
 const CartProductList = ({
   cart,
@@ -20,6 +22,7 @@ const CartProductList = ({
   lightThemeStyle,
   darkThemeStyle,
 }) => {
+  const { showNotification } = useNotification();
   const handleQuantityIncrease = (item) => {
     setCart((prev) => ({
       ...prev,
@@ -44,6 +47,21 @@ const CartProductList = ({
   };
 
   const handleRemoveFromCart = (item) => {
+    // if item has been paid for, prevent removal and show alert
+    if (
+      cart?.payment?.paymentStatus?.amountPaid > 0 ||
+      cart?.payment?.paymentStatus?.value === 'success'
+    ) {
+      showNotification(
+        'warning',
+        'Item Removal',
+        'This item has been paid for and cannot be removed.',
+        3000
+      );
+      return;
+    }
+
+    // If it's the last item in the cart, clear the cart entirely
     if (cart?.items?.length === 1) {
       setCart({
         items: [],

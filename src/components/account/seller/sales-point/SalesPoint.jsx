@@ -13,6 +13,7 @@ import { FaTimes } from 'react-icons/fa';
 import SubHeadbar from './SubHeadbar';
 import SalesPointNotification from './notifications/SalesPointNotification';
 import ScheduledOrdersForToday from './scheduled-orders-for-today/ScheduledOrdersForToday';
+import SuccessfullPaymentCard from './payment/SuccessfullPaymentCard';
 
 const SalesPoint = ({
   mode,
@@ -36,6 +37,10 @@ const SalesPoint = ({
   const [cart, setCart] = React.useState({
     linkedCustomer: null,
     items: [],
+  });
+  const [showReceipt, setShowReceipt] = React.useState({
+    success: false,
+    order: null,
   });
   const [pendingOrders, setPendingOrders] = React.useState([]);
   const [pendingCustomerRegistration, setPendingCustomerRegistration] =
@@ -235,9 +240,10 @@ const SalesPoint = ({
   };
 
   console.log(
-    'Cart from context:',
-    salesPointState?.find((s) => s.seller === user?._id)?.states?.cart
+    'Cart payment from context:',
+    salesPointState?.find((s) => s.seller === user?._id)?.states?.cart?.payment
   );
+  console.log('Show receipt state:', showReceipt);
 
   const handleSelectComponents = () => {
     if (selectedProduct?.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
@@ -250,6 +256,8 @@ const SalesPoint = ({
     setActiveMenuItem,
     lightThemeStyle,
     darkThemeStyle,
+    showReceipt,
+    setShowReceipt,
     MAX_ALLOWED_PENDING_ORDERS,
     loading,
     setLoading,
@@ -271,6 +279,7 @@ const SalesPoint = ({
     setScanMode,
     cart,
     setCart,
+    setShowReceipt,
     pendingOrders,
     setPendingOrders,
     MAX_ALLOWED_PENDING_ORDERS,
@@ -390,6 +399,25 @@ const SalesPoint = ({
           </motion.div>
         </div>
       )}
+
+      {/* Show successful payment card if payment was successful and there is a last paid order to display details for */}
+      {showReceipt.success &&
+        showReceipt?.order?.payment?.paymentStatus?.value === 'success' &&
+        showReceipt?.order !== null && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
+          >
+            <SuccessfullPaymentCard
+              paidOrderDetails={showReceipt?.order}
+              paymentData={showReceipt?.order?.payment}
+              mode={mode}
+              lightThemeStyle={lightThemeStyle}
+              darkThemeStyle={darkThemeStyle}
+              showReceipt={showReceipt}
+              setShowReceipt={setShowReceipt}
+            />
+          </div>
+        )}
     </div>
   );
 };
