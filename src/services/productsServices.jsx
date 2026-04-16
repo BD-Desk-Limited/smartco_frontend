@@ -142,9 +142,9 @@ export const createOrUpdateProductService = async (productData) => {
         method: productData._id ? 'PUT' : 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-
-        body: productData,
+        body: JSON.stringify(productData),
       }
     );
 
@@ -283,5 +283,44 @@ export const deactivateProductInAllBranchesService = async (productId) => {
     return {
       error: 'error deactivating product in all branches, please try again',
     };
+  }
+};
+
+//fetch products by branchId to be used in sales point
+import { sampleProducts } from '@/services/sampleData';
+export const getProductsByBranchIdService = async (branchId) => {
+  console.log('Fetching products for branch:', branchId);
+  const token = getToken();
+  try {
+    /*const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/branch/${branchId}`,
+      { method: 'GET', headers: { Authorization: `Bearer ${token}` } }
+    );*/
+
+    //placeholder response until API is ready
+    const response = {
+      ok: true,
+      data: new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(sampleProducts);
+        }, 2000);
+      }),
+    };
+
+    if (response.ok) {
+      const responseData = await response.data;
+      return { data: responseData };
+    }
+
+    let errorMessage = 'error fetching products for branch, please try again';
+    if (typeof response.json === 'function') {
+      const errorData = await response.json();
+      errorMessage = errorData?.message || errorMessage;
+    }
+
+    return { error: errorMessage };
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching products for branch, please try again' };
   }
 };

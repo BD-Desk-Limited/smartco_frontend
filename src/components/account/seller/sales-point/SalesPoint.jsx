@@ -239,12 +239,6 @@ const SalesPoint = ({
     setActiveMenuItem('payment');
   };
 
-  console.log(
-    'Cart payment from context:',
-    salesPointState?.find((s) => s.seller === user?._id)?.states?.cart?.payment
-  );
-  console.log('Show receipt state:', showReceipt);
-
   const handleSelectComponents = () => {
     if (selectedProduct?.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
     setOpenSelectProductComponents(true);
@@ -411,6 +405,7 @@ const SalesPoint = ({
               paidOrderDetails={showReceipt?.order}
               paymentData={showReceipt?.order?.payment}
               mode={mode}
+              workBranch={workBranch}
               lightThemeStyle={lightThemeStyle}
               darkThemeStyle={darkThemeStyle}
               showReceipt={showReceipt}

@@ -21,8 +21,13 @@ const OrderFulfilmentTime = ({
         label: 'Full payment',
         amountPaid: cart?.payment?.total || 0,
       });
-      setPartialAmountPaid(0);
+      setPartialAmountPaid(cart?.payment?.total || 0);
     }
+  };
+
+  const handlePaymentPlanSelection = (plan) => {
+    setSelectedPaymentPlan(plan);
+    setPartialAmountPaid(plan.amountPaid);
   };
 
   return (
@@ -67,7 +72,7 @@ const OrderFulfilmentTime = ({
             <hr className="my-1 border-gray-300" />
             <ul className="p-2">
               <p>Select a payment plan</p>
-              {PaymentPlans.map((plan) => (
+              {PaymentPlans?.map((plan) => (
                 <li
                   key={plan.value}
                   className={`cursor-pointer p-2 rounded-md ${
@@ -75,7 +80,7 @@ const OrderFulfilmentTime = ({
                       ? 'text-brand-green'
                       : ' text-text-gray'
                   } gap-2 flex items-center`}
-                  onClick={() => setSelectedPaymentPlan(plan)}
+                  onClick={() => handlePaymentPlanSelection(plan)}
                 >
                   <input
                     type="checkbox"
@@ -95,7 +100,7 @@ const OrderFulfilmentTime = ({
                         <input
                           type="number"
                           className="p-1 px-2 border rounded-md text-text-gray outline-brand-green w-36"
-                          value={partialAmountPaid || ''}
+                          value={partialAmountPaid || ' 0.00'}
                           placeholder="Enter amount to pay"
                           onChange={(e) =>
                             setPartialAmountPaid(Number(e.target.value))

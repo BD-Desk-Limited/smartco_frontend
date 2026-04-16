@@ -36,16 +36,20 @@ const CustomerLookUp = ({
     useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
 
+  const handleClose = () => {
+    setCustomerFetchError('');
+    setAwaitingScanForCustomer(false);
+    setIsOpenCustomerOverlay(false);
+    setCustomerData({});
+    setOpenSelectOfferComponent(false);
+    setSelectedOffer(null);
+    setAppliedOffers([]);
+  };
+
   const handleCloseIfNotScanning = (e) => {
     e.stopPropagation();
     if (!customerData._id || loading) {
-      setAwaitingScanForCustomer(false);
-      setIsOpenCustomerOverlay(false);
-      setCustomerFetchError('');
-      setCustomerData({});
-      setOpenSelectOfferComponent(false);
-      setSelectedOffer(null);
-      setAppliedOffers([]);
+      handleClose();
     }
   };
 
@@ -106,8 +110,6 @@ const CustomerLookUp = ({
       }));
     }
   }, [appliedOffers, customerData, linkedCustomerData, setCart]);
-
-  console.log('APPLIED OFFERS:', appliedOffers);
 
   return (
     <div
@@ -373,7 +375,7 @@ const CustomerLookUp = ({
       {customerFetchError && (
         <NoCustomerFoundModal
           customerFetchError={customerFetchError}
-          handleClose={handleCloseIfNotScanning}
+          handleClose={handleClose}
         />
       )}
     </div>

@@ -10,7 +10,12 @@ const CashPayment = ({
 }) => {
   const [amountReceived, setAmountReceived] = React.useState('');
   const parsedAmountReceived = parseFloat(amountReceived || '0');
-  const change = parsedAmountReceived - cart?.payment?.total;
+  const isScheduled = cart?.payment?.selectedFulfillmentTime === 'scheduled';
+  const amountDue = isScheduled
+    ? cart?.payment?.partialAmountPaid || 0
+    : cart?.payment?.total || 0;
+
+  const change = parsedAmountReceived - amountDue;
 
   const handleNumberInput = (e) => {
     const value = e.target.value;
@@ -49,9 +54,8 @@ const CashPayment = ({
           <p className="text-center">
             Cash Amount:
             <span className="font-semibold ml-1">
-              {cart?.payment?.total?.toFixed(2)}
+              {amountDue?.toFixed(2) || '0.00'}
             </span>
-            .
           </p>
 
           {/* Allow user to input the amount received and calculate change */}
@@ -79,13 +83,15 @@ const CashPayment = ({
           <NumberPad
             value={amountReceived}
             assignValueFunction={setAmountReceived}
+            themeMode={mode}
           />
         </div>
       </div>
 
       <button
         onClick={handleActionsToFollowPaymentConfirmation}
-        className={`${paymentMethod?.style?.button || ''} px-4 py-2 w-full rounded hover:bg-opacity-90 transition`}
+        className={`${paymentMethod?.style?.button || ''} ${parsedAmountReceived < amountDue ? 'opacity-50 cursor-not-allowed' : ''} px-4 py-2 w-full rounded hover:bg-opacity-90 transition`}
+        disabled={parsedAmountReceived < amountDue}
       >
         Confirm Payment
       </button>

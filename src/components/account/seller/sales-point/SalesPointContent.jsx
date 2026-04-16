@@ -63,8 +63,9 @@ const SalesPointContent = ({
           .toLowerCase()
           .includes(searchTerm.toLowerCase()); // Check if search term matches name or description
       const matchesFilter =
-        filterValue === 'All Products' ||
-        product.availabilityStatus === filterValue;
+        filterValue?.toLowerCase() === 'all products' ||
+        product.availabilityStatus?.toLowerCase() ===
+          filterValue?.toLowerCase();
       const matchesCategory =
         selectedCategory === 'All' || product.category === selectedCategory;
 
@@ -79,12 +80,15 @@ const SalesPointContent = ({
   }, [searchTerm, filterValue, products, selectedCategory]);
 
   const handleRefreshProducts = async () => {
-    setRefreshingProducts(true);
-    setLoading(true);
-    const fetchedProducts = await fetchProductsFromAPI();
-    setProducts(fetchedProducts);
-    setLoading(false);
-    setRefreshingProducts(false);
+    try {
+      setRefreshingProducts(true);
+      setLoading(true);
+      const refreshedProducts = await fetchProductsFromAPI(workBranch?._id);
+      setProducts(refreshedProducts || []);
+    } finally {
+      setLoading(false);
+      setRefreshingProducts(false);
+    }
   };
 
   //listen for barcode scanner

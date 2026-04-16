@@ -38,7 +38,7 @@ const POSPayment = ({
 
         <Spinner
           size={10}
-          spaceHeight="4rem"
+          spaceHeight="3rem"
           color={paymentMethod?.style?.spinnerColor || ''}
         />
       </div>

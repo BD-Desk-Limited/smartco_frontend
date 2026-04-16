@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React from 'react';
 import BillAndSummary from '../cart/BillAndSummary';
 import {
   productsTax,
@@ -19,6 +19,7 @@ import CashPayment from './payment-methods/CashPayment';
 import CardPayment from './payment-methods/CardPayment';
 import POSPayment from './payment-methods/POSPayment';
 import BankTransfer from './payment-methods/BankTransfer';
+import { persistTransactionMultiLayer } from '@/services/transactionPersistenceService';
 
 const Payment = ({
   cart,
@@ -112,7 +113,11 @@ const Payment = ({
   ];
 
   const PaymentPlans = [
-    { label: 'Full Advance', value: 'full', amountPaid: total },
+    {
+      label: 'Full Advance',
+      value: 'full',
+      amountPaid: cart?.payment?.total || 0,
+    },
     {
       label: 'Partial Payment',
       value: 'partial',
@@ -132,6 +137,19 @@ const Payment = ({
         overlay: 'border-2 border-brand-green',
         button: 'bg-brand-green text-white',
         spinnerColor: 'brand-green',
+      },
+    },
+    {
+      label: 'P.O.S',
+      value: 'pos',
+      icon: () => <FaCashRegister className="font-bold" />,
+      image:
+        'https://www.golomtbank.com/wp-content/uploads/2020/06/V240M-1-1.png',
+      overlay: POSPayment,
+      style: {
+        overlay: 'border-2 border-red-500',
+        button: 'bg-red-500 text-white',
+        spinnerColor: 'red-500',
       },
     },
     {
@@ -158,19 +176,6 @@ const Payment = ({
         spinnerColor: 'yellow-500',
       },
     },
-    {
-      label: 'P.O.S',
-      value: 'pos',
-      icon: () => <FaCashRegister className="font-bold" />,
-      image:
-        'https://www.golomtbank.com/wp-content/uploads/2020/06/V240M-1-1.png',
-      overlay: POSPayment,
-      style: {
-        overlay: 'border-2 border-red-500',
-        button: 'bg-red-500 text-white',
-        spinnerColor: 'red-500',
-      },
-    },
   ];
 
   const SelectedPaymentMethod = PAYMENT_METHOD_OPTIONS?.find(
@@ -195,22 +200,23 @@ const Payment = ({
     setPaymentType(null);
   };
 
-  const handleActionsToFollowPaymentConfirmation = () => {
-    // TODO: Implement any additional logic needed after a payment confirmation,
-    // sales update
-    // updating inventory
-
-    const cartPaidFor = {
+  const handleActionsToFollowPaymentConfirmation = async () => {
+    const successfullyPaidOrderStatus = {
       success: true,
       order: {
         ...cart,
         payment: {
-          id: 'ID FROM_BACKEND', // TODO: Replace with actual ID from backend after implementing payment processing and order creation logic
           ...cart.payment,
           paymentStatus: {
             ...cart.payment.paymentStatus,
             value: 'success',
-            label: 'Payment confirmed...',
+            label:
+              cart?.payment?.selectedFulfillmentTime === 'Now'
+                ? `Payment confirmed!!!`
+                : cart?.payment?.selectedFulfillmentTime === 'scheduled' &&
+                    cart?.payment?.partialAmountPaid > 0
+                  ? `Payment of ${cart.payment.partialAmountPaid} confirmed for scheduled order!!!`
+                  : 'Order Scheduled!!!',
             time: new Date().toISOString(),
             amountPaid: partialAmountPaid,
           },
@@ -218,14 +224,50 @@ const Payment = ({
       },
     };
 
-    setShowReceipt(cartPaidFor); // Set the paid order details in state to trigger the display of the receipt with the correct order details after payment confirmation
+    try {
+      /*
+      // MULTI-LAYER PERSISTENCE: Ensures transaction is saved across all available storage layers
+      // Layer 1: IndexedDB (primary, offline first)
+      // Layer 2: API with retry (backend, falls back to IDB if API fails)
+      // Layer 3: Encrypted localStorage (final fallback. only if API and IDB both fail, to avoid data loss)
+      // Layer 4: Background sync on reconnection (recovers localStorage backup to API when connectivity is restored, and retries any failed sync attempts, ensuring data eventually reaches backend even if all layers fail at the moment of transaction creation)
+      */
 
-    // Clear cart after payment confirmation
-    setCart({
-      items: [],
-      linkedCustomer: null,
-      payment: null,
-    });
+      const persistSalesResult = await persistTransactionMultiLayer(cart);
+
+      if (!persistSalesResult?.success) {
+        console.error(
+          'Transaction persistence failed on all layers:',
+          persistSalesResult
+        );
+        // Even if persistence fails, allow user to see receipt since payment was confirmed
+        // but show persistent message that data needs to be saved
+      }
+
+      // Include persistence status in receipt for user feedback
+      const persistenceStatus = {
+        trackingId: persistSalesResult?.trackingId,
+        persistedTo: persistSalesResult?.persistedTo,
+        userMessage: persistSalesResult?.userMessage,
+        hasSynced: persistSalesResult?.persistedTo?.includes('API'),
+      };
+
+      successfullyPaidOrderStatus.order.persistenceStatus = persistenceStatus;
+
+      setShowReceipt(successfullyPaidOrderStatus); // Set the paid order details in state to trigger the display of the receipt with the correct order details after payment confirmation
+
+      // Clear cart after payment confirmation
+      setCart({
+        items: [],
+        linkedCustomer: null,
+        payment: null,
+      });
+    } catch (err) {
+      console.error('Error in payment confirmation handler:', err);
+      // Even on error, proceed to show receipt - payment was confirmed in payment gateway
+      // Persistence errors should not block user experience at this point
+      setShowReceipt(successfullyPaidOrderStatus);
+    }
   };
 
   const SHARED_PROPS_FOR_PAYMENT_METHOD_OVERLAYS = {

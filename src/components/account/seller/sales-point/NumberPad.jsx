@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaBackspace } from 'react-icons/fa';
 
-const NumberPad = ({ value, assignValueFunction }) => {
+const NumberPad = ({ value, assignValueFunction, themeMode = 'light' }) => {
   const [number, setNumber] = React.useState(value || '');
   const OnNumberClick = (num) => {
     if (!buttons.map((bt) => bt.value).includes(num)) {
@@ -69,7 +69,7 @@ const NumberPad = ({ value, assignValueFunction }) => {
           onClick={() => OnNumberClick(button.value)}
           style={{
             padding: '0.5rem',
-            backgroundColor: '#e5e7eb',
+            backgroundColor: themeMode === 'dark' ? '#1f2937' : '#e5e7eb',
             borderRadius: '0.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -81,10 +81,12 @@ const NumberPad = ({ value, assignValueFunction }) => {
             ...(button.className ? {} : {}),
           }}
           onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = '#d1d5db')
+            (e.currentTarget.style.backgroundColor =
+              themeMode === 'dark' ? '#374151' : '#d1d5db')
           }
           onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = '#e5e7eb')
+            (e.currentTarget.style.backgroundColor =
+              themeMode === 'dark' ? '#1f2937' : '#e5e7eb')
           }
         >
           {button.icon ? button.icon : button.label}

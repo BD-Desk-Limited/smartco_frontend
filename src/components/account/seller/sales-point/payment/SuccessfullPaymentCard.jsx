@@ -1,26 +1,41 @@
-import { motion } from 'framer-motion';
-import Image from 'next/image';
 import React from 'react';
-import { FaEnvelope, FaPaperPlane, FaPrint, FaWhatsapp } from 'react-icons/fa';
+import {
+  getTotalCashOfferDiscount,
+  getVATAmount,
+  itemTotalCost,
+  productsTax,
+  subtotal,
+} from '../cart/CartBillCalculationFunctions';
+import SuccessfulPaymentDisplay from './SuccessfulPaymentDisplay';
+import { useAuth } from '@/contexts/authContext';
+import printReceipt from '../PrintReceipt';
 
 const SuccessfullPaymentCard = ({
   paymentData,
   paidOrderDetails,
   mode,
+  workBranch,
   lightThemeStyle,
   darkThemeStyle,
   showReceipt,
   setShowReceipt,
 }) => {
-  const orderDate = new Date(paymentData?.orderScheduledDateTime);
+  const { user } = useAuth();
+  const workBranchVATRate =
+    workBranch && workBranch.taxBand?.rates[0]?.rate
+      ? workBranch.taxBand.rates[0].rate
+      : 0;
+
+  const orderDateString = (dateTimeString) =>
+    new Date(dateTimeString).toLocaleDateString();
   // Format the time to 12-hour format with AM/PM
-  const orderTime = orderDate.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    formatMatcher: 'basic',
-  });
-  const orderDateString = orderDate.toLocaleDateString();
+  const orderTime = (dateTimeString) =>
+    new Date(dateTimeString).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      formatMatcher: 'basic',
+    });
 
   const unpaidBalance =
     paymentData?.total - paymentData?.paymentStatus?.amountPaid;
@@ -28,125 +43,124 @@ const SuccessfullPaymentCard = ({
   const isScheduled =
     paymentData?.selectedFulfillmentTime === 'Now' ? false : true;
 
+  const cashDiscounts = () => {
+    const cashOffers =
+      paidOrderDetails?.linkedCustomer?.appliedOffers?.filter(
+        (offer) => offer.type === 'cash'
+      ) || [];
+
+    return getTotalCashOfferDiscount(cashOffers, paidOrderDetails?.items) || 0;
+  };
+
+  const productOffers = () => {
+    const offers =
+      paidOrderDetails?.linkedCustomer?.appliedOffers?.filter(
+        (offer) => offer.type === 'product'
+      ) || [];
+    const result = offers?.map((offer) => {
+      const productDetails = offer?.productDetails;
+      return {
+        ...productDetails,
+        selectedChoices: Object.values(productDetails.selectedChoices) || [],
+      };
+    });
+    return result;
+  };
+
+  const handleSendReceipt = () => {
+    //TODO: Implement receipt generation logic here
+    alert('Receipt Sent!');
+    setShowReceipt({ success: false, order: null });
+  };
+
+  const handlePrintReceipt = () => {
+    // construct receipt data
+    const receiptData = {
+      transactionId: paymentData?.id,
+      metaData: {
+        title: isScheduled
+          ? `Advanced order note for - ${orderDateString(paymentData?.orderScheduledDateTime)}, ${orderTime(paymentData?.orderScheduledDateTime)}`
+          : 'Sales Receipt',
+        storeName: workBranch?.name || 'Store Name',
+        address: workBranch?.address || 'Store Address',
+        phone: workBranch?.phone || 'Store Phone',
+        date: `${orderDateString(paymentData?.paymentStatus?.time)}, ${orderTime(paymentData?.paymentStatus?.time)}`,
+        cashierName: user?.fullName || ' ',
+      },
+      listOfItems:
+        paidOrderDetails?.items?.map((item) => ({
+          name: item?.product?.name || 'Item...',
+          quantity: item?.quantity || 0,
+          price: itemTotalCost(item) || 0,
+          options:
+            item?.choices?.map((choiceObj) => ({
+              additionalPrice: choiceObj?.choice?.additionalPrice || 0,
+              name: choiceObj?.choice?.material?.name || 'Option',
+            })) || [],
+        })) || [],
+
+      endNotes: [
+        {
+          label: 'Subtotal:',
+          value: `${subtotal(paidOrderDetails?.items)?.toFixed(2)}`,
+        },
+        {
+          label: `Tax (${workBranchVATRate?.toFixed(2)}%)`,
+          value: `${getVATAmount(
+            paidOrderDetails?.items,
+            [],
+            workBranchVATRate
+          )?.toFixed(2)}`,
+        },
+        productsTax(paidOrderDetails?.items) > 0 && {
+          label: 'Products Tax:',
+          value: `${productsTax(paidOrderDetails?.items)?.toFixed(2)}`,
+        },
+        cashDiscounts() > 0 && {
+          label: 'Cash Discounts:',
+          value: `- ${cashDiscounts()?.toFixed(2)}`,
+        },
+        {
+          label: 'Total Amount:',
+          value: `${paymentData?.total?.toFixed(2) || '0.00'}`,
+        },
+
+        // items for scheduled orders
+        isScheduled && {
+          label: 'Amount Paid Now:',
+          value: `${paymentData?.paymentStatus?.amountPaid?.toFixed(2) || '0.00'}`,
+        },
+        isScheduled &&
+          unpaidBalance > 0 && {
+            label: 'Unpaid Balance:',
+            value: `${unpaidBalance?.toFixed(2)}`,
+          },
+      ].filter(Boolean),
+
+      footer: 'Thank you for your purchase! Visit again!',
+    };
+    printReceipt(receiptData);
+    setShowReceipt({ success: false, order: null });
+  };
+
   return (
-    <div
-      className={`flex flex-row justify-center items-center gap-1 w-[640px] h-[90vh] p-3 rounded-lg ${mode === 'light' ? lightThemeStyle : darkThemeStyle} p-5 rounded-lg`}
-    >
-      <div
-        className={`flex flex-col justify-between items-start gap-0 w-2/3 h-full`}
-      >
-        <h2 className="text-xl font-thin">
-          {isScheduled ? 'Order Schedule Details' : 'Payment Details'}
-        </h2>
-
-        <div className="flex items-center justify-center gap-1 flex-col w-full my-5">
-          <motion.h1
-            className="text-5xl font-bold flex items-center justify-center w-full animate-pulse"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <Image
-              src={'/assets/verified.png'}
-              alt=""
-              width={100}
-              height={100}
-            />
-          </motion.h1>
-          <div className="text-center text-sm text-success font-semibold ">
-            Payment Confirmed!!!
-          </div>
-        </div>
-
-        <div className="font-mono">
-          {isScheduled ? (
-            <p className="flex flex-col">
-              <span>
-                <strong>Payment Plan: </strong>
-                {`${paymentData?.selectedPaymentPlan?.label} (${paymentData?.paymentType})`}
-              </span>
-              <span>
-                <strong>Amount paid: </strong>
-                {paymentData?.paymentStatus?.amountPaid?.toFixed(2)}
-              </span>
-              {unpaidBalance > 0 && (
-                <span className="">
-                  <strong>Unpaid Balance: </strong>
-                  {unpaidBalance.toFixed(2)}
-                </span>
-              )}
-
-              <span className="font-semibold">
-                Scheduled for: {orderDateString} at {orderTime}
-              </span>
-            </p>
-          ) : (
-            <p className="flex flex-col">
-              <span>
-                <strong>Payment Method: </strong>
-                {paymentData?.paymentType}
-              </span>
-            </p>
-          )}
-          <p>
-            <strong>Total Amount: </strong>
-            {paymentData?.total?.toFixed(2)}
-          </p>
-        </div>
-
-        {/*Action buttons*/}
-        <div className="flex flex-col items-center justify-center gap-2 w-full my-5">
-          <button
-            className={`px-2 py-2 rounded-md border-2 transition-colors w-full hover:border-green-600`}
-            onClick={() => {
-              //TODO: Implement receipt generation logic here
-              alert('Receipt printed!');
-              setShowReceipt({ success: false, order: null });
-            }}
-          >
-            <FaPrint className="inline-block mr-2" />
-            {isScheduled ? 'Print Advance Order notice' : 'Print Receipt'}
-          </button>
-          {/* Send soft copy Receipt */}
-          {showReceipt?.order?.linkedCustomer !== null && (
-            <button
-              className={`px-2 py-2 rounded-md border-2 transition-colors w-full hover:border-green-600`}
-              onClick={() => {
-                //TODO: Implement receipt generation logic here
-                alert('Receipt Sent!');
-                setShowReceipt({ success: false, order: null });
-              }}
-            >
-              <FaPaperPlane className="inline-block mr-2" />
-              {isScheduled ? 'Send Advance Order notice' : 'Send Receipt'}
-              <FaWhatsapp className="inline-block ml-2 text-green-500" />
-              <FaEnvelope className="inline-block ml-2 text-blue-500" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-1 flex-col py-2 w-full my-5 border rounded-lg h-full">
-        <h3 className=" font-semibold">
-          Order Details (
-          {(paidOrderDetails?.items?.length || 0) > 1
-            ? `${paidOrderDetails?.items?.length} items`
-            : `${paidOrderDetails?.items?.length} item`}
-          )
-        </h3>
-        <span className="text-text-gray text-xs">{paymentData?.id}</span>
-        <div className="flex flex-col gap-1 w-full h-full p-2 overflow-y-auto">
-          {paidOrderDetails?.items?.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between w-full p-2 rounded-md bg-gray-200"
-            >
-              kglugl
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <SuccessfulPaymentDisplay
+      paymentData={paymentData}
+      paidOrderDetails={paidOrderDetails}
+      mode={mode}
+      lightThemeStyle={lightThemeStyle}
+      darkThemeStyle={darkThemeStyle}
+      showReceipt={showReceipt}
+      handlePrintReceipt={handlePrintReceipt}
+      handleSendReceipt={handleSendReceipt}
+      isScheduled={isScheduled}
+      unpaidBalance={unpaidBalance}
+      orderDateString={orderDateString}
+      orderTime={orderTime}
+      cashDiscounts={cashDiscounts}
+      productOffers={productOffers}
+      workBranchVATRate={workBranchVATRate}
+    />
   );
 };
 

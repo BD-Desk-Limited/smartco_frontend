@@ -3,6 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
 import { InternetStatusProvider } from '@/contexts/internetStatusContext';
 import { SetupProvider } from '@/contexts/setupContext';
+import TransactionSyncInitializer from '@/components/TransactionSyncInitializer';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -44,6 +45,8 @@ export default function RootLayout({ children }) {
             </SetupProvider>
           </InternetStatusProvider>
         </AuthProvider>
+        <TransactionSyncInitializer />
+
         {/* Service Worker Registration for Offline Support */}
         <script
           dangerouslySetInnerHTML={{

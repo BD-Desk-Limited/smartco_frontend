@@ -31,7 +31,9 @@ const SubHeadbar = ({
     {
       label: 'Pending Registrations',
       key: 'pending-registrations',
-      onClick: () => setActiveMenuItem('pending-registrations'),
+      onClick: () => {
+        alert('This feature is not yet implemented. Try at a later time.');
+      }, //setActiveMenuItem('pending-registrations'),
       showBadge: false,
       badgeContent: null,
       badgeStyle: '',
@@ -39,7 +41,9 @@ const SubHeadbar = ({
     {
       label: 'Scheduled Orders',
       key: 'scheduled-orders',
-      onClick: () => setActiveMenuItem('scheduled-orders'),
+      onClick: () => {
+        alert('This feature is not yet implemented. Try at a later time.');
+      }, //setActiveMenuItem('scheduled-orders'),
       showBadge: false,
       badgeContent: null,
       badgeStyle: '',
@@ -48,11 +52,11 @@ const SubHeadbar = ({
 
   // mapping filter options for easier management and scalability
   const filterOptions = [
-    'All Products',
-    'in Stock',
-    'out of Stock',
-    'low stock',
-    'discontinued',
+    { label: 'All Products', value: 'all products' },
+    { label: 'In Stock', value: 'in stock' },
+    { label: 'Out of Stock', value: 'out of stock' },
+    { label: 'Low Stock', value: 'low stock' },
+    { label: 'Discontinued', value: 'discontinued' },
   ];
 
   return (
@@ -80,14 +84,13 @@ const SubHeadbar = ({
           onBlur={() => setScanMode(true)}
           onChange={(e) => setFilterValue(e.target.value)}
         >
-          <option value="All Products">All Products</option>
           {filterOptions.map((option) => (
             <option
-              key={option}
-              value={option}
+              key={option.value}
+              value={option.value}
               className={mode === 'light' ? lightThemeStyle : darkThemeStyle}
             >
-              {option}
+              {option.label}
             </option>
           ))}
         </select>

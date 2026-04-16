@@ -103,6 +103,7 @@ const Cart = ({
         setCustomerSearchTerm('');
       }
       if (response && response.error) {
+        setCustomerData({});
         setCustomerFetchError(response.error);
       }
     } catch (err) {
