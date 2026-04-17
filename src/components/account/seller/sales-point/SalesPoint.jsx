@@ -399,7 +399,7 @@ const SalesPoint = ({
         showReceipt?.order?.payment?.paymentStatus?.value === 'success' &&
         showReceipt?.order !== null && (
           <div
-            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-10`}
           >
             <SuccessfullPaymentCard
               paidOrderDetails={showReceipt?.order}

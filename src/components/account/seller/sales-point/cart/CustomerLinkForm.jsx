@@ -31,7 +31,7 @@ const CustomerLinkForm = ({
               }
             }}
             ref={searchCustomerRef}
-            placeholder="Search customer ID, name or email..."
+            placeholder="Search customer ID, email, or phone..."
             className={`w-80 bg-inherit p-2 border border-gray-border rounded-md outline-none focus:ring-2 focus:ring-brand-green`}
           />
           <button

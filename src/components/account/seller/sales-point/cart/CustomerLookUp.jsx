@@ -343,7 +343,6 @@ const CustomerLookUp = ({
           )}
         </div>
       )}
-
       {awaitingScanForCustomer && (
         <div className="w-full h-full flex items-center justify-center rounded-lg">
           <span className="flex flex-col justify-center items-center text-lg font-semibold text-center">
@@ -352,7 +351,6 @@ const CustomerLookUp = ({
           </span>
         </div>
       )}
-
       {/* if offer is a product offer, allow user select allowed product components. Overlay */}
       {openSelectOfferComponent && selectedOffer && (
         <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 flex items-center justify-center z-50 rounded-lg">
@@ -370,7 +368,6 @@ const CustomerLookUp = ({
           />
         </div>
       )}
-
       {/* error overlay */}
       {customerFetchError && (
         <NoCustomerFoundModal

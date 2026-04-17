@@ -80,19 +80,9 @@ export function verifyInputText(inputText) {
     return { passed: false, message: 'Input cannot be empty.' };
   }
 
-  // More permissive regex that allows most common text characters
+  // Permissive regex that allows most common text characters
   const allowed = /^[A-Za-z0-9\s.,''""’’&@#$%*()[\]{}|<>?!;:_/+\-=]*$/;
   const verified = allowed.test(value);
-
-  //if (!verified) {
-  //  // Find invalid characters for debugging
-  //  const invalidChars = value.split('')
-  //    .filter(char => !char.match(allowed))
-  //    .join('');
-  //
-  //  console.log('Invalid characters found:', invalidChars);
-  //  console.log('Full input:', value);
-  //}
 
   return {
     passed: verified,
@@ -101,3 +91,10 @@ export function verifyInputText(inputText) {
       : 'Invalid character in text input. Only letters, numbers, spaces, and common punctuation allowed.',
   };
 }
+
+//helper function to normalize phone number for whatsapp by removing any non-digit characters and ensuring it starts with country code
+export const normalizePhoneForWhatsapp = (phoneNumber = '') => {
+  const cleaned = String(phoneNumber).replace(/[^\d+]/g, '');
+  const withoutPlus = cleaned.startsWith('+') ? cleaned.slice(1) : cleaned;
+  return withoutPlus.replace(/^00/, '');
+};

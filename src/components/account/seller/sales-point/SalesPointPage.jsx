@@ -148,7 +148,7 @@ const SalesPointPage = () => {
   }
 
   return (
-    <NotificationProvider>
+    <div>
       <div
         className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
       >
@@ -235,7 +235,7 @@ const SalesPointPage = () => {
           logOutSalesPoint={logOutSalesPoint}
         />
       </div>
-    </NotificationProvider>
+    </div>
   );
 };
 

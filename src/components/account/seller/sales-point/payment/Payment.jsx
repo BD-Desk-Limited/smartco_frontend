@@ -252,7 +252,10 @@ const Payment = ({
         hasSynced: persistSalesResult?.persistedTo?.includes('API'),
       };
 
+      // Update the order status with persistence results to show in receipt and token for customer registration if needed
       successfullyPaidOrderStatus.order.persistenceStatus = persistenceStatus;
+      successfullyPaidOrderStatus.customerRegToken =
+        persistSalesResult?.customerRegToken || null;
 
       setShowReceipt(successfullyPaidOrderStatus); // Set the paid order details in state to trigger the display of the receipt with the correct order details after payment confirmation
 

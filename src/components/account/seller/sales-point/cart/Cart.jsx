@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CustomerLookUp from './CustomerLookUp';
-import { fetchCustomerData } from './sampleData';
 import CartProductList from './CartProductList';
 import CustomerLinkForm from './CustomerLinkForm';
 import LinkedCustomer from './LinkedCustomer';
 import BillAndSummary from './BillAndSummary';
+import { getCustomerByIdEmailOrPhoneService } from '@/services/customerServices';
 
 const Cart = ({
   products,
@@ -66,6 +66,7 @@ const Cart = ({
     };
   }, [scanMode, workBranch, cart?.items]);
 
+  // cleanup function to reset scan mode when component unmounts
   useEffect(() => {
     return () => {
       setScanMode(true);
@@ -83,19 +84,30 @@ const Cart = ({
     e.preventDefault();
     if (customerSearchTerm.trim() === '' || loading) return;
 
-    //if offline, show error message saying customer data cannot be fetched while offline
-    if (!navigator.onLine) {
-      setCustomerFetchError('Sorry, cannot fetch customer data while offline.');
-      return;
-    }
-
     try {
+      setLoading(true);
+
       //fetch customer data, using searchterm
       setIsOpenCustomerOverlay(true);
       setLoading(true);
       setCustomerFetchError('');
 
-      const response = await fetchCustomerData(customerSearchTerm);
+      //if offline, show error message saying customer data cannot be fetched while offline
+      if (!navigator.onLine) {
+        setCustomerFetchError(
+          'Sorry, cannot fetch customer data while offline.'
+        );
+      }
+      //validate search term to allow only text, numbers, ., - and + for phone numbers, and @ for emails
+      const validSearchTerm = /^[a-zA-Z0-9@.,+\-]+$/.test(customerSearchTerm);
+      if (!validSearchTerm) {
+        setCustomerFetchError('Invalid search term. Please try again.');
+        console.log('Invalid search term:', customerSearchTerm);
+        return;
+      }
+
+      const response =
+        await getCustomerByIdEmailOrPhoneService(customerSearchTerm);
 
       if (response && response.data) {
         setCustomerData(response.data);
@@ -107,6 +119,7 @@ const Cart = ({
         setCustomerFetchError(response.error);
       }
     } catch (err) {
+      console.error('Error fetching customer data:', err);
       setCustomerFetchError(
         'Failed to fetch customer data. Please try again later.'
       );
@@ -226,7 +239,6 @@ const Cart = ({
           </div>
         ) : (
           <div className="w-full h-full flex flex-row items-center justify-center">
-            {/* Cart items list */}
             <div className="w-3/5 h-full rounded-lg mx-3 flex flex-col relative">
               {/* Customer look-up/linking section */}
               {linkedCustomerData &&
@@ -253,6 +265,7 @@ const Cart = ({
                   handleOpenOverlayForScanning={handleOpenOverlayForScanning}
                 />
               )}
+              {/* Cart items list */}
               <CartProductList
                 cart={cart}
                 setCart={setCart}

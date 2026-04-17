@@ -286,7 +286,7 @@ export const deactivateProductInAllBranchesService = async (productId) => {
   }
 };
 
-//fetch products by branchId to be used in sales point
+//TODO: fetch products by branchId to be used in sales point
 import { sampleProducts } from '@/services/sampleData';
 export const getProductsByBranchIdService = async (branchId) => {
   console.log('Fetching products for branch:', branchId);

@@ -9,7 +9,7 @@ const getToken = () => {
   return null;
 };
 
-//create or update sales transactions
+//TODO: create or update sales transactions
 export const recordTransactionsService = async (transactionsData) => {
   const token = getToken();
 
@@ -31,7 +31,14 @@ export const recordTransactionsService = async (transactionsData) => {
       setTimeout(() => {
         resolve({
           ok: true,
-          json: async () => ({ data: transactionsData }),
+          json: async () => ({
+            data: {
+              ...transactionsData,
+              customerRegToken: transactionsData?.linkedCustomer
+                ? null
+                : 'http://localhost:3000/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-159959',
+            },
+          }),
           message: 'Transactions recorded successfully...',
 
           //error sample response
@@ -52,5 +59,73 @@ export const recordTransactionsService = async (transactionsData) => {
   } catch (error) {
     console.error('Error:', error);
     return { error: 'error recording transactions, please try again' };
+  }
+};
+
+//TODO: Send receipt through configured channels (email/whatsapp)
+export const sendReceiptService = async ({
+  transactionId,
+  channel,
+  recipient,
+  receipt,
+}) => {
+  const token = getToken();
+
+  try {
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      /*const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/send-receipt`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            transactionId,
+            channel,
+            recipient,
+            receipt,
+          }),
+        }
+      );*/
+
+      // Mock response when API URL is not configured yet.
+      const response = await new Promise((resolve) =>
+        setTimeout(() => {
+          resolve({
+            ok: true,
+            json: async () => ({
+              data: {
+                transactionId,
+                channel,
+                recipient,
+                status: 'queued now',
+              },
+            }),
+          });
+        }, 800)
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        return { data: responseData?.data || responseData };
+      }
+
+      const errorData = await response.json();
+      return {
+        error:
+          errorData?.message ||
+          `Failed to send receipt via ${channel}. Please try again.`,
+      };
+    }
+
+    const responseData = await mockResponse.json();
+    return { data: responseData.data };
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: `Error sending receipt via ${channel}. Please try again.`,
+    };
   }
 };

@@ -173,6 +173,8 @@ const persistToIndexedDB = async (transactions) => {
 //LAYER 2: API with Exponential Backoff Retry
 const persistToAPIWithRetry = async (transactions) => {
   let lastSuccessMessage = 'Transactions recorded successfully';
+  let singleTransaction = transactions?.length === 1;
+  let customerRegToken = null;
 
   // Log initial attempt for each transaction
   for (let attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
@@ -202,6 +204,9 @@ const persistToAPIWithRetry = async (transactions) => {
         if (response?.data) {
           lastSuccessMessage =
             response?.message || 'Transactions recorded successfully';
+          if (singleTransaction) {
+            customerRegToken = response?.data?.customerRegToken || null; // API returns a customer registration token to be used for post-transaction customer self-registration
+          }
 
           //delete local IDB record after successful API persistence
           await deleteDocuments('pending-transactions', [transaction.orderId]);
@@ -219,6 +224,7 @@ const persistToAPIWithRetry = async (transactions) => {
         success: true,
         layer: 'API',
         message: lastSuccessMessage,
+        customerRegToken: customerRegToken,
       };
     } catch (err) {
       const isLastAttempt = attempt === MAX_RETRY_ATTEMPTS - 1;
@@ -636,6 +642,7 @@ const persistTransactionMultiLayer = async (transaction) => {
     success: false,
     persistedTo: [],
     userMessage: '',
+    customerRegToken: null,
   };
 
   try {
@@ -667,6 +674,7 @@ const persistTransactionMultiLayer = async (transaction) => {
         results.persistedTo.push('API');
         results.success = true;
         results.userMessage = 'Transaction saved to backend';
+        results.customerRegToken = apiResult?.customerRegToken || null; // in case API returns a customer registration token to be used for post-transaction customer self-registration
         return results;
       }
     }

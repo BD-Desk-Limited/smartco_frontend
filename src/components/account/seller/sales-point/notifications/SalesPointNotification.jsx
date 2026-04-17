@@ -68,7 +68,7 @@ const SalesPointNotification = ({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -20, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className={`fixed ${positionClasses[position]} z-[999px] max-w-sm border-2 border-gray-border rounded-lg shadow-lg `}
+        className={`fixed ${positionClasses[position]} z-50 max-w-sm border-2 border-gray-border rounded-lg shadow-lg `}
       >
         <div
           className={`${config.bgColor} border-l-4 ${config.borderColor} rounded-lg shadow-lg p-4 flex items-start gap-3`}

@@ -7,6 +7,7 @@ import {
   FaPaperPlane,
   FaPrint,
   FaShoppingBag,
+  FaUserAlt,
   FaWhatsapp,
 } from 'react-icons/fa';
 import {
@@ -22,6 +23,7 @@ import {
 const SuccessfulPaymentDisplay = ({
   paymentData,
   paidOrderDetails,
+  setShowReceipt,
   mode,
   lightThemeStyle,
   darkThemeStyle,
@@ -35,6 +37,7 @@ const SuccessfulPaymentDisplay = ({
   cashDiscounts,
   productOffers,
   workBranchVATRate,
+  handleOpenNewCustomerRegistration,
 }) => {
   return (
     <div
@@ -109,13 +112,16 @@ const SuccessfulPaymentDisplay = ({
         <div className="flex flex-col items-center justify-center gap-2 w-full my-5">
           <button
             className={`px-2 py-2 rounded-md border-2 transition-colors w-full hover:border-green-600`}
-            onClick={handlePrintReceipt}
+            onClick={() => {
+              handlePrintReceipt();
+              setShowReceipt({ success: false, order: null });
+            }}
           >
             <FaPrint className="inline-block mr-2" />
             {isScheduled ? 'Print Advance Order notice' : 'Print Receipt'}
           </button>
           {/* Send soft copy Receipt */}
-          {showReceipt?.order?.linkedCustomer !== null && (
+          {showReceipt?.order?.linkedCustomer !== null ? (
             <button
               className={`px-2 py-2 rounded-md border-2 transition-colors w-full hover:border-green-600`}
               onClick={handleSendReceipt}
@@ -124,6 +130,14 @@ const SuccessfulPaymentDisplay = ({
               {isScheduled ? 'Send Advance Order notice' : 'Send Receipt'}
               <FaWhatsapp className="inline-block ml-2 text-green-500" />
               <FaEnvelope className="inline-block ml-2 text-blue-500" />
+            </button>
+          ) : (
+            <button
+              className={`px-2 py-2 text-green-600 font-semibold rounded-md border-2 transition-colors w-full hover:border-green-600`}
+              onClick={handleOpenNewCustomerRegistration}
+            >
+              <FaUserAlt className="inline-block mr-2 text-green-600" />
+              Register Customer
             </button>
           )}
         </div>
