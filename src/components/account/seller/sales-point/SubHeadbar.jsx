@@ -13,6 +13,7 @@ const SubHeadbar = ({
   lightThemeStyle,
   darkThemeStyle,
   pendingOrders,
+  scheduledOrdersForToday,
   setActiveMenuItem,
   activeMenuItem,
 }) => {
@@ -29,24 +30,15 @@ const SubHeadbar = ({
         'absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center',
     },
     {
-      label: 'Pending Registrations',
-      key: 'pending-registrations',
+      label: 'Scheduled Orders for today',
+      key: 'scheduled-orders-for-today',
       onClick: () => {
-        alert('This feature is not yet implemented. Try at a later time.');
-      }, //setActiveMenuItem('pending-registrations'),
-      showBadge: false,
-      badgeContent: null,
-      badgeStyle: '',
-    },
-    {
-      label: 'Scheduled Orders',
-      key: 'scheduled-orders',
-      onClick: () => {
-        alert('This feature is not yet implemented. Try at a later time.');
-      }, //setActiveMenuItem('scheduled-orders'),
-      showBadge: false,
-      badgeContent: null,
-      badgeStyle: '',
+        setActiveMenuItem('scheduled-orders-for-today');
+      },
+      showBadge: scheduledOrdersForToday?.length > 0,
+      badgeContent: scheduledOrdersForToday?.length,
+      badgeStyle:
+        'absolute -top-1 -right-2 bg-error text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center',
     },
   ];
 

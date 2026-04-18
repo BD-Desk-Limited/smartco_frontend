@@ -11,14 +11,10 @@ import {
 import ErrorInterface from '@/components/account/errorInterface';
 import { registerNewCustomerService } from '@/services/customerServices';
 import { useNotification } from '@/contexts/notificationContext';
-import { useSalesPoint } from '@/contexts/salesPointContext';
-import { useAuth } from '@/contexts/authContext';
 import Spinner from '@/components/account/Spinner';
 
 const NewCustomerRegistration = () => {
   const { showNotification } = useNotification();
-  const { handleUpdateSalesPointState } = useSalesPoint();
-  const { user } = useAuth();
   const { registrationData, setRegistrationData } =
     useNewCustomerRegistration();
   const [formData, setFormData] = React.useState({
@@ -167,24 +163,6 @@ const NewCustomerRegistration = () => {
     }
   };
 
-  const handlePendCustomerRegistration = () => {
-    const currentSellerId = user?._id;
-
-    handleUpdateSalesPointState(
-      currentSellerId,
-      'pending_customer_registration',
-      { formData, token, orderId, createdAt: Date.now() }
-    );
-    showNotification(
-      'info',
-      'Customer Registration Pended',
-      'Customer registration has been pended and can be completed later.',
-      3000
-    );
-    setRegistrationData({ token: null, orderId: null });
-    router.push('/pages/account/sales-point');
-  };
-
   // Check if there is registration data available, if not redirect back to sales point home
   React.useEffect(() => {
     if (!registrationData?.token || !registrationData?.orderId) {
@@ -310,13 +288,6 @@ const NewCustomerRegistration = () => {
           ) : (
             'Submit Registration'
           )}
-        </button>
-        <button
-          className={`p-2 rounded bg-transparent border border-yellow-500 hover:bg-yellow-600 transition-colors ${loading ? 'cursor-not-allowed opacity-70' : ''}`}
-          onClick={handlePendCustomerRegistration}
-          disabled={loading}
-        >
-          Pend Registration
         </button>
       </div>
     </div>

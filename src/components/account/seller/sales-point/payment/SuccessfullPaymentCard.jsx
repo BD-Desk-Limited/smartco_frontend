@@ -235,6 +235,7 @@ const SuccessfullPaymentCard = ({
     setShowReceipt({ success: false, order: null });
   };
 
+  //TODO: Implement WhatsApp receipt sending functionality in the service and handle response accordingly
   const handleSendWhatsappReceipt = ({ phoneNumber, message }) => {
     showNotification(
       'success',

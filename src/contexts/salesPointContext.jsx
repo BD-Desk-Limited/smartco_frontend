@@ -22,8 +22,7 @@ const initialSalesPointState = {
   states: {
     cart: { items: [], linkedCustomer: null },
     pending_orders: [],
-    pending_customer_registration: [],
-    pending_order_schedule: [],
+    scheduled_orders_for_today: [],
   },
   lastUpdated: Date.now(),
 };

@@ -1,3 +1,5 @@
+import LinkedCustomer from '@/components/account/seller/sales-point/cart/LinkedCustomer';
+
 // TODO: Replace with actual API call to fetch products
 const sampleProducts = [
   {
@@ -1839,6 +1841,179 @@ const sampleCustomers = [
   },
 ];
 
+const sampleScheduledOrderForToday = [
+  {
+    orderId: 'ORD-001',
+    linkedCustomer: {
+      _id: '28116303288',
+      customerNumber: 'CUST-001',
+      name: 'John Doe',
+      phone: '123-456-7890',
+      email: 'olusolasamson18@gmail.com',
+      lastVisited: '2024-05-15T14:48:00.000Z',
+      imageUrl:
+        'https://media.istockphoto.com/id/1682296067/photo/happy-studio-portrait-or-professional-man-real-estate-agent-or-asian-businessman-smile-for.jpg?s=612x612&w=0&k=20&c=9zbG2-9fl741fbTWw5fNgcEEe4ll-JegrGlQQ6m54rg=',
+      appliedOffers: [
+        {
+          _id: 1,
+          type: 'cash',
+          description: '10% off on next purchase',
+          expiryDate: '2024-12-31',
+          percentageDiscount: 10.0,
+          amountDiscount: 0,
+          currency: '£',
+          status: 'active',
+          effectiveDate: '2024-01-01',
+        },
+      ],
+    },
+    items: [
+      {
+        cartItemId: 'CART-item-001',
+        isPromo: false,
+        product: {
+          _id: 1,
+          name: 'Apple juice',
+          description:
+            'A smooth blend of creamy tea with your choice of tea variety and milk',
+          category: 'Beverages',
+          imageURL:
+            'https://images.unsplash.com/photo-1597318972412-6db3dd2acf10?w=400&h=400&fit=crop',
+          barcode: '28116303288',
+          components: [
+            {
+              _id: 1,
+              categoryName: 'Tea',
+              isOptional: false,
+              materialChoices: [
+                {
+                  material: {
+                    _id: 99,
+                    name: 'Green Tea',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1596318895147-cd3b66dd330d?w=200&h=200&fit=crop',
+                  },
+                  quantity: 2,
+                  additionalPrice: 0,
+                },
+                {
+                  material: {
+                    _id: 2,
+                    name: 'Black Tea',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1599654389725-5f5dfe1e3ee5?w=200&h=200&fit=crop',
+                  },
+                  quantity: 1,
+                  additionalPrice: 0.45,
+                },
+                {
+                  material: {
+                    _id: 3,
+                    name: 'Herbal Tea',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop',
+                  },
+                  quantity: 3,
+                  additionalPrice: 0.75,
+                },
+              ],
+            },
+            {
+              _id: 2,
+              categoryName: 'Milk',
+              isOptional: false,
+              materialChoices: [
+                {
+                  material: {
+                    _id: 4,
+                    name: 'Whole Milk',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1600788148184-7a36dc4df4ee?w=200&h=200&fit=crop',
+                  },
+                  quantity: 1,
+                  additionalPrice: 0,
+                },
+                {
+                  material: {
+                    _id: 5,
+                    name: 'Skim Milk',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1600788148184-7a36dc4df4ee?w=200&h=200&fit=crop',
+                  },
+                  quantity: 2,
+                  additionalPrice: 0.15,
+                },
+              ],
+            },
+            {
+              _id: 3,
+              categoryName: 'Sweetener',
+              isOptional: true,
+              materialChoices: [
+                {
+                  material: {
+                    _id: 6,
+                    name: 'Sugar',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1599599810831-d2300f5de0a3?w=200&h=200&fit=crop',
+                  },
+                  quantity: 1,
+                  additionalPrice: 0,
+                },
+                {
+                  material: {
+                    _id: 7,
+                    name: 'Honey',
+                    imageURL:
+                      'https://images.unsplash.com/photo-1587049352693-ee9edbf0e3c6?w=200&h=200&fit=crop',
+                  },
+                  quantity: 1,
+                  additionalPrice: 0.5,
+                },
+              ],
+            },
+          ],
+          productTax: {
+            isTaxExcluded: false,
+            baseTax: 7.5,
+            additionalTaxAmount: 10,
+          },
+          price: 9.99,
+          currency: '£',
+          availabilityStatus: 'in Stock',
+        },
+        choices: [
+          {
+            choice: {
+              additionalPrice: 0,
+              material: {
+                imageURL:
+                  'https://images.unsplash.com/photo-1550583724-b2692b63c311?w=200&h=200&fit=crop',
+                name: 'Light Foam',
+                _id: 1,
+              },
+              quantity: 1,
+            },
+          },
+        ],
+        quantity: 10,
+      },
+    ],
+    payment: {
+      orderScheduledDateTime: '2024-06-01T10:00:00.000Z',
+      partialAmountPaid: 2.3875,
+      paymentType: 'cash',
+      selectedFulfillmentTime: 'scheduled',
+      selectedPaymentPlan: {
+        amountPaid: 2.3875,
+        label: 'Full Advance',
+        value: 'full',
+      },
+      total: 2.3875,
+    },
+  },
+];
+
 //simulate fetching of customer data by passing id, email, or phone as parameter
 const fetchCustomerData = (idOrEmailOrPhone) => {
   const userData = sampleCustomers.find(
@@ -1857,4 +2032,9 @@ const fetchCustomerData = (idOrEmailOrPhone) => {
   });
 };
 
-export { sampleProducts, sampleCustomers, fetchCustomerData };
+export {
+  sampleProducts,
+  sampleCustomers,
+  sampleScheduledOrderForToday,
+  fetchCustomerData,
+};

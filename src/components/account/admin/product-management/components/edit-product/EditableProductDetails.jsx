@@ -1,6 +1,6 @@
 /* Working from here next time*/
 import Header from '@/components/account/Header';
-import SubHeader from '@/components/account/SubHeader';
+import SubHeader from '@/components/account/admin/SubHeader';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
 import PageDescription from '@/components/account/PageDescription';

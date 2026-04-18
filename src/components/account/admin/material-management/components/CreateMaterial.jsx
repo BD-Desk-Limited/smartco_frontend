@@ -1,7 +1,7 @@
 import React from 'react';
 import MaterialSidebar from './materialSidebar';
 import Header from '@/components/account/Header';
-import SubHeader from '../../../SubHeader';
+import SubHeader from '../../SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import {
   getMaterialCategories,
@@ -75,17 +75,17 @@ const CreateMaterial = ({ pageDescription }) => {
     e.preventDefault();
     const createCategory = async () => {
       setError('');
-      
+
       if (!newCategory) {
         setError('Please enter a new category name');
         return;
-      };
+      }
 
       const passedVerification = verifyInputText(newCategory);
       if (!passedVerification.passed) {
         setError(passedVerification.message);
         return;
-      };  
+      }
 
       try {
         setLoading(true);
@@ -93,7 +93,7 @@ const CreateMaterial = ({ pageDescription }) => {
         if (response.data) {
           setForm({ ...form, materialCategory: newCategory });
           const tempId = `sampleCategoryId-${Math.floor(Math.random() * 1000)}`;
-          setCategories([...categories, {name: newCategory, _id: tempId}]);
+          setCategories([...categories, { name: newCategory, _id: tempId }]);
           setCategoryCreated(true);
           setNewCategory('');
         }
@@ -110,7 +110,7 @@ const CreateMaterial = ({ pageDescription }) => {
   const handleCreateUnit = (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!newUnit) {
       setError('Please enter a new unit name');
       return;
@@ -120,14 +120,13 @@ const CreateMaterial = ({ pageDescription }) => {
     if (!passedVerification.passed) {
       setError(passedVerification.message);
       return;
-    };
+    }
 
     const createUnit = async () => {
       setLoading(true);
       try {
         const response = await createMaterialUnits({ name: newUnit });
         if (response.data) {
-
           setForm({ ...form, materialUnit: newUnit });
           const tempId = `sampleUnitId-${Math.floor(Math.random() * 1000)}`;
           setUnits([...units, { name: newUnit, _id: tempId }]);
@@ -157,27 +156,27 @@ const CreateMaterial = ({ pageDescription }) => {
     ) {
       setError(
         `Please fill all fields. ${
-            !form.materialName ? 'Material Name, ' : ''} ${
-                !form.materialType ? 'Material Type, ' : ''} ${
-                    !form.materialCategory ? 'Material Category, ' : ''} ${
-                        !form.materialUnit ? 'Material Unit, ' : ''} ${
-                            !form.materialDescription ? 'Material Description, ' : ''
+          !form.materialName ? 'Material Name, ' : ''
+        } ${!form.materialType ? 'Material Type, ' : ''} ${
+          !form.materialCategory ? 'Material Category, ' : ''
+        } ${!form.materialUnit ? 'Material Unit, ' : ''} ${
+          !form.materialDescription ? 'Material Description, ' : ''
         } is not filled`
       );
       return;
-    };
+    }
 
-    const verifyInputs =(input) => {
+    const verifyInputs = (input) => {
       const passed = verifyInputText(input);
       if (!passed.passed) {
         setError(passed.message);
         return;
-      };
+      }
     };
 
     verifyInputs(form.materialName);
-    verifyInputs(form.materialDescription); 
-    
+    verifyInputs(form.materialDescription);
+
     try {
       setLoading(true);
       const body = {
@@ -188,8 +187,8 @@ const CreateMaterial = ({ pageDescription }) => {
         description: form.materialDescription,
       };
 
-      const {data, error} = await createMaterial(body);
-      if(data && data.success) {
+      const { data, error } = await createMaterial(body);
+      if (data && data.success) {
         setSuccess(true);
         setForm({
           materialName: '',
@@ -204,12 +203,10 @@ const CreateMaterial = ({ pageDescription }) => {
         setUnitCreated(false);
       } else if (error) {
         setError(error || 'error creating material, please try again!!!');
-      };
-
+      }
     } catch (error) {
       setError(error || 'error creating material, please try again!!!');
       console.error('Error:', error);
-      
     } finally {
       setLoading(false);
     }
@@ -225,7 +222,7 @@ const CreateMaterial = ({ pageDescription }) => {
       </div>
       <div className="flex flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
-          <MaterialSidebar 
+          <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
             setIsOpen={setOpenSidebar}
@@ -290,7 +287,10 @@ const CreateMaterial = ({ pageDescription }) => {
                             </option>
                             {categories &&
                               categories?.map((category) => (
-                                <option key={category._id} value={category.name}>
+                                <option
+                                  key={category._id}
+                                  value={category.name}
+                                >
                                   {category.name}
                                 </option>
                               ))}
@@ -463,10 +463,8 @@ const CreateMaterial = ({ pageDescription }) => {
               </button>
             </div>
           </div>
-          <div className='sticky bottom-0 w-full'>
-            <PageDescription 
-              pageDescription={pageDescription} 
-            />
+          <div className="sticky bottom-0 w-full">
+            <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
       </div>
@@ -484,7 +482,7 @@ const CreateMaterial = ({ pageDescription }) => {
       )}
       {success && (
         <div className="inset-0 bg-black bg-opacity-70 fixed z-50 flex justify-center items-center">
-          <SuccessModal 
+          <SuccessModal
             message={'Material created successfully'}
             title={'Create New Material'}
             buttonStyle={'bg-brand-blue hover:bg-blue-shadow5'}

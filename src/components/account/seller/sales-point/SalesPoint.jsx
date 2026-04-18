@@ -43,9 +43,9 @@ const SalesPoint = ({
     order: null,
   });
   const [pendingOrders, setPendingOrders] = React.useState([]);
-  const [pendingCustomerRegistration, setPendingCustomerRegistration] =
-    React.useState([]);
-  const [pendingOrderSchedule, setPendingOrderSchedule] = React.useState([]);
+  const [scheduledOrdersForToday, setScheduledOrdersForToday] = React.useState(
+    []
+  );
   const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -68,16 +68,12 @@ const SalesPoint = ({
         value: pendingOrders,
         setValue: setPendingOrders,
       },
-      pending_customer_registration: {
-        value: pendingCustomerRegistration,
-        setValue: setPendingCustomerRegistration,
-      },
-      pending_order_schedule: {
-        value: pendingOrderSchedule,
-        setValue: setPendingOrderSchedule,
+      scheduled_orders_for_today: {
+        value: scheduledOrdersForToday,
+        setValue: setScheduledOrdersForToday,
       },
     }),
-    [cart, pendingOrders, pendingCustomerRegistration, pendingOrderSchedule]
+    [cart, pendingOrders, scheduledOrdersForToday]
   );
 
   const MAX_ALLOWED_PENDING_ORDERS = 5; // Maximum number of pending orders allowed, can be adjusted as needed
@@ -277,17 +273,15 @@ const SalesPoint = ({
     pendingOrders,
     setPendingOrders,
     MAX_ALLOWED_PENDING_ORDERS,
-    pendingCustomerRegistration,
-    setPendingCustomerRegistration,
-    pendingOrderSchedule,
-    setPendingOrderSchedule,
+    scheduledOrdersForToday,
+    setScheduledOrdersForToday,
     handleAddToCart,
     handleCheckout,
     workBranch,
     workBranchKey,
   };
 
-  // map active menu item to content component - if no match, default to sales point content to allow dynamic switching between numerous submenus
+  // map active menu item to content component
   const CONTENT_COMPONENT_MAP = {
     'sales-items': SalesPointContent,
     cart: SalesPointContent,

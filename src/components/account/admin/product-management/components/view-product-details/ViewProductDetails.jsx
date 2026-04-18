@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
-import SubHeader from '@/components/account/SubHeader';
+import SubHeader from '@/components/account/admin/SubHeader';
 import Header from '@/components/account/Header';
 import PageDescription from '@/components/account/PageDescription';
 import Image from 'next/image';

@@ -66,12 +66,12 @@ const SendReceipt = ({
         </button>
       </div>
 
-      {/* buttons for sending receipt methods */}
+      {/* buttons for sending receipt methods out */}
       <div className="grid grid-cols-2 gap-5 sm:grid-cols-2">
         {RECEIPT_SEND_METHODS.map((method) => (
           <button
             key={method.id}
-            className={`flex flex-col flex-wrap h-52 w-32 items-center rounded p-2 text-white transition-colors text-sm hover:bg-opacity-50 ${method.status !== 'active' ? 'cursor-not-allowed opacity-50' : ''}`}
+            className={`flex flex-col flex-wrap h-14 w-32 items-center rounded p-2 text-white transition-colors text-sm hover:bg-opacity-50 ${method.status !== 'active' ? 'cursor-not-allowed opacity-50' : ''}`}
             style={method.style}
             onClick={method.onClick}
             disabled={method.status !== 'active'}
