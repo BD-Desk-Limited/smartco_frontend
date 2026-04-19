@@ -286,39 +286,29 @@ export const deactivateProductInAllBranchesService = async (productId) => {
   }
 };
 
-//TODO: fetch products by branchId to be used in sales point
-import { sampleProducts } from '@/services/sampleData';
 export const getProductsByBranchIdService = async (branchId) => {
-  console.log('Fetching products for branch:', branchId);
   const token = getToken();
   try {
-    /*const response = await fetch(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products/branch/${branchId}`,
-      { method: 'GET', headers: { Authorization: `Bearer ${token}` } }
-    );*/
-
-    //placeholder response until API is ready
-    const response = {
-      ok: true,
-      data: new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(sampleProducts);
-        }, 2000);
-      }),
-    };
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log('Response:', response);
 
     if (response.ok) {
-      const responseData = await response.data;
-      return { data: responseData };
-    }
-
-    let errorMessage = 'error fetching products for branch, please try again';
-    if (typeof response.json === 'function') {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
       const errorData = await response.json();
-      errorMessage = errorData?.message || errorMessage;
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
     }
-
-    return { error: errorMessage };
   } catch (error) {
     console.error('Error:', error);
     return { error: 'error fetching products for branch, please try again' };

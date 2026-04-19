@@ -236,7 +236,7 @@ const SalesPoint = ({
   };
 
   const handleSelectComponents = () => {
-    if (selectedProduct?.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
+    if (selectedProduct?.availabilityStatus !== 'in stock') return; // Prevent selection if product is not in stock
     setOpenSelectProductComponents(true);
   };
 

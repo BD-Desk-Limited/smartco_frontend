@@ -83,7 +83,7 @@ const SalesPointProducts = ({
   ]);
 
   const handleProductClick = (product) => {
-    if (product.availabilityStatus !== 'in Stock') return; // Prevent selection if product is not in stock
+    if (product.availabilityStatus !== 'in stock') return; // Prevent selection if product is not in stock
     setSelectedProduct(product);
   };
 
@@ -175,6 +175,7 @@ const SalesPointProducts = ({
               />
             </div>
           </div>
+
           {/* Product list */}
           {filteredProducts && filteredProducts.length > 0 ? (
             <ul className="w-full h-[calc(100vh-250px)] mb-10 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 scrollbar-thin overflow-y-auto">
@@ -225,14 +226,14 @@ const SalesPointProducts = ({
                     >
                       <span className="">Availability</span>
                       <span
-                        className={` ${product?.availabilityStatus === 'in Stock' ? 'text-brand-green' : 'text-error'} flex flex-row font-semibold text-sm`}
+                        className={` ${product?.availabilityStatus === 'in stock' ? 'text-brand-green' : 'text-error'} flex flex-row font-semibold text-sm`}
                       >
-                        {product?.availabilityStatus === 'in Stock' ? (
+                        {product?.availabilityStatus === 'in stock' ? (
                           <FaCheckCircle className={`mr-1 text-brand-green`} />
                         ) : (
                           <FaExclamationCircle className={`mr-1 text-error`} />
                         )}
-                        {product?.availabilityStatus === 'in Stock'
+                        {product?.availabilityStatus === 'in stock'
                           ? 'Available'
                           : product.availabilityStatus}
                       </span>
@@ -243,7 +244,7 @@ const SalesPointProducts = ({
                         buttonStyle={` 
                           ${mode !== 'light' ? 'bg-gray-shadow1 hover:bg-gray-shadow2' : 'bg-white hover:bg-gray-shadow8'} 
                           rounded-md p-2 w-full mx-1 text-sm flex items-center justify-center mb-3 h-fit
-                          ${product.availabilityStatus !== 'in Stock' ? 'cursor-not-allowed opacity-20' : ''}
+                          ${product.availabilityStatus !== 'in stock' ? 'cursor-not-allowed opacity-20' : ''}
                         `}
                       >
                         <FaShoppingCart

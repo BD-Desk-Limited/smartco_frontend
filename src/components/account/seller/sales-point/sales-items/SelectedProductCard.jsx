@@ -77,14 +77,14 @@ const SelectedProductCard = ({
             >
               <span className={`font-semibold`}>Availability</span>
               <span
-                className={` ${product?.availabilityStatus === 'in Stock' ? 'text-brand-green' : 'text-error'} flex flex-row font-semibold text-sm`}
+                className={` ${product?.availabilityStatus === 'in stock' ? 'text-brand-green' : 'text-error'} flex flex-row font-semibold text-sm`}
               >
-                {product?.availabilityStatus === 'in Stock' ? (
+                {product?.availabilityStatus === 'in stock' ? (
                   <FaCheckCircle className={`mr-1 text-brand-green`} />
                 ) : (
                   <FaExclamationCircle className={`mr-1 text-error`} />
                 )}
-                {product?.availabilityStatus === 'in Stock'
+                {product?.availabilityStatus === 'in stock'
                   ? 'Available'
                   : product.availabilityStatus}
               </span>
@@ -124,7 +124,7 @@ const SelectedProductCard = ({
               <Button
                 onClick={handleSelectComponents}
                 buttonStyle={`bg-brand-green hover:bg-green-shadow1 rounded-md p-2 w-full mx-1 text-sm flex items-center justify-center mb-3 h-fit
-                  ${product.availabilityStatus !== 'in Stock' ? 'cursor-not-allowed opacity-20' : ''}
+                  ${product.availabilityStatus !== 'in stock' ? 'cursor-not-allowed opacity-20' : ''}
                 `}
               >
                 <FaArrowRight

@@ -7,6 +7,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaShoppingCart,
+  FaShoppingBag,
 } from 'react-icons/fa';
 
 const SelectedProductComponents = ({
@@ -122,13 +123,17 @@ const SelectedProductComponents = ({
                         : ''}
                     </span>
 
-                    <Image
-                      src={choice.material?.imageURL}
-                      alt={choice.material?.name}
-                      width={100}
-                      height={100}
-                      className="w-full h-20 object-cover rounded-t-md mb-2"
-                    />
+                    {choice.material?.imageURL ? (
+                      <Image
+                        src={choice.material?.imageURL}
+                        alt={choice.material?.name}
+                        width={100}
+                        height={100}
+                        className="w-full h-20 object-cover rounded-t-md mb-2"
+                      />
+                    ) : (
+                      <FaShoppingBag className="w-full h-20 object-cover rounded-t-md mb-2" />
+                    )}
                     <p className="flex flex-col">
                       <span className="text-sm font-semibold">
                         {choice.material?.name}
@@ -219,7 +224,7 @@ const SelectedProductComponents = ({
                     handleAddToCart(product, selectedChoices, quantity)
                   }
                   buttonStyle={`bg-brand-green hover:bg-green-shadow1 p-3 rounded-r-lg w-fit font-semibold text-sm flex items-center justify-center h-fit absolute right-0
-                  ${product.availabilityStatus !== 'in Stock' ? 'cursor-not-allowed opacity-20' : ''}
+                  ${product.availabilityStatus !== 'in stock' ? 'cursor-not-allowed opacity-20' : ''}
                 `}
                 >
                   <FaShoppingCart
