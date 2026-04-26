@@ -1,7 +1,5 @@
 'use client';
 
-import { fetchCustomerData } from './sampleData';
-
 // safely access sessionStorage in client-side code
 // This function checks if the code is running in a browser environment
 const getToken = () => {
@@ -11,14 +9,14 @@ const getToken = () => {
   return null;
 };
 
-//TODO: get customer by id, email, or phone
-export const getCustomerByIdEmailOrPhoneService = async (
-  customerIdOrEmailOrPhone
+//Get customer by customerNumber, email, or phone
+export const getCustomerByCustomerNumberEmailOrPhoneService = async (
+  customerNumberOrEmailOrPhone
 ) => {
   const token = getToken();
   try {
-    /*const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customers/${customerIdOrEmailOrPhone}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customers/${customerNumberOrEmailOrPhone}`,
       {
         method: 'GET',
         headers: {
@@ -26,13 +24,7 @@ export const getCustomerByIdEmailOrPhoneService = async (
           Authorization: `Bearer ${token}`,
         },
       }
-    );*/
-
-    // Mock response for testing
-    const response = {
-      ok: true,
-      json: async () => await fetchCustomerData(customerIdOrEmailOrPhone),
-    };
+    );
 
     if (response.ok) {
       const responseData = await response.json();
@@ -48,12 +40,12 @@ export const getCustomerByIdEmailOrPhoneService = async (
   }
 };
 
-//TODO: create or update customer
+//Register new customer
 export const registerNewCustomerService = async (customerData) => {
   const token = getToken();
 
   try {
-    /*const response = await fetch(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/customers`,
       {
         method: 'POST',
@@ -63,35 +55,10 @@ export const registerNewCustomerService = async (customerData) => {
         },
         body: JSON.stringify(customerData),
       }
-    );*/
-
-    // Mock response for testing
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve({
-          ok: true,
-          json: async () => ({
-            data: {
-              _id: 'mockCustomerId123',
-              customerNumber: 'CUST-003',
-              name: customerData.name,
-              email: customerData.email,
-              phone: customerData.phone,
-            },
-          }),
-
-          // Uncomment below to simulate an error response
-          /*ok: false,
-          json: async () => ({
-            message: 'Failed to register customer. Please try again now.',
-          }),*/
-        });
-      }, 1000)
     );
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log('Registered new customer:', responseData);
       return { data: responseData.data };
     } else {
       const errorData = await response.json();
@@ -104,15 +71,43 @@ export const registerNewCustomerService = async (customerData) => {
   }
 };
 
-//TODO: Validate customer registration token for self-registration flow
-export const validateCustomerRegistrationTokenService = async (
-  registrationToken,
-  orderId
+// Self-register new customer using registration token
+export const selfRegisterationCustomerService = async (customerData) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customers/self-register`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error registering customer, please try again' };
+  }
+};
+
+//Validate customer registration token for self-registration flow
+export const validateCustomerSelfRegistrationTokenService = async (
+  registrationToken
 ) => {
   const token = getToken();
   try {
-    /*const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/validate-registration?token=${registrationToken}&orderId=${orderId}`,
+    console.log('Validating registration token:', registrationToken);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customers/validate-registration-token/${registrationToken}`,
       {
         method: 'GET',
         headers: {
@@ -120,33 +115,6 @@ export const validateCustomerRegistrationTokenService = async (
           Authorization: `Bearer ${token}`,
         },
       }
-    );*/
-
-    // Mock response for testing
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve({
-          ok: true,
-          json: async () => ({
-            valid: true,
-          }),
-
-          // Uncomment below to simulate an invalid token response
-          /*ok: false,
-          json: async () => ({
-            valid: false,
-            message:
-              'Invalid or expired registration link, Looks like the link has expired.',
-          }),
-
-          // Uncomment below to simulate an error response
-          /*ok: false,
-          json: async () => ({  
-            valid: false,
-            message: 'Failed to validate registration token. Please try again now.',
-          }),*/
-        });
-      }, 1000)
     );
 
     if (response.ok) {

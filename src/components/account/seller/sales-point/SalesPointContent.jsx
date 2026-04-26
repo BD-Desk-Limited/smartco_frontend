@@ -85,6 +85,14 @@ const SalesPointContent = ({
       setLoading(true);
       const refreshedProducts = await fetchProductsFromAPI(workBranch?._id);
       setProducts(refreshedProducts || []);
+    } catch (error) {
+      console.error('Error refreshing products:', error);
+      showNotification(
+        'error',
+        'Refresh Failed',
+        'Failed to refresh products. Please try again later.',
+        4000
+      );
     } finally {
       setLoading(false);
       setRefreshingProducts(false);

@@ -1,12 +1,13 @@
 'use client';
-import React, { use, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect } from 'react';
+import Confetti from 'react-confetti';
 import ErrorInterface from '@/components/account/errorInterface';
 import Spinner from '@/components/account/Spinner';
 import {
-  registerNewCustomerService,
-  validateCustomerRegistrationTokenService,
+  selfRegisterationCustomerService,
+  validateCustomerSelfRegistrationTokenService,
 } from '@/services/customerServices';
+import { useSearchParams } from 'next/navigation';
 import {
   verifyEmail,
   verifyName,
@@ -14,7 +15,6 @@ import {
 } from '@/utilities/verifyInput';
 
 const CustomerSelfRegistration = () => {
-  const searchParams = useSearchParams();
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
@@ -29,24 +29,40 @@ const CustomerSelfRegistration = () => {
   const [mounting, setMounting] = React.useState(true);
   const [tokenVerificationError, setTokenVerificationError] =
     React.useState(null);
+  const [showConfetti, setShowConfetti] = React.useState(false);
+  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
+
+  const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const orderId = searchParams.get('ref');
+
+  // Set window dimensions for confetti
+  useEffect(() => {
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      updateDimensions();
+      window.addEventListener('resize', updateDimensions);
+      return () => window.removeEventListener('resize', updateDimensions);
+    }
+  }, []);
 
   // validate token and orderId on backend
   useEffect(() => {
     const validateTokenAndOrderId = async () => {
-      if (!token || !orderId) {
-        setTokenVerificationError('Invalid registration link.');
-        return;
-      }
-
       try {
         setMounting(true);
-        // Call a backend API to validate the token and orderId
-        const response = await validateCustomerRegistrationTokenService(
-          token,
-          orderId
-        );
+        if (!token) {
+          setTokenVerificationError('Invalid registration link.');
+          return;
+        }
+        // Call a backend API to validate the token
+        const response =
+          await validateCustomerSelfRegistrationTokenService(token);
 
         if (response?.data?.valid) {
           setTokenVerificationError(null);
@@ -68,9 +84,19 @@ const CustomerSelfRegistration = () => {
     };
 
     validateTokenAndOrderId();
-  }, [token, orderId]);
+  }, [token]);
 
-  const handleRegisterCustomer = async () => {
+  // Hide confetti after 10 seconds
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
+
+  const handleSelfRegisterCustomer = async () => {
     setCustomerRegistrationError(null);
     const { name, email, phone } = formData;
 
@@ -110,11 +136,11 @@ const CustomerSelfRegistration = () => {
     try {
       setLoading(true);
 
-      const response = await registerNewCustomerService({
+      const response = await selfRegisterationCustomerService({
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        customerRegistrationToken: token,
+        token,
       });
 
       if (response?.error) {
@@ -124,6 +150,8 @@ const CustomerSelfRegistration = () => {
       }
       if (response?.data) {
         setSuccessfullyRegisteredCustomer(true);
+        setShowConfetti(true);
+        setTokenVerificationError(null);
         setMessage('Registration successful! You can close this window.');
       }
     } catch (error) {
@@ -131,6 +159,7 @@ const CustomerSelfRegistration = () => {
       setCustomerRegistrationError('Registration failed, please try again.');
     } finally {
       setLoading(false);
+      setMounting(false);
     }
   };
 
@@ -196,7 +225,7 @@ const CustomerSelfRegistration = () => {
 
             <button
               className={`px-4 py-2 rounded bg-brand-green hover:bg-green-shadow3 transition-colors ${loading ? 'cursor-not-allowed opacity-70' : ''}`}
-              onClick={handleRegisterCustomer}
+              onClick={handleSelfRegisterCustomer}
               disabled={loading}
             >
               {loading ? (
@@ -211,8 +240,22 @@ const CustomerSelfRegistration = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center p-4">
-          <p className="text-center font-bold text-brand-green">{message}</p>
+        <div className="w-full h-full flex items-center justify-center p-4 relative overflow-hidden">
+          {showConfetti && (
+            <Confetti
+              width={dimensions.width - 80}
+              height={dimensions.height}
+              recycle={false}
+              numberOfPieces={200}
+              gravity={0.1}
+            />
+          )}
+          <div className="text-center h-full">
+            <div className="text-5xl mb-4">🎉</div>
+            <p className="text-center font-bold text-brand-green text-xl">
+              {message}
+            </p>
+          </div>
         </div>
       )}
     </>

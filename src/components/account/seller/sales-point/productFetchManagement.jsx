@@ -94,8 +94,6 @@ const updateProductsInIndexedDB = async (products) => {
     );
 
     if (response.success) {
-      console.log(response.message);
-
       const persistedProductsResponse = await getAllDocuments(
         INDEXED_DB_STORE_NAME
       );
@@ -132,7 +130,7 @@ const updateProductsInIndexedDB = async (products) => {
   }
 };
 
-const loadProducts = async (forceRefresh) => {
+const loadProducts = async (branchId, forceRefresh) => {
   try {
     // Load products from indexedDB or API based on last refresh time
     const DBData = await fetchProductsDataFromIndexedDB();
@@ -146,7 +144,7 @@ const loadProducts = async (forceRefresh) => {
       DBData?.products?.length === 0 ||
       now - new Date(DBData.updatedAt).getTime() > 24 * 60 * 60 * 1000
     ) {
-      const fetchedProducts = await fetchProductsFromAPI();
+      const fetchedProducts = await fetchProductsFromAPI(branchId);
       //update indexedDB with new products and return the stored result
       const updateResult = await updateProductsInIndexedDB(fetchedProducts);
       if (!updateResult?.products) {

@@ -4,7 +4,7 @@ import CartProductList from './CartProductList';
 import CustomerLinkForm from './CustomerLinkForm';
 import LinkedCustomer from './LinkedCustomer';
 import BillAndSummary from './BillAndSummary';
-import { getCustomerByIdEmailOrPhoneService } from '@/services/customerServices';
+import { getCustomerByCustomerNumberEmailOrPhoneService } from '@/services/customerServices';
 
 const Cart = ({
   products,
@@ -107,7 +107,9 @@ const Cart = ({
       }
 
       const response =
-        await getCustomerByIdEmailOrPhoneService(customerSearchTerm);
+        await getCustomerByCustomerNumberEmailOrPhoneService(
+          customerSearchTerm
+        );
 
       if (response && response.data) {
         setCustomerData(response.data);

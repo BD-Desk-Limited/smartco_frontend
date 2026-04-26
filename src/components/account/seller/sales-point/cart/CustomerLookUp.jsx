@@ -274,41 +274,50 @@ const CustomerLookUp = ({
                                     </span>
                                   ) : (
                                     <>
-                                      <span
-                                        className={`bg-green-shadow7 font-thin hover:bg-green-shadow3 text-brand-green transition-colors duration-200 p-1 rounded-md  ${
-                                          appliedOffers.some(
+                                      {offer?.status === 'active' ? (
+                                        <span
+                                          className={`bg-green-shadow7 font-thin hover:bg-green-shadow3 text-brand-green transition-colors duration-200 p-1 rounded-md  ${
+                                            appliedOffers.some(
+                                              (o) => o._id === offer._id
+                                            )
+                                              ? 'cursor-not-allowed opacity-50'
+                                              : 'cursor-pointer'
+                                          }`}
+                                          onClick={
+                                            appliedOffers.some(
+                                              (o) => o._id === offer._id
+                                            )
+                                              ? null
+                                              : claim?.type === 'product'
+                                                ? () =>
+                                                    handleOpenSelectProductOfferComponent(
+                                                      offer,
+                                                      claim?.type
+                                                    )
+                                                : () =>
+                                                    handleApplyOffer(
+                                                      offer,
+                                                      claim?.type
+                                                    )
+                                          }
+                                          disabled={appliedOffers.some(
+                                            (o) => o._id === offer._id
+                                          )}
+                                        >
+                                          {appliedOffers.some(
                                             (o) => o._id === offer._id
                                           )
-                                            ? 'cursor-not-allowed opacity-50'
-                                            : 'cursor-pointer'
-                                        }`}
-                                        onClick={
-                                          appliedOffers.some(
-                                            (o) => o._id === offer._id
-                                          )
-                                            ? null
-                                            : claim?.type === 'product'
-                                              ? () =>
-                                                  handleOpenSelectProductOfferComponent(
-                                                    offer,
-                                                    claim?.type
-                                                  )
-                                              : () =>
-                                                  handleApplyOffer(
-                                                    offer,
-                                                    claim?.type
-                                                  )
-                                        }
-                                        disabled={appliedOffers.some(
-                                          (o) => o._id === offer._id
-                                        )}
-                                      >
-                                        {appliedOffers.some(
-                                          (o) => o._id === offer._id
-                                        )
-                                          ? 'Applied..'
-                                          : 'Apply'}
-                                      </span>
+                                            ? 'Applied..'
+                                            : 'Apply'}
+                                        </span>
+                                      ) : (
+                                        <span
+                                          className={`bg-green-shadow7 font-thin hover:bg-green-shadow3 text-brand-green transition-colors duration-200 p-1 rounded-md cursor-not-allowed opacity-50`}
+                                          disabled={true}
+                                        >
+                                          {offer.status}
+                                        </span>
+                                      )}
                                     </>
                                   )}
 

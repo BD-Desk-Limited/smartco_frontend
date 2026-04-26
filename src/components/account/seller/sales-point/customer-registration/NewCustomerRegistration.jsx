@@ -32,11 +32,10 @@ const NewCustomerRegistration = () => {
 
   const QRCodeText = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/pages/splash/open-pages/customer-self-registration?${new URLSearchParams(
     {
-      ref: orderId || '',
       token: token || '',
     }
   ).toString()}`;
-  console.log('Generated QR Code Text:', QRCodeText);
+  console.log('Generated QR code text:', QRCodeText);
 
   const handlePrintQRCode = () => {
     if (qrContainerRef.current) {
@@ -135,7 +134,7 @@ const NewCustomerRegistration = () => {
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        customerRegistrationToken: token,
+        orderId: orderId,
       });
 
       if (response?.error) {

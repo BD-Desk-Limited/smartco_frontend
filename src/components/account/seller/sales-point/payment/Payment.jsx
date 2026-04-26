@@ -5,6 +5,7 @@ import {
   itemUnitCost,
   taxfreeProduct,
   subtotal,
+  getVATAmount,
 } from '../cart/CartBillCalculationFunctions';
 import OrderFulfilmentTime from './OrderFulfilmentTime';
 import SelectPaymentMethod from './SelectPaymentMethod';
@@ -224,6 +225,63 @@ const Payment = ({
       },
     };
 
+    const cashDiscounts =
+      cart?.linkedCustomer?.appliedOffers?.filter(
+        (offer) => offer.type === 'cash'
+      ) || [];
+
+    const cartToSubmit = {
+      ...cart,
+      linkedCustomer: cart?.linkedCustomer?._id || null,
+      orderId: cart?.orderId,
+      branch: workBranch?._id,
+      totalAmount: cart?.payment?.total || 0,
+      transactionType: 'sale',
+      offersApplied:
+        cart?.linkedCustomer?.appliedOffers?.map((offer) => offer._id) || [],
+      payment: cart?.payment || null,
+      items:
+        cart?.items?.map((item) => {
+          const product = item?.product?._id || null;
+          const quantity = item?.quantity || 0;
+          const price = item?.product?.price || 0;
+          const selectedOptions = (
+            item?.choices?.map((choiceObj) => {
+              if (choiceObj === '') {
+                return null; // skip empty choices
+              }
+              const optionId = choiceObj?.choice?.material?._id || null;
+              const optionAdditionalPrice =
+                choiceObj?.choice?.additionalPrice || 0;
+              const quantity = choiceObj?.choice?.quantity || 0;
+              return {
+                optionId,
+                optionAdditionalPrice,
+                quantity,
+              };
+            }) || []
+          ).filter((choice) => choice.optionId !== null); // filter out any null choices resulting from empty strings
+          return {
+            product,
+            selectedOptions,
+            quantity,
+            price,
+          };
+        }) || [],
+      taxDetails: [
+        {
+          taxType: 'VAT',
+          taxAmount: getVATAmount(
+            cart?.items,
+            cashDiscounts,
+            workBranchVATRate
+          ),
+        },
+        { taxType: 'Product Tax', taxAmount: productsTax(cart?.items) },
+      ],
+      orderCompletedAt: new Date().toISOString(),
+    };
+
     try {
       /*
       // MULTI-LAYER PERSISTENCE: Ensures transaction is saved across all available storage layers
@@ -233,7 +291,8 @@ const Payment = ({
       // Layer 4: Background sync on reconnection (recovers localStorage backup to API when connectivity is restored, and retries any failed sync attempts, ensuring data eventually reaches backend even if all layers fail at the moment of transaction creation)
       */
 
-      const persistSalesResult = await persistTransactionMultiLayer(cart);
+      const persistSalesResult =
+        await persistTransactionMultiLayer(cartToSubmit);
 
       if (!persistSalesResult?.success) {
         console.error(

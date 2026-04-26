@@ -84,17 +84,18 @@ const SalesPoint = ({
       setLoading(true);
       setError(null);
       try {
-        const loadedProducts = await loadProducts();
+        const loadedProducts = await loadProducts(workBranch._id, false);
+
         setProducts(loadedProducts);
       } catch (err) {
-        setError('Failed to load products. Please try again later.');
+        setError('Failed to load products. Please try again later!!!');
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [workBranch?._id]);
 
   // Reset hydration marker when switching users to ensure fresh state is loaded.
   React.useEffect(() => {

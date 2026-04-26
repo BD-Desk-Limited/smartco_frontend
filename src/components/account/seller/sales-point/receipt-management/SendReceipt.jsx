@@ -12,9 +12,7 @@ const SendReceipt = ({
   onClose,
   onSendEmail,
   onSendWhatsapp,
-  isSendingEmail,
 }) => {
-  const [email, setEmail] = useState(linkedCustomer?.email || '');
   const [phoneNumber, setPhoneNumber] = useState(linkedCustomer?.phone || '');
   const [message, setMessage] = useState(receiptText || '');
 
@@ -44,7 +42,7 @@ const SendReceipt = ({
   ];
 
   const handleEmailSend = () => {
-    onSendEmail({ email, message: message.trim() });
+    onSendEmail();
   };
 
   const handleWhatsappSend = () => {
@@ -71,7 +69,7 @@ const SendReceipt = ({
         {RECEIPT_SEND_METHODS.map((method) => (
           <button
             key={method.id}
-            className={`flex flex-col flex-wrap h-14 w-32 items-center rounded p-2 text-white transition-colors text-sm hover:bg-opacity-50 ${method.status !== 'active' ? 'cursor-not-allowed opacity-50' : ''}`}
+            className={`flex flex-col flex-wrap h-14 w-32 items-center rounded p-2 text-white transition-colors text-sm hover:bg-blue-shadow3 ${method.status !== 'active' ? 'cursor-not-allowed opacity-50' : ''}`}
             style={method.style}
             onClick={method.onClick}
             disabled={method.status !== 'active'}

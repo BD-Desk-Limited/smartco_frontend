@@ -166,8 +166,6 @@ const ScheduledOrdersForToday = ({
       ? workBranch.taxBand.rates[0].rate
       : 0;
 
-  console.log('scheduledOrdersForToday:', scheduledOrdersForToday);
-
   return (
     <div className="h-full w-full p-1 flex flex-row justify-between relative">
       {/* back button */}

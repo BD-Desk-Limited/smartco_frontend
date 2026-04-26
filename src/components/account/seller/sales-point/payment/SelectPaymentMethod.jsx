@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { useNotification } from '@/contexts/notificationContext';
 
 const SelectPaymentMethod = ({
   cart,
@@ -8,7 +9,21 @@ const SelectPaymentMethod = ({
   setOpenPaymentMethodOverlay,
   mode,
 }) => {
+  const { showNotification } = useNotification();
   const handlePaymentMethodClick = (option) => {
+    // check if paayment plan is scheduled. if yes, ensure that a plan is selected before allowing payment method selection
+    if (
+      cart?.payment?.selectedFulfillmentTime === 'scheduled' &&
+      !cart?.payment?.selectedPaymentPlan
+    ) {
+      showNotification(
+        'error',
+        'Payment plan not selected',
+        'Please select a payment plan before choosing a payment method.',
+        4000
+      );
+      return;
+    }
     setPaymentType(option.value);
     setOpenPaymentMethodOverlay(true);
   };

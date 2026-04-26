@@ -101,14 +101,14 @@ const SuccessfullPaymentCard = ({
   };
 
   const getReceiptData = () => ({
-    transactionId: paymentData?.id,
+    transactionId: paidOrderDetails?.orderId,
     metaData: {
       title: isScheduled
         ? `Advanced order note for - ${orderDateString(paymentData?.orderScheduledDateTime)}, ${orderTime(paymentData?.orderScheduledDateTime)}`
         : 'Sales Receipt',
       storeName: workBranch?.name || 'Store Name',
       address: workBranch?.address || 'Store Address',
-      phone: workBranch?.phone || 'Store Phone',
+      phone: workBranch?.phoneNumber || 'Store Phone',
       date: `${orderDateString(paymentData?.paymentStatus?.time)}, ${orderTime(paymentData?.paymentStatus?.time)}`,
       cashierName: user?.fullName || ' ',
     },
@@ -200,7 +200,7 @@ const SuccessfullPaymentCard = ({
     setOpenSendReceipt(true);
   };
 
-  const handleSendEmailReceipt = async ({ email, message }) => {
+  const handleSendEmailReceipt = async () => {
     setIsSendingEmail(true);
 
     const receiptData = getReceiptData();
@@ -208,14 +208,11 @@ const SuccessfullPaymentCard = ({
       transactionId: paidOrderDetails?.orderId,
       channel: 'email',
       recipient: {
-        email,
+        email: paidOrderDetails?.linkedCustomer?.email,
         customerId: paidOrderDetails?.linkedCustomer?._id,
         customerName: paidOrderDetails?.linkedCustomer?.name,
       },
-      receipt: {
-        ...receiptData,
-        text: message,
-      },
+      receiptData: receiptData,
     });
 
     if (response?.error) {
@@ -227,7 +224,7 @@ const SuccessfullPaymentCard = ({
     showNotification(
       'success',
       'Receipt Sent',
-      `Receipt sent to ${email}`,
+      `Receipt sent to ${paidOrderDetails?.linkedCustomer?.email} successfully`,
       3000
     );
     setIsSendingEmail(false);
@@ -236,7 +233,7 @@ const SuccessfullPaymentCard = ({
   };
 
   //TODO: Implement WhatsApp receipt sending functionality in the service and handle response accordingly
-  const handleSendWhatsappReceipt = ({ phoneNumber, message }) => {
+  const handleSendWhatsappReceipt = async () => {
     showNotification(
       'success',
       'WhatsApp Receipt sent',

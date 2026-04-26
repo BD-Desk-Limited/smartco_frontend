@@ -9,12 +9,12 @@ const getToken = () => {
   return null;
 };
 
-//TODO: create or update sales transactions
+//Record sales transactions
 export const recordTransactionsService = async (transactionsData) => {
   const token = getToken();
 
   try {
-    /*const response = await fetch(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/transactions`,
       {
         method: 'POST',
@@ -24,32 +24,11 @@ export const recordTransactionsService = async (transactionsData) => {
         },
         body: JSON.stringify(transactionsData),
       }
-    );*/
-
-    //simulate api call with a delay response and return the sent data as response
-    const response = await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve({
-          ok: true,
-          json: async () => ({
-            data: {
-              ...transactionsData,
-              customerRegToken: transactionsData?.linkedCustomer
-                ? null
-                : 'http://localhost:3000/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-159959',
-            },
-          }),
-          message: 'Transactions recorded successfully...',
-
-          //error sample response
-          //ok: false,
-          //json: async () => ({ message: 'Failed to record transactions' }),
-        });
-      }, 1000)
     );
 
     if (response.ok) {
       const responseData = await response.json();
+
       return { data: responseData.data };
     } else {
       const errorData = await response.json();
@@ -62,19 +41,19 @@ export const recordTransactionsService = async (transactionsData) => {
   }
 };
 
-//TODO: Send receipt through configured channels (email/whatsapp)
+//Send receipt through configured channels (email/whatsapp)
 export const sendReceiptService = async ({
   transactionId,
   channel,
   recipient,
-  receipt,
+  receiptData,
 }) => {
   const token = getToken();
 
   try {
     if (process.env.NEXT_PUBLIC_API_URL) {
-      /*const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/transactions/send-receipt`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/receipts/send`,
         {
           method: 'POST',
           headers: {
@@ -85,26 +64,9 @@ export const sendReceiptService = async ({
             transactionId,
             channel,
             recipient,
-            receipt,
+            receiptData,
           }),
         }
-      );*/
-
-      // Mock response when API URL is not configured yet.
-      const response = await new Promise((resolve) =>
-        setTimeout(() => {
-          resolve({
-            ok: true,
-            json: async () => ({
-              data: {
-                transactionId,
-                channel,
-                recipient,
-                status: 'queued now',
-              },
-            }),
-          });
-        }, 800)
       );
 
       if (response.ok) {
