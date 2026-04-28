@@ -46,7 +46,7 @@ export const registerNewCustomerService = async (customerData) => {
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customers`,
+      `${process.env.NEXT_PUBLIC_API_URL}/customers/${customerData.branch._id}`,
       {
         method: 'POST',
         headers: {
@@ -112,7 +112,6 @@ export const validateCustomerSelfRegistrationTokenService = async (
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
       }
     );

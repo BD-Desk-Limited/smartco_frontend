@@ -43,9 +43,6 @@ const SalesPoint = ({
     order: null,
   });
   const [pendingOrders, setPendingOrders] = React.useState([]);
-  const [scheduledOrdersForToday, setScheduledOrdersForToday] = React.useState(
-    []
-  );
   const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -68,12 +65,8 @@ const SalesPoint = ({
         value: pendingOrders,
         setValue: setPendingOrders,
       },
-      scheduled_orders_for_today: {
-        value: scheduledOrdersForToday,
-        setValue: setScheduledOrdersForToday,
-      },
     }),
-    [cart, pendingOrders, scheduledOrdersForToday]
+    [cart, pendingOrders]
   );
 
   const MAX_ALLOWED_PENDING_ORDERS = 5; // Maximum number of pending orders allowed, can be adjusted as needed
@@ -216,8 +209,9 @@ const SalesPoint = ({
         items: [...(prev?.items || []), newProduct],
       }));
     }
-    //mark the time when the first product was added, to track how long each transaction takes from start to finish
+    // assign ID to cart
     const orderId = `ID-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    //mark the time when the first product was added, to track how long each transaction takes from start to finish
     if (!cart?.orderStartTime || !cart?.orderId) {
       setCart((prev) => ({
         ...prev,
@@ -274,8 +268,6 @@ const SalesPoint = ({
     pendingOrders,
     setPendingOrders,
     MAX_ALLOWED_PENDING_ORDERS,
-    scheduledOrdersForToday,
-    setScheduledOrdersForToday,
     handleAddToCart,
     handleCheckout,
     workBranch,

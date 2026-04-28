@@ -63,6 +63,7 @@ const Payment = ({
   React.useEffect(() => {
     setIsHydrated(true);
   }, []);
+  console.log('Cart data in Payment component:', cart);
 
   // if cart is empty, switch to sales items tab
   React.useEffect(() => {
@@ -216,7 +217,7 @@ const Payment = ({
                 ? `Payment confirmed!!!`
                 : cart?.payment?.selectedFulfillmentTime === 'scheduled' &&
                     cart?.payment?.partialAmountPaid > 0
-                  ? `Payment of ${cart.payment.partialAmountPaid} confirmed for scheduled order!!!`
+                  ? `Payment of ${cart.payment.partialAmountPaid?.toFixed(2)} confirmed for scheduled order!!!`
                   : 'Order Scheduled!!!',
             time: new Date().toISOString(),
             amountPaid: partialAmountPaid,
@@ -297,7 +298,10 @@ const Payment = ({
       if (!persistSalesResult?.success) {
         console.error(
           'Transaction persistence failed on all layers:',
-          persistSalesResult
+          persistSalesResult ?? {
+            success: false,
+            message: 'No persistence result returned',
+          }
         );
         // Even if persistence fails, allow user to see receipt since payment was confirmed
         // but show persistent message that data needs to be saved
@@ -305,9 +309,11 @@ const Payment = ({
 
       // Include persistence status in receipt for user feedback
       const persistenceStatus = {
-        trackingId: persistSalesResult?.trackingId,
-        persistedTo: persistSalesResult?.persistedTo,
-        userMessage: persistSalesResult?.userMessage,
+        trackingId: persistSalesResult?.trackingId || null,
+        persistedTo: persistSalesResult?.persistedTo || [],
+        userMessage:
+          persistSalesResult?.userMessage ||
+          'Unable to determine persistence status.',
         hasSynced: persistSalesResult?.persistedTo?.includes('API'),
       };
 

@@ -95,6 +95,7 @@ const CustomerSelfRegistration = () => {
       return () => clearTimeout(timer);
     }
   }, [showConfetti]);
+  console.log('okok:', token);
 
   const handleSelfRegisterCustomer = async () => {
     setCustomerRegistrationError(null);

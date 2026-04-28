@@ -649,9 +649,9 @@ const persistTransactionMultiLayer = async (transaction) => {
     // Check internet status
     const online = isOnline();
     results.online = online;
-    let idbResult;
-    let apiResult;
-    let storageResult;
+    let idbResult = { success: false, layer: 'IDB' };
+    let apiResult = { success: false, layer: 'API' };
+    let storageResult = { success: false, layer: 'localStorage' };
 
     // LAYER 1: IndexedDB (always attempt)
     idbResult = await persistToIndexedDB([transaction]);
@@ -662,25 +662,23 @@ const persistTransactionMultiLayer = async (transaction) => {
       results.success = true;
     }
 
-    //proceed to API persistence if IDB succeeded, if IDB failed, we can still attempt API persistence as long as we are online, if API persistence succeeds, it cleans-up the IDB record for this transaction in the API persistence function, if API persistence fails, we will rely on the retry mechanism in checkAndSyncPendingTransactions function to retry syncing this transaction later from the indexedDB
-
-    // LAYER 2: API (only if online)
+    // Proceed to API persistence if online. If IDB failed, we can still attempt API persistence as long as we are online.
+    // If API succeeds, it will handle cleanup of the IDB record.
     if (online) {
-      apiResult = await persistToAPIWithRetry([transaction]); // This will also handle cleanup of IndexedDB if successful
-
+      apiResult = await persistToAPIWithRetry([transaction]);
       results.layers.push(apiResult);
 
       if (apiResult.success) {
         results.persistedTo.push('API');
         results.success = true;
         results.userMessage = 'Transaction saved to backend';
-        results.customerRegToken = apiResult?.customerRegToken || null; // in case API returns a customer registration token to be used for post-transaction customer self-registration
+        results.customerRegToken = apiResult?.customerRegToken || null;
         return results;
       }
     }
 
     // LAYER 3: localStorage (final fallback) if both IDB and API failed
-    if (!apiResult.success && !idbResult.success) {
+    if (!idbResult.success && !apiResult.success) {
       storageResult = await persistToLocalStorageFallback(transaction);
       results.layers.push(storageResult);
 
@@ -691,21 +689,24 @@ const persistTransactionMultiLayer = async (transaction) => {
           : 'Transaction saved locally as backup. Backend sync will retry.';
         results.success = true;
         return results;
-      } else {
-        // If we get here, all layers failed
-        results.success = false;
-        results.userMessage =
-          'Failed to save transaction. Please check your connection and try again.';
-
-        return results;
       }
+
+      results.success = false;
+      results.userMessage =
+        'Failed to save transaction. Please check your connection and try again.';
+      return results;
     }
 
     if (idbResult.success || apiResult.success || storageResult.success) {
-      //if any result is successfull, return success. Data would be synced later
       results.success = true;
       return results;
     }
+
+    // If we reach here, no persistence layer succeeded
+    results.success = false;
+    results.userMessage =
+      'Failed to save transaction. Please check your connection and try again.';
+    return results;
   } catch (err) {
     results.success = false;
     results.error = err.message;

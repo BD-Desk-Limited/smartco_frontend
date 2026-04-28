@@ -1,4 +1,4 @@
-import CustomerSelfRegistration from '@/components/account/seller/sales-point/customer-registration/CustomerSelfRegistration';
+import CustomerSelfRegistration from '@/components/account/seller/customer-registration/CustomerSelfRegistration';
 import React, { Suspense } from 'react';
 
 const Page = () => {

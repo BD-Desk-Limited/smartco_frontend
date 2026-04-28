@@ -1,7 +1,6 @@
 import React from 'react';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
-import { NotificationProvider } from '@/contexts/notificationContext';
 import SalesPoint from './SalesPoint';
 import SelectWorkBranch from './SelectWorkBranch';
 import WarningModal from '../../WarningModal';

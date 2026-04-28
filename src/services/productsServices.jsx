@@ -299,7 +299,6 @@ export const getProductsByBranchIdService = async (branchId) => {
         },
       }
     );
-    console.log('Response:', response);
 
     if (response.ok) {
       const responseData = await response.json();

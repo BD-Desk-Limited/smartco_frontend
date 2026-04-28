@@ -1,6 +1,6 @@
 'use client';
 
-import NewCustomerRegistration from '@/components/account/seller/sales-point/customer-registration/NewCustomerRegistration';
+import NewCustomerRegistration from '@/components/account/seller/customer-registration/NewCustomerRegistration';
 import React from 'react';
 
 const Page = () => {

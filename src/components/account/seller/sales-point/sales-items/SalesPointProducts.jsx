@@ -3,6 +3,7 @@ import Spinner from '../../../Spinner';
 import ErrorInterface from '../../../errorInterface';
 import Button from '../../../Button';
 import Image from 'next/image';
+import { useNotification } from '@/contexts/notificationContext';
 import {
   FaShoppingCart,
   FaExclamationCircle,
@@ -35,6 +36,7 @@ const SalesPointProducts = ({
   lightThemeStyle,
   darkThemeStyle,
 }) => {
+  const { showNotification } = useNotification();
   const inputRef = useRef(null);
   // Track whether the scanner has been focused at least once since mount.
   // On the very first focus attempt the page may still be stabilising (products
@@ -83,6 +85,15 @@ const SalesPointProducts = ({
   ]);
 
   const handleProductClick = (product) => {
+    if (cart?.restoredFromScheduledOrder) {
+      showNotification(
+        'warning',
+        'Scheduled Order in Cart',
+        'You cannot modify this order as it was restored from a scheduled order. Please create a new order for any additional items.',
+        10000
+      );
+      return;
+    }
     if (product.availabilityStatus !== 'in stock') return; // Prevent selection if product is not in stock
     setSelectedProduct(product);
   };

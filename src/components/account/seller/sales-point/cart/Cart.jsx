@@ -73,6 +73,7 @@ const Cart = ({
     };
   }, [setScanMode]);
 
+  console.log('Cart from schedule:', cart.payment);
   // if cart is empty, switch to sales items tab
   useEffect(() => {
     if (cart?.items?.length === 0 || cart?.items === undefined) {
@@ -247,6 +248,7 @@ const Cart = ({
               Object.keys(linkedCustomerData).length > 0 &&
               linkedCustomerData._id ? (
                 <LinkedCustomer
+                  cart={cart}
                   handleUnlinkCustomer={handleUnlinkCustomer}
                   linkedCustomerData={linkedCustomerData}
                   setIsOpenCustomerOverlay={setIsOpenCustomerOverlay}

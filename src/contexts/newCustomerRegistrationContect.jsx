@@ -20,6 +20,7 @@ export const NewCustomerRegistrationProvider = ({ children }) => {
   const [registrationData, setRegistrationData] = useState({
     token: null,
     orderId: null,
+    branch: null,
   });
 
   const contextValue = useMemo(

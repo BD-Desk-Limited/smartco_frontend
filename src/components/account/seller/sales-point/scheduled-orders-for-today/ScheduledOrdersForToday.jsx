@@ -22,9 +22,8 @@ import Spinner from '@/components/account/Spinner';
 
 const ScheduledOrdersForToday = ({
   setActiveMenuItem,
-  scheduledOrdersForToday,
-  setScheduledOrdersForToday,
   workBranch,
+  cart,
   setCart,
   lightThemeStyle,
   darkThemeStyle,
@@ -32,6 +31,9 @@ const ScheduledOrdersForToday = ({
 }) => {
   const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [scheduledOrdersForToday, setScheduledOrdersForToday] = React.useState(
+    []
+  );
   const [selectedScheduledOrder, setSelectedScheduledOrder] = React.useState(
     (scheduledOrdersForToday && scheduledOrdersForToday[0]) || null
   );
@@ -44,21 +46,25 @@ const ScheduledOrdersForToday = ({
     const fetchScheduledOrders = async () => {
       setLoading(true);
       if (workBranch?._id) {
-        const response = await getOrdersForTodayByBranchIdService(
-          workBranch._id
-        );
-        if (response.data) {
-          setScheduledOrdersForToday(response.data);
-        } else {
+        try {
+          const response = await getOrdersForTodayByBranchIdService(
+            workBranch._id
+          );
+          if (response.data) {
+            setScheduledOrdersForToday(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching scheduled orders for today:', error);
           showNotification(
             'error',
             'Error',
-            response.error || 'Error fetching scheduled orders',
+            'An error occurred while fetching scheduled orders. Please try again.',
             3000
           );
+        } finally {
+          setLoading(false);
         }
       }
-      setLoading(false);
     };
 
     fetchScheduledOrders();
@@ -95,8 +101,7 @@ const ScheduledOrdersForToday = ({
     e.stopPropagation(); // Prevent triggering parent onClick
 
     //check if user is online before allowing move to cart action since it requires API call to fetch latest status or order fufillment
-
-    if (!navigator.online) {
+    if (!navigator.onLine) {
       showNotification(
         'error',
         'Offline',
@@ -108,38 +113,45 @@ const ScheduledOrdersForToday = ({
 
     try {
       setLoading(true);
-      const { data, error } = await checkOrderStatusService(order.orderId);
+      const { data, error } = await getOrdersForTodayByBranchIdService(
+        workBranch._id
+      );
 
-      if (data && data.status === 'pending') {
-        setCart((prev) => ({
-          ...prev,
-          restoredFromScheduledOrder: true,
-          restoredFromScheduledOrderAt: new Date().toISOString(),
-          items: order?.items || [],
-          linkedCustomer: order?.linkedCustomer || null,
-        }));
-
-        setScheduledOrdersForToday((prev) =>
-          prev.filter((o) => o.orderId !== order.orderId)
+      if (data) {
+        //map through the orderIds to see if the current order matches any orderId still scheduled for today. If it doesn't then it means the order has already been fulfilled and we should prevent moving it to cart and show error notification instead.
+        const isOrderStillScheduled = data.some(
+          (scheduledOrder) => scheduledOrder.orderId === order.orderId
         );
 
-        showNotification(
-          'success',
-          'Order Restored',
-          `${order?.items?.length || 0} item(s) moved to cart`,
-          6000
-        );
+        if (isOrderStillScheduled) {
+          // mark the order as restored from scheduled order
+          setCart((prev) => ({
+            ...prev,
+            orderId: order.orderId,
+            restoredFromScheduledOrder: true,
+            restoredFromScheduledOrderAt: new Date().toISOString(),
+            items: order?.items || [],
+            linkedCustomer: order?.linkedCustomer || null,
+            payment: { ...order.payment, selectedFulfillmentTime: 'Now' },
+            amountPaid: order?.payment?.partialAmountPaid,
+          }));
 
-        setTimeout(() => {
+          showNotification(
+            'success',
+            'Order Restored',
+            `${order?.items?.length || 0} item(s) moved to cart`,
+            6000
+          );
+
           setActiveMenuItem('cart');
-        }, 800);
-      } else if (data && data.status === 'fulfilled') {
-        showNotification(
-          'error',
-          'Order Already Fulfilled',
-          'This order has already been fulfilled and cannot be moved to cart.',
-          6000
-        );
+        } else if (!isOrderStillScheduled) {
+          showNotification(
+            'error',
+            'Order Already Fulfilled',
+            'This order has already been fulfilled and cannot be moved to cart.',
+            6000
+          );
+        }
       } else {
         showNotification(
           'error',
@@ -320,7 +332,7 @@ const ScheduledOrdersForToday = ({
         ) : (
           <div className="w-full h-[70%] flex items-center justify-center">
             <p className="text-base opacity-70">
-              {scheduledOrdersForToday?.length > 0
+              {!loading && scheduledOrdersForToday?.length > 0
                 ? ` No matching scheduled orders found for "${searchTerm}".`
                 : `No scheduled orders available.`}
             </p>

@@ -1,6 +1,5 @@
 import LinkedCustomer from '@/components/account/seller/sales-point/cart/LinkedCustomer';
 
-// TODO: Replace with actual API call to fetch products
 const sampleProducts = [
   {
     _id: 1,
@@ -1864,6 +1863,32 @@ const sampleScheduledOrderForToday = [
           currency: '£',
           status: 'active',
           effectiveDate: '2024-01-01',
+        },
+        {
+          _id: 6,
+          type: 'product',
+          description: 'Get a free keychain with your next purchase',
+          expiryDate: '2024-12-31',
+          status: 'active',
+          effectiveDate: '2024-01-01',
+          freeProduct: {
+            _id: 2,
+            quantity: 1,
+            allowedComponents: [
+              {
+                _id: 1,
+                allowedMaterialChoices: [99, 2, 3],
+              },
+              {
+                _id: 2,
+                allowedMaterialChoices: [4, 5],
+              },
+              {
+                _id: 6,
+                allowedMaterialChoices: [6, 7],
+              },
+            ],
+          },
         },
       ],
     },

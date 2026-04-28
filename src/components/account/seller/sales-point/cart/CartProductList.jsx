@@ -2,14 +2,12 @@ import Image from 'next/image';
 import React from 'react';
 import { useNotification } from '@/contexts/notificationContext';
 import {
-  FaExpeditedssl,
   FaMinus,
   FaMoneyCheckAlt,
   FaPlus,
   FaShoppingBag,
   FaTrashAlt,
 } from 'react-icons/fa';
-import { warning } from 'framer-motion';
 
 const CartProductList = ({
   cart,
@@ -23,7 +21,18 @@ const CartProductList = ({
   darkThemeStyle,
 }) => {
   const { showNotification } = useNotification();
+
   const handleQuantityIncrease = (item) => {
+    if (cart?.restoredFromScheduledOrder) {
+      showNotification(
+        'warning',
+        'Order Modification Not Allowed',
+        'Orders restored from a scheduled order cannot be modified.',
+        6000
+      );
+      return;
+    }
+
     setCart((prev) => ({
       ...prev,
       items: prev.items.map((cartItem) =>
@@ -35,6 +44,15 @@ const CartProductList = ({
   };
 
   const handleQuantityDecrease = (item) => {
+    if (cart?.restoredFromScheduledOrder) {
+      showNotification(
+        'warning',
+        'Order Modification Not Allowed',
+        'Orders restored from a scheduled order cannot be modified.',
+        6000
+      );
+      return;
+    }
     if (item.quantity === 1) return; // prevent quantity from going below 1
     setCart((prev) => ({
       ...prev,
@@ -48,6 +66,16 @@ const CartProductList = ({
 
   const handleRemoveFromCart = (item) => {
     // if item has been paid for, prevent removal and show alert
+    if (cart?.restoredFromScheduledOrder) {
+      showNotification(
+        'warning',
+        'Order Modification Not Allowed',
+        'Orders restored from a scheduled order cannot be modified.',
+        6000
+      );
+      return;
+    }
+
     if (
       cart?.payment?.paymentStatus?.amountPaid > 0 ||
       cart?.payment?.paymentStatus?.value === 'success'

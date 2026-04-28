@@ -29,6 +29,7 @@ const NewCustomerRegistration = () => {
   const router = useRouter();
   const token = registrationData?.token || null;
   const orderId = registrationData?.orderId || null;
+  const branch = registrationData?.branch || null;
 
   const QRCodeText = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/pages/splash/open-pages/customer-self-registration?${new URLSearchParams(
     {
@@ -135,6 +136,7 @@ const NewCustomerRegistration = () => {
         email: email.trim(),
         phone: phone.trim(),
         orderId: orderId,
+        branch: branch,
       });
 
       if (response?.error) {
@@ -149,7 +151,7 @@ const NewCustomerRegistration = () => {
           'Customer registration successful.',
           6000
         );
-        setRegistrationData({ token: null, orderId: null });
+        setRegistrationData({ token: null, orderId: null, branch: null });
         router.push('/pages/account/sales-point');
       }
     } catch (error) {

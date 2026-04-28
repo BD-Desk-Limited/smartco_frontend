@@ -12,9 +12,11 @@ import {
   FaUserCircle,
 } from 'react-icons/fa';
 import SelectOfferComponent from './SelectOfferComponent';
+import { useNotification } from '@/contexts/notificationContext';
 
 const CustomerLookUp = ({
   products,
+  cart,
   setCart,
   mode,
   lightThemeStyle,
@@ -31,6 +33,7 @@ const CustomerLookUp = ({
   setAwaitingScanForCustomer,
   loading,
 }) => {
+  const { showNotification } = useNotification();
   const [tabs, setTabs] = useState({});
   const [openSelectOfferComponent, setOpenSelectOfferComponent] =
     useState(false);
@@ -58,6 +61,15 @@ const CustomerLookUp = ({
   };
 
   const handleLinkCustomerAndClaim = () => {
+    if (cart?.restoredFromScheduledOrder) {
+      showNotification(
+        'warning',
+        'Scheduled Order Modification',
+        'You cannot link a customer to an order that was previously scheduled.',
+        10000
+      );
+      return;
+    }
     //Function to link customer to current sale and apply any relevant claims
     const dataToLink = { ...customerData, appliedOffers: appliedOffers };
     setCart((prevCart) => ({ ...prevCart, linkedCustomer: dataToLink }));

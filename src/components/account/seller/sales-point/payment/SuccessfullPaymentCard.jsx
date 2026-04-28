@@ -48,6 +48,7 @@ const SuccessfullPaymentCard = ({
     setRegistrationData({
       token: showReceipt?.customerRegToken || null,
       orderId: showReceipt?.order?.orderId || null,
+      branch: workBranch,
     });
 
     handlePrintReceipt();
