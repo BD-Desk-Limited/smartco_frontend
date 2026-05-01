@@ -23,6 +23,7 @@ const SalesPoint = ({
   setActiveMenuItem,
   lightThemeStyle,
   darkThemeStyle,
+  style,
   workBranch,
   workBranchKey,
 }) => {
@@ -46,6 +47,7 @@ const SalesPoint = ({
   const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [userMenuDropdown, setUserMenuDropdown] = React.useState(false);
   const [openSelectProductComponents, setOpenSelectProductComponents] =
     React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -288,12 +290,19 @@ const SalesPoint = ({
     CONTENT_COMPONENT_MAP[activeMenuItem] || SalesPointContent;
 
   return (
-    <div className="h-screen overflow-y-auto no-scrollbar flex flex-col items-center relative">
+    <div
+      onClick={() => setUserMenuDropdown(false)}
+      className="h-screen overflow-y-auto no-scrollbar flex flex-col items-center relative"
+    >
       {/* HeadBar with props for mode, menu items, cart, and active menu item */}
       <HeadBar
         mode={mode}
+        lightThemeStyle={lightThemeStyle}
+        darkThemeStyle={darkThemeStyle}
         menuItems={menuItems}
         cart={cart}
+        userMenuDropdown={userMenuDropdown}
+        setUserMenuDropdown={setUserMenuDropdown}
         activeMenuItem={activeMenuItem}
         setActiveMenuItem={setActiveMenuItem}
         style={mode === 'light' ? lightThemeStyle : darkThemeStyle}

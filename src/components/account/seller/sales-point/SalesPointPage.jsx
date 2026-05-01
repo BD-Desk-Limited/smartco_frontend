@@ -7,14 +7,14 @@ import WarningModal from '../../WarningModal';
 import { useRouter } from 'next/navigation';
 import ErrorModal from '@/components/auth/commons/ErrorModal';
 import Spinner from '../../Spinner';
+import { useTheme } from '@/contexts/themeContext';
 import ShiftManagement from './shift-management/ShiftManagement';
 
 const SalesPointPage = () => {
   const router = useRouter();
+  const { mode, setMode } = useTheme();
   const { companyData } = useCompanyData();
   const { user, logOutSalesPoint, isLoading } = useAuth();
-
-  const [mode, setMode] = React.useState('light');
   const [activeMenuItem, setActiveMenuItem] = React.useState('sales-items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
     React.useState(false);

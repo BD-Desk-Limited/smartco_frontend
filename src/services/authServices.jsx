@@ -286,3 +286,34 @@ export const salesPointLoginService = async (body) => {
     return { error: 'error logging in, please try again' };
   }
 };
+
+//sales point pin change service
+export const changePinService = async (body) => {
+  const token = getToken();
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/sales-point/change-pin`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error resetting pin, please try again' };
+  }
+};

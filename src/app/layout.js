@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/authContext';
 import { InternetStatusProvider } from '@/contexts/internetStatusContext';
 import { SetupProvider } from '@/contexts/setupContext';
 import TransactionSyncInitializer from '@/components/TransactionSyncInitializer';
+import { ThemeProvider } from '@/contexts/themeContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -38,13 +39,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
-        <AuthProvider>
-          <InternetStatusProvider>
-            <SetupProvider>
-              <CompanyDataProvider>{children}</CompanyDataProvider>
-            </SetupProvider>
-          </InternetStatusProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <InternetStatusProvider>
+              <SetupProvider>
+                <CompanyDataProvider>{children}</CompanyDataProvider>
+              </SetupProvider>
+            </InternetStatusProvider>
+          </AuthProvider>
+        </ThemeProvider>
         <TransactionSyncInitializer />
 
         {/* Service Worker Registration for Offline Support */}

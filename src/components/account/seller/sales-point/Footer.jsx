@@ -1,9 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
-import { useAuth } from '@/contexts/authContext';
 
 const Footer = ({ style, mode, setMode }) => {
-  const { logOutSalesPoint } = useAuth();
   return (
     <div
       className={`${style} border-t-2 border-gray-border flex items-center justify-start p-3 flex-row w-full px-10 gap-5`}
@@ -53,21 +51,6 @@ const Footer = ({ style, mode, setMode }) => {
             onClick={() => setMode('dark')}
           />
         </span>
-      </div>
-
-      {/* Logout Button */}
-      <div
-        onClick={logOutSalesPoint}
-        className="flex flex-row justify-center items-center font-semibold text-error hover:bg-error/30 px-4 py-1 rounded-md cursor-pointer space-x-2"
-      >
-        <Image
-          src="/assets/logout_pos.png"
-          alt="Logout Icon"
-          width={30}
-          height={30}
-          className="object-contain"
-        />
-        <span>Logout</span>
       </div>
     </div>
   );

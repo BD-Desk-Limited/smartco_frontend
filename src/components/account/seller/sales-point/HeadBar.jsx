@@ -2,18 +2,29 @@ import Image from 'next/image';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import {
+  FaChevronCircleDown,
+  FaChevronCircleLeft,
+  FaDoorOpen,
+} from 'react-icons/fa';
 
 const HeadBar = ({
   style,
+  lightThemeStyle,
+  darkThemeStyle,
   menuItems,
+  userMenuDropdown,
+  setUserMenuDropdown,
   activeMenuItem,
   setActiveMenuItem,
   cart,
   mode,
 }) => {
-  const { user } = useAuth();
+  const { user, logOutSalesPoint } = useAuth();
   const [isAnimating, setIsAnimating] = useState(false);
   const previousCartCountRef = useRef(0);
+  const router = useRouter();
 
   useEffect(() => {
     const hasIncreased = cart?.items?.length > previousCartCountRef.current;
@@ -38,6 +49,18 @@ const HeadBar = ({
       clearTimeout(stopTimer);
     };
   }, [cart?.items?.length]);
+
+  const USERMENUITEMS = [
+    {
+      label: 'change password',
+      onClick: () => router.push('/pages/account/sales-point/change-pin'),
+    },
+  ];
+
+  const handleDropDownClick = (e) => {
+    e.stopPropagation();
+    setUserMenuDropdown((prev) => !prev);
+  };
 
   return (
     <div className="bg-brand-green flex items-center justify-between p-3 flex-row w-full px-10">
@@ -121,7 +144,10 @@ const HeadBar = ({
       </nav>
 
       {/* User Profile Section */}
-      <div className="flex items-center space-x-4">
+      <div
+        onClick={handleDropDownClick}
+        className={`h-full flex items-center space-x-2 relative p-1 rounded-md cursor-pointer ${userMenuDropdown ? (mode === 'light' ? 'border border-gray-border' : ' border border-black') : 'border-none'}`}
+      >
         {user?.profilePictureUrl ? (
           <Image
             src={user?.profilePictureUrl}
@@ -141,6 +167,44 @@ const HeadBar = ({
         <span className="text-text-white text-sm font-semibold">
           {user?.fullName?.split(' ')[0] || 'Seller'}
         </span>
+        <span>
+          {userMenuDropdown ? (
+            <FaChevronCircleDown className="text-white" />
+          ) : (
+            <FaChevronCircleLeft className="text-white" />
+          )}
+        </span>
+
+        {/* User menu Dropdown */}
+        {userMenuDropdown && (
+          <ul
+            className={`w-full absolute top-10 right-0 ${style} z-50 h-[200px] p-1 rounded-b-md shadow-gray-border shadow-sm`}
+          >
+            <ul className="h-[80%] overflow-y-auto scrollbar-thin">
+              {USERMENUITEMS.map((item, index) => (
+                <li
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    item.onClick();
+                  }}
+                  className="bg-inherit pt-2 text-center cursor-pointer px-1 border-b text-wrap hover:text-brand-green hover:border-brand-green"
+                >
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+
+            {/* Logout Button */}
+            <li
+              onClick={logOutSalesPoint}
+              className="flex flex-row justify-center items-center font-semibold text-error hover:underline py-1 rounded-md cursor-pointer space-x-2 w-full my-2"
+            >
+              <FaDoorOpen />
+              <span>Logout</span>
+            </li>
+          </ul>
+        )}
       </div>
     </div>
   );
