@@ -10,20 +10,20 @@ export const validateExcelTime = (timeString) => {
 
   // Remove any whitespace and convert to uppercase
   const cleanTime = timeString.trim().toUpperCase();
-  
+
   // Regular expression for HH:MMAM/PM format
   const timeRegex = /^(0?[1-9]|1[0-2]):([0-5][0-9])(AM|PM)$/;
-  
+
   if (!timeRegex.test(cleanTime)) {
-    return { 
-      isValid: false, 
-      display: 'Invalid Time'
+    return {
+      isValid: false,
+      display: 'Invalid Time',
     };
   }
 
   return {
     isValid: true,
-    display: cleanTime
+    display: cleanTime,
   };
 };
 
@@ -34,4 +34,16 @@ export const validateExcelTime = (timeString) => {
  */
 export const formatBusinessHours = (timeString) => {
   return validateExcelTime(timeString);
+};
+
+export const ISOStringToLocalTime = (dateString) => {
+  return dateString
+    ? new Date(dateString).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '-';
 };

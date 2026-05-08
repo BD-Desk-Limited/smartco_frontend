@@ -43,6 +43,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
   React.useEffect(() => {
     const fetchCompanyBand = async () => {
       try {
+        setLoading(true);
         const response = await getAllBranchBandsByCompanyId();
         if (response.data) {
           setCompanyBand(response.data);
@@ -52,6 +53,8 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
         }
       } catch (error) {
         console.error('Error fetching company bands:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCompanyBand();
@@ -60,15 +63,19 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
   React.useEffect(() => {
     const fetchTaxBands = async () => {
       try {
+        setLoading(true);
         const response = await getAllTaxBandsByCompanyId();
         if (response.data) {
           setCompanyTaxBands(response.data);
+          console.log('All tax bands', response.data);
         }
         if (response.error) {
           console.error('Error fetching tax bands:', response.error);
         }
       } catch (error) {
         console.error('Error fetching tax bands:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchTaxBands();
@@ -84,6 +91,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
     setSuccess(null);
     setOpenSubmitModal(false);
   };
+  console.log('Updated branch data:', updatedBranchData.taxBand);
 
   const handleUpdateBranch = async () => {
     // Validate form fields
@@ -445,6 +453,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
             onClick={handleUpdateBranch}
             onClose={() => setOpenSubmitModal(false)}
             loadingText={'Updating...'}
+            loading={loading}
             subText={
               'This action will update the branch information in the system.'
             }

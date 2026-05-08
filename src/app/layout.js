@@ -5,6 +5,7 @@ import { InternetStatusProvider } from '@/contexts/internetStatusContext';
 import { SetupProvider } from '@/contexts/setupContext';
 import TransactionSyncInitializer from '@/components/TransactionSyncInitializer';
 import { ThemeProvider } from '@/contexts/themeContext';
+import { AccountThemeProvider } from '@/contexts/accountThemeContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -38,14 +39,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#003399" />
+      </head>
+
       <body className="antialiased">
         <ThemeProvider>
           <AuthProvider>
-            <InternetStatusProvider>
-              <SetupProvider>
-                <CompanyDataProvider>{children}</CompanyDataProvider>
-              </SetupProvider>
-            </InternetStatusProvider>
+            <AccountThemeProvider>
+              <InternetStatusProvider>
+                <SetupProvider>
+                  <CompanyDataProvider>{children}</CompanyDataProvider>
+                </SetupProvider>
+              </InternetStatusProvider>
+            </AccountThemeProvider>
           </AuthProvider>
         </ThemeProvider>
         <TransactionSyncInitializer />

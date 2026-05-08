@@ -85,9 +85,11 @@ const EditableProductDetails = ({ pageDescription }) => {
               price: band.price,
             })),
             productTax: (p.productTax || []).map((tax) => ({
+              isTaxExcluded: tax.isTaxExcluded || false,
               taxBand: tax?.taxBand?._id,
-              taxPercentage: tax?.taxPercentage || 0,
-              additionalTaxAmount: tax?.additionalTaxAmount || 0,
+              taxPercentage: tax?.taxDetails.taxPercentage || 0,
+              additionalTaxAmount: tax?.taxDetails.additionalTaxAmount || 0,
+              effectiveDate: tax?.taxDetails.effectiveDate || new Date(),
             })),
             components: (p.components || []).map((comp) => ({
               categoryName: comp?.categoryName || '',
@@ -221,19 +223,31 @@ const EditableProductDetails = ({ pageDescription }) => {
 
   // adapters for child components (they expect products[])
   const products = product ? [product] : [];
-  const setProducts = (updater) => {
-    if (!product) return;
-    if (typeof updater === 'function') {
-      const next = updater([product]);
-      if (next && next[0]) {
-        setProduct({ ...next[0] });
+
+  const setProducts = React.useCallback((updater) => {
+    setProduct((prevProduct) => {
+      if (!prevProduct) return prevProduct;
+
+      if (typeof updater === 'function') {
+        const next = updater([prevProduct]);
+        if (next && next[0]) {
+          if (JSON.stringify(next[0]) !== JSON.stringify(prevProduct)) {
+            return { ...next[0] };
+          }
+        }
+        return prevProduct;
+      } else if (Array.isArray(updater)) {
+        if (updater[0]) {
+          if (JSON.stringify(updater[0]) !== JSON.stringify(prevProduct)) {
+            return { ...updater[0] };
+          }
+        }
+        return prevProduct;
       }
-    } else if (Array.isArray(updater)) {
-      if (updater[0]) {
-        setProduct({ ...updater[0] });
-      }
-    }
-  };
+
+      return prevProduct;
+    });
+  }, []);
   const productIndex = 0;
 
   // Handle image upload
@@ -330,23 +344,57 @@ const EditableProductDetails = ({ pageDescription }) => {
     setError([]);
     setSuccess(false);
     try {
-      const formData = new FormData();
       const formattedProducts = [
         {
           _id: product._id,
           name: product.name,
           description: product.description || '',
           category: product.category,
-          components: product.components,
-          pricing: product.pricing,
-          productTax: product.productTax || [],
+
+          //Format components.
+          components: (product.components || []).map((comp) => ({
+            categoryName: comp.categoryName || '',
+            isOptional: comp.isOptional || false,
+            materialChoices: (comp.materialChoices || []).map((mc) => ({
+              material: mc.material,
+              quantity: mc.quantity || 1,
+              additionalPrice: (mc.additionalPrice || []).map((ap) => ({
+                band: ap.band,
+                price: Number(ap.price) || 0,
+                effectiveDate: ap.effectiveDate || new Date().toISOString(),
+              })),
+            })),
+          })),
+
+          // Format pricing
+          pricing: (product.pricing || []).map((p) => ({
+            band: p.band,
+            price: Number(p.price) || 0,
+            effectiveDate: p.effectiveDate || new Date().toISOString(),
+          })),
+
+          // productTax formatted to backend expected
+          productTax: (product.productTax || []).map((tax) => ({
+            taxBand: tax.taxBand,
+            isTaxExcluded: tax.isTaxExcluded ?? false,
+            taxDetails: [
+              {
+                taxPercentage: Number(tax.taxPercentage) || 0,
+                additionalTaxAmount: Number(tax.additionalTaxAmount) || 0,
+                effectiveDate: tax.effectiveDate || new Date().toISOString(),
+              },
+            ],
+          })),
         },
       ];
+
+      const formData = new FormData();
       formData.append('products', JSON.stringify(formattedProducts));
-      formData._id = product._id; // trigger PUT in service
+
       if (product.image && product.image.file) {
         formData.append(product.name, product.image.file);
       }
+
       const { data, error: svcError } =
         await createOrUpdateProductService(formData);
       if (svcError) {
@@ -366,7 +414,7 @@ const EditableProductDetails = ({ pageDescription }) => {
   const switchTab = (tab) => {
     setVisibleTab(tab);
   };
-
+  console.log('product', product);
   if (!product) return <Spinner />;
 
   return (
@@ -386,22 +434,34 @@ const EditableProductDetails = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="p-5 h-full flex flex-col gap-5 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-            <div className="p-5 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
+          <div className="h-full flex flex-col gap-3 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
+            <div className="p-1 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
               {/* Header Section (name + actions) */}
-              <div className="bg-text-white p-2 sticky top-0 z-10 w-full flex flex-row items-center justify-between mb-5">
+              <div className="bg-text-white py-1 px-5 sticky top-0 z-10 w-full flex flex-row items-center justify-between mb-2">
                 <h3 className="flex flex-row items-center gap-4">
-                  <span className="text-lg font-semibold flex flex-col">
-                    <span>
+                  <span className="text-lg font-semibold flex flex-col mx-5">
+                    <span className="ml-2">
                       {product?.name
                         ? product.name[0]?.toUpperCase() + product.name.slice(1)
                         : 'Unnamed Product'}
                     </span>
-                    <span className="text-xs text-text-gray py-1">
+                    <span className="text-xs text-text-gray py-1 ml-3">
                       ID: {product?._id}
                     </span>
                   </span>
                 </h3>
+
+                {/* Error notice (inline) */}
+                {error && error.length > 0 && (
+                  <div className=" animate-bounce bg-error bg-opacity-20 border border-error text-error p-3 rounded-lg z-50">
+                    {error.map((e, idx) => (
+                      <p className="text-sm" key={idx}>
+                        {e}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
                 <ul className="flex flex-row gap-3 list-none">
                   <li>
                     <button
@@ -767,17 +827,6 @@ const EditableProductDetails = ({ pageDescription }) => {
             }}
             buttonText={'OK'}
           />
-        </div>
-      )}
-
-      {/* Error notice (inline) */}
-      {error && error.length > 0 && (
-        <div className="fixed bottom-4 right-4 bg-error bg-opacity-20 border border-error text-error p-3 rounded-lg z-50">
-          {error.map((e, idx) => (
-            <p className="text-sm" key={idx}>
-              {e}
-            </p>
-          ))}
         </div>
       )}
     </div>

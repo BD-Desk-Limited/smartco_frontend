@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
@@ -7,25 +7,12 @@ export const ThemeProvider = ({ children }) => {
   const darkThemeStyle = `bg-[#242424] text-text-white`;
   const lightThemeStyle = `bg-white text-text-black`;
 
-  const [mode, SetMode] = useState('light');
-  const [style, setStyle] = useState(lightThemeStyle);
-
-  useEffect(() => {
+  const [mode, SetMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      const persistedMode = localStorage.getItem(THEME_MODE_KEY);
-      if (persistedMode) {
-        SetMode(persistedMode);
-      }
+      return localStorage.getItem(THEME_MODE_KEY) || 'light';
     }
-  }, []);
-
-  useEffect(() => {
-    if (mode === 'light') {
-      setStyle(lightThemeStyle);
-    } else {
-      setStyle(darkThemeStyle);
-    }
-  }, [mode, lightThemeStyle, darkThemeStyle]);
+    return 'light';
+  });
 
   const setMode = (themeMode) => {
     SetMode(themeMode);
@@ -34,13 +21,14 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
+  const style = mode === 'light' ? lightThemeStyle : darkThemeStyle;
+
   const value = {
     mode,
     setMode,
     lightThemeStyle,
     darkThemeStyle,
     style,
-    setStyle,
   };
 
   return (

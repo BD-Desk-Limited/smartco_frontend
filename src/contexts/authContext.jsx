@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
 
     const syncAuthState = async () => {
       const token = sessionStorage.getItem('token');
+      console.log(token);
 
       if (token !== null) {
         try {

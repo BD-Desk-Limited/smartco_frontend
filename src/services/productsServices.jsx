@@ -131,20 +131,48 @@ export const getProductByIdService = async (productId) => {
   }
 };
 
+//get product price and tax history by id
+export const getProductPriceAndTaxHistoryByIdService = async (productId) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/price-and-tax-history/${productId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching product, please try again' };
+  }
+};
+
 //create or update product
-export const createOrUpdateProductService = async (productData) => {
+export const createOrUpdateProductService = async (formData) => {
   const token = getToken();
 
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products`,
       {
-        method: productData._id ? 'PUT' : 'POST',
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(productData),
+        body: formData,
       }
     );
 
