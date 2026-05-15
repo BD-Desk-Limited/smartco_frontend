@@ -119,6 +119,7 @@ export const getProductByIdService = async (productId) => {
 
     if (response.ok) {
       const responseData = await response.json();
+
       return { data: responseData.data };
     } else {
       const errorData = await response.json();
@@ -132,11 +133,11 @@ export const getProductByIdService = async (productId) => {
 };
 
 //get product price and tax history by id
-export const getProductPriceAndTaxHistoryByIdService = async (productId) => {
+export const getProductPriceHistoryByIdService = async (productId) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/price-and-tax-history/${productId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products/price-history/${productId}`,
       {
         method: 'GET',
         headers: {

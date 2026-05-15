@@ -263,7 +263,7 @@ const ViewProductDetails = ({
         </div>
         <div className="flex flex-col h-full w-full">
           <div className="px-5 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-            {productData ? (
+            {productData && !loading ? (
               <div className=" h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
                 {/* Header Section */}
                 <div className="bg-text-white p-2 sticky top-0 z-10 w-full flex flex-row items-center justify-between ml-5">
@@ -332,7 +332,10 @@ const ViewProductDetails = ({
                 <div className="flex flex-row w-full px-5 gap-5">
                   {/* Product Description and Audit Section */}
                   <div className="w-1/5 gap-2 flex flex-col overflow-y-auto scrollbar-thin">
-                    <ProductDescriptionSection productData={productData} />
+                    <ProductDescriptionSection
+                      productData={productData}
+                      loading={loading}
+                    />
                   </div>
 
                   {/* Product Components, Price and Tax Details Section */}
@@ -340,6 +343,7 @@ const ViewProductDetails = ({
                     <ProductComponentsPriceAndTaxDetails
                       productData={productData}
                       setProductData={setProductData}
+                      loading={loading}
                     />
                   </div>
 
@@ -350,6 +354,7 @@ const ViewProductDetails = ({
                       selectedBranches={selectedBranches}
                       setSelectedBranches={setSelectedBranches}
                       branchesWithAvailability={branchesWithAvailability}
+                      loading={loading}
                       branchesAvailabilityStatus={
                         productData?.availabilityStatus || []
                       }

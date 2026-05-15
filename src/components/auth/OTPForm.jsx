@@ -264,7 +264,7 @@ const OTPForm = () => {
               height={150}
             />
           </motion.h1>
-          <div className="text-center">{message}</div>
+          <div className="text-center text-text-gray">{message}</div>
           {redirecting && (
             <div className="mt-4">
               <Spinner />

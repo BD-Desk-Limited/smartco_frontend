@@ -70,8 +70,6 @@ const ProductDetailsPage = () => {
     }
   }, [id, router, loading]);
 
-  console.log('Product-data:', productData);
-
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(
     'admin',
