@@ -7,15 +7,7 @@ import SetUps from './components/setups/SetUps';
 import Spinner from '../../Spinner';
 
 const AdminDashboardPage = () => {
-  const [selectedMenu, setSelectedMenu] = useState([
-    {
-      name: 'Dashboard',
-      icon: '/assets/dashboard.png',
-      iconActive: '/assets/dashboard_active.png',
-      link: '/',
-      title: 'Dashboard',
-    },
-  ]);
+  const [selectedMenu, setSelectedMenu] = React.useState('dashboard');
 
   const { setupComplete, setupProgress, loading, isSetUpAdmin, error } =
     useSetup();

@@ -1,17 +1,22 @@
 import Button from '@/components/account/Button';
 import ErrorInterface from '@/components/account/errorInterface';
 import SuccessModal from '@/components/account/SuccessModal';
-import { createTaxBand } from '@/services/branchServices';
+import {
+  createTaxBand,
+  getAllTaxBandsByCompanyId,
+} from '@/services/branchServices';
 import { verifyInputText } from '@/utilities/verifyInput';
 import React from 'react';
 
-const CreateNewTaxBand = ({
+const CreateNewTaxBandForm = ({
   onClose,
   taxBands,
   setTaxBands,
   formData,
   setFormData,
+  standAloneTaxManagement,
 }) => {
+  const [localTaxBand, setLocalTaxBand] = React.useState([]);
   const [newTaxBand, setNewTaxBand] = React.useState({
     name: '',
     rate: 0,
@@ -21,6 +26,23 @@ const CreateNewTaxBand = ({
   const [error, setError] = React.useState(null);
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchTaxBands = async () => {
+      try {
+        const response = await getAllTaxBandsByCompanyId();
+        if (response.data) {
+          setLocalTaxBand(response.data);
+          !standAloneTaxManagement &&
+            typeof setTaxBands === 'function' &&
+            setTaxBands(response.data);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      }
+    };
+    fetchTaxBands();
+  }, [setTaxBands, setLocalTaxBand, standAloneTaxManagement]);
 
   //validate input
   let inputValidationErrors = [];
@@ -75,8 +97,6 @@ const CreateNewTaxBand = ({
       setError(inputValidationErrors[0]);
       return;
     }
-    console.log(new Date(newTaxBand.effectiveDate) - new Date(Date.now()));
-    return;
 
     setLoading(true);
     try {
@@ -90,9 +110,13 @@ const CreateNewTaxBand = ({
       }
 
       if (response.data) {
-        setTaxBands([...taxBands, response.data]);
-        setFormData({ ...formData, taxBand: response.data.name });
+        if (!standAloneTaxManagement) {
+          setTaxBands([...taxBands, response.data]);
+          setFormData({ ...formData, taxBand: response.data.name });
+        }
+
         setNewTaxBand({ name: '', rate: 0, description: '' });
+        setLocalTaxBand([...localTaxBand, response.data]);
         setError(null);
         setSuccess(true);
       }
@@ -105,16 +129,19 @@ const CreateNewTaxBand = ({
       setLoading(false);
     }
   };
+  console.log('stand', standAloneTaxManagement);
 
   return (
     <div className="w-[80vw] h-[80vh] relative bg-white rounded-lg shadow-lg flex flex-col p-5 items-center">
-      <button
-        className="absolute top-0.5 right-0.5 bg-brand-gray rounded-[100%] px-4 py-2 text-text-white hover:bg-gray-shadow2 font-bold transition-all duration-300 ease-in-out"
-        onClick={onClose}
-        title="Close"
-      >
-        X
-      </button>
+      {!standAloneTaxManagement && (
+        <button
+          className="absolute top-0.5 right-0.5 bg-brand-gray rounded-[100%] px-4 py-2 text-text-white hover:bg-gray-shadow2 font-bold transition-all duration-300 ease-in-out"
+          onClick={onClose}
+          title="Close"
+        >
+          X
+        </button>
+      )}
 
       <h1 className="text-brand-blue font-bold my-5">Tax Bands</h1>
       <div className="w-full h-full flex flex-row shadow-lg rounded-lg p-1 border-2 border-gray-border">
@@ -164,7 +191,7 @@ const CreateNewTaxBand = ({
               >{`Effective Date`}</label>
               <input
                 id="date"
-                type="date"
+                type="datetime-local"
                 value={newTaxBand.effectiveDate || new Date()}
                 placeholder="yyyy-mm-dd"
                 className="w-full p-2 border border-gray-border rounded-lg focus:ring-2 focus:ring-brand-blue focus:outline-none"
@@ -223,19 +250,22 @@ const CreateNewTaxBand = ({
                   </tr>
                 </thead>
                 <tbody className="text-brand-blue text-sm">
-                  {taxBands?.length > 0 ? (
-                    taxBands.map((band, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-gray-border hover:bg-gray-border cursor-pointer"
-                      >
-                        <td className="p-1 w-1/6 text-left">{band.name}</td>
-                        <td className="p-1 w-1/6 text-left">{band.rate}%</td>
-                        <td className="p-1 w-2/3 text-left">
-                          {band.description}
-                        </td>
-                      </tr>
-                    ))
+                  {(!standAloneTaxManagement ? taxBands : localTaxBand)
+                    ?.length > 0 ? (
+                    (!standAloneTaxManagement ? taxBands : localTaxBand).map(
+                      (band, index) => (
+                        <tr
+                          key={index}
+                          className="border-b border-gray-border hover:bg-gray-border cursor-pointer"
+                        >
+                          <td className="p-1 w-1/6 text-left">{band.name}</td>
+                          <td className="p-1 w-1/6 text-left">{band.rate}%</td>
+                          <td className="p-1 w-2/3 text-left">
+                            {band.description}
+                          </td>
+                        </tr>
+                      )
+                    )
                   ) : (
                     <tr className="border-b border-gray-border hover:bg-gray-border cursor-pointer">
                       <td
@@ -260,7 +290,11 @@ const CreateNewTaxBand = ({
             message={'Tax band created successfully!'}
             subText={'You can now assign this tax band to your branches.'}
             onClose={() => {
-              onClose();
+              {
+                standAloneTaxManagement &&
+                  typeof onClose === 'function' &&
+                  onClose();
+              }
               setSuccess(false);
             }}
             buttonText={'Close'}
@@ -272,4 +306,4 @@ const CreateNewTaxBand = ({
   );
 };
 
-export default CreateNewTaxBand;
+export default CreateNewTaxBandForm;

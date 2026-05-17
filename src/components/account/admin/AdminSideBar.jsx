@@ -4,6 +4,21 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 import { useRouter } from 'next/navigation';
 import Spinner from '../Spinner';
+import {
+  FaCodeBranch,
+  FaShoppingCart,
+  FaChartBar,
+  FaUsers,
+  FaAddressBook,
+  FaPercent,
+  FaCog,
+  FaUserAltSlash,
+  FaShoppingBag,
+  FaBoxes,
+  FaWindows,
+  FaChevronRight,
+  FaChevronLeft,
+} from 'react-icons/fa';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const [isOpen, setIsOpen] = useState(openSideBar || false);
@@ -12,110 +27,110 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
 
   const menuList = [
     {
-      name: 'Dashboard',
-      icon: '/assets/dashboard.png',
-      iconActive: '/assets/dashboard_active.png',
+      name: 'dashboard',
+      icon: <FaWindows className="text-text-white" />,
+      iconActive: <FaWindows className="text-brand-blue" />,
       link: '/',
-      title: 'Dashboard',
+      label: 'Dashboard',
       requiredAccess: null,
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Branch Management',
-      icon: '/assets/store.png',
-      iconActive: '/assets/branch.png',
+      name: 'branch-management',
+      icon: <FaCodeBranch className="text-text-white" />,
+      iconActive: <FaCodeBranch className="text-brand-blue" />,
       link: '/branch-management',
-      title: 'Branch Management',
+      label: 'Branch Management',
       requiredAccess: 'Branch_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Products',
-      icon: '/assets/product.png',
-      iconActive: '/assets/product_active.png',
+      name: 'my-products',
+      icon: <FaShoppingBag className="text-text-white" />,
+      iconActive: <FaShoppingBag className="text-brand-blue" />,
       link: '/product-management',
-      title: 'Product Management',
+      label: 'Product Management',
       requiredAccess: 'Product_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Purchases',
-      icon: '/assets/purchase.png',
-      iconActive: '/assets/purchase.png',
+      name: 'purchases',
+      icon: <FaShoppingCart className="text-text-white" />,
+      iconActive: <FaShoppingCart className="text-brand-blue" />,
       link: '/purchases',
-      title: 'Purchases',
+      label: 'Purchases',
       requiredAccess: 'Purchases',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Materials Management',
-      icon: '/assets/material.png',
-      iconActive: '/assets/material_active.png',
+      name: 'materials-management',
+      icon: <FaBoxes className="text-text-white" />,
+      iconActive: <FaBoxes className="text-brand-blue" />,
       link: '/manage-materials',
-      title: 'Manage Materials',
+      label: 'Manage Materials',
       requiredAccess: 'Materials_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Reports',
-      icon: '/assets/report_white.png',
-      iconActive: '/assets/report_active.png',
+      name: 'reports',
+      icon: <FaChartBar className="text-text-white" />,
+      iconActive: <FaChartBar className="text-brand-blue" />,
       link: '/reports',
-      title: 'Reports',
+      label: 'Reports',
       requiredAccess: 'Reports',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Users Management',
-      icon: '/assets/user.png',
-      iconActive: '/assets/user_active.png',
+      name: 'users-management',
+      icon: <FaUsers className="text-text-white" />,
+      iconActive: <FaUsers className="text-brand-blue" />,
       link: '/users-management',
-      title: 'Users Management',
+      label: 'Users Management',
       requiredAccess: 'Users_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'My team',
-      icon: '/assets/team.png',
-      iconActive: '/assets/team_active.png',
+      name: 'my-team',
+      icon: <FaUserAltSlash className="text-text-white" />,
+      iconActive: <FaUserAltSlash className="text-brand-blue" />,
       link: '/my-team',
-      title: 'My Team',
+      label: 'My Team',
       requiredAccess: 'Team_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: true,
     },
     {
-      name: 'My Customers',
-      icon: '/assets/team.png',
-      iconActive: '/assets/customer_active.png',
+      name: 'my-customers',
+      icon: <FaAddressBook className="text-text-white" />,
+      iconActive: <FaAddressBook className="text-brand-blue" />,
       link: '/my-customers',
-      title: 'My Customers',
+      label: 'My Customers',
       requiredAccess: 'Customer_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'My Profile',
-      icon: '/assets/profile.png',
-      iconActive: '/assets/profile_active.png',
-      link: '/my-profile',
-      title: 'My Profile',
+      name: 'tax-management',
+      icon: <FaPercent className="text-text-white" />,
+      iconActive: <FaPercent className="text-brand-blue" />,
+      link: '/tax-management',
+      label: 'Tax Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
     {
-      name: 'Settings',
-      icon: '/assets/settings.png',
-      iconActive: '/assets/settings_active.png',
+      name: 'settings',
+      icon: <FaCog className="text-text-white" />,
+      iconActive: <FaCog className="text-brand-blue" />,
       link: '/settings',
-      title: 'Settings',
+      label: 'Settings',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
@@ -186,9 +201,12 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
 
   return (
     <div
-      className={`bg-brand-blue h-screen flex flex-col ${isOpen ? 'w-48' : 'w-20'}`}
+      className={`bg-brand-blue h-screen flex flex-col justify-center items-center ${isOpen ? 'w-48' : 'w-16'}`}
     >
-      <div className="flex justify-between items-center px-4 pt-5 pb-16">
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex justify-between items-center px-4 pt-5 pb-16 gap-2 cursor-pointer"
+      >
         <div className="flex flex-row justify-center items-center">
           <Image
             src={'/assets/logo_white.png'}
@@ -205,14 +223,11 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             />
           )}
         </div>
-        <p onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
-          <Image
-            src={isOpen ? '/assets/arrow_left.png' : '/assets/arrow_right.png'}
-            alt="close"
-            width={10}
-            height={10}
-          />
-        </p>
+        {!isOpen ? (
+          <FaChevronRight className="text-white" />
+        ) : (
+          <FaChevronLeft className="text-white" />
+        )}
       </div>
 
       {/* Render the menu items */}
@@ -221,28 +236,16 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
           {menuList.map((menu, index) => (
             <div
               key={index}
-              className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-2 px-2 ${selectedMenu?.name === menu.name ? 'bg-white text-brand-blue' : ''}`}
+              className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-1 px-1 ${isOpen ? '' : 'flex justify-center items-center'} ${selectedMenu === menu.name ? 'bg-white text-brand-blue' : ''}`}
               onClick={() => handleMenuClick(menu)}
             >
               {hasAccessToMenu(menu) && hasRequiredRole(menu) ? (
                 <div
                   className="flex flex-row items-center  py-2"
-                  title={!isOpen ? `${menu?.title}` : ''}
+                  title={!isOpen ? `${menu?.label}` : ''}
                 >
-                  <Image
-                    src={
-                      selectedMenu?.name === menu.name
-                        ? menu.iconActive
-                        : menu.icon
-                    }
-                    alt={menu?.name}
-                    width={15}
-                    height={15}
-                    className={
-                      selectedMenu?.name === menu.name ? '' : 'bg-brand-blue'
-                    }
-                  />
-                  {isOpen && <p className="ml-2 text-sm">{menu?.name}</p>}
+                  {selectedMenu === menu.name ? menu.iconActive : menu.icon}
+                  {isOpen && <p className="ml-2 text-sm">{menu?.label}</p>}
                 </div>
               ) : null}
             </div>

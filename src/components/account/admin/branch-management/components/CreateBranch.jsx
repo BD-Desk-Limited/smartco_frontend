@@ -9,7 +9,7 @@ import SuccessModal from '@/components/account/SuccessModal';
 import BranchSidebar from './BranchSideBar';
 import Image from 'next/image';
 import CreateNewBand from './band/CreateNewBand';
-import CreateNewTaxBand from './band/CreateNewTaxBand';
+import CreateNewTaxBand from '../../tax-management/components/CreateNewTaxBandForm';
 import {
   createBranchService,
   getAllBranchBandsByCompanyId,
@@ -68,20 +68,6 @@ const CreateBranch = ({ pageDescription }) => {
       }
     };
     fetchBands();
-  }, []);
-
-  React.useEffect(() => {
-    const fetchTaxBands = async () => {
-      try {
-        const response = await getAllTaxBandsByCompanyId();
-        if (response.data) {
-          setTaxBands(response.data);
-        }
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-    fetchTaxBands();
   }, []);
 
   const handleOpenSubmitModal = (e) => {
@@ -489,6 +475,7 @@ const CreateBranch = ({ pageDescription }) => {
             setTaxBands={setTaxBands}
             formData={formData}
             setFormData={setFormData}
+            standAloneTaxManagement={false}
           />
         </div>
       )}

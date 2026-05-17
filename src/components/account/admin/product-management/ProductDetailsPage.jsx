@@ -16,14 +16,7 @@ const ProductDetailsPage = () => {
   const [branches, setBranches] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
-  const [selectedMenu, setSelectedMenu] = React.useState({
-    name: 'Products',
-    icon: '/assets/product.png',
-    iconActive: '/assets/product_active.png',
-    link: '/product-management',
-    title: 'Product Management',
-    requiredAccess: 'Product_Management',
-  });
+  const [selectedMenu, setSelectedMenu] = React.useState('my-products');
   const pageDescription =
     "The Product Details page provides a comprehensive overview of a product, including its name, category, tax information, prices across branch bands, stock status, and other relevant details. It also displays the product's components and any available alternatives for components that have options. Use this page to review all attributes and settings associated with the product, ensuring accurate management and visibility throughout your organization.";
 
