@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -19,9 +19,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isMounted.current && companyData.isLoaded) {
+    if (isMounted.current && companyData?.isLoaded) {
       let timer;
-      if (companyData.id && companyData.authorizationToken) {
+
+      if (companyData?.id && companyData?.authorizationToken) {
+        if (!navigator.onLine) {
+          timer = setTimeout(() => {
+            router.push('/pages/splash/splash3');
+          }, 5000);
+
+          return () => clearTimeout(timer);
+        }
+
         const authorize = async () => {
           try {
             const requestBody = {
@@ -42,6 +51,7 @@ export default function Home() {
             timer = setTimeout(() => {
               if (companyData?.authorizationToken && data?.isAuthorized) {
                 const updatedData = {
+                  ...data.companyData,
                   id: data.companyData.id,
                   authorizationToken: data.companyData.authorizationToken,
                   allowedBranches: data.companyData.allowedBranches,
@@ -56,6 +66,11 @@ export default function Home() {
           } catch (error) {
             console.error(error);
             timer = setTimeout(() => {
+              if (companyData?.authorizationToken) {
+                router.push('/pages/splash/splash3');
+                return;
+              }
+
               router.push('/pages/auth/login');
             }, 5000);
           }

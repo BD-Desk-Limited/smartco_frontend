@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/oluso/Documents/work/PROJECTS/PERSONAL/BDS/smartco_frontend/src/app/page.jsx"],"sourcesContent":["'use client';\r\nimport { useEffect } from 'react';\r\nimport { useRouter } from 'next/navigation';\r\n\r\nexport default function Index() {\r\n  const router = useRouter();\r\n\r\n  useEffect(() => {\r\n    // Only redirect if on the root path\r\n    if (window.location.pathname === '/') {\r\n      router.replace('/pages/splash/splash1');\r\n    }\r\n  }, [router]);\r\n\r\n  return null;\r\n}\r\n"],"names":[],"mappings":";;;;AACA;AACA;;AAFA;;;AAIe,SAAS;;IACtB,MAAM,SAAS,IAAA,0NAAS;IAExB,IAAA,kPAAS;2BAAC;YACR,oCAAoC;YACpC,IAAI,OAAO,QAAQ,CAAC,QAAQ,KAAK,KAAK;gBACpC,OAAO,OAAO,CAAC;YACjB;QACF;0BAAG;QAAC;KAAO;IAEX,OAAO;AACT;GAXwB;;QACP,0NAAS;;;KADF"}}]
+}

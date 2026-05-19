@@ -16,72 +16,71 @@ const SetPrices = ({
   const [activeTab, setActiveTab] = useState('prices');
 
   const tabs = ['prices', 'tax'];
+  const today = new Date().toISOString().split('T')[0];
 
-  // Initialize tax bands with 0 values by default
   React.useEffect(() => {
-    if (taxBands && taxBands.length > 0) {
-      setProducts((prevProducts) => {
-        const updatedProducts = [...prevProducts];
-        const productToUpdate = updatedProducts[productIndex];
+    if (!taxBands || taxBands.length === 0) return;
 
-        if (!productToUpdate.productTax) {
-          productToUpdate.productTax = [];
-        }
+    const validTaxBands = taxBands.filter((tb) => tb !== null);
 
-        const validTaxBands = taxBands.filter((taxBand) => taxBand !== null);
-
-        validTaxBands.forEach((taxBand) => {
-          const existingTaxIndex = productToUpdate.productTax.findIndex(
-            (taxObj) => taxObj.taxBand === taxBand._id
-          );
-
-          if (existingTaxIndex === -1) {
-            productToUpdate.productTax.push({
-              taxBand: taxBand._id,
-              taxPercentage: 0,
-              additionalTaxAmount: 0,
-              isTaxExcluded: false,
-            });
-          }
-        });
-
-        return updatedProducts;
-      });
-    }
-  }, [taxBands, productIndex, setProducts]);
-
-  const handleNext = (e) => {
-    e.preventDefault();
-
-    setBandsError((prev) => ({ ...prev, [productIndex]: '' }));
-    const currentTabIndex = tabs.findIndex((tab) => tab === activeTab);
-
-    if (currentTabIndex !== -1 && currentTabIndex !== tabs.length - 1) {
-      setActiveTab(tabs[currentTabIndex + 1]);
-    }
-    return;
-  };
-
-  const handlePrev = (e) => {
-    e.preventDefault();
-    setBandsError((prev) => ({ ...prev, [productIndex]: '' }));
-
-    const currentTabIndex = tabs.findIndex((tab) => tab === activeTab);
-
-    if (currentTabIndex !== -1 && currentTabIndex !== 0) {
-      setActiveTab(tabs[currentTabIndex - 1]);
-    }
-    return;
-  };
-
-  const handleTaxExclusionToggle = (taxBandId) => {
     setProducts((prevProducts) => {
-      const updatedProducts = JSON.parse(JSON.stringify(prevProducts)); // Deep clone
+      const productToCheck = prevProducts[productIndex];
+      if (!productToCheck) return prevProducts;
+
+      const missingTaxBands = validTaxBands.filter(
+        (taxBand) =>
+          !productToCheck.productTax?.some(
+            (taxObj) => taxObj.taxBand === taxBand._id
+          )
+      );
+
+      if (missingTaxBands.length === 0) return prevProducts;
+
+      const updatedProducts = JSON.parse(JSON.stringify(prevProducts));
       const productToUpdate = updatedProducts[productIndex];
 
       if (!productToUpdate.productTax) {
         productToUpdate.productTax = [];
       }
+
+      missingTaxBands.forEach((taxBand) => {
+        productToUpdate.productTax.push({
+          taxBand: taxBand._id,
+          taxPercentage: 0,
+          additionalTaxAmount: 0,
+          isTaxExcluded: false,
+          effectiveDate: today,
+        });
+      });
+
+      return updatedProducts;
+    });
+  }, [taxBands, productIndex, setProducts, today]);
+
+  const handleNext = (e) => {
+    e.preventDefault();
+    setBandsError((prev) => ({ ...prev, [productIndex]: '' }));
+    const currentTabIndex = tabs.findIndex((tab) => tab === activeTab);
+    if (currentTabIndex !== -1 && currentTabIndex !== tabs.length - 1) {
+      setActiveTab(tabs[currentTabIndex + 1]);
+    }
+  };
+
+  const handlePrev = (e) => {
+    e.preventDefault();
+    setBandsError((prev) => ({ ...prev, [productIndex]: '' }));
+    const currentTabIndex = tabs.findIndex((tab) => tab === activeTab);
+    if (currentTabIndex !== -1 && currentTabIndex !== 0) {
+      setActiveTab(tabs[currentTabIndex - 1]);
+    }
+  };
+
+  const handleTaxExclusionToggle = (taxBandId) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = JSON.parse(JSON.stringify(prevProducts));
+      const productToUpdate = updatedProducts[productIndex];
+
+      if (!productToUpdate.productTax) productToUpdate.productTax = [];
 
       const taxBandIndex = productToUpdate.productTax.findIndex(
         (taxObj) => taxObj.taxBand === taxBandId
@@ -92,8 +91,6 @@ const SetPrices = ({
           productToUpdate.productTax[taxBandIndex].isTaxExcluded;
         productToUpdate.productTax[taxBandIndex].isTaxExcluded =
           !currentExcludedState;
-
-        // If now excluded, reset tax values to 0
         if (!currentExcludedState) {
           productToUpdate.productTax[taxBandIndex].taxPercentage = 0;
           productToUpdate.productTax[taxBandIndex].additionalTaxAmount = 0;
@@ -104,6 +101,7 @@ const SetPrices = ({
           taxPercentage: 0,
           additionalTaxAmount: 0,
           isTaxExcluded: true,
+          effectiveDate: today,
         });
       }
 
@@ -116,11 +114,8 @@ const SetPrices = ({
       const updatedProducts = JSON.parse(JSON.stringify(prevProducts));
       const productToUpdate = updatedProducts[productIndex];
 
-      if (!productToUpdate.productTax) {
-        productToUpdate.productTax = [];
-      }
+      if (!productToUpdate.productTax) productToUpdate.productTax = [];
 
-      // Check if all tax bands are currently excluded
       const validTaxBands = taxBands.filter((taxBand) => taxBand !== null);
       const allExcluded = validTaxBands.every((taxBand) => {
         const taxObj = productToUpdate.productTax.find(
@@ -129,7 +124,6 @@ const SetPrices = ({
         return taxObj?.isTaxExcluded === true;
       });
 
-      // Toggle all to opposite state
       const newExcludedState = !allExcluded;
 
       validTaxBands.forEach((taxBand) => {
@@ -140,8 +134,6 @@ const SetPrices = ({
         if (taxBandIndex !== -1) {
           productToUpdate.productTax[taxBandIndex].isTaxExcluded =
             newExcludedState;
-
-          // If now excluded, reset tax values to 0
           if (newExcludedState) {
             productToUpdate.productTax[taxBandIndex].taxPercentage = 0;
             productToUpdate.productTax[taxBandIndex].additionalTaxAmount = 0;
@@ -152,6 +144,7 @@ const SetPrices = ({
             taxPercentage: 0,
             additionalTaxAmount: 0,
             isTaxExcluded: newExcludedState,
+            effectiveDate: today,
           });
         }
       });
@@ -162,60 +155,107 @@ const SetPrices = ({
 
   const handleOnEnterPriceOrTax = (e, band, type) => {
     const inputValue = e.target.value;
-    const value = inputValue === '' ? 0 : parseFloat(inputValue);
-
-    // Check for NaN and default to 0
-    const safeValue = isNaN(value) ? 0 : value;
+    const safeValue =
+      inputValue === ''
+        ? ''
+        : isNaN(parseFloat(inputValue))
+          ? 0
+          : parseFloat(inputValue);
 
     setProducts((prevProducts) => {
-      const updatedProducts = [...prevProducts];
+      const updatedProducts = JSON.parse(JSON.stringify(prevProducts));
       const productToUpdate = updatedProducts[productIndex];
 
       if (type === 'price') {
-        if (!productToUpdate.pricing) {
-          productToUpdate.pricing = [];
-        }
+        if (!productToUpdate.pricing) productToUpdate.pricing = [];
         const bandIndex = productToUpdate.pricing.findIndex(
-          (priceObj) => priceObj.band === band
+          (p) => p.band === band
         );
         if (bandIndex !== -1) {
           productToUpdate.pricing[bandIndex].price = safeValue;
         } else {
-          productToUpdate.pricing.push({ band: band, price: safeValue });
+          productToUpdate.pricing.push({
+            band,
+            price: safeValue,
+            effectiveDate: today,
+          });
+        }
+      } else if (type === 'priceEffectiveDate') {
+        if (!productToUpdate.pricing) productToUpdate.pricing = [];
+        const selectedDate = inputValue < today ? today : inputValue;
+        const bandIndex = productToUpdate.pricing.findIndex(
+          (p) => p.band === band
+        );
+        if (bandIndex !== -1) {
+          productToUpdate.pricing[bandIndex].effectiveDate = selectedDate;
+        } else {
+          productToUpdate.pricing.push({
+            band,
+            price: 0,
+            effectiveDate: selectedDate,
+          });
         }
       } else if (type === 'tax') {
-        if (!productToUpdate.productTax) {
-          productToUpdate.productTax = [];
-        }
-        const taxBandIndex = productToUpdate.productTax.findIndex(
-          (taxObj) => taxObj.taxBand === band._id
+        if (!productToUpdate.productTax) productToUpdate.productTax = [];
+        const idx = productToUpdate.productTax.findIndex(
+          (t) => t.taxBand === band._id
         );
-        if (taxBandIndex !== -1) {
-          productToUpdate.productTax[taxBandIndex].taxPercentage = safeValue;
+        if (idx !== -1) {
+          productToUpdate.productTax[idx].taxPercentage = safeValue;
+          // ✅ ensure isTaxExcluded is always set
+          if (productToUpdate.productTax[idx].isTaxExcluded === undefined) {
+            productToUpdate.productTax[idx].isTaxExcluded = false;
+          }
         } else {
           productToUpdate.productTax.push({
             taxBand: band._id,
             taxPercentage: safeValue,
             additionalTaxAmount: 0,
             isTaxExcluded: false,
+            effectiveDate: today,
           });
         }
       } else if (type === 'additional') {
-        if (!productToUpdate.productTax) {
-          productToUpdate.productTax = [];
-        }
-        const taxBandIndex = productToUpdate.productTax.findIndex(
-          (taxObj) => taxObj.taxBand === band._id
+        if (!productToUpdate.productTax) productToUpdate.productTax = [];
+        const idx = productToUpdate.productTax.findIndex(
+          (t) => t.taxBand === band._id
         );
-        if (taxBandIndex !== -1) {
-          productToUpdate.productTax[taxBandIndex].additionalTaxAmount =
-            safeValue;
+        if (idx !== -1) {
+          productToUpdate.productTax[idx].additionalTaxAmount = safeValue;
+          // ✅ ensure isTaxExcluded is always set
+          if (productToUpdate.productTax[idx].isTaxExcluded === undefined) {
+            productToUpdate.productTax[idx].isTaxExcluded = false;
+          }
         } else {
           productToUpdate.productTax.push({
             taxBand: band._id,
             additionalTaxAmount: safeValue,
             taxPercentage: 0,
             isTaxExcluded: false,
+            effectiveDate: today,
+          });
+        }
+      } else if (type === 'taxEffectiveDate') {
+        if (!productToUpdate.productTax) productToUpdate.productTax = [];
+        const selectedDate = inputValue < today ? today : inputValue;
+        const taxBandIndex = productToUpdate.productTax.findIndex(
+          (t) => t.taxBand === band._id
+        );
+        if (taxBandIndex !== -1) {
+          productToUpdate.productTax[taxBandIndex].effectiveDate = selectedDate;
+          // ✅ ensure isTaxExcluded is always set
+          if (
+            productToUpdate.productTax[taxBandIndex].isTaxExcluded === undefined
+          ) {
+            productToUpdate.productTax[taxBandIndex].isTaxExcluded = false;
+          }
+        } else {
+          productToUpdate.productTax.push({
+            taxBand: band._id,
+            taxPercentage: 0,
+            additionalTaxAmount: 0,
+            isTaxExcluded: false,
+            effectiveDate: selectedDate,
           });
         }
       }
@@ -228,18 +268,21 @@ const SetPrices = ({
     e.preventDefault();
     setBandsError((prev) => ({ ...prev, [productIndex]: '' }));
 
-    //check if all bands have prices
     const productToCheck = products[productIndex];
 
-    //filter out null bands
-    const validBands = bands.filter((band) => band !== null);
+    //normalize missing isTaxExcluded before validating
+    const normalizedTax = (productToCheck.productTax || []).map((t) => ({
+      ...t,
+      isTaxExcluded: t.isTaxExcluded ?? false,
+    }));
+    const normalizedProduct = { ...productToCheck, productTax: normalizedTax };
 
-    //check if all bands have prices set
+    const validBands = bands.filter((band) => band !== null);
     const allBandsHavePrices = validBands.every((band) => {
-      const priceObj = productToCheck.pricing?.find(
+      const priceObj = normalizedProduct.pricing?.find(
         (price) => price.band === band
       );
-      return priceObj && priceObj.price > 0;
+      return priceObj && Number(priceObj.price) > 0;
     });
 
     if (!allBandsHavePrices) {
@@ -250,28 +293,24 @@ const SetPrices = ({
       setActiveTab('prices');
       return;
     }
-    //filter out null tax bands
-    const validTaxBands = taxBands.filter((taxBand) => taxBand !== null);
 
-    //check if all tax bands have required fields set (or are excluded)
+    const validTaxBands = taxBands.filter((taxBand) => taxBand !== null);
     const allTaxBandsSet = validTaxBands.every((taxBand) => {
-      const taxObj = productToCheck.productTax?.find(
+      const taxObj = normalizedProduct.productTax?.find(
         (tax) => tax.taxBand === taxBand._id
       );
 
-      // If tax is excluded for this band, it's valid
-      if (taxObj?.isTaxExcluded) {
-        return true;
-      }
+      if (!taxObj) return false;
+      if (taxObj.isTaxExcluded) return true;
 
-      // If not excluded, check that percentage and amount are set
+      //allow 0 as valid, just reject undefined/null/empty string
       return (
-        taxObj &&
         taxObj.taxPercentage !== undefined &&
         taxObj.taxPercentage !== null &&
+        taxObj.taxPercentage !== '' &&
         taxObj.additionalTaxAmount !== undefined &&
         taxObj.additionalTaxAmount !== null &&
-        taxObj.isTaxExcluded !== undefined
+        taxObj.additionalTaxAmount !== ''
       );
     });
 
@@ -279,18 +318,15 @@ const SetPrices = ({
       setBandsError((prev) => ({
         ...prev,
         [productIndex]:
-          'Please configure all tax bands. For non-excluded bands, set tax percentage and additional amount. If no tax, set to 0 or check &quot;Tax Excluded&quot;.',
+          'Please configure all tax bands. For non-excluded bands, set tax percentage and additional amount. If no tax, set to 0 or check the tax excluded box.',
       }));
       setActiveTab('tax');
       return;
     }
 
-    //if all validations pass, close the overlay
     closePriceDropdown();
     setBandsError('');
   };
-
-  console.log('Set Taxes:', products[productIndex]);
 
   return (
     <>
@@ -298,8 +334,8 @@ const SetPrices = ({
       {activeTab === 'prices' && (
         <div className="min-h-[30vh] flex flex-col py-3 px-1 w-full items-center gap-1">
           <div className="flex flex-col text-center gap-1">
-            <span className="text-sm w-full">
-              set price for this product in all your store price bands
+            <span className="text-sm w-full text-white">
+              Set price for this product in all your store price bands
             </span>
           </div>
 
@@ -309,8 +345,14 @@ const SetPrices = ({
             </span>
           )}
 
-          {/* price inputs for each band */}
           <div className="flex flex-col gap-2 p-2 max-h-[30vh] overflow-y-auto scrollbar-thin w-full">
+            <li className="list-none w-full flex flex-row gap-1">
+              <span className="w-1/3 text-white">Band</span>
+              <span className="w-1/3 font-serif font-semibold text-white">
+                Price
+              </span>
+              <span className="w-1/3 text-white">Effective Date</span>
+            </li>
             {bands.length > 0 &&
               bands.map(
                 (band, index) =>
@@ -319,25 +361,43 @@ const SetPrices = ({
                       key={index}
                       className="list-none w-full flex flex-row gap-1"
                     >
-                      <span className="bg-blue-shadow4 p-2 rounded-md w-1/2">
+                      <span className="bg-blue-shadow4 p-2 rounded-md w-1/3 text-white">
                         {band}
                       </span>
-                      <span className="flex font-serif font-semibold items-center">
-                        {companyDetails?.currency?.symbol || '$'}
+                      <span className="flex font-serif font-semibold items-center text-white">
+                        {companyDetails?.currency?.symbol || ' '}
                       </span>
                       <input
                         type="number"
                         min={0}
-                        placeholder={`${companyDetails?.currency?.symbol || '$'}0.00`}
+                        placeholder={`${companyDetails?.currency?.symbol || ' '}0.00`}
                         value={
                           products[productIndex].pricing?.find(
                             (priceObj) => priceObj.band === band
-                          )?.price || ''
+                          )?.price ?? ''
                         }
                         onChange={(e) =>
                           handleOnEnterPriceOrTax(e, band, 'price')
                         }
-                        className="w-1/2 rounded-md px-1 text-text-black"
+                        className="w-1/3 rounded-md px-1 text-text-black"
+                      />
+                      <input
+                        type="date"
+                        min={today}
+                        value={(() => {
+                          const dateVal = products[productIndex].pricing?.find(
+                            (priceObj) => priceObj.band === band
+                          )?.effectiveDate;
+                          if (!dateVal) return today;
+                          const formatted = new Date(dateVal)
+                            .toISOString()
+                            .split('T')[0];
+                          return formatted < today ? today : formatted;
+                        })()}
+                        onChange={(e) =>
+                          handleOnEnterPriceOrTax(e, band, 'priceEffectiveDate')
+                        }
+                        className="flex-1 w-1/3 rounded-md p-1 text-text-black"
                       />
                     </li>
                   )
@@ -349,21 +409,23 @@ const SetPrices = ({
       {/* set tax rates */}
       {activeTab === 'tax' && (
         <div className="min-h-[30vh] flex flex-col py-3 px-1 w-full items-center gap-1">
-          <div className="flex flex-col text-center gap-1">
+          <div className="flex flex-col text-center gap-1 text-white">
             <span className="font-semibold text-base">
-              {`Product Tax Configuration`}
+              Product Tax Configuration
             </span>
-            <span className="text-sm w-full">
-              Configure tax settings for each tax band. Check &quot;Tax Excluded&quot; to
-              exempt this product from that specific tax band.
+            <span className="text-sm text-yellow-500 w-full">
+              Note: this is a product specific additional tax, on top of the tax
+              charged in each tax band for this product. Check Tax Excluded to
+              exempt this product from all taxes in individual taxband or in all
+              tax bands.
             </span>
           </div>
 
-          {/* Master toggle for all tax bands */}
-          <div className="w-full bg-blue-shadow8 border-2 border-brand-blue rounded-lg p-3 mb-2">
+          {/* Master toggle */}
+          <div className="w-full bg-blue-shadow5 border-2 border-brand-blue rounded-lg p-3 mb-2">
             <div className="flex items-center justify-center gap-3">
               <span className="text-sm font-semibold text-white">
-                Product excluded from tax in all tax bands?
+                Product excluded from all taxes in all tax bands?
               </span>
               <input
                 type="checkbox"
@@ -389,10 +451,11 @@ const SetPrices = ({
               <ErrorInterface error={bandsError[productIndex]} />
             </span>
           )}
+
           <div className="flex flex-col gap-2 p-2 max-h-[30vh] overflow-y-auto scrollbar-thin w-full">
             {taxBands.length > 0 &&
               taxBands.map(
-                (taxBand, index) =>
+                (taxBand) =>
                   taxBand !== null && (
                     <div
                       key={taxBand._id}
@@ -402,6 +465,15 @@ const SetPrices = ({
                         <span className="font-semibold text-base text-white">
                           {taxBand.name}
                         </span>
+
+                        {products[productIndex].productTax?.find(
+                          (taxObj) => taxObj.taxBand === taxBand._id
+                        )?.isTaxExcluded && (
+                          <span className="text-yellow-500 italic text-sm">
+                            product is excluded from all taxes in this band...
+                          </span>
+                        )}
+
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-white">
                             Tax Excluded?
@@ -411,7 +483,7 @@ const SetPrices = ({
                             checked={
                               products[productIndex].productTax?.find(
                                 (taxObj) => taxObj.taxBand === taxBand._id
-                              )?.isTaxExcluded || false
+                              )?.isTaxExcluded ?? false
                             }
                             onChange={() =>
                               handleTaxExclusionToggle(taxBand._id)
@@ -445,12 +517,12 @@ const SetPrices = ({
                               value={
                                 products[productIndex].productTax?.find(
                                   (taxObj) => taxObj.taxBand === taxBand._id
-                                )?.taxPercentage || ''
+                                )?.taxPercentage ?? ''
                               }
                               onChange={(e) =>
                                 handleOnEnterPriceOrTax(e, taxBand, 'tax')
                               }
-                              placeholder={'0.00'}
+                              placeholder="0.00"
                               className="flex-1 rounded-md p-1 text-text-black"
                             />
                           </div>
@@ -467,7 +539,7 @@ const SetPrices = ({
                               value={
                                 products[productIndex].productTax?.find(
                                   (taxObj) => taxObj.taxBand === taxBand._id
-                                )?.additionalTaxAmount || ''
+                                )?.additionalTaxAmount ?? ''
                               }
                               onChange={(e) =>
                                 handleOnEnterPriceOrTax(
@@ -476,7 +548,36 @@ const SetPrices = ({
                                   'additional'
                                 )
                               }
-                              placeholder={`0.00`}
+                              placeholder="0.00"
+                              className="flex-1 rounded-md p-1 text-text-black"
+                            />
+                          </div>
+                          <div className="flex flex-row gap-2 items-center">
+                            <span className="text-white text-sm w-32">
+                              Effective date:
+                            </span>
+                            <input
+                              type="date"
+                              min={today}
+                              value={(() => {
+                                const dateVal = products[
+                                  productIndex
+                                ].productTax?.find(
+                                  (taxObj) => taxObj.taxBand === taxBand._id
+                                )?.effectiveDate;
+                                if (!dateVal) return today;
+                                const formatted = new Date(dateVal)
+                                  .toISOString()
+                                  .split('T')[0];
+                                return formatted < today ? today : formatted;
+                              })()}
+                              onChange={(e) =>
+                                handleOnEnterPriceOrTax(
+                                  e,
+                                  taxBand,
+                                  'taxEffectiveDate'
+                                )
+                              }
                               className="flex-1 rounded-md p-1 text-text-black"
                             />
                           </div>
@@ -492,14 +593,11 @@ const SetPrices = ({
       {/* Buttons */}
       <div className="w-full my-2 flex flex-col gap-1 px-2">
         <hr className="border border-blue-shadow4 w-full" />
-
         <div className="w-full flex flex-row justify-between">
           <button
             onClick={handlePrev}
             disabled={activeTab === tabs[0]}
-            className={`
-            ${activeTab === tabs[0] && 'opacity-50 cursor-not-allowed'} 
-            p-2 text-brand-blue bg-text-white w-fit rounded-l-md hover:bg-blue-shadow9`}
+            className={`${activeTab === tabs[0] && 'opacity-50 cursor-not-allowed'} p-2 text-brand-blue bg-text-white w-fit rounded-l-md hover:bg-blue-shadow9`}
           >
             {`< Prev`}
           </button>
@@ -507,7 +605,7 @@ const SetPrices = ({
           {activeTab === tabs[tabs.length - 1] ? (
             <button
               onClick={handleDone}
-              className={`py-2 px-4 text-brand-blue bg-text-white w-fit rounded-md hover:bg-blue-shadow9`}
+              className="py-2 px-4 text-brand-blue bg-text-white w-fit rounded-md hover:bg-blue-shadow9"
             >
               Done
             </button>
@@ -515,9 +613,7 @@ const SetPrices = ({
             <button
               onClick={handleNext}
               disabled={activeTab === tabs[tabs.length - 1]}
-              className={`
-              ${activeTab === tabs[tabs.length - 1] && 'opacity-50 cursor-not-allowed'} 
-              p-2 text-brand-blue bg-text-white w-fit rounded-r-md hover:bg-blue-shadow9`}
+              className={`${activeTab === tabs[tabs.length - 1] && 'opacity-50 cursor-not-allowed'} p-2 text-brand-blue bg-text-white w-fit rounded-r-md hover:bg-blue-shadow9`}
             >
               {`Next >`}
             </button>

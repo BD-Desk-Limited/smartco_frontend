@@ -120,12 +120,12 @@ const OTPForm = () => {
         return;
       }
       if (response?.data) {
-        
         setMessage('OTP verified successfully!!! logging in...');
         setSuccess(true);
         setLoading(false);
         setRedirecting(true);
 
+        console.log('OTP verified successfully:', response.data.user);
         // set user and token in session storage for use in the login attempt notification page. It will be cleared once the user logs in successfully or closes the page.
         sessionStorage.setItem('token', response?.data?.token);
         setUser(response?.data?.user);
@@ -155,7 +155,7 @@ const OTPForm = () => {
         setRedirecting(false);
         return;
       }
-      
+
       //clean up the session storage
       sessionStorage.removeItem('email');
       sessionStorage.removeItem('userId');
@@ -264,13 +264,11 @@ const OTPForm = () => {
               height={150}
             />
           </motion.h1>
-          <div className="text-center">{message}</div>
+          <div className="text-center text-text-gray">{message}</div>
           {redirecting && (
             <div className="mt-4">
               <Spinner />
-              <p className="text-sm text-gray-600 mt-2">
-                Redirecting ...
-              </p>
+              <p className="text-sm text-gray-600 mt-2">Redirecting ...</p>
             </div>
           )}
         </div>

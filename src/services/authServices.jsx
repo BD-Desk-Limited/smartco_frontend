@@ -2,7 +2,9 @@
 // This function checks if the code is running in a browser environment
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 if (!API_BASE) {
-  console.error('NEXT_PUBLIC_API_URL not set — API requests will be relative to this site.');
+  console.error(
+    'NEXT_PUBLIC_API_URL not set — API requests will be relative to this site.'
+  );
 }
 
 const getToken = () => {
@@ -34,7 +36,9 @@ export const loginService = async (form) => {
       return { error: errorMessage };
     }
   } catch (error) {
-    return { error: 'Internal server error, please try again or contact support' };
+    return {
+      error: 'Internal server error, please try again or contact support',
+    };
   }
 };
 
@@ -280,5 +284,36 @@ export const salesPointLoginService = async (body) => {
   } catch (error) {
     console.error('Error:', error);
     return { error: 'error logging in, please try again' };
+  }
+};
+
+//sales point pin change service
+export const changePinService = async (body) => {
+  const token = getToken();
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/sales-point/change-pin`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error resetting pin, please try again' };
   }
 };

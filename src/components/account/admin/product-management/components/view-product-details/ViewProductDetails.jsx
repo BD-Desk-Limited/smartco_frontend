@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
-import SubHeader from '@/components/account/SubHeader';
+import SubHeader from '@/components/account/admin/SubHeader';
 import Header from '@/components/account/Header';
 import PageDescription from '@/components/account/PageDescription';
 import Image from 'next/image';
@@ -21,13 +21,13 @@ import {
 } from '@/services/productsServices';
 import SuccessModal from '@/components/account/SuccessModal';
 import ProductDescriptionSection from './ProductDescriptionSection';
+import { FaEdit, FaExclamationTriangle, FaTrash } from 'react-icons/fa';
 
 const ViewProductDetails = ({
   pageDescription,
   productData,
   setProductData,
   branches,
-  setBranches,
 }) => {
   const selectedSubMenu = {
     name: 'View All Products',
@@ -246,7 +246,7 @@ const ViewProductDetails = ({
     : [];
 
   return (
-    <div className="relative bg-background-1">
+    <div className="relative bg-background-1 h-screen overflow-hidden">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
@@ -262,13 +262,13 @@ const ViewProductDetails = ({
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="p-5 h-full flex flex-col gap-5 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-            {productData ? (
-              <div className="p-5 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
+          <div className="px-5 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
+            {productData && !loading ? (
+              <div className=" h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
                 {/* Header Section */}
-                <div className="bg-text-white p-2 sticky top-0 z-10 w-full flex flex-row items-center justify-between mb-5">
+                <div className="bg-text-white p-2 sticky top-0 z-10 w-full flex flex-row items-center justify-between ml-5">
                   <h3 className="flex flex-row items-center gap-4">
-                    <span className="text-lg font-semibold flex flex-col">
+                    <span className="text-base font-semibold flex flex-col">
                       <span>
                         {(productData.name &&
                           productData?.name[0]?.toUpperCase() +
@@ -280,52 +280,42 @@ const ViewProductDetails = ({
                       </span>
                     </span>
                     <span
-                      className={`text-sm ${productData?.isDisabled ? 'bg-error' : 'bg-success text-text-white'} rounded-full p-1 items-center justify-center flex`}
+                      className={`text-sm ${productData?.isDisabled ? 'bg-error text-text-white' : 'bg-success text-text-white'} rounded-full py-1 px-2 items-center justify-center flex shadow-lg`}
                     >
-                      {productData?.isDisabled ? 'Inactive' : 'Active'}
+                      {productData?.isDisabled ? 'Deactivated' : 'Active'}
                     </span>
                   </h3>
 
                   {/*number of active branches */}
-                  <span className="text-sm text-brand-blue">
-                    Available for sale in{' '}
-                    {branchesWithAvailability?.length || 0}{' '}
-                    {branchesWithAvailability?.length === 1
-                      ? 'branch'
-                      : 'branches'}
-                  </span>
+                  {!productData?.isDisabled && (
+                    <span className="text-sm text-brand-blue">
+                      Available for sale in{' '}
+                      {branchesWithAvailability?.length || 0}{' '}
+                      {branchesWithAvailability?.length === 1
+                        ? 'branch'
+                        : 'branches'}
+                    </span>
+                  )}
 
                   {/* Action Buttons */}
-                  <ul className="flex flex-row gap-3 list-none">
-                    <li>
-                      <button
-                        onClick={() =>
-                          Router.push(
-                            `/pages/account/admin/product-management/edit-product?id=${productData?._id}`
-                          )
-                        }
-                        className="border border-brand-blue text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-brand-blue hover:text-text-white transition"
-                      >
-                        <Image
-                          src={`/assets/edit.png`}
-                          alt={`Update`}
-                          width={16}
-                          height={16}
-                        />
-                        Update
-                      </button>
-                    </li>
+                  <ul className="flex flex-row gap-3 mx-5">
+                    <button
+                      onClick={() =>
+                        Router.push(
+                          `/pages/account/admin/product-management/edit-product?id=${productData?._id}`
+                        )
+                      }
+                      className="border border-brand-blue text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-brand-blue hover:text-text-white transition"
+                    >
+                      <FaEdit />
+                      Update
+                    </button>
                     <li>
                       <button
                         onClick={() => setOpenEnableOrDisableModal(true)}
                         className={`border text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 ${productData?.isDisabled ? 'hover:bg-brand-green border-brand-green' : 'hover:bg-amber-500 border-amber-500'} hover:text-text-white transition`}
                       >
-                        <Image
-                          src={`/assets/warning.png`}
-                          alt={`Update`}
-                          width={16}
-                          height={16}
-                        />
+                        <FaExclamationTriangle />
                         {productData?.isDisabled ? 'Activate' : 'Deactivate'}
                       </button>
                     </li>
@@ -334,12 +324,7 @@ const ViewProductDetails = ({
                         onClick={() => setOpenDeleteModal(true)}
                         className="border border-error text-text-gray p-1 rounded-lg flex flex-row items-center gap-1 hover:bg-error hover:text-text-white transition"
                       >
-                        <Image
-                          src={`/assets/delete.png`}
-                          alt={`Update`}
-                          width={16}
-                          height={16}
-                        />
+                        <FaTrash />
                         Delete
                       </button>
                     </li>
@@ -348,8 +333,11 @@ const ViewProductDetails = ({
 
                 <div className="flex flex-row w-full px-5 gap-5">
                   {/* Product Description and Audit Section */}
-                  <div className="w-1/5 gap-5 flex flex-col">
-                    <ProductDescriptionSection productData={productData} />
+                  <div className="w-1/5 gap-2 flex flex-col overflow-y-auto scrollbar-thin">
+                    <ProductDescriptionSection
+                      productData={productData}
+                      loading={loading}
+                    />
                   </div>
 
                   {/* Product Components, Price and Tax Details Section */}
@@ -357,6 +345,7 @@ const ViewProductDetails = ({
                     <ProductComponentsPriceAndTaxDetails
                       productData={productData}
                       setProductData={setProductData}
+                      loading={loading}
                     />
                   </div>
 
@@ -367,6 +356,7 @@ const ViewProductDetails = ({
                       selectedBranches={selectedBranches}
                       setSelectedBranches={setSelectedBranches}
                       branchesWithAvailability={branchesWithAvailability}
+                      loading={loading}
                       branchesAvailabilityStatus={
                         productData?.availabilityStatus || []
                       }
@@ -376,6 +366,7 @@ const ViewProductDetails = ({
                       setOpenUpdateProductAvailabilityModal={
                         setOpenUpdateProductAvailabilityModal
                       }
+                      productIsDisabled={productData?.isDisabled}
                     />
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import React, { use, useEffect } from 'react';
+import React from 'react';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
 import SalesPoint from './SalesPoint';
@@ -7,14 +7,15 @@ import WarningModal from '../../WarningModal';
 import { useRouter } from 'next/navigation';
 import ErrorModal from '@/components/auth/commons/ErrorModal';
 import Spinner from '../../Spinner';
+import { useTheme } from '@/contexts/themeContext';
 import ShiftManagement from './shift-management/ShiftManagement';
 
 const SalesPointPage = () => {
   const router = useRouter();
+  const { mode, setMode } = useTheme();
   const { companyData } = useCompanyData();
-  const { user, logOutSalesPoint } = useAuth();
-  const [mode, setMode] = React.useState('light');
-  const [activeMenuItem, setActiveMenuItem] = React.useState('Dashboard');
+  const { user, logOutSalesPoint, isLoading } = useAuth();
+  const [activeMenuItem, setActiveMenuItem] = React.useState('sales-items');
   const [userBranchAccessWarning, setUserBranchAccessWarning] =
     React.useState(false);
   const [userBranchAccessWarningBranch, setUserBranchAccessWarningBranch] =
@@ -22,10 +23,11 @@ const SalesPointPage = () => {
   const [deviceNotAuthorizedForAnyBranch, setDeviceNotAuthorizedForAnyBranch] =
     React.useState(false);
   const [workBranch, setWorkBranch] = React.useState(null);
+
   const menuItems = [
     {
-      name: 'Dashboard',
-      component: null,
+      name: 'sales-items',
+      label: 'Sales Items',
       iconPath: {
         light: '/assets/window_white.png',
         dark: '/assets/window_dark.png',
@@ -33,7 +35,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'Cart',
+      name: 'cart',
+      label: 'Cart',
       iconPath: {
         light: '/assets/cart_white.png',
         dark: '/assets/cart_dark.png',
@@ -41,15 +44,8 @@ const SalesPointPage = () => {
       },
     },
     {
-      name: 'Customers',
-      iconPath: {
-        light: '/assets/customers_white.png',
-        dark: '/assets/customers_dark.png',
-        active: '/assets/customers_green.png',
-      },
-    },
-    {
-      name: 'Payments',
+      name: 'payment',
+      label: 'Payment',
       iconPath: {
         light: '/assets/card_white.png',
         dark: '/assets/card_dark.png',
@@ -57,23 +53,60 @@ const SalesPointPage = () => {
       },
     },
   ];
+
   // Memoized list of branches accessible on the device to avoid unnecessary rerenders
   const branchesAccessibleOnDevice = React.useMemo(
     () => companyData?.allowedBranches || [],
     [companyData?.allowedBranches]
   );
 
+  //generate work-branch key for localStorage based on user and device to prevent conflicts when user has access to same branch from multiple devices or multiple users use the same device
+  const workBranchKey = `workBranch_${user?._id}`;
+
+  const canUseBranch = (branchId) => {
+    if (!branchId) return false;
+
+    if (Array.isArray(user?.branch)) {
+      return user.branch?.includes(branchId);
+    }
+
+    return false;
+  };
+
+  // Sync auth state on component mount to handle cases where user might have logged in from another tab or refreshed the page
+  React.useEffect(() => {
+    if (isLoading) return; // Wait for auth state to finish loading
+
+    const checkWorkBranchInLocalStorage = () => {
+      const existingWorkBranch = localStorage.getItem(workBranchKey);
+      const parsedWorkBranch = existingWorkBranch
+        ? JSON.parse(existingWorkBranch)
+        : null;
+      if (
+        parsedWorkBranch &&
+        user.branch?.includes(parsedWorkBranch._id) &&
+        branchesAccessibleOnDevice?.some(
+          (branch) => branch._id === parsedWorkBranch._id
+        )
+      ) {
+        setWorkBranch(parsedWorkBranch);
+      }
+    };
+
+    checkWorkBranchInLocalStorage();
+  }, [user, isLoading, branchesAccessibleOnDevice, workBranchKey]);
+
   const darkThemeStyle = `bg-[#242424] text-text-white`;
   const lightThemeStyle = `bg-white text-text-black`;
 
   const handleWorkBranchSelect = (branch_obj) => {
     // check if user has access to the branch
-    if (!user?.branch?.includes(branch_obj._id)) {
+    if (!canUseBranch(branch_obj?._id)) {
       setUserBranchAccessWarning(true);
       setUserBranchAccessWarningBranch(branch_obj);
     } else {
       setWorkBranch(branch_obj);
-      sessionStorage.setItem('work-branch', branch_obj._id);
+      localStorage.setItem(workBranchKey, JSON.stringify(branch_obj));
     }
   };
 
@@ -93,104 +126,114 @@ const SalesPointPage = () => {
   React.useEffect(() => {
     if (branchesAccessibleOnDevice?.length === 1) {
       const singleBranch = branchesAccessibleOnDevice[0];
-      if (user?.branch?.includes(singleBranch._id)) {
+      let userHasAccess = false;
+
+      if (Array.isArray(user?.branch)) {
+        userHasAccess = user.branch?.includes(singleBranch._id);
+      }
+
+      if (userHasAccess) {
         setWorkBranch(singleBranch);
-        sessionStorage.setItem('work-branch', singleBranch._id);
+        localStorage.setItem(workBranchKey, JSON.stringify(singleBranch));
+      } else {
+        setUserBranchAccessWarning(true);
+        setUserBranchAccessWarningBranch(singleBranch);
       }
     }
-  }, [branchesAccessibleOnDevice, user]);
+  }, [branchesAccessibleOnDevice, user, workBranchKey]);
 
-  console.log('workBranch', workBranch);
-  console.log('branchesAccessibleOnDevice', branchesAccessibleOnDevice);
-
-  if (!companyData || !companyData.allowedBranches) {
+  if (!companyData || !companyData.allowedBranches || isLoading || !user) {
     return <Spinner />;
   }
 
   return (
-    <div
-      className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
-    >
-      {/* Select Branch */}
-      {branchesAccessibleOnDevice.length > 0 && !workBranch?._id && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
-        >
-          <SelectWorkBranch
-            branchesAccessibleOnDevice={branchesAccessibleOnDevice}
-            handleWorkBranchSelect={handleWorkBranchSelect}
-            logOutSalesPoint={logOutSalesPoint}
+    <div>
+      <div
+        className={`relative w-full h-full overflow-hidden ${mode === 'light' ? lightThemeStyle : darkThemeStyle}`}
+      >
+        {/* Select Branch */}
+        {branchesAccessibleOnDevice.length > 0 && !workBranch && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center z-50`}
+          >
+            <SelectWorkBranch
+              branchesAccessibleOnDevice={branchesAccessibleOnDevice}
+              handleWorkBranchSelect={handleWorkBranchSelect}
+              logOutSalesPoint={logOutSalesPoint}
+              style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
+            />
+          </div>
+        )}
+
+        {/* User Branch Access Warning Modal */}
+        {userBranchAccessWarning && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <WarningModal
+              title="Access Denied"
+              message={`Sorry, you do not have access to ${userBranchAccessWarningBranch?.name}, kindly contact your admin for assistance`}
+              onClick={() => {
+                setWorkBranch(null);
+                setUserBranchAccessWarning(false);
+              }}
+              onClose={() => router.push(`/pages/auth/login/sales-point`)}
+              button1Text={`Choose another branch`}
+              button2Text={`Logout`}
+            />
+          </div>
+        )}
+
+        {/* No Branches Authorized for Device */}
+        {deviceNotAuthorizedForAnyBranch && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <ErrorModal
+              title="Unauthorized Device"
+              message={`Sorry, this device is not authorized for any branch use, kindly contact your admin for assistance`}
+              buttonStyle={`bg-error text-white`}
+              onClose={logOutSalesPoint}
+            />
+          </div>
+        )}
+
+        {/* check if the branch the user has logged into is active */}
+        {workBranch && workBranch.status !== 'active' && (
+          <div
+            className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
+          >
+            <ErrorModal
+              title="Inactive Branch"
+              message={`Sorry, this branch is inactive, kindly contact your admin for assistance`}
+              buttonStyle={`bg-error text-white`}
+              onClose={logOutSalesPoint}
+            />
+          </div>
+        )}
+
+        {/* Shift Creation Enforcement Check */}
+        {/*workBranch && workBranch.settings.shiftCreationEnforced && (
+          <ShiftManagement
+            onClose={logOutSalesPoint}
             style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
           />
-        </div>
-      )}
+        )*/}
 
-      {/* User Branch Access Warning Modal */}
-      {userBranchAccessWarning && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <WarningModal
-            title="Access Denied"
-            message={`Sorry, you do not have access to ${userBranchAccessWarningBranch?.name}, kindly contact your admin for assistance`}
-            onClick={() => {
-              setWorkBranch(null);
-              setUserBranchAccessWarning(false);
-            }}
-            onClose={() => router.push(`/pages/auth/login/sales-point`)}
-            button1Text={`Choose another branch`}
-            button2Text={`Logout`}
-          />
-        </div>
-      )}
-
-      {/* No Branches Authorized for Device */}
-      {deviceNotAuthorizedForAnyBranch && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <ErrorModal
-            title="Unauthorized Device"
-            message={`Sorry, this device is not authorized for any branch use, kindly contact your admin for assistance`}
-            buttonStyle={`bg-error text-white`}
-            onClose={logOutSalesPoint}
-          />
-        </div>
-      )}
-
-      {/* check if the branch the user has logged into is active */}
-      {workBranch && workBranch.status !== 'active' && (
-        <div
-          className={`absolute top-0 left-0 w-full h-full bg-black bg-opacity-100 flex items-center justify-center z-50`}
-        >
-          <ErrorModal
-            title="Inactive Branch"
-            message={`Sorry, this branch is inactive, kindly contact your admin for assistance`}
-            buttonStyle={`bg-error text-white`}
-            onClose={logOutSalesPoint}
-          />
-        </div>
-      )}
-
-      {/* Shift Creation Enforcement Check */}
-      {workBranch && workBranch.settings.shiftCreationEnforced && (
-        <ShiftManagement
-          onClose={logOutSalesPoint}
-          style={mode === 'light' ? lightThemeStyle : darkThemeStyle}
+        {/* Main Sales Point Interface */}
+        <SalesPoint
+          mode={mode}
+          setMode={setMode}
+          menuItems={menuItems}
+          activeMenuItem={activeMenuItem}
+          setActiveMenuItem={setActiveMenuItem}
+          lightThemeStyle={lightThemeStyle}
+          darkThemeStyle={darkThemeStyle}
+          workBranch={workBranch}
+          workBranchKey={workBranchKey}
+          logOutSalesPoint={logOutSalesPoint}
         />
-      )}
-
-      {/* Main Sales Point Interface */}
-      <SalesPoint
-        mode={mode}
-        setMode={setMode}
-        menuItems={menuItems}
-        activeMenuItem={activeMenuItem}
-        setActiveMenuItem={setActiveMenuItem}
-        lightThemeStyle={lightThemeStyle}
-        darkThemeStyle={darkThemeStyle}
-        logOutSalesPoint={logOutSalesPoint}
-      />
+      </div>
     </div>
   );
 };

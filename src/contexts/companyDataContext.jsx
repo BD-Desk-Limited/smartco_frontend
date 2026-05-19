@@ -1,31 +1,32 @@
 'use client';
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 // Create a context for company data
 const CompanyDataContext = createContext(null);
 
-export const CompanyDataProvider = ({ children }) => {
-  const [companyData, SetCompanyDataState] = useState(null);
+const getInitialCompanyData = () => {
+  if (typeof window === 'undefined') return null;
 
-  useEffect(() => {
-    // Retrieve the JSON string from localStorage
+  try {
     const storedCompanyData = localStorage.getItem('companyData');
-    // Parse the JSON string back into an object
     const fetchedData = storedCompanyData
       ? JSON.parse(storedCompanyData)
       : null;
-    const newCompanyData = { ...fetchedData, isLoaded: true };
-    if (JSON.stringify(companyData) !== JSON.stringify(newCompanyData)) {
-      SetCompanyDataState(newCompanyData);
-    }
-  }, [SetCompanyDataState, companyData]);
+    return { ...fetchedData, isLoaded: true };
+  } catch (error) {
+    console.error('Failed to read companyData from localStorage', error);
+    return { isLoaded: true };
+  }
+};
+
+export const CompanyDataProvider = ({ children }) => {
+  const [companyData, SetCompanyDataState] = useState(getInitialCompanyData);
 
   const setCompanyData = (data) => {
     // Update the company data in state and localStorage
     SetCompanyDataState({ ...data, isLoaded: true });
     localStorage.setItem('companyData', JSON.stringify(data));
   };
-  console.log('Company Data from Context:', companyData);
 
   return (
     <CompanyDataContext.Provider value={{ companyData, setCompanyData }}>

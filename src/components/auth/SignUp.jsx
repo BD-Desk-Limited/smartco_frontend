@@ -177,7 +177,6 @@ const SignUp = () => {
       setLoading(false);
     }
   };
-  console.log('Form Data:', formData);
 
   const inputStyle = `w-full border-2 rounded-sm px-4 h-8 items-center drop-shadow-md focus:outline-brand-blue text-md border-[#DDDDDD]`;
   const labelStyle = `w-full text-left text-sm font-semibold`;

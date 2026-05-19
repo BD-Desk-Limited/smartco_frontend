@@ -1,13 +1,11 @@
 import { CompanyDataProvider } from '@/contexts/companyDataContext';
 import './globals.css';
 import { AuthProvider } from '@/contexts/authContext';
-import { BulkMaterialUploadProvider } from '@/contexts/bulkMaterialUploadContext';
-import { BulkbranchUploadProvider } from '@/contexts/bulkBranchUploadContext';
-import { BulkUserUploadProvider } from '@/contexts/bulkUserUploadContext';
-import { CreateProductsProvider } from '@/contexts/createProductsContext';
-import { SetupProvider } from '@/contexts/setupContext';
 import { InternetStatusProvider } from '@/contexts/internetStatusContext';
-import OfflineNotifier from '@/components/OfflineNotifier';
+import { SetupProvider } from '@/contexts/setupContext';
+import TransactionSyncInitializer from '@/components/TransactionSyncInitializer';
+import { ThemeProvider } from '@/contexts/themeContext';
+import { AccountThemeProvider } from '@/contexts/accountThemeContext';
 
 const APP_NAME = 'SmartCo.';
 const APP_DEFAULT_TITLE =
@@ -41,25 +39,24 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#003399" />
+      </head>
+
       <body className="antialiased">
-        <AuthProvider>
-          <InternetStatusProvider>
-            <OfflineNotifier />
-            <SetupProvider>
-              <BulkUserUploadProvider>
-                <BulkMaterialUploadProvider>
-                  <BulkbranchUploadProvider>
-                    <CompanyDataProvider>
-                      <CreateProductsProvider>
-                        {children}
-                      </CreateProductsProvider>
-                    </CompanyDataProvider>
-                  </BulkbranchUploadProvider>
-                </BulkMaterialUploadProvider>
-              </BulkUserUploadProvider>
-            </SetupProvider>
-          </InternetStatusProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <AccountThemeProvider>
+              <InternetStatusProvider>
+                <SetupProvider>
+                  <CompanyDataProvider>{children}</CompanyDataProvider>
+                </SetupProvider>
+              </InternetStatusProvider>
+            </AccountThemeProvider>
+          </AuthProvider>
+        </ThemeProvider>
+        <TransactionSyncInitializer />
+
         {/* Service Worker Registration for Offline Support */}
         <script
           dangerouslySetInnerHTML={{

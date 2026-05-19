@@ -12,46 +12,96 @@ export const AuthProvider = ({ children }) => {
   const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for token in sessionStorage (used by all users now)
-    const token = sessionStorage.getItem('token');
-    if (token !== null) {
-      try {
-        const decodedToken = jwtDecode(token);
-        const currentTime = Date.now() / 1000;
-        if (decodedToken.exp < currentTime) {
-          // Token has expired
+    let isCurrent = true;
+
+    const syncAuthState = async () => {
+      const token = sessionStorage.getItem('token');
+      console.log(token);
+
+      if (token !== null) {
+        try {
+          const decodedToken = jwtDecode(token);
+
+          const currentTime = Date.now() / 1000;
+
+          if (decodedToken.exp < currentTime) {
+            sessionStorage.removeItem('token');
+
+            if (!isCurrent) return;
+            setIsAuthenticated(false);
+            setUser(null);
+            setIsLoading(false);
+            router.push('/pages/splash/splash3');
+            return;
+          }
+
+          const isSalesPointRoute =
+            pathname?.startsWith('/pages/account/sales-point') ||
+            pathname?.startsWith('/pages/auth/login/sales-point');
+          const isOfflineMode =
+            !navigator.onLine || localStorage.getItem('userMode') === 'offline';
+
+          if (!isCurrent) return;
+
+          setIsAuthenticated(true);
+
+          if (isOfflineMode && isSalesPointRoute) {
+            localStorage.setItem('userMode', 'offline');
+            setUser(decodedToken);
+            setIsLoading(false);
+            return;
+          }
+
+          const userData = await getUserService(token);
+
+          if (!isCurrent) return;
+
+          if (userData?.data) {
+            setUser(userData.data);
+            setIsLoading(false);
+            return;
+          }
+
+          const hasRecoverableFetchError =
+            !navigator.onLine ||
+            userData?.error === 'error getting user details, please try again';
+
+          if (isSalesPointRoute && hasRecoverableFetchError) {
+            localStorage.setItem('userMode', 'offline');
+            setUser(decodedToken);
+            setIsLoading(false);
+            return;
+          }
+
           sessionStorage.removeItem('token');
           setIsAuthenticated(false);
           setUser(null);
+          setIsLoading(false);
           router.push('/pages/splash/splash3');
-        } else {
-          setIsAuthenticated(true);
-          if (!user) {
-            const getUser = async () => {
-              const userData = await getUserService(token);
-              if (userData.data) {
-                setUser(userData.data);
-              } else {
-                sessionStorage.removeItem('token');
-                setIsAuthenticated(false);
-                setUser(null);
-                router.push('/pages/splash/splash3');
-              }
-            };
-            getUser();
-          }
+          return;
+        } catch (error) {
+          if (!isCurrent) return;
+
+          console.error('Auth token decode/rehydration failed:', error);
+
+          sessionStorage.removeItem('token');
+          setIsAuthenticated(false);
+          setUser(null);
+          setIsLoading(false);
+          router.push('/pages/splash/splash3');
+          return;
         }
-      } catch (error) {
-        sessionStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setUser(null);
-        router.push('/pages/splash/splash3');
       }
-    } else {
+
+      if (!isCurrent) return;
+
       setIsAuthenticated(false);
       setUser(null);
+      setIsLoading(false);
+
       if (
         pathname &&
         !pathname.startsWith('/pages/auth') &&
@@ -59,23 +109,31 @@ export const AuthProvider = ({ children }) => {
       ) {
         router.push('/pages/splash/splash3');
       }
-    }
-    // Only run on mount and when router/pathname changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+
+    syncAuthState();
+
+    return () => {
+      isCurrent = false;
+    };
   }, [router, pathname]);
 
   const logOut = () => {
     sessionStorage.removeItem('token');
+    localStorage.removeItem('userMode');
     setIsAuthenticated(false);
     setUser(null);
     router.push('/pages/splash/splash3');
   };
 
   const logOutSalesPoint = () => {
+    const workBranchKey = `workBranch_${user?._id}`;
+
     sessionStorage.removeItem('token');
+    localStorage.removeItem('userMode');
     setIsAuthenticated(false);
     setUser(null);
-    sessionStorage.removeItem('work-branch');
+    localStorage.removeItem(workBranchKey);
     router.push('/pages/auth/login/sales-point');
   };
 
@@ -90,7 +148,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, setUser, logOut, logOutSalesPoint }}
+      value={{
+        isAuthenticated,
+        user,
+        setUser,
+        logOut,
+        logOutSalesPoint,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,5 +1,5 @@
 import Header from '@/components/account/Header';
-import SubHeader from '@/components/account/SubHeader';
+import SubHeader from '@/components/account/admin/SubHeader';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
 import PageDescription from '@/components/account/PageDescription';
@@ -282,12 +282,45 @@ const CreateProducts = ({ pageDescription }) => {
 
     // Format and append each product individually
     const formattedProducts = products.map((product) => ({
+      _id: product._id,
       name: product.name,
       description: product.description || '',
       category: product.category,
-      components: product.components,
-      pricing: product.pricing,
-      productTax: product.productTax || [],
+
+      //Format components.
+      components: (product.components || []).map((comp) => ({
+        categoryName: comp.categoryName || '',
+        isOptional: comp.isOptional || false,
+        materialChoices: (comp.materialChoices || []).map((mc) => ({
+          material: mc.material,
+          quantity: mc.quantity || 1,
+          additionalPrice: (mc.additionalPrice || []).map((ap) => ({
+            band: ap.band,
+            price: Number(ap.price) || 0,
+            effectiveDate: ap.effectiveDate || new Date().toISOString(),
+          })),
+        })),
+      })),
+
+      // Format pricing
+      pricing: (product.pricing || []).map((p) => ({
+        band: p.band,
+        price: Number(p.price) || 0,
+        effectiveDate: p.effectiveDate || new Date().toISOString(),
+      })),
+
+      // productTax formatted to backend expected
+      productTax: (product.productTax || []).map((tax) => ({
+        taxBand: tax.taxBand,
+        isTaxExcluded: tax.isTaxExcluded ?? false,
+        taxDetails: [
+          {
+            taxPercentage: Number(tax.taxPercentage) || 0,
+            additionalTaxAmount: Number(tax.additionalTaxAmount) || 0,
+            effectiveDate: tax.effectiveDate || new Date().toISOString(),
+          },
+        ],
+      })),
     }));
 
     // Attach products array as JSON string
@@ -300,7 +333,6 @@ const CreateProducts = ({ pageDescription }) => {
       }
     });
 
-    // Call the service to create or update products
     try {
       const { data, error } = await createOrUpdateProductService(formData);
 

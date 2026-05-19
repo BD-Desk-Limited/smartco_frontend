@@ -9,15 +9,6 @@ const SelectWorkBranch = ({
 }) => {
   const [selectedBranch, setSelectedBranch] = React.useState(null);
 
-  const handleBranchSelect = (branchID) => {
-    const branch = branchesAccessibleOnDevice.find(
-      (branch) => branch._id === branchID
-    );
-    setSelectedBranch(branch);
-  };
-
-  console.log('Selected Branch:', selectedBranch);
-
   return (
     <div
       className={`rounded-lg shadow-lg flex flex-col w-1/3 h-1/2 overflow-y-auto no-scrollbar  ${style}`}
@@ -30,11 +21,9 @@ const SelectWorkBranch = ({
         {branchesAccessibleOnDevice?.map((branch) => (
           <li
             key={branch._id}
-            onClick={() => handleBranchSelect(branch._id)}
+            onClick={() => setSelectedBranch(branch)}
             className={`cursor-pointer p-2 mb-2 rounded-md hover:bg-gray-shadow7 ${
-              selectedBranch && selectedBranch._id === branch._id
-                ? 'bg-green-shadow3 font-semibold'
-                : ''
+              selectedBranch === branch ? 'bg-green-shadow3 font-semibold' : ''
             }`}
           >
             {branch.name}
@@ -53,7 +42,11 @@ const SelectWorkBranch = ({
 
         <Button
           text="Enter"
-          onClick={() => handleWorkBranchSelect(selectedBranch)}
+          onClick={() => {
+            if (selectedBranch) {
+              handleWorkBranchSelect(selectedBranch);
+            }
+          }}
           type="primary"
           buttonStyle="px-4 py-2 shadow-sm bg-brand-green text-white hover:bg-green-700"
           disabled={!selectedBranch}

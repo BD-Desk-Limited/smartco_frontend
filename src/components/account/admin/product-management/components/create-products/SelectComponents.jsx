@@ -18,7 +18,7 @@ const SelectComponents = ({
   const [currentComponentIndex, setCurrentComponentIndex] = React.useState(0);
   const alternativeMaterialRef = React.useRef(null);
 
-  const safeMaterials = Array.isArray(materials) ? materials : []; // Ensure materials is always an array
+  const safeMaterials = Array.isArray(materials) ? materials : [];
 
   const currentProduct = products[productIndex];
   const rawMaterials = safeMaterials.filter(
@@ -28,28 +28,24 @@ const SelectComponents = ({
     (mat) => mat.materialType === 'packaging'
   );
 
-  // Filter materials and packagings based on search input
   const filteredMaterials = materialSearch
     ? rawMaterials.filter((mat) =>
         mat.name.toLowerCase().includes(materialSearch.toLowerCase())
       )
     : rawMaterials;
 
-  // Filter packagings based on search input
   const filteredPackagings = packagingSearch
     ? packagings.filter((pack) =>
         pack.name.toLowerCase().includes(packagingSearch.toLowerCase())
       )
     : packagings;
 
-  // All materials filtered for selecting alternate materials based on search input
   const filteredAllMaterials = altSearch[productIndex]
-    ? materials.filter((mat) =>
+    ? safeMaterials.filter((mat) =>
         mat.name.toLowerCase().includes(altSearch[productIndex].toLowerCase())
       )
-    : materials;
+    : safeMaterials;
 
-  // helper to create default additionalPrice array for each band
   const createDefaultPrices = () =>
     bands &&
     bands
@@ -59,45 +55,51 @@ const SelectComponents = ({
         price: 0,
       }));
 
-  // add a new component (raw material or packaging)
   const handleAddComponent = (material, categoryName = '') => {
+    const components = currentProduct?.components || [];
+    const existingIndex = components.findIndex(
+      (comp) => comp.materialChoices?.[0]?.material === material._id
+    );
+
+    if (existingIndex !== -1) {
+      setCurrentComponentIndex(existingIndex);
+      setShowSelectComponents((prev) => ({ ...prev, [productIndex]: true }));
+      setMaterialSearch('');
+      setPackagingSearch('');
+      return;
+    }
+
     setProducts((prev) => {
-      const updated = [...prev];
-      const components = updated[productIndex].components || [];
-
-      // Check if a component with the same material already exists
-      const exists = components.some(
-        (comp) => comp.materialChoices[0].material === material._id
-      );
-
-      if (!exists) {
-        const newComp = {
-          categoryName,
-          materialChoices: [
-            {
-              material: material._id,
-              quantity: 1,
-              additionalPrice: createDefaultPrices(),
-            },
-          ],
-        };
-        updated[productIndex].components = [...components, newComp];
-        // Set currentComponentIndex to the last index (newly added component)
-        setCurrentComponentIndex(updated[productIndex].components.length - 1);
-      }
+      const updated = JSON.parse(JSON.stringify(prev));
+      const product = updated[productIndex];
+      const nextComponents = product.components || [];
+      const newComp = {
+        categoryName,
+        isOptional: false,
+        materialChoices: [
+          {
+            material: material._id,
+            quantity: 1,
+            additionalPrice: createDefaultPrices(),
+          },
+        ],
+      };
+      updated[productIndex] = {
+        ...product,
+        components: [...nextComponents, newComp],
+      };
       return updated;
     });
 
-    // Reset search and close dropdown
+    setCurrentComponentIndex(components.length);
     setShowSelectComponents((prev) => ({ ...prev, [productIndex]: true }));
     setMaterialSearch('');
     setPackagingSearch('');
   };
 
-  // add alternate material to component
   const handleAddAlternate = (material, compIndex) => {
     setProducts((prev) => {
-      const updated = [...prev];
+      const updated = JSON.parse(JSON.stringify(prev));
       const comps = updated[productIndex].components || [];
       if (!comps[compIndex]) return prev;
 
@@ -115,7 +117,6 @@ const SelectComponents = ({
       return updated;
     });
 
-    // Scroll to the newly added material
     setTimeout(() => {
       if (alternativeMaterialRef.current) {
         const lastAlternative = alternativeMaterialRef.current.lastElementChild;
@@ -127,13 +128,12 @@ const SelectComponents = ({
           });
         }
       }
-    }, 100); // Small delay to ensure DOM is updated
+    }, 100);
   };
 
-  // update quantity of a materialChoice
   const handleUpdateQuantity = (compIndex, choiceIndex, quantity) => {
     setProducts((prev) => {
-      const updated = [...prev];
+      const updated = JSON.parse(JSON.stringify(prev));
       updated[productIndex].components[compIndex].materialChoices[
         choiceIndex
       ].quantity = quantity;
@@ -141,26 +141,24 @@ const SelectComponents = ({
     });
   };
 
-  // remove a materialChoice
   const handleRemoveMaterial = (compIndex, choiceIndex) => {
     setProducts((prev) => {
-      const updated = [...prev];
-      const components = updated[productIndex].components
+      const updated = JSON.parse(JSON.stringify(prev));
+      updated[productIndex].components = updated[productIndex].components
         .map((comp, idx) => {
           if (idx !== compIndex) return comp;
-          // Remove the materialChoice at choiceIndex
-          const newChoices = comp.materialChoices.filter(
-            (_, i) => i !== choiceIndex
-          );
-          return { ...comp, materialChoices: newChoices };
+          return {
+            ...comp,
+            materialChoices: comp.materialChoices.filter(
+              (_, i) => i !== choiceIndex
+            ),
+          };
         })
         .filter((comp) => comp.materialChoices.length > 0);
-      updated[productIndex].components = components;
       return updated;
     });
   };
 
-  // Keep currentComponentIndex in bounds after products/components change
   React.useEffect(() => {
     const comps = products[productIndex]?.components || [];
     if (currentComponentIndex > comps.length - 1) {
@@ -168,28 +166,36 @@ const SelectComponents = ({
     }
   }, [products, productIndex, currentComponentIndex]);
 
-  // remove entire component
   const handleRemoveComponent = (compIndex) => {
     setProducts((prev) => {
-      const updated = [...prev];
-      updated[productIndex].components.splice(compIndex, 1);
+      const updated = JSON.parse(JSON.stringify(prev));
+      updated[productIndex].components = updated[
+        productIndex
+      ].components.filter((_, idx) => idx !== compIndex);
       return updated;
     });
   };
 
-  // update category name
   const handleUpdateCategoryName = (compIndex, value) => {
     setProducts((prev) => {
-      const updated = [...prev];
+      const updated = JSON.parse(JSON.stringify(prev));
       updated[productIndex].components[compIndex].categoryName = value;
       return updated;
     });
   };
 
-  // update band price
+  const handleToggleOptional = (compIndex) => {
+    setProducts((prev) => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      const comp = updated[productIndex].components[compIndex];
+      comp.isOptional = !(comp.isOptional ?? false);
+      return updated;
+    });
+  };
+
   const handleUpdateBandPrice = (compIndex, choiceIndex, bandIndex, price) => {
     setProducts((prev) => {
-      const updated = [...prev];
+      const updated = JSON.parse(JSON.stringify(prev));
       updated[productIndex].components[compIndex].materialChoices[
         choiceIndex
       ].additionalPrice[bandIndex].price = price;
@@ -208,7 +214,7 @@ const SelectComponents = ({
         onClick={() =>
           setShowSelectComponents((prev) => ({ ...prev, [productIndex]: true }))
         }
-        className="absolute top-2 right-2 font-bold bg-error p-1"
+        className="absolute top-2 right-2 font-bold bg-error p-1 rounded-md cursor-pointer hover:bg-opacity-80 hover:text-white"
       >
         {`${currentComponentIndex + 1} / ${currentProduct?.components?.length || 0}`}
       </span>
@@ -285,7 +291,7 @@ const SelectComponents = ({
         </div>
       ) : (
         <div className="w-full flex flex-row gap-2 justify-between items-center">
-          {/* Navigation buttons back and prev component */}
+          {/* Back / Prev */}
           {currentComponentIndex === 0 ? (
             <span
               onClick={() =>
@@ -305,24 +311,46 @@ const SelectComponents = ({
             >{`<< prev`}</span>
           )}
 
-          {/* Display current component for editing */}
+          {/* Current component editor */}
           {currentProduct?.components?.map((comp, compIdx) => (
             <div key={compIdx}>
               {currentComponentIndex === compIdx && (
                 <div className="border border-gray-border rounded-lg p-2 bg-blue-shadow4 text-white relative w-full">
-                  {/* Material Choices category Name*/}
-                  <div className="flex gap-1 items-center">
-                    <span className="font-semibold">Category Title: </span>
-                    <input
-                      type="text"
-                      value={comp.categoryName || ''}
-                      onChange={(e) =>
-                        handleUpdateCategoryName(compIdx, e.target.value)
-                      }
-                      placeholder="Enter category Title..."
-                      className="bg-transparent border-b border-gray-border outline-none text-base w-fit"
-                    />
+                  {/* Category name + isOptional toggle */}
+                  <div className="flex gap-3 items-center flex-col mb-2">
+                    <div className="flex gap-1 items-center">
+                      <span className="font-semibold">Category Title: </span>
+                      <input
+                        type="text"
+                        value={comp.categoryName || ''}
+                        onChange={(e) =>
+                          handleUpdateCategoryName(compIdx, e.target.value)
+                        }
+                        placeholder="Enter category Title..."
+                        className="bg-transparent border-b border-gray-border outline-none text-base w-fit"
+                      />
+                    </div>
+
+                    {/*isOptional toggle */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-white">
+                        Optional component?
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={comp.isOptional ?? false}
+                        onChange={() => handleToggleOptional(compIdx)}
+                        className="w-5 h-5 cursor-pointer rounded-md"
+                      />
+                      {comp.isOptional && (
+                        <span className="text-sm text-yellow-400 italic">
+                          customers can skip this
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Remove component button */}
                   <button
                     onClick={() => handleRemoveComponent(compIdx)}
                     className="text-red-500 text-base font-bold bg-text-white p-2 rounded-full hover:bg-red-100 absolute right-0 top-0"
@@ -337,7 +365,6 @@ const SelectComponents = ({
                     className="flex flex-wrap overflow-y-auto scrollbar-thin max-h-[35vh] gap-4 mt-2"
                   >
                     {comp.materialChoices.map((mc, choiceIdx) => {
-                      // Find the material details from safeMaterials
                       const mat = safeMaterials.find(
                         (m) => m._id === mc.material
                       );
@@ -346,7 +373,7 @@ const SelectComponents = ({
                           key={choiceIdx}
                           className="px-2 border border-gray-border rounded-md bg-gray-shadow7 text-black flex flex-col items-center"
                         >
-                          {/* Remove material choice button */}
+                          {/* Remove material choice */}
                           <button
                             onClick={() =>
                               handleRemoveMaterial(compIdx, choiceIdx)
@@ -356,7 +383,7 @@ const SelectComponents = ({
                           >
                             X
                           </button>
-                          {/* Material details */}
+
                           <Image
                             src={mat?.imageURL || '/assets/edit-material.png'}
                             alt={mat?.name || 'material image'}
@@ -367,6 +394,7 @@ const SelectComponents = ({
                           <span className="text-sm font-semibold">
                             {mat?.name}
                           </span>
+
                           <span>
                             <em className="text-sm font-bold">Qty:</em>{' '}
                             <input
@@ -382,7 +410,6 @@ const SelectComponents = ({
                               }
                               className="mt-1 w-16 text-center p-1 border rounded"
                             />
-                            {/* find unit of measurement that tallies with the material */}
                             <em className="text-sm font-bold">
                               {
                                 safeMaterials.find((m) => m._id === mc.material)
@@ -391,13 +418,12 @@ const SelectComponents = ({
                             </em>
                           </span>
 
-                          {/* Band prices */}
+                          {/* Band prices — only show when there are alternatives */}
                           {comp.materialChoices.length > 1 && (
                             <div className="mt-2 flex flex-col gap-1 border border-gray-border p-1 rounded-md bg-gray-100 overflow-y-auto max-h-36 scrollbar-thin">
                               <span className="text-xs font-semibold w-full text-center sticky top-[-3%] bg-text-white">
                                 Additional Price for this option:
                               </span>
-
                               {mc.additionalPrice.map((band, bandIdx) => (
                                 <div
                                   key={bandIdx}
@@ -406,6 +432,7 @@ const SelectComponents = ({
                                   <span className="text-xs">{band.band}:</span>
                                   <input
                                     type="number"
+                                    min={0}
                                     value={
                                       isNaN(parseFloat(band.price)) ||
                                       band.price === null ||
@@ -464,7 +491,7 @@ const SelectComponents = ({
                         <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto bg-blue-shadow1 px-2 rounded-b shadow-md mt-1 relative scrollbar-thin my-[-10px]">
                           <button
                             className="text-red-500 text-base font-bold bg-text-white p-2 rounded-full hover:bg-red-100 left-0 top-0 shadow-md sticky"
-                            title="Remove component"
+                            title="Close alternate search"
                             onClick={() => setOpenAltSearch(false)}
                           >
                             X
@@ -492,7 +519,7 @@ const SelectComponents = ({
             </div>
           ))}
 
-          {/* Navigation buttons next and add more components */}
+          {/* Next / Add another */}
           {currentComponentIndex === currentProduct?.components.length - 1 ? (
             <span
               onClick={() =>
@@ -516,7 +543,7 @@ const SelectComponents = ({
         </div>
       )}
 
-      {/* Close dropdown */}
+      {/* Done button */}
       <button
         onClick={closeComponentsDropdown}
         className="mt-4 px-4 py-2 text-brand-blue bg-white hover:bg-blue-shadow8 rounded-lg"

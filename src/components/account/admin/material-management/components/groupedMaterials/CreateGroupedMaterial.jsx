@@ -1,17 +1,21 @@
 import PageDescription from '@/components/account/PageDescription';
 import React from 'react';
 import Header from '@/components/account/Header';
-import SubHeader from '../../../../SubHeader';
+import SubHeader from '../../../SubHeader';
 import MaterialSidebar from '../materialSidebar';
 import CreateGroupedMaterialForm from './CreateGroupedMaterialForm';
 import CreateGroupedMaterialPreview from './CreateGroupedMaterialPreview';
-import { getMaterialCategories, getMaterialUnits, getAllMaterials, createMaterial } from '@/services/materialServices';
+import {
+  getMaterialCategories,
+  getMaterialUnits,
+  getAllMaterials,
+  createMaterial,
+} from '@/services/materialServices';
 import ReviewGroupedMaterial from './ReviewGroupedMaterial';
 import { verifyInputText } from '@/utilities/verifyInput';
 import SuccessModal from '@/components/account/SuccessModal';
 
-const CreateGroupedMaterial = ({pageDescription}) => {
-
+const CreateGroupedMaterial = ({ pageDescription }) => {
   const [formData, setFormData] = React.useState({
     name: '',
     description: '',
@@ -22,7 +26,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
   });
   const [allCategories, setAllCategories] = React.useState([]);
   const [allUnits, setAllUnits] = React.useState([]);
-  const [allMaterials, setAllMaterials] = React.useState([]); 
+  const [allMaterials, setAllMaterials] = React.useState([]);
   const [showReview, setShowReview] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -31,20 +35,18 @@ const CreateGroupedMaterial = ({pageDescription}) => {
 
   const [openSidebar, setOpenSidebar] = React.useState(false);
   const selectedSubMenu = {
-      name: 'Create Grouped Material',
-      link: '/create-grouped-material',
+    name: 'Create Grouped Material',
+    link: '/create-grouped-material',
   };
 
   React.useEffect(() => {
     const fetchMaterialCategories = async () => {
-
       try {
-        const {data} = await getMaterialCategories();
+        const { data } = await getMaterialCategories();
         setAllCategories(data);
       } catch (error) {
         console.error('Error fetching material categories: ', error);
       }
-      
     };
     fetchMaterialCategories();
   }, []);
@@ -52,12 +54,11 @@ const CreateGroupedMaterial = ({pageDescription}) => {
   React.useEffect(() => {
     const fetchMaterialUnits = async () => {
       try {
-        const {data} = await getMaterialUnits();
+        const { data } = await getMaterialUnits();
         setAllUnits(data);
       } catch (error) {
         console.error('Error fetching material units: ', error);
       }
-
     };
     fetchMaterialUnits();
   }, []);
@@ -65,7 +66,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
   React.useEffect(() => {
     const fetchAllMaterials = async () => {
       try {
-        const {data} = await getAllMaterials();
+        const { data } = await getAllMaterials();
         setAllMaterials(data);
       } catch (error) {
         console.error('Error fetching all materials: ', error);
@@ -74,7 +75,7 @@ const CreateGroupedMaterial = ({pageDescription}) => {
     fetchAllMaterials();
   }, []);
 
-  const handleCreateGroupedMaterial = async(e) => { 
+  const handleCreateGroupedMaterial = async (e) => {
     e.preventDefault();
     setError(null);
 
@@ -83,10 +84,10 @@ const CreateGroupedMaterial = ({pageDescription}) => {
       const passed = verifyInputText(input);
       if (!passed.passed) {
         return passed.message;
-      }else {
+      } else {
         return true;
       }
-    }
+    };
 
     for (const field of Object.values(formData)) {
       if (typeof field === 'string') {
@@ -94,20 +95,24 @@ const CreateGroupedMaterial = ({pageDescription}) => {
           setError('Please fill in all fields');
           return;
         }
-        
-        if(passedInputValidation(field) !== true) {
-          setError(`${passedInputValidation(field)} please check ${Object.keys(formData).find(key => formData[key] === field)}`);
-          return;
-        }
-      };
 
-      if (Array.isArray(field)) {
-        if (field.length < 2) {
-          setError('Please select at least two component materials to create a grouped material');
+        if (passedInputValidation(field) !== true) {
+          setError(
+            `${passedInputValidation(field)} please check ${Object.keys(formData).find((key) => formData[key] === field)}`
+          );
           return;
         }
       }
-    };
+
+      if (Array.isArray(field)) {
+        if (field.length < 2) {
+          setError(
+            'Please select at least two component materials to create a grouped material'
+          );
+          return;
+        }
+      }
+    }
 
     const body = {
       name: formData.name,
@@ -120,15 +125,15 @@ const CreateGroupedMaterial = ({pageDescription}) => {
     };
 
     setLoading(true);
-    try{
-      const {data, error} = await createMaterial(body);
+    try {
+      const { data, error } = await createMaterial(body);
 
-      if(error){
+      if (error) {
         setError('An error occurred while creating the grouped material');
         console.error('Error creating grouped material: ', error);
-      };
+      }
 
-      if(data && data.success){
+      if (data && data.success) {
         setShowSuccess(true);
         setFormData({
           name: '',
@@ -140,17 +145,19 @@ const CreateGroupedMaterial = ({pageDescription}) => {
         });
         setShowReview(false);
       }
-    }catch(err){
+    } catch (err) {
       setError('An error occurred while creating the grouped material');
       console.error('Error creating grouped material: ', err);
-    }finally{
+    } finally {
       setLoading(false);
-    };
+    }
   };
 
   const handleDeleteMaterial = (id) => {
-    const newComponents = formData.components.filter((material) => material.id !== id);
-    setFormData({...formData, components: newComponents});
+    const newComponents = formData.components.filter(
+      (material) => material.id !== id
+    );
+    setFormData({ ...formData, components: newComponents });
   };
 
   const handleCloseSuccessModal = () => {
@@ -168,16 +175,16 @@ const CreateGroupedMaterial = ({pageDescription}) => {
       </div>
       <div className="flex flex-row gap-5 w-full h-full">
         <div className="min-w-fit">
-          <MaterialSidebar 
+          <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col w-full h-full gap-5"> 
-          <div className='flex flex-row gap-5 w-full max-h-[80vh] overflow-y-auto scrollbar-thin'>
-            <CreateGroupedMaterialForm 
-              formData={formData} 
+        <div className="flex flex-col w-full h-full gap-5">
+          <div className="flex flex-row gap-5 w-full max-h-[80vh] overflow-y-auto scrollbar-thin">
+            <CreateGroupedMaterialForm
+              formData={formData}
               setFormData={setFormData}
               allCategories={allCategories}
               allUnits={allUnits}
@@ -194,44 +201,40 @@ const CreateGroupedMaterial = ({pageDescription}) => {
               handleDeleteMaterial={handleDeleteMaterial}
             />
           </div>
-          <PageDescription pageDescription={pageDescription}/>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
-      {
-        showReview && (
-          <div className='inset-0 bg-black bg-opacity-70 z-50 fixed w-full h-full flex justify-center items-center'>
-            <ReviewGroupedMaterial 
-              formData={formData}
-              setFormData={setFormData}
-              setShowReview={setShowReview}
-              handleCreateGroupedMaterial={handleCreateGroupedMaterial}
-              handleDeleteMaterial={handleDeleteMaterial}
-              allMaterials={allMaterials}
-              error={error}
-              setError={setError}
-              showSuccess={showSuccess}
-              setShowSuccess={setShowSuccess}
-              loading={loading}
-            />
-          </div>
-        )
-      }
-      {
-        showSuccess && (
-          <div className='inset-0 bg-black bg-opacity-70 z-50 fixed w-full h-full flex justify-center items-center'>
-            <SuccessModal 
-              message={'Grouped material created successfully'} 
-              title={'Success'} 
-              onClose={handleCloseSuccessModal} 
-              subText={`you can now view the grouped material in the materials list`}
-              buttonStyle={'bg-brand-blue'}
-              buttonText={'Close'}
-            />
-          </div>
-        )
-      }
+      {showReview && (
+        <div className="inset-0 bg-black bg-opacity-70 z-50 fixed w-full h-full flex justify-center items-center">
+          <ReviewGroupedMaterial
+            formData={formData}
+            setFormData={setFormData}
+            setShowReview={setShowReview}
+            handleCreateGroupedMaterial={handleCreateGroupedMaterial}
+            handleDeleteMaterial={handleDeleteMaterial}
+            allMaterials={allMaterials}
+            error={error}
+            setError={setError}
+            showSuccess={showSuccess}
+            setShowSuccess={setShowSuccess}
+            loading={loading}
+          />
+        </div>
+      )}
+      {showSuccess && (
+        <div className="inset-0 bg-black bg-opacity-70 z-50 fixed w-full h-full flex justify-center items-center">
+          <SuccessModal
+            message={'Grouped material created successfully'}
+            title={'Success'}
+            onClose={handleCloseSuccessModal}
+            subText={`you can now view the grouped material in the materials list`}
+            buttonStyle={'bg-brand-blue'}
+            buttonText={'Close'}
+          />
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default CreateGroupedMaterial
+export default CreateGroupedMaterial;

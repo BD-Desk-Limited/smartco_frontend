@@ -32,3 +32,19 @@
 .scrollbar-thin {
   scrollbar-width: thin;
 }
+
+:root {
+  --color-theme: #739400;
+  --color-background: #739400;
+  --color-surface: #8aaf00;
+}
+
+:root[data-account='admin'] {
+  --color-theme: #1a3c6e;
+  --color-background: #0f2444;
+  --color-surface: #2a5298;
+}
+
+body {
+  background-color: var(--color-background);
+}

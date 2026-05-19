@@ -2,8 +2,10 @@
 import React, { useReducer, useEffect, useRef } from 'react';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getPendingTransactionsCount } from './account/seller/sales-point/payment/transactionSyncManager';
 
 const OfflineNotifier = () => {
+  const [offlineSyncCount, setOfflineSyncCount] = React.useState(0);
   const { internetStatus } = useInternetStatus();
   const initialState = {
     showNotification: false,
@@ -32,6 +34,14 @@ const OfflineNotifier = () => {
         };
       case 'COLLAPSE':
         return { ...state, collapsed: true };
+      case 'ONLINE_COLLAPSE':
+        return {
+          ...state,
+          collapsed: true,
+          justWentOnline: false,
+          notificationType: 'online',
+          showNotification: true,
+        };
       case 'EXPAND':
         return { ...state, collapsed: false };
       case 'CLOSE':
@@ -58,16 +68,50 @@ const OfflineNotifier = () => {
     }
   }, [internetStatus]);
 
-  // Auto-close online notification after 3s
+  // Update pending transaction count in near real-time.
+  useEffect(() => {
+    let isMounted = true;
+    const updatePendingCount = async () => {
+      const count = await getPendingTransactionsCount();
+      if (isMounted) {
+        setOfflineSyncCount(count || 0);
+      }
+    };
+
+    // Initial fetch for immediate UI update.
+    updatePendingCount();
+
+    // Poll for count changes so queued transactions are visible even while online.
+    const intervalId = setInterval(updatePendingCount, 1500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  // While online, show a non-intrusive collapsed notifier whenever there are pending transactions.
+  useEffect(() => {
+    if (internetStatus === 'online' && offlineSyncCount > 0) {
+      dispatch({ type: 'ONLINE_COLLAPSE' });
+    }
+  }, [internetStatus, offlineSyncCount]);
+
+  // Auto-close online notification after all pending transactions are synced.
   useEffect(() => {
     let timer;
+    const pendingTransactionsCount = async () => getPendingTransactionsCount();
     if (state.notificationType === 'online' && state.showNotification) {
       timer = setTimeout(() => {
-        dispatch({ type: 'CLOSE' });
-      }, 3000);
+        pendingTransactionsCount().then((count) => {
+          if (count === 0) {
+            dispatch({ type: 'CLOSE' });
+          }
+        });
+      }, 10000);
     }
     return () => clearTimeout(timer);
-  }, [state.notificationType, state.showNotification]);
+  }, [state.notificationType, state.showNotification, offlineSyncCount]);
 
   // If collapsed, show a floating round icon at top-left
   // Draggable collapsed icon state
@@ -118,11 +162,25 @@ const OfflineNotifier = () => {
     if (!state.collapsed) setIconPosition({ x: 16, y: 16 });
   }, [state.collapsed]);
 
-  if (state.collapsed && state.notificationType === 'offline') {
+  {
+    /* minimize event listeners when notification is collapsed to improve performance and prevent unintended behavior */
+  }
+  const shouldShowCollapsedNotifier =
+    state.collapsed &&
+    (state.notificationType === 'offline' ||
+      (state.notificationType === 'online' && offlineSyncCount > 0));
+
+  if (shouldShowCollapsedNotifier) {
+    const isOfflineCollapsed = state.notificationType === 'offline';
+
     return (
       <button
         ref={iconRef}
-        className="fixed z-50 bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors cursor-move"
+        className={`fixed z-50 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-colors cursor-move ${
+          isOfflineCollapsed
+            ? 'bg-red-500 hover:bg-red-600'
+            : 'bg-green-500 hover:bg-green-600 border-2 border-yellow-400 shadow-lg'
+        }`}
         onClick={() => dispatch({ type: 'EXPAND' })}
         aria-label="Expand offline notification"
         style={{
@@ -134,19 +192,25 @@ const OfflineNotifier = () => {
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
-        <svg
-          className="w-7 h-7"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"
-          />
-        </svg>
+        {isOfflineCollapsed ? (
+          <svg
+            className="w-7 h-7"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"
+            />
+          </svg>
+        ) : (
+          <span className="font-serif text-2xl leading-none">
+            {offlineSyncCount}
+          </span>
+        )}
       </button>
     );
   }
@@ -198,23 +262,35 @@ const OfflineNotifier = () => {
                 </svg>
               )}
 
-              {/* Message */}
-              <div>
-                <p className="font-semibold">
-                  {state.notificationType === 'offline'
-                    ? 'You are offline'
-                    : 'Back online'}
-                </p>
-                <p className="text-sm opacity-90">
-                  {state.notificationType === 'offline'
-                    ? 'Your changes will be saved locally and synced when reconnected'
-                    : 'Connection restored. Syncing data...'}
-                </p>
+              {/* Message Display */}
+              <div className="flex flex-row items-center justify-between w-full gap-5">
+                <div>
+                  <p className="font-semibold">
+                    {state.notificationType === 'offline'
+                      ? 'You are offline'
+                      : 'Online... '}
+                  </p>
+                  <p className="text-sm opacity-90">
+                    {state.notificationType === 'offline'
+                      ? 'Your changes will be saved locally and synced when reconnected'
+                      : offlineSyncCount > 0
+                        ? 'You are online, but some transactions are still pending sync'
+                        : 'Connection restored. Syncing data...'}
+                  </p>
+                </div>
+                <hr />
+                <div className="">
+                  <p className="text-sm opacity-90 flex items-center gap-2">
+                    <span>Pending transactions to sync:</span>
+                    <strong className="font-bold text-yellow-200 text-lg">{` ${offlineSyncCount}`}</strong>
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Collapse button for offline notification */}
-            {state.notificationType === 'offline' && (
+            {/* Collapse button for notification */}
+            {(state.notificationType === 'offline' ||
+              state.notificationType === 'online') && (
               <button
                 onClick={() => dispatch({ type: 'COLLAPSE' })}
                 className="p-1 hover:bg-white/20 rounded-full transition-colors ml-2"
