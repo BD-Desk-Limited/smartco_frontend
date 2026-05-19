@@ -280,20 +280,22 @@ const ViewProductDetails = ({
                       </span>
                     </span>
                     <span
-                      className={`text-sm ${productData?.isDisabled ? 'bg-error' : 'bg-success text-text-white'} rounded-full p-1 items-center justify-center flex`}
+                      className={`text-sm ${productData?.isDisabled ? 'bg-error text-text-white' : 'bg-success text-text-white'} rounded-full py-1 px-2 items-center justify-center flex shadow-lg`}
                     >
-                      {productData?.isDisabled ? 'Inactive' : 'Active'}
+                      {productData?.isDisabled ? 'Deactivated' : 'Active'}
                     </span>
                   </h3>
 
                   {/*number of active branches */}
-                  <span className="text-sm text-brand-blue">
-                    Available for sale in{' '}
-                    {branchesWithAvailability?.length || 0}{' '}
-                    {branchesWithAvailability?.length === 1
-                      ? 'branch'
-                      : 'branches'}
-                  </span>
+                  {!productData?.isDisabled && (
+                    <span className="text-sm text-brand-blue">
+                      Available for sale in{' '}
+                      {branchesWithAvailability?.length || 0}{' '}
+                      {branchesWithAvailability?.length === 1
+                        ? 'branch'
+                        : 'branches'}
+                    </span>
+                  )}
 
                   {/* Action Buttons */}
                   <ul className="flex flex-row gap-3 mx-5">
@@ -364,6 +366,7 @@ const ViewProductDetails = ({
                       setOpenUpdateProductAvailabilityModal={
                         setOpenUpdateProductAvailabilityModal
                       }
+                      productIsDisabled={productData?.isDisabled}
                     />
                   </div>
                 </div>

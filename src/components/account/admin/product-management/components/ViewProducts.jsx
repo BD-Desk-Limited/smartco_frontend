@@ -16,6 +16,7 @@ import {
   enableOrDisableProductService,
 } from '@/services/productsServices';
 import { getAllProductsByCompanyIdService } from '@/services/productsServices';
+import { FaFileExport, FaFilter, FaPlus, FaSearch } from 'react-icons/fa';
 
 const ViewProducts = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -313,12 +314,7 @@ const ViewProducts = ({ pageDescription }) => {
             {/* search bar and filters */}
             <div className="flex flex-row gap-5 w-full justify-between items-center">
               <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
-                <Image
-                  src="/assets/search.png"
-                  alt="search"
-                  width={15}
-                  height={15}
-                />
+                <FaSearch className="text-text-gray" />
                 <input
                   type="text"
                   placeholder="Search product name or category ..."
@@ -329,12 +325,7 @@ const ViewProducts = ({ pageDescription }) => {
               </div>
               <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
                 <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
-                  <Image
-                    src="/assets/filter.png"
-                    alt="sort"
-                    width={15}
-                    height={15}
-                  />
+                  <FaFilter className="" />
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -365,12 +356,7 @@ const ViewProducts = ({ pageDescription }) => {
                     href="/pages/account/admin/product-management/create-new-product"
                     className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
                   >
-                    <Image
-                      src="/assets/add.png"
-                      alt="add"
-                      width={15}
-                      height={15}
-                    />
+                    <FaPlus className="text-white" />
                     <span className="">create new product</span>
                   </Link>
                 </button>
@@ -378,12 +364,7 @@ const ViewProducts = ({ pageDescription }) => {
                   className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center text-text-gray gap-1"
                   onClick={() => setExportContent(true)}
                 >
-                  <Image
-                    src={'/assets/export.png'}
-                    alt="export"
-                    width={15}
-                    height={15}
-                  />
+                  <FaFileExport className="" />
                   <span className="">Export</span>
                 </button>
               </div>
@@ -456,13 +437,13 @@ const ViewProducts = ({ pageDescription }) => {
                               {product?.name || '-'}
                             </span>
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
+                          <td className={`px-2 py-2 text-left w-1/6`}>
                             {product?._id || '-'}
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
+                          <td className={`px-2 py-2 text-left w-1/6`}>
                             {product?.category?.name || '-'}
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
+                          <td className={`px-2 py-2 text-left w-1/6`}>
                             Available in
                             <span className="font-semibold">
                               {` ${product?.availability || 0}`}

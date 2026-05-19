@@ -15,9 +15,9 @@ import {
   FaUserAltSlash,
   FaShoppingBag,
   FaBoxes,
-  FaWindows,
   FaChevronRight,
   FaChevronLeft,
+  FaHome,
 } from 'react-icons/fa';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
@@ -28,8 +28,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const menuList = [
     {
       name: 'dashboard',
-      icon: <FaWindows className="text-text-white" />,
-      iconActive: <FaWindows className="text-brand-blue" />,
+      icon: <FaHome className="text-text-white" />,
+      iconActive: <FaHome className="text-brand-blue" />,
       link: '/',
       label: 'Dashboard',
       requiredAccess: null,
@@ -51,11 +51,11 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       icon: <FaShoppingBag className="text-text-white" />,
       iconActive: <FaShoppingBag className="text-brand-blue" />,
       link: '/product-management',
-      label: 'Product Management',
+      label: 'My Products',
       requiredAccess: 'Product_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    } /*
     {
       name: 'purchases',
       icon: <FaShoppingCart className="text-text-white" />,
@@ -65,7 +65,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Purchases',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    },*/,
     {
       name: 'materials-management',
       icon: <FaBoxes className="text-text-white" />,
@@ -75,7 +75,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Materials_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    } /*
     {
       name: 'reports',
       icon: <FaChartBar className="text-text-white" />,
@@ -85,7 +85,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Reports',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    },*/,
     {
       name: 'users-management',
       icon: <FaUsers className="text-text-white" />,
@@ -96,7 +96,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
-    {
+    /*{
+      
       name: 'my-team',
       icon: <FaUserAltSlash className="text-text-white" />,
       iconActive: <FaUserAltSlash className="text-brand-blue" />,
@@ -105,8 +106,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Team_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: true,
-    },
-    {
+    
+    } {
       name: 'my-customers',
       icon: <FaAddressBook className="text-text-white" />,
       iconActive: <FaAddressBook className="text-brand-blue" />,
@@ -115,7 +116,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Customer_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    
+    },*/
     {
       name: 'tax-management',
       icon: <FaPercent className="text-text-white" />,
@@ -124,8 +126,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       label: 'Tax Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    } /*
     {
+      
       name: 'settings',
       icon: <FaCog className="text-text-white" />,
       iconActive: <FaCog className="text-brand-blue" />,
@@ -133,7 +136,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       label: 'Settings',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },
+    
+    },*/,
   ];
 
   React.useEffect(() => {

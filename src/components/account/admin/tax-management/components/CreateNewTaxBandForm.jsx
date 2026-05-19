@@ -129,7 +129,6 @@ const CreateNewTaxBandForm = ({
       setLoading(false);
     }
   };
-  console.log('stand', standAloneTaxManagement);
 
   return (
     <div className="w-[80vw] h-[80vh] relative bg-white rounded-lg shadow-lg flex flex-col p-5 items-center">
