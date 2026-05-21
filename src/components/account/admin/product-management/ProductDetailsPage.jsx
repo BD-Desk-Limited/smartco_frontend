@@ -14,6 +14,7 @@ const ProductDetailsPage = () => {
   const router = useRouter();
   const [productData, setProductData] = React.useState({});
   const [branches, setBranches] = React.useState([]);
+  const [errorMessage, setErrorMessage] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
   const [selectedMenu, setSelectedMenu] = React.useState('my-products');
@@ -25,13 +26,18 @@ const ProductDetailsPage = () => {
     if (id) {
       setLoading(true);
       const fetchProductData = async () => {
-        const response = await getProductByIdService(id);
-        if (response.data) {
-          setProductData(response.data);
-        }
-        if (response.error) {
+        try {
+          const response = await getProductByIdService(id);
+          if (response.data) {
+            setProductData(response.data);
+          }
+          if (response.error) {
+            setErrorMessage(
+              'Error fetching product detail. Please try again later'
+            );
+          }
+        } catch (error) {
           console.error('Error fetching product data:', response.error);
-          router.push('/pages/account/admin/product-management');
         }
       };
       fetchProductData();
@@ -77,23 +83,39 @@ const ProductDetailsPage = () => {
   }
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
-      <div className="h-full">
-        <AdminSideBar
-          selectedMenu={selectedMenu}
-          setSelectedMenu={setSelectedMenu}
-        />
+    <>
+      <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
+        <div className="h-full">
+          <AdminSideBar
+            selectedMenu={selectedMenu}
+            setSelectedMenu={setSelectedMenu}
+          />
+        </div>
+        {errorMessage ? (
+          <div className="w-full h-full flex flex-col justify-center items-center">
+            <p className="text-error font-semibold">{errorMessage}</p>{' '}
+            <button
+              onClick={() =>
+                router.push('/pages/account/admin/product-management')
+              }
+              className="p-2 rounded-md text-white bg-brand-blue"
+            >
+              Back
+            </button>
+          </div>
+        ) : (
+          <div className="w-full h-full overflow-y-auto no-scrollbar">
+            <ViewProductDetails
+              pageDescription={pageDescription}
+              productData={productData}
+              setProductData={setProductData}
+              branches={branches}
+              setBranches={setBranches}
+            />
+          </div>
+        )}
       </div>
-      <div className="w-full h-full overflow-y-auto no-scrollbar">
-        <ViewProductDetails
-          pageDescription={pageDescription}
-          productData={productData}
-          setProductData={setProductData}
-          branches={branches}
-          setBranches={setBranches}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 
