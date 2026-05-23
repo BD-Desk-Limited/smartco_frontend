@@ -1,13 +1,31 @@
 import Header from '@/components/account/Header';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SubHeader from '../../SubHeader';
 import SideBar from '../../SideBar';
 import { TAX_MANAGEMENT_SUB_MENUS } from './TaxManagementSideBarItems';
 import PageDescription from '@/components/account/PageDescription';
 import { useAuth } from '@/contexts/authContext';
-import { FaFileExport, FaSearch } from 'react-icons/fa';
+import {
+  FaEdit,
+  FaFileExport,
+  FaPlus,
+  FaSearch,
+  FaTrash,
+} from 'react-icons/fa';
 import ExportContent from '@/components/account/ExportContent';
 import Spinner from '@/components/account/Spinner';
+import {
+  deleteTaxBandById,
+  getAllTaxBandDetailsByCompanyId,
+  getAllTaxBandsByCompanyId,
+} from '@/services/branchServices';
+import Image from 'next/image';
+import { ISOStringToLocalTime } from '@/utilities/formatTime';
+import Link from 'next/link';
+import WarningModal from '@/components/account/WarningModal';
+import DeleteModal from '@/components/account/DeleteModal';
+import TaxBandDetails from './TaxBandDetails';
+import SuccessModal from '@/components/account/SuccessModal';
 
 const TaxManagement = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
@@ -16,11 +34,107 @@ const TaxManagement = ({ pageDescription }) => {
   const [searchterm, setSearchterm] = useState('');
   const [exportContent, setExportContent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedBand, setSelectedBand] = useState(null);
+  const [bandToDelete, setBandToDelete] = useState(null);
   const [taxBands, setTaxBands] = useState([]);
   const [filteredTaxBands, setFilteredTaxBands] = useState([]);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [deleteErrors, setDeleteErrors] = useState([]);
+
+  useEffect(() => {
+    const fetchTaxBands = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllTaxBandDetailsByCompanyId();
+        if (response && response.data) {
+          setTaxBands(response.data);
+        } else {
+          console.error('Error fetching taxbands', response?.error);
+        }
+      } catch (err) {
+        console.error('Error fetching taxband data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTaxBands();
+  }, []);
+  console.log('Taxbands:', taxBands);
+  console.log('selectedBand:', selectedBand);
+
+  //filter
+  useEffect(() => {
+    const filter = (t) => {
+      return (
+        t.name?.includes(searchterm) ||
+        t.associatedBranches?.some((b) => b.name?.includes(searchterm))
+      );
+    };
+
+    const filtered = (taxBands || []).filter((t) => filter(t));
+    setFilteredTaxBands(filtered);
+  }, [taxBands, searchterm]);
+
+  const handleDeleteTaxBandClick = (e, band) => {
+    e.stopPropagation();
+    if (band?.associatedBranches?.length > 0) {
+      setModalMessage(
+        `You cannot delete "${band?.name || 'this tax band'}" because it is assigned to one or more branches. Please disassociate the branches before deleting this tax band.`
+      );
+      setShowConfirmationModal(true);
+      return;
+    }
+
+    setBandToDelete(band);
+    setShowDeleteModal(true);
+    setModalMessage(
+      `Are you sure you want to delete "${band?.name || 'this tax band'}"? This action cannot be undone.`
+    ); // Set the confirmation message
+  };
+
+  const handleDeleteTaxBandConfirm = async () => {
+    try {
+      setLoading(true);
+      const response = await deleteTaxBandById(bandToDelete._id);
+      if (response && response.data) {
+        setSuccess(true);
+        // Refresh tax bands list
+        const updatedTaxBands = taxBands?.filter(
+          (band) => band._id !== response?.data._id
+        );
+        setTaxBands(updatedTaxBands);
+        setShowDeleteModal(false);
+        setBandToDelete(null);
+      } else {
+        console.error('Error deleting tax band:', response?.error);
+        setDeleteErrors(['Failed to delete tax band. Please try again.']);
+      }
+    } catch (error) {
+      console.error('Error deleting tax band:', error);
+      setDeleteErrors([
+        'An error occurred while deleting the tax band. Please try again.',
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenExportContent = () => {
+    filteredTaxBands?.length > 0 && setExportContent(true);
+  };
 
   const handleCloseAllModals = () => {
     setExportContent(false);
+    setShowConfirmationModal(false);
+    setShowDeleteModal(false);
+    setSelectedBand(null);
+    setBandToDelete(null);
+    setModalMessage('');
+    setSuccess(false);
   };
 
   return (
@@ -56,7 +170,7 @@ const TaxManagement = ({ pageDescription }) => {
               </div>
               <button
                 className="h-8 py-1 px-2 border border-gray-border rounded-md flex flex-row items-center text-text-gray gap-1"
-                onClick={() => setExportContent(true)}
+                onClick={() => handleOpenExportContent()}
               >
                 <FaFileExport />
                 <span className="text-sm">Export</span>
@@ -71,133 +185,65 @@ const TaxManagement = ({ pageDescription }) => {
                 <table className="w-full table-auto relative">
                   <thead className="bg-background-1 sticky top-[-1px] z-10">
                     <tr className="text-left text-text-gray text-sm font-medium border border-gray-border">
-                      <th className="px-2 py-2 border border-gray-border text-center">
+                      <th className="px-2 py-2 border border-gray-border text-left">
                         TAX PROFILE NAME
                       </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
+                      <th className="px-2 py-2 text-left border border-gray-border">
                         TAX BAND RATE
                       </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
+                      <th className="px-2 py-2 text-left border border-gray-border">
                         EFFECTIVE DATE
                       </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        ASSOCIATED BRANCHES
+                      <th className="px-2 py-2 text-left border border-gray-border">
+                        ASSIGNED BRANCHES
                       </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Actions
-                      </th>
+                      <th className="px-2 py-2 text-left border border-gray-border"></th>
                     </tr>
                   </thead>
 
-                  {/*<tbody className="text-sm text-text-gray min-h-[40vh] w-full">
+                  <tbody className="text-sm text-text-gray min-h-[40vh] w-full">
                     {filteredTaxBands?.length > 0 ? (
                       filteredTaxBands?.map((band) => (
                         <tr
                           key={band._id}
+                          onClick={() => setSelectedBand(band)}
                           className={`border-b border-gray-border hover:bg-gray-shadow10 hover:text-text-black cursor-pointer items-center w-full`}
-                          onClick={()=>console.log(band._id)}
                         >
                           <td
-                            className={`px-2 py-2 text-left flex items-center gap-2`}
+                            className={`px-2 py-1 text-left flex items-left gap-2`}
                           >
-                            <input
-                              type="checkbox"
-                              value={band._id}
-                              checked={selectedProduct.includes(band._id)}
-                              onClick={(e) => e.stopPropagation()} // Stop event propagation
-                              onChange={(e) => {
-                                e.stopPropagation(); // Stop event propagation
-                                handleSelectProduct(e.target.value);
-                              }}
-                              className="cursor-pointer mr-5"
-                            />
-
-                            <Image
-                              src={
-                                band?.imageURL || '/assets/shopping-bag.png'
-                              }
-                              alt={band?.name || 'Product Image'}
-                              width={30}
-                              height={30}
-                              className="object-cover"
-                            />
                             <span
                               className={`px-2 py-2 text-center font-semibold`}
                             >
                               {band?.name || '-'}
                             </span>
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
-                            {band?._id || '-'}
+                          <td className={`px-2 py-1 text-left w-32`}>
+                            {`${band?.effectiveRate?.rate?.toFixed(2)}%` ||
+                              'rate not set'}
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
-                            {band?.category?.name || '-'}
+                          <td className={`px-2 py-1 text-left w-1/5`}>
+                            {ISOStringToLocalTime(
+                              band?.effectiveRate?.effectiveDate
+                            ) || 'effective date not set'}
                           </td>
-                          <td className={`px-2 py-2 text-center w-1/6`}>
-                            Available in
-                            <span className="font-semibold">
-                              {` ${band?.availability || 0}`}
-                            </span>
-                            {band?.availability > 1
-                              ? ' branches'
-                              : ' branch'}
+                          <td className={`px-2 py-1 text-left w-1/5`}>
+                            {band?.associatedBranches?.length || 0}{' '}
+                            {band?.associatedBranches?.length > 1
+                              ? 'branches'
+                              : 'branch'}
                           </td>
 
-                          
-                          <td className={`px-2 py-2 text-center w-1/6`}>
+                          {/* action buttons */}
+                          <td className={`px-2 py-1 text-left w-1/8`}>
                             <span className="flex flex-row items-center gap-2 justify-around">
-                              <button>
-                                <Image
-                                  src="/assets/edit.png"
-                                  alt="edit"
-                                  width={15}
-                                  height={15}
-                                  className="cursor-pointer"
-                                  title="Edit Product"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Stop event propagation
-                                    Router.push(
-                                      `/pages/account/admin/band-management/edit-band?id=${band._id}`
-                                    );
-                                  }}
-                                />
-                              </button>
-                              <button className="">
-                                <Image
-                                  src={
-                                    band.isDisabled !== true
-                                      ? '/assets/switch_active.png'
-                                      : '/assets/switch_inactive.png'
-                                  }
-                                  alt="delete"
-                                  width={20}
-                                  height={20}
-                                  title={
-                                    band.isDisabled
-                                      ? 'Enable Product'
-                                      : 'Disable Product'
-                                  }
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleOpenEnableOrDisableModal(e, [
-                                      band._id,
-                                    ]);
-                                  }}
-                                  className="cursor-pointer"
-                                />
-                              </button>
-                              <button className="">
-                                <Image
-                                  src="/assets/delete.png"
-                                  alt="delete"
-                                  width={15}
-                                  height={15}
-                                  title="Delete Product"
-                                  onClick={(e) =>
-                                    handleOpenDeleteModal(e, [band._id])
-                                  }
-                                  className="cursor-pointer"
-                                />
+                              <button
+                                onClick={(e) => {
+                                  handleDeleteTaxBandClick(e, band);
+                                }}
+                                className=""
+                              >
+                                <FaTrash className="cursor-pointer hover:text-error-hover" />
                               </button>
                             </span>
                           </td>
@@ -205,26 +251,23 @@ const TaxManagement = ({ pageDescription }) => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="text-center py-32">
-                          <div className="flex flex-col w-full justify-center items-center gap-4">
-                            <span className="text-lg">No products found</span>
-                            <Link
-                              href="/pages/account/admin/band-management/create-new-band"
-                              className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
-                            >
-                              <Image
-                                src="/assets/add.png"
-                                alt="add"
-                                width={15}
-                                height={15}
-                              />
-                              <span>start by creating a band</span>
-                            </Link>
-                          </div>
-                        </td>
+                        {
+                          <td colSpan={5} className="text-center py-32">
+                            <div className="flex flex-col w-full justify-center items-center gap-4">
+                              <span className="text-lg">No tax band found</span>
+                              <Link
+                                href="/pages/account/admin/tax-management/create-tax-band"
+                                className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
+                              >
+                                <FaPlus />
+                                <span>Create a tax band</span>
+                              </Link>
+                            </div>
+                          </td>
+                        }
                       </tr>
                     )}
-                  </tbody>*/}
+                  </tbody>
                 </table>
               </div>
             )}
@@ -235,6 +278,58 @@ const TaxManagement = ({ pageDescription }) => {
         </div>
       </div>
 
+      {/* Tax band details */}
+      {selectedBand && (
+        <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
+          <TaxBandDetails band={selectedBand} onClose={handleCloseAllModals} />
+        </div>
+      )}
+
+      {/*delete band with associated branches warning Modal */}
+      {showConfirmationModal && (
+        <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
+          <WarningModal
+            title={'Cannot delete tax band'}
+            button1Text={'OK'}
+            button1Style={`bg-yellow-500 hover:bg-yellow-400`}
+            message={modalMessage}
+            onClick={() => setShowConfirmationModal(false)}
+          />
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && bandToDelete && (
+        <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
+          <DeleteModal
+            message={modalMessage}
+            title={'Delete Tax Band'}
+            buttonStyle={`bg-red-500 hover:bg-red-400`}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={() => {
+              handleDeleteTaxBandConfirm();
+            }}
+            button2Style={`bg-gray-500 hover:bg-gray-400`}
+            deleteErrors={deleteErrors}
+            loading={loading}
+          />
+        </div>
+      )}
+
+      {/* Success Message Modal */}
+      {success && (
+        <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
+          <SuccessModal
+            message={'Tax band deleted successfully.'}
+            title={'Success'}
+            buttonStyle={`bg-green-500 hover:bg-green-400`}
+            onClose={() => handleCloseAllModals()}
+            subText={'The tax band has been deleted successfully.'}
+            buttonText={'OK'}
+          />
+        </div>
+      )}
+
       {/* Export Content Modal */}
       {exportContent && filteredTaxBands.length > 0 && (
         <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
@@ -242,12 +337,20 @@ const TaxManagement = ({ pageDescription }) => {
             metadata={{
               Date: [new Date().toLocaleDateString()],
               Time: [new Date().toLocaleTimeString()],
+              'Showing results for': searchterm ? [`"${searchterm}"`] : ['All'],
             }}
             data={filteredTaxBands.map((band, index) => {
               return {
                 'S/No': index + 1,
                 Name: band?.name,
-                'Profile ID': band?._id,
+                'Tax Band Rate':
+                  `${band?.effectiveRate?.rate?.toFixed(2)}%` || '-',
+                'Effective Date':
+                  ISOStringToLocalTime(band?.effectiveRate?.effectiveDate) ||
+                  '-',
+                'Assigned Branches': band?.associatedBranches
+                  ?.map((b) => b.name)
+                  .join(', '),
               };
             })}
             onClose={() => setExportContent(false)}

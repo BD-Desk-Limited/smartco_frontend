@@ -45,14 +45,12 @@ const AdminDashboardPage = () => {
             <AdminDashboard />
           </div>
         </div>
-      ) : setupComplete === false ? (
+      ) : (
         <SetUps
           setupProgress={setupProgress}
           loading={loading}
           isSetUpAdmin={isSetUpAdmin}
         />
-      ) : (
-        <Spinner />
       )}
     </>
   );
