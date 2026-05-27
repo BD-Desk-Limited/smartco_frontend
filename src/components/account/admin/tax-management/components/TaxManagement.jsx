@@ -63,8 +63,6 @@ const TaxManagement = ({ pageDescription }) => {
 
     fetchTaxBands();
   }, []);
-  console.log('Taxbands:', taxBands);
-  console.log('selectedBand:', selectedBand);
 
   //filter
   useEffect(() => {
@@ -121,6 +119,11 @@ const TaxManagement = ({ pageDescription }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditTaxBandClick = (e, band) => {
+    e.stopPropagation();
+    // TODO: implement edit tax band functionality
   };
 
   const handleOpenExportContent = () => {
@@ -235,7 +238,19 @@ const TaxManagement = ({ pageDescription }) => {
                           </td>
 
                           {/* action buttons */}
-                          <td className={`px-2 py-1 text-left w-1/8`}>
+                          <td
+                            className={`px-2 py-1 text-left w-1/8 flex flex-row items-center justify-center gap-5`}
+                          >
+                            <span className="flex flex-row items-center gap-2 justify-around">
+                              <button
+                                onClick={(e) => {
+                                  handleEditTaxBandClick(e, band);
+                                }}
+                                className=""
+                              >
+                                <FaEdit className="cursor-pointer hover:text-error-hover" />
+                              </button>
+                            </span>
                             <span className="flex flex-row items-center gap-2 justify-around">
                               <button
                                 onClick={(e) => {
