@@ -296,7 +296,13 @@ const TaxManagement = ({ pageDescription }) => {
       {/* Tax band details */}
       {selectedBand && (
         <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
-          <TaxBandDetails band={selectedBand} onClose={handleCloseAllModals} />
+          <TaxBandDetails
+            band={selectedBand}
+            onClose={handleCloseAllModals}
+            otherTaxBands={taxBands?.filter(
+              (tb) => tb._id !== selectedBand._id
+            )}
+          />
         </div>
       )}
 

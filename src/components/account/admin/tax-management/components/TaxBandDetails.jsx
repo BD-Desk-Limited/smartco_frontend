@@ -1,8 +1,14 @@
 import React from 'react';
 import { FaExchangeAlt, FaStar, FaTimes, FaTrash } from 'react-icons/fa';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
+import Button from '@/components/account/Button';
 
-const TaxBandDetails = ({ band, effectiveRate, onClose }) => {
+const TaxBandDetails = ({ band, effectiveRate, onClose, otherTaxBands }) => {
+  const [openDissociateBranchModal, setOpenDissociateBranchModal] =
+    React.useState(false);
+  const [branchToDissociate, setBranchToDissociate] = React.useState(null);
+  const [newTaxBandId, setNewTaxBandId] = React.useState('');
+
   const handleDeleteTaxRateEntry = () => {
     // TODO: implement delete tax rate entry functionality
     if (band?.historicalRates?.length < 2) {
@@ -14,9 +20,27 @@ const TaxBandDetails = ({ band, effectiveRate, onClose }) => {
     alert('tax entry deleted successfully');
   };
 
+  const onDissociateBranchFromTaxBand = (branch) => {
+    setOpenDissociateBranchModal(true);
+    setBranchToDissociate(branch);
+  };
+
+  const onCloseDissociateBranchModal = () => {
+    setOpenDissociateBranchModal(false);
+    setBranchToDissociate(null);
+    setNewTaxBandId('');
+  };
+
   const handleDissociateBranchFromTaxBand = () => {
     // TODO: implement dissociate branch from tax band functionality
     alert('branch dissociated from tax band successfully');
+  };
+
+  const handleSelectNewTaxBand = (newTaxBandId) => {
+    const selectedBand = otherTaxBands?.find((tb) => tb._id === newTaxBandId);
+    if (selectedBand) {
+      setNewTaxBandId(selectedBand._id);
+    }
   };
 
   return (
@@ -100,7 +124,7 @@ const TaxBandDetails = ({ band, effectiveRate, onClose }) => {
                   {`-`}
                   <span>{branch.branchId}</span>
                   <span
-                    onClick={handleDissociateBranchFromTaxBand}
+                    onClick={() => onDissociateBranchFromTaxBand(branch)}
                     title="disassociate branch from this tax band"
                   >
                     <FaExchangeAlt className="text-red-500 hover:border shadow-md text-sm cursor-pointer" />
@@ -115,6 +139,86 @@ const TaxBandDetails = ({ band, effectiveRate, onClose }) => {
           )}
         </div>
       </div>
+
+      {/* Dissociate branch and assign new tax band */}
+      {openDissociateBranchModal && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-3 min-h-[50vh] w-[600px]">
+          <div className="bg-white rounded-lg w-[400px] p-5 relative">
+            {/* close button */}
+            <button
+              onClick={onCloseDissociateBranchModal}
+              className="absolute top-2 right-2 bg-gray-shadow5 text-gray-shadow10 rounded-full p-2 transition-colors duration-200 hover:bg-gray-shadow2"
+            >
+              <FaTimes />
+            </button>
+            <h3 className="text-brand-blue w-full text-center font-bold mb-4">
+              Assign New Tax Band
+            </h3>
+            {otherTaxBands?.length > 0 && (
+              <p className="text-center text-text-gray mb-5">
+                You are about to dissociate{' '}
+                <span className="font-semibold">
+                  {branchToDissociate?.name || 'this branch'}
+                </span>{' '}
+                from{' '}
+                <span className="font-semibold">
+                  {band.name || 'its current tax band'}
+                </span>
+                . Please select a new tax band to assign to this branch.
+              </p>
+            )}
+            {otherTaxBands?.length > 0 ? (
+              <div className="w-full flex flex-col gap-3 items-center">
+                <label
+                  htmlFor="taxBandSelect"
+                  className="font-semibold text-sm"
+                >
+                  Select New Tax Band
+                </label>
+                <select
+                  id="taxBandSelect"
+                  className="border border-gray-border rounded-md p-2"
+                  defaultValue={band._id}
+                  value={newTaxBandId || ''}
+                  onChange={(e) => handleSelectNewTaxBand(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Select a tax band
+                  </option>
+                  {otherTaxBands?.map((tb) => (
+                    <option key={tb._id} value={tb._id}>
+                      {tb.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={handleDissociateBranchFromTaxBand}
+                  disabled={!newTaxBandId}
+                  className={`bg-brand-blue text-white py-2 px-4 rounded-md hover:bg-blue-shadow1 transition-colors duration-200 ${!newTaxBandId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  Confirm
+                </button>
+              </div>
+            ) : (
+              <p className="text-center text-error flex flex-col gap-5 items-center">
+                <span className=" my-10">
+                  No other tax bands are available. Please create another tax
+                  band before dissociating this branch.
+                </span>
+                <button
+                  onClick={() => {
+                    setOpenDissociateBranchModal(false);
+                  }}
+                  className="bg-brand-blue text-white py-2 px-4 rounded-md hover:bg-blue-shadow1 transition-colors duration-200"
+                >
+                  ok
+                </button>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
