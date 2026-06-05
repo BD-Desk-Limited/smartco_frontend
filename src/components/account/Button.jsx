@@ -16,7 +16,7 @@ const Button = ({
       disabled={loading}
       className={`h-10 rounded-md text-md text-white px-2 ${
         loading ? 'cursor-not-allowed' : 'hover:bg-blue-shadow1'
-      } items-center justify-center ${buttonStyle} shadow-md bg-brand-blue flex items-center justify-center`}
+      } items-center justify-center bg-brand-blue ${buttonStyle} shadow-md flex items-center justify-center`}
     >
       {loading ? (
         <>

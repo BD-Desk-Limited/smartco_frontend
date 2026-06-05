@@ -17,20 +17,17 @@ import Spinner from '@/components/account/Spinner';
 import {
   deleteTaxBandById,
   getAllTaxBandDetailsByCompanyId,
-  getAllTaxBandsByCompanyId,
-} from '@/services/branchServices';
-import Image from 'next/image';
+} from '@/services/taxBandServices';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
-import Link from 'next/link';
 import WarningModal from '@/components/account/WarningModal';
 import DeleteModal from '@/components/account/DeleteModal';
 import TaxBandDetails from './TaxBandDetails';
 import SuccessModal from '@/components/account/SuccessModal';
+import { useRouter } from 'next/navigation';
 
 const TaxManagement = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
-  const auth = useAuth();
-  const loggedInUser = auth.user;
+  const router = useRouter();
   const [searchterm, setSearchterm] = useState('');
   const [exportContent, setExportContent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,6 +73,18 @@ const TaxManagement = ({ pageDescription }) => {
     const filtered = (taxBands || []).filter((t) => filter(t));
     setFilteredTaxBands(filtered);
   }, [taxBands, searchterm]);
+
+  //update selected branch if it changes down-stream
+  useEffect(() => {
+    setTaxBands((prev) => {
+      const updatedTaxBands = prev?.map((bd) => {
+        if (selectedBand && bd._id === selectedBand._id) return selectedBand;
+        return bd;
+      });
+
+      return updatedTaxBands;
+    });
+  }, [selectedBand]);
 
   const handleDeleteTaxBandClick = (e, band) => {
     e.stopPropagation();
@@ -123,7 +132,9 @@ const TaxManagement = ({ pageDescription }) => {
 
   const handleEditTaxBandClick = (e, band) => {
     e.stopPropagation();
-    // TODO: implement edit tax band functionality
+    router.push(
+      `/pages/account/admin/tax-management/edit-tax-band?id=${band._id}`
+    );
   };
 
   const handleOpenExportContent = () => {
@@ -137,6 +148,7 @@ const TaxManagement = ({ pageDescription }) => {
     setSelectedBand(null);
     setBandToDelete(null);
     setModalMessage('');
+    setDeleteErrors([]);
     setSuccess(false);
   };
 
@@ -270,13 +282,17 @@ const TaxManagement = ({ pageDescription }) => {
                           <td colSpan={5} className="text-center py-32">
                             <div className="flex flex-col w-full justify-center items-center gap-4">
                               <span className="text-lg">No tax band found</span>
-                              <Link
-                                href="/pages/account/admin/tax-management/create-tax-band"
+                              <span
+                                onClick={() =>
+                                  router.push(
+                                    '/pages/account/admin/tax-management/create-tax-band'
+                                  )
+                                }
                                 className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
                               >
                                 <FaPlus />
                                 <span>Create a tax band</span>
-                              </Link>
+                              </span>
                             </div>
                           </td>
                         }
@@ -298,10 +314,13 @@ const TaxManagement = ({ pageDescription }) => {
         <div className="inset-0 fixed bg-black bg-opacity-60 z-50 flex justify-center items-center">
           <TaxBandDetails
             band={selectedBand}
+            setBand={setSelectedBand}
             onClose={handleCloseAllModals}
             otherTaxBands={taxBands?.filter(
               (tb) => tb._id !== selectedBand._id
             )}
+            handleEditTaxBandClick={handleEditTaxBandClick}
+            handleDeleteTaxBandClick={handleDeleteTaxBandClick}
           />
         </div>
       )}
@@ -326,10 +345,8 @@ const TaxManagement = ({ pageDescription }) => {
             message={modalMessage}
             title={'Delete Tax Band'}
             buttonStyle={`bg-red-500 hover:bg-red-400`}
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={() => {
-              handleDeleteTaxBandConfirm();
-            }}
+            onClose={handleCloseAllModals}
+            onConfirm={handleDeleteTaxBandConfirm}
             button2Style={`bg-gray-500 hover:bg-gray-400`}
             deleteErrors={deleteErrors}
             loading={loading}

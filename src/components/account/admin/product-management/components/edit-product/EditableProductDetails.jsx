@@ -5,10 +5,8 @@ import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
 import PageDescription from '@/components/account/PageDescription';
 import { useAuth } from '@/contexts/authContext';
-import {
-  getAllBranchBandsByCompanyId,
-  getAllTaxBandsByCompanyId,
-} from '@/services/branchServices';
+import { getAllBranchBandsByCompanyId } from '@/services/branchServices';
+import { getAllTaxBandsByCompanyId } from '@/services/taxBandServices';
 import {
   createOrUpdateProductService,
   getAllProductCategoriesByCompanyIdService,
@@ -414,7 +412,7 @@ const EditableProductDetails = ({ pageDescription }) => {
   const switchTab = (tab) => {
     setVisibleTab(tab);
   };
-  console.log('product', product);
+
   if (!product) return <Spinner />;
 
   return (

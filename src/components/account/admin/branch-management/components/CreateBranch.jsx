@@ -13,7 +13,6 @@ import CreateNewTaxBand from '../../tax-management/components/CreateNewTaxBandFo
 import {
   createBranchService,
   getAllBranchBandsByCompanyId,
-  getAllTaxBandsByCompanyId,
 } from '@/services/branchServices';
 import { validateEmail, validatePhoneNumber } from '@/utilities/validateInput';
 import WarningModal from '@/components/account/WarningModal';

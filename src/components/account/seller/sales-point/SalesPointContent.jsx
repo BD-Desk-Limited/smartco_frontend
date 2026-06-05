@@ -81,8 +81,20 @@ const SalesPointContent = ({
 
   const handleRefreshProducts = async () => {
     try {
+      //if offline, don't attempt to fetch and just show error notification
+      if (!navigator.onLine) {
+        showNotification(
+          'warning',
+          'You are offline',
+          'You are currently working offline. Please connect back online to refresh products.',
+          4000
+        );
+        return;
+      }
+
       setRefreshingProducts(true);
       setLoading(true);
+
       const refreshedProducts = await fetchProductsFromAPI(workBranch?._id);
       setProducts(refreshedProducts || []);
     } catch (error) {

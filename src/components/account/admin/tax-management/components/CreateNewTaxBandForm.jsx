@@ -4,7 +4,7 @@ import SuccessModal from '@/components/account/SuccessModal';
 import {
   createTaxBand,
   getAllTaxBandsByCompanyId,
-} from '@/services/branchServices';
+} from '@/services/taxBandServices';
 import { verifyInputText } from '@/utilities/verifyInput';
 import React from 'react';
 
