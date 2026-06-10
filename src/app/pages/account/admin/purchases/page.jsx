@@ -1,9 +1,13 @@
-import React from 'react'
+'use client';
+import PurchasesAndSupplyPage from '@/components/account/admin/purchases-and-supply/PurchasesAndSupplyPage';
+import React from 'react';
 
 const page = () => {
   return (
-    <div>Purchases page</div>
-  )
-}
+    <div>
+      <PurchasesAndSupplyPage />
+    </div>
+  );
+};
 
 export default page;
