@@ -108,9 +108,7 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
 
             <div
               className="absolute top-2 left-2 flex items-center justify-center gap-2 px-2 font-semibold hover:text-green-shadow4 text-brand-green cursor-pointer shadow-md"
-              onClick={() =>
-                router.push('/pages/account/admin/branch-management')
-              }
+              onClick={() => router.back()}
             >
               <Image
                 src={'/assets/back_green.png'}

@@ -1,8 +1,8 @@
 // Custom Service Worker for offline app-shell behavior.
 // This keeps previously visited pages/assets usable when network is down.
-const STATIC_CACHE_NAME = 'smartco-static-v2';
-const PAGES_CACHE_NAME = 'smartco-pages-v2';
-const RUNTIME_CACHE_NAME = 'smartco-runtime-v2';
+const STATIC_CACHE_NAME = 'smartco-static-v1';
+const PAGES_CACHE_NAME = 'smartco-pages-v1';
+const RUNTIME_CACHE_NAME = 'smartco-runtime-v1';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [

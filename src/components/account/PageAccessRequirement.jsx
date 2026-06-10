@@ -12,24 +12,25 @@ export const PageAccessRequirement = (requiredRole, requiredAccess) => {
   }
 
   // Check if the user meets the conditions to access the page
-  const allActiveUserAccess = user?.accessLevel.length > 0 &&
-    user?.accessLevel.filter(access => access.accessGranted === true) || [];
+  const allActiveUserAccess =
+    (user?.accessLevel.length > 0 &&
+      user?.accessLevel.filter((access) => access.accessGranted === true)) ||
+    [];
 
-  
-  const conditionsToShowPage = (
+  const conditionsToShowPage =
     user?.role === requiredRole &&
-    (
-      user?.superAdmin ||
-      (  
-        user?.accessLevel?.map(access => access.accessName).includes('All_Access') &&
-        user?.accessLevel?.find(access => access.accessName === 'All_Access').accessGranted
-      ) ||
-      (
-        allActiveUserAccess.map((access) => access.accessName).includes(requiredAccess) &&
-        allActiveUserAccess.find((access) => access.accessName === requiredAccess).accessGranted
-      )
-    )
-  );
+    (user?.superAdmin ||
+      (user?.accessLevel
+        ?.map((access) => access.accessName)
+        .includes('All_Access') &&
+        user?.accessLevel?.find((access) => access.accessName === 'All_Access')
+          .accessGranted) ||
+      (allActiveUserAccess
+        .map((access) => access.accessName)
+        .includes(requiredAccess) &&
+        allActiveUserAccess.find(
+          (access) => access.accessName === requiredAccess
+        ).accessGranted));
 
   // If access is denied, show the "No Permission" page
   if (user && !conditionsToShowPage) {
@@ -39,8 +40,6 @@ export const PageAccessRequirement = (requiredRole, requiredAccess) => {
   // If all conditions are met, allow the page to render
   return null;
 };
-
-
 
 const PageAccessDenied = () => {
   const { user } = useAuth();
@@ -60,10 +59,14 @@ const PageAccessDenied = () => {
     <div className="flex flex-col items-center justify-center w-full h-screen bg-background-1 gap-5">
       <h1 className="text-l font-bold text-center text-error">
         You do not have permission to view this part of the business!!!
-        <p className='text-amber-500'>Please contact your administrator to request access.</p>
-
+        <p className="text-amber-500">
+          Please contact your administrator to request access.
+        </p>
       </h1>
-      <Button text={'Back'} onClick={() => (window.location.href = whereToRedirect())} />
+      <Button
+        text={'Back'}
+        onClick={() => (window.location.href = whereToRedirect())}
+      />
     </div>
   );
 };

@@ -7,10 +7,8 @@ import { useCreateProducts } from '@/contexts/createProductsContext';
 import CreateProductForm from './CreateProductForm';
 import CreateProductSidePreview from './ProductSidePreview';
 import { useAuth } from '@/contexts/authContext';
-import {
-  getAllBranchBandsByCompanyId,
-  getAllTaxBandsByCompanyId,
-} from '@/services/branchServices';
+import { getAllBranchBandsByCompanyId } from '@/services/branchServices';
+import { getAllTaxBandsByCompanyId } from '@/services/taxBandServices';
 import {
   createOrUpdateProductService,
   getAllProductCategoriesByCompanyIdService,

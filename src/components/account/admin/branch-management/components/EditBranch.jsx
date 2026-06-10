@@ -6,8 +6,8 @@ import BranchSidebar from './BranchSideBar';
 import {
   editBranchById,
   getAllBranchBandsByCompanyId,
-  getAllTaxBandsByCompanyId,
 } from '@/services/branchServices';
+import { getAllTaxBandsByCompanyId } from '@/services/taxBandServices';
 import Image from 'next/image';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';

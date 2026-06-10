@@ -39,6 +39,8 @@ export const SetupProvider = ({ children }) => {
   const { internetStatus, userMode } = useInternetStatus();
   const router = useRouter();
   const pathname = usePathname();
+
+  // routes that should bypass all setup checks and be accessible regardless of setup status, user role, or internet status
   const shouldBypassSetupChecks =
     pathname?.startsWith('/pages/account/sales-point') ||
     pathname?.startsWith('/pages/auth/login/sales-point') ||

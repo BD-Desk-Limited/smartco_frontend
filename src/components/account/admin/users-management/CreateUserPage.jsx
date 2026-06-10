@@ -6,13 +6,7 @@ import { PageAccessRequirement } from '../../PageAccessRequirement';
 import AdminSideBar from '../AdminSideBar';
 
 const CreateUserPage = () => {
-  const [selectedMenu, setSelectedMenu] = React.useState({
-    name: 'Users Management',
-    icon: '/assets/user.png',
-    iconActive: '/assets/user_active.png',
-    link: '/users-management',
-    title: 'Users Management',
-  });
+  const [selectedMenu, setSelectedMenu] = React.useState('users-management');
 
   const pageDescription =
     'The Create User page allows you to add new users to your system by entering their details such as name, email, role, and other relevant information. After creating a user, you can manage their information, and update their status as needed. Use this interface to efficiently onboard new users and ensure they have the appropriate access and permissions within the system.';

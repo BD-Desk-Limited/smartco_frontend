@@ -8,7 +8,7 @@ export const TAX_MANAGEMENT_SUB_MENUS = [
   },
   {
     name: 'view-tax-band-details',
-    label: 'View Tax Band details',
+    label: 'View All Tax Bands',
     link: `${TOP_MENU_URL}/`,
   },
 ];

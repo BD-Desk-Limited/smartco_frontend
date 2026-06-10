@@ -9,19 +9,19 @@ const getToken = () => {
   return null;
 };
 
-//create branch
-export const createBranchService = async (branchData) => {
+//create tax band
+export const createTaxBand = async (taxBandData) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(branchData),
+        body: JSON.stringify(taxBandData),
       }
     );
     if (response.ok) {
@@ -34,16 +34,16 @@ export const createBranchService = async (branchData) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error creating branch, please try again' };
+    return { error: 'error creating tax band, please try again' };
   }
 };
 
-//get all branches by company id
-export const getAllBranchesByCompanyId = async () => {
+//get all taxbands with associated branches and historical rates by company id
+export const getAllTaxBandDetailsByCompanyId = async () => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands/branches-and-history`,
       {
         method: 'GET',
         headers: {
@@ -63,26 +63,22 @@ export const getAllBranchesByCompanyId = async () => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error fetching branches, please try again' };
+    return { error: 'error fetching tax bands, please try again' };
   }
 };
 
-//activate or deactivate branch
-export const toggleBranchStatus = async (branchIds, status) => {
+//get all taxbands by company id
+export const getAllTaxBandsByCompanyId = async () => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/status`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands`,
       {
-        method: 'PUT',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          branchIds,
-          status,
-        }),
       }
     );
 
@@ -96,25 +92,22 @@ export const toggleBranchStatus = async (branchIds, status) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error toggling branch status, please try again' };
+    return { error: 'error fetching tax bands, please try again' };
   }
 };
 
-//delete branches by id
-export const deleteBranchesById = async (branchIds) => {
+//delete taxband by id
+export const deleteTaxBandById = async (bandId) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands/${bandId}`,
       {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          branchIds,
-        }),
       }
     );
 
@@ -128,16 +121,16 @@ export const deleteBranchesById = async (branchIds) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error deleting branches, please try again' };
+    return { error: 'error deleting tax band, please try again' };
   }
 };
 
-//get branch by id
-export const getBranchById = async (branchId) => {
+//get taxbandDetails by id
+export const getTaxBandDetailsById = async (bandId) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands/minimal/${bandId}`,
       {
         method: 'GET',
         headers: {
@@ -157,82 +150,23 @@ export const getBranchById = async (branchId) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error fetching branch, please try again' };
+    return { error: 'error fetching tax band details, please try again' };
   }
 };
 
-//get all users by branch id
-export const getAllUsersByBranchId = async (branchId) => {
+//update taxbandDetails
+export const updateTaxBand = async (updatedTaxBandData) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/users/${branchId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log('Response data:', responseData.data);
-      return { data: responseData.data };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error fetching users, please try again' };
-  }
-};
-
-//get all branch bands by company id
-export const getAllBranchBandsByCompanyId = async (companyId) => {
-  const token = getToken();
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/bands/${companyId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData.data };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error fetching bands, please try again' };
-  }
-};
-
-//edit branch by id
-export const editBranchById = async (branchId, branchData) => {
-  const token = getToken();
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands/${updatedTaxBandData._id}`,
       {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(branchData),
+        body: JSON.stringify(updatedTaxBandData),
       }
     );
 
@@ -246,16 +180,16 @@ export const editBranchById = async (branchId, branchData) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error editing branch, please try again' };
+    return { error: 'error updating tax band, please try again' };
   }
 };
 
-//change branch taxband by id
-export const changeBranchTaxBandService = async (branchId, newTaxBandId) => {
+//delete a rate entry from a taxband by its ID
+export const deleteTaxRateEntryService = async (taxBandId, rateEntryId) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/branches/${branchId}/${newTaxBandId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tax-bands/${taxBandId}/${rateEntryId}`,
       {
         method: 'PATCH',
         headers: {
@@ -275,6 +209,6 @@ export const changeBranchTaxBandService = async (branchId, newTaxBandId) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error changing branch taxband, please try again' };
+    return { error: 'error deleting tax rate entry, please try again' };
   }
 };
