@@ -55,14 +55,24 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Product_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    } /*
+    },
     {
-      name: 'purchases',
+      name: 'purchases-and-supply',
       icon: <FaShoppingCart className="text-text-white" />,
       iconActive: <FaShoppingCart className="text-brand-blue" />,
       link: '/purchases',
-      label: 'Purchases',
-      requiredAccess: 'Purchases',
+      label: 'Purchases and Supply',
+      requiredAccess: '',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
+    } /*
+    {
+      name: 'branch-transfers',
+      icon: <FaShoppingCart className="text-text-white" />,
+      iconActive: <FaShoppingCart className="text-brand-blue" />,
+      link: '/branch-transfers',
+      label: 'Branch Transfers',
+      requiredAccess: '',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },*/,
@@ -107,7 +117,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       superAdminOnly: false,
       nonSuperAdminOnly: true,
     
-    } {
+    }, {
       name: 'my-customers',
       icon: <FaAddressBook className="text-text-white" />,
       iconActive: <FaAddressBook className="text-brand-blue" />,
