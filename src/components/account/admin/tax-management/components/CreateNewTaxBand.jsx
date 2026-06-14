@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import { useRouter } from 'next/navigation';
 import Spinner from '@/components/account/Spinner';

@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import Image from 'next/image';
 import Link from 'next/link';

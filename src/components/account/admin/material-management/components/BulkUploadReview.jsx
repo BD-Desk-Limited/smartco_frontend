@@ -2,7 +2,7 @@ import React from 'react';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
 import PageDescription from '@/components/account/PageDescription';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import Button from '@/components/account/Button';

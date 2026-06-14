@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import UsersManagementSidebar from './UsersManagementSidebar';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import Button from '@/components/account/Button';

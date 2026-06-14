@@ -1,6 +1,6 @@
 import React from 'react';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import EditUserForm from './EditUserForm';

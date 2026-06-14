@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import BranchSidebar from './BranchSideBar';
 import PageDescription from '@/components/account/PageDescription';

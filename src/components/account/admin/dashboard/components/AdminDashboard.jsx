@@ -1,4 +1,4 @@
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import { useAuth } from '@/contexts/authContext';
 import React from 'react';

@@ -2,7 +2,7 @@
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
 import SubHeader from '@/components/account/admin/SubHeader';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import PageDescription from '@/components/account/PageDescription';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

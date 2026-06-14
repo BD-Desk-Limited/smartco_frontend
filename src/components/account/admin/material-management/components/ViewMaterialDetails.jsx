@@ -1,7 +1,7 @@
 import PageDescription from '@/components/account/PageDescription';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import MaterialSidebar from './materialSidebar';
 import SubHeader from '../../SubHeader';
 import Image from 'next/image';

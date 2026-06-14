@@ -1,5 +1,5 @@
 /* Working from here next time*/
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';

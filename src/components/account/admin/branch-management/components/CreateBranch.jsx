@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '../../SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import Button from '@/components/account/Button';

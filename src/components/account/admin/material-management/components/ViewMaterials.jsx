@@ -1,6 +1,6 @@
 import React, { use } from 'react';
 import Image from 'next/image';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import PageDescription from '@/components/account/PageDescription';
@@ -49,7 +49,7 @@ const ViewMaterial = ({ pageDescription }) => {
     };
     fetchAllMaterials();
   }, []);
-  console.log('allMaterials', allMaterials);
+
   React.useEffect(() => {
     const filtered =
       (Array.isArray(allMaterials) &&

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import * as XLSX from 'xlsx';
 import { verifyEmail, verifyInputText } from '@/utilities/verifyInput';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import BranchSidebar from './BranchSideBar';
 import PageDescription from '@/components/account/PageDescription';

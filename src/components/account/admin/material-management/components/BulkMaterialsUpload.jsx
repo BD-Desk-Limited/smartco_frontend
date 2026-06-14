@@ -3,7 +3,7 @@ import Image from 'next/image';
 import * as XLSX from 'xlsx';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '../../SubHeader';
 import MaterialSidebar from './materialSidebar';
 import SuccessModal from '@/components/account/SuccessModal';

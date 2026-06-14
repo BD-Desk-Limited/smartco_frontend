@@ -1,7 +1,7 @@
 import React from 'react';
 import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import NewPurchase from './components/NewPurchase';
+import NewPurchase from './components/purchases/NewPurchase';
 
 const NewPurchasePage = () => {
   const pageDescription = ' ';

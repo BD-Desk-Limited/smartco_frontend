@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBulkUserUpload } from '@/contexts/bulkUserUploadContext';
 import { createUserService } from '@/services/usersServices';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import UsersManagementSidebar from '../UsersManagementSidebar';
 import SuccessModal from '@/components/account/SuccessModal';

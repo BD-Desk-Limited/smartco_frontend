@@ -1,4 +1,4 @@
-import Header from '@/components/account/Header';
+import Header from '@/components/account/AdminHeader';
 import React from 'react';
 import AdminSideBar from '../../AdminSideBar';
 import SubHeader from '../../SubHeader';
