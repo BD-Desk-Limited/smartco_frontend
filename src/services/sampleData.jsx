@@ -2057,9 +2057,192 @@ const fetchCustomerData = (idOrEmailOrPhone) => {
   });
 };
 
+const fetchSuppliersData = (searchTerm) => {
+  const supplierData = sampleSuppliers
+    .filter((sup) => {
+      if (!searchTerm || searchTerm === '') return true;
+      return sup.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .map((s) => ({ name: s.name, _id: s._id }));
+  console.log('d:', supplierData);
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: supplierData,
+        total: supplierData.length,
+        error: supplierData.length === 0 ? 'No suppliers found' : null,
+      });
+    }, 2000);
+  });
+};
+
+const fetchUserBranchesById = (userId) => {
+  const branches = [
+    { _id: 1, name: 'Branch 1-one' },
+    { _id: 2, name: 'Branch 2-one' },
+    { _id: 3, name: 'Branch 3-one' },
+    { _id: 4, name: 'Branch 4-one' },
+    { _id: 5, name: 'Branch 5-one' },
+  ];
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: branches || null,
+        error: branches ? null : 'Branches not found',
+      });
+    }, 2000);
+  });
+};
+
+const sampleSuppliers = [
+  {
+    _id: 1,
+    name: 'James Thornton Inc Limited',
+    address: '14 Baker Street, London, EC1A 1BB',
+    email: 'james.thornton@nortex.co.uk',
+    phone: '+44 7911 123456',
+  },
+  {
+    _id: 2,
+    name: 'Priya Sharma Inc Limited',
+    address: '22 Elm Avenue, Manchester, M1 3DQ',
+    email: 'priya.sharma@deltalogix.com',
+    phone: '+44 7922 234567',
+  },
+  {
+    _id: 3,
+    name: 'Carlos Rivera Inc Limited',
+    address: '8 Sunset Blvd, Birmingham, B2 4QT',
+    email: 'c.rivera@riverasupply.net',
+    phone: '+44 7933 345678',
+  },
+  {
+    _id: 4,
+    name: 'Aiko Nakamura Inc Limited',
+    address: '5 Harrington Road, Leeds, LS1 2AB',
+    email: 'aiko.nakamura@zenith-goods.jp',
+    phone: '+81 90 1234 5678',
+  },
+  {
+    _id: 5,
+    name: 'Mohamed Al-Farsi Inc Limited',
+    address: '31 Crescent Lane, Edinburgh, EH1 1YZ',
+    email: 'm.alfarsi@alfarsitrading.ae',
+    phone: '+971 50 987 6543',
+  },
+  {
+    _id: 6,
+    name: 'Sophie Beaumont Inc Limited',
+    address: '17 Rue des Fleurs, Bristol, BS1 5TH',
+    email: 'sophie.beaumont@beaumont-intl.fr',
+    phone: '+44 7944 456789',
+  },
+  {
+    _id: 7,
+    name: 'David Okafor Inc Limited',
+    address: '99 Victoria Park, Glasgow, G1 3NP',
+    email: 'd.okafor@okafor-ventures.ng',
+    phone: '+234 803 456 7890',
+  },
+  {
+    _id: 8,
+    name: 'Elena Vasquez Inc Limited',
+    address: '45 Maple Drive, Sheffield, S1 2GH',
+    email: 'elena.vasquez@vascorp.es',
+    phone: '+34 612 345 678',
+  },
+  {
+    _id: 9,
+    name: "Liam O'Connor Inc Limited",
+    address: '3 Clover Hill, Dublin, D01 A1B2',
+    email: 'liam.oconnor@oconnorsupplies.ie',
+    phone: '+353 87 123 4567',
+  },
+  {
+    _id: 10,
+    name: 'Zhang Wei Inc Limited',
+    address: '12 Commerce Street, Liverpool, L1 8JQ',
+    email: 'zhang.wei@weiexports.cn',
+    phone: '+86 138 0013 8000',
+  },
+  {
+    _id: 11,
+    name: 'Fatima Hussain Inc Limited',
+    address: '67 Orchard Road, Nottingham, NG1 4FP',
+    email: 'fatima.hussain@hussain-global.pk',
+    phone: '+92 300 123 4567',
+  },
+  {
+    _id: 12,
+    name: 'Marcus Becker Inc Limited',
+    address: '29 Riverside Close, Cardiff, CF10 1DX',
+    email: 'marcus.becker@beckersolutions.de',
+    phone: '+49 151 12345678',
+  },
+  {
+    _id: 13,
+    name: 'Nadia Petrov Inc Limited',
+    address: '54 Highland Terrace, Aberdeen, AB10 1XY',
+    email: 'nadia.petrov@petrov-supply.ru',
+    phone: '+7 912 345 6789',
+  },
+  {
+    _id: 14,
+    name: 'Samuel Adeyemi Inc Limited',
+    address: '18 Queensway, Leicester, LE1 7GH',
+    email: 's.adeyemi@adeyemigroup.ng',
+    phone: '+234 706 789 0123',
+  },
+  {
+    _id: 15,
+    name: 'Isabella Rossi Inc Limited',
+    address: '6 Cobblestone Lane, Oxford, OX1 3BQ',
+    email: 'i.rossi@rossiforniture.it',
+    phone: '+39 347 123 4567',
+  },
+  {
+    _id: 16,
+    name: 'Hiroshi Tanaka Inc Limited',
+    address: '41 Northgate Avenue, Cambridge, CB2 1RZ',
+    email: 'hiroshi.tanaka@tanaka-trade.jp',
+    phone: '+81 80 9876 5432',
+  },
+  {
+    _id: 17,
+    name: 'Amara Diallo Inc Limited',
+    address: '77 Sunflower Street, Coventry, CV1 2WX',
+    email: 'amara.diallo@diallosupply.sn',
+    phone: '+221 77 456 7890',
+  },
+  {
+    _id: 18,
+    name: 'Ryan McAllister Inc Limited',
+    address: '9 Fernwood Drive, Belfast, BT1 2LN',
+    email: 'ryan.mcallister@mcallister-dist.co.uk',
+    phone: '+44 7855 567890',
+  },
+  {
+    _id: 19,
+    name: 'Leila Ahmadi Inc Limited',
+    address: '33 Jasmine Court, Southampton, SO14 3GK',
+    email: 'leila.ahmadi@ahmadi-imports.ir',
+    phone: '+98 912 345 6789',
+  },
+  {
+    _id: 20,
+    name: 'Tom Vandenberg Inc Limited',
+    address: '21 Windmill Road, Plymouth, PL1 2DE',
+    email: 'tom.vandenberg@vandenberg-nl.com',
+    phone: '+31 6 12345678',
+  },
+];
+
 export {
   sampleProducts,
   sampleCustomers,
   sampleScheduledOrderForToday,
   fetchCustomerData,
+  fetchSuppliersData,
+  fetchUserBranchesById,
 };

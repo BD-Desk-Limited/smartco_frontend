@@ -18,6 +18,7 @@ import {
   FaChevronRight,
   FaChevronLeft,
   FaHome,
+  FaShippingFast,
 } from 'react-icons/fa';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
@@ -58,8 +59,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     },
     {
       name: 'purchases-and-supply',
-      icon: <FaShoppingCart className="text-text-white" />,
-      iconActive: <FaShoppingCart className="text-brand-blue" />,
+      icon: <FaShippingFast className="text-text-white" />,
+      iconActive: <FaShippingFast className="text-brand-blue" />,
       link: '/purchases',
       label: 'Purchases and Supply',
       requiredAccess: '',
