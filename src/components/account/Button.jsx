@@ -8,7 +8,15 @@ const Button = ({
   onClick,
   buttonStyle,
   children,
+  icon,
+  iconAfterText,
+  iconStyle,
 }) => {
+  const renderIcon = () => {
+    const Icon = icon; // capitalize so JSX treats it as a component
+    return icon ? <Icon className={iconStyle || ''} /> : null;
+  };
+
   return (
     <button
       onClick={onClick}
@@ -26,7 +34,11 @@ const Button = ({
       ) : children ? (
         children
       ) : (
-        `${text || 'Submit'}`
+        <span className="flex flex-row justify-center items-center gap-2">
+          {!iconAfterText && <span>{renderIcon()}</span>}
+          {text !== '' && <span>{text || 'Submit'}</span>}
+          {iconAfterText && <span>{renderIcon()}</span>}
+        </span>
       )}
     </button>
   );

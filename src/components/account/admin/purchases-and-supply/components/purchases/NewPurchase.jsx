@@ -5,7 +5,14 @@ import Header from '@/components/account/AdminHeader';
 import SubHeader from '../../../SubHeader';
 import SideBar from '../../../SideBar';
 import { PURCHASES_AND_SUPPLY_SUBMENUS } from '../PurchasesAndSupplySubMenus';
-import { FaChevronDown, FaShippingFast } from 'react-icons/fa';
+import {
+  FaAdjust,
+  FaChevronDown,
+  FaEdit,
+  FaExchangeAlt,
+  FaRegEdit,
+  FaShippingFast,
+} from 'react-icons/fa';
 import SelectSupplierPannel from './SelectSupplierPannel';
 import { fetchSuppliersData } from '@/services/sampleData';
 import { getAllMaterials } from '@/services/materialServices';
@@ -21,6 +28,8 @@ const NewPurchase = ({ pageDescription }) => {
   const [openSupplierSelectPannel, setOpenSupplierSelectPannel] =
     React.useState(false);
   const [openSelectItemPannel, setOpenSelectItemPannel] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [openEnterQuantityPannel, setOpenEnterQuantityPannel] = useState(false);
   const [loading, setLoading] = React.useState(false);
   const [purchaseRecord, setPurchaseRecord] = useState({
     supplierId: '',
@@ -106,7 +115,34 @@ const NewPurchase = ({ pageDescription }) => {
     }));
   }, []);
 
-  console.log('record:', purchaseRecord);
+  const handleEditItem = (e, itemIndex) => {
+    e.stopPropagation();
+    //find the item to edit in the purchaseRecord.items array
+    const item = purchaseRecord?.items[itemIndex] || null;
+
+    if (item && item.materialId) {
+      const itemToEdit = item;
+      itemToEdit.isUpdate = true; // Mark the item as being updated
+      itemToEdit.index = itemIndex; // Store the index of the item being edited
+      setSelectedMaterial(itemToEdit);
+      onOpenSelectItemPannel(e); // Open the SelectItemPannel for editing
+      setOpenEnterQuantityPannel(true); // Open the EnterQuantityPannel for editing
+    }
+  };
+
+  const handleDeleteItem = (e, itemIndex) => {
+    e.stopPropagation();
+
+    const deletePurchaseItem = () => {
+      const updatedItems =
+        purchaseRecord?.items?.filter((_, index) => index !== itemIndex) || [];
+      onChangePurchaseRecord('items', updatedItems);
+    };
+
+    itemIndex !== undefined &&
+      purchaseRecord?.items[itemIndex] &&
+      deletePurchaseItem();
+  };
 
   if (loading) return <Spinner />;
 
@@ -163,9 +199,10 @@ const NewPurchase = ({ pageDescription }) => {
                 <span
                   onClick={() => setOpenSupplierSelectPannel(true)}
                   title="change supplier"
-                  className="font-thin text-xs w-fit bg-error text-text-white p-0.5 rounded-full shadow-md cursor-pointer hover:bg-red-500"
+                  className="font-thin text-xs w-fit bg-error text-text-white py-0.5 px-1 rounded-full shadow-black shadow-md cursor-pointer hover:bg-red-400 hover:text-text-black flex flex-row gap-2"
                 >
-                  change supplier
+                  <span>change supplier</span>
+                  <FaExchangeAlt />
                 </span>
 
                 {/* Vendor name for open market */}
@@ -192,16 +229,16 @@ const NewPurchase = ({ pageDescription }) => {
 
             <hr />
 
-            {/* Selected supplier on the order */}
+            {/* If Selected supplier on the order, show purchase details */}
             {selectedSupplier && (
               <PurchaseDetails
                 loading={loading}
                 setLoading={setLoading}
                 purchaseRecord={purchaseRecord}
-                setPurchaseRecord={setPurchaseRecord}
                 onChangePurchaseRecord={onChangePurchaseRecord}
                 onOpenSelectItemPannel={onOpenSelectItemPannel}
-                onCloseSelectItemPannel={onCloseSelectItemPannel}
+                onEditItemClick={handleEditItem}
+                onDeleteItemClick={handleDeleteItem}
               />
             )}
 
@@ -229,8 +266,13 @@ const NewPurchase = ({ pageDescription }) => {
                 <SelectItemPannel
                   onCloseSelectItemPannel={onCloseSelectItemPannel}
                   materials={materials}
+                  setMaterials={setMaterials}
                   onChangePurchaseRecord={onChangePurchaseRecord}
                   purchaseRecord={purchaseRecord}
+                  selectedMaterial={selectedMaterial}
+                  setSelectedMaterial={setSelectedMaterial}
+                  openEnterQuantityPannel={openEnterQuantityPannel}
+                  setOpenEnterQuantityPannel={setOpenEnterQuantityPannel}
                 />
               </div>
             )}

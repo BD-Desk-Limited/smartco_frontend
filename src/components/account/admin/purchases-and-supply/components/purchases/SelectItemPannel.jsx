@@ -7,11 +7,13 @@ const SelectItemPannel = ({
   materials,
   onChangePurchaseRecord,
   purchaseRecord,
+  selectedMaterial,
+  setSelectedMaterial,
+  openEnterQuantityPannel,
+  setOpenEnterQuantityPannel,
 }) => {
   const [filterTerm, setFilterTerm] = useState('');
   const [filteredMaterials, setFilteredMaterials] = useState([]);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
-  const [openEnterQuantityPannel, setOpenEnterQuantityPannel] = useState(false);
 
   useEffect(() => {
     const handleFilter = () => {
@@ -28,8 +30,13 @@ const SelectItemPannel = ({
     handleFilter();
   }, [filterTerm, materials]);
 
-  const onSelectMaterial = (material) => {
-    setSelectedMaterial(material);
+  const onMaterialClick = (material) => {
+    const updatedMaterial = {
+      ...material,
+      unitOfMeasurement: material.unitOfMeasurement?.name || '',
+    };
+
+    setSelectedMaterial(updatedMaterial);
     setOpenEnterQuantityPannel(true);
   };
 
@@ -71,7 +78,7 @@ const SelectItemPannel = ({
               {filteredMaterials.map((material) => (
                 <li
                   key={material._id}
-                  onClick={() => onSelectMaterial(material)}
+                  onClick={() => onMaterialClick(material)}
                   className="py-2 border-y-1 border-y px-2 cursor-pointer flex flex-row items-center gap-3 hover:bg-gray-shadow9 hover:text-text-black"
                 >
                   <span className="bg-brand-blue p-1 rounded-full">
@@ -96,7 +103,8 @@ const SelectItemPannel = ({
         <div className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-center items-center ">
           <EnterQuantityPannel
             material={selectedMaterial}
-            onClose={() => setOpenEnterQuantityPannel(false)}
+            setMaterial={setSelectedMaterial}
+            setOpenEnterQuantityPannel={setOpenEnterQuantityPannel}
             onCloseSelectItemPannel={onCloseSelectItemPannel}
             onChangePurchaseRecord={onChangePurchaseRecord}
             purchaseRecord={purchaseRecord}
