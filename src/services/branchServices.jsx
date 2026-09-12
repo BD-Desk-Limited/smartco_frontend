@@ -278,3 +278,32 @@ export const changeBranchTaxBandService = async (branchId, newTaxBandId) => {
     return { error: 'error changing branch taxband, please try again' };
   }
 };
+
+//Get all branches by user id
+export const getUserBranchesService = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/branches/user-branches`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error changing branch taxband, please try again' };
+  }
+};

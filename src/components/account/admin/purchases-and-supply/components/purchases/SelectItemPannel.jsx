@@ -11,6 +11,7 @@ const SelectItemPannel = ({
   setSelectedMaterial,
   openEnterQuantityPannel,
   setOpenEnterQuantityPannel,
+  setValidationsError,
 }) => {
   const [filterTerm, setFilterTerm] = useState('');
   const [filteredMaterials, setFilteredMaterials] = useState([]);
@@ -108,6 +109,7 @@ const SelectItemPannel = ({
             onCloseSelectItemPannel={onCloseSelectItemPannel}
             onChangePurchaseRecord={onChangePurchaseRecord}
             purchaseRecord={purchaseRecord}
+            setValidationsError={setValidationsError}
           />
         </div>
       )}

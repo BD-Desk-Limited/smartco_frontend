@@ -9,7 +9,7 @@ const Button = ({
   buttonStyle,
   children,
   icon,
-  iconAfterText,
+  iconAfterText = false,
   iconStyle,
 }) => {
   const renderIcon = () => {
@@ -22,7 +22,7 @@ const Button = ({
       onClick={onClick}
       type={`${type || 'button'}`}
       disabled={loading}
-      className={`h-10 rounded-md text-md text-white px-2 ${
+      className={`h-10 text-center rounded-md text-md text-white px-2 ${
         loading ? 'cursor-not-allowed' : 'hover:bg-blue-shadow1'
       } items-center justify-center bg-brand-blue ${buttonStyle} shadow-md flex items-center justify-center`}
     >

@@ -25,7 +25,8 @@ const PurchaseSummary = ({ data }) => {
 
   return (
     <tr className="w-full h-full flex flex-row justify-center items-center gap-5 font-semibold">
-      <td>{purchaseItems?.length} Items</td> <td>{`|`}</td>
+      <td>{purchaseItems?.length} Items</td>
+      <td>{`|`}</td>
       <td>Total cost: {calculateTotalCost()}</td>
     </tr>
   );

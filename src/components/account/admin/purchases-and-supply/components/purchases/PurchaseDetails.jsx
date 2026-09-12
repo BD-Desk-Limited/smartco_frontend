@@ -1,6 +1,5 @@
 import ErrorInterface from '@/components/account/errorInterface';
 import Spinner from '@/components/account/Spinner';
-import { fetchUserBranchesById } from '@/services/sampleData';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React, { useEffect, useState } from 'react';
 import { FaPlusCircle, FaEdit, FaSave, FaTrash } from 'react-icons/fa';
@@ -8,34 +7,41 @@ import { commaNumberFormat } from '@/utilities/numbersUtils';
 import PurchaseSummary from './PurchaseSummary';
 import Button from '@/components/account/Button';
 import { verifyInputText } from '@/utilities/verifyInput';
+import { getUserBranchesService } from '@/services/branchServices';
 
 const PurchaseDetails = ({
   loading,
-  setLoading,
   purchaseRecord,
   onOpenSelectItemPannel,
   onChangePurchaseRecord,
   onEditItemClick,
   onDeleteItemClick,
+  setOpenSavePurchaseRecordModal,
+  validationsError,
+  setValidationsError,
 }) => {
   const [userBranches, setUserBranches] = useState([]);
-  const [validationsError, setValidationsError] = useState(null);
+  const [branchesLoading, setBranchesLoading] = useState(false);
 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        setLoading(true);
-        const response = await fetchUserBranchesById();
-        setUserBranches(response.data);
+        setBranchesLoading(true);
+        const response = await getUserBranchesService();
+        if (response.data) {
+          setUserBranches(response.data);
+        } else if (response.error) {
+          console.error(response.error, 'error fetching branches');
+        }
       } catch (err) {
         console.error(err, 'error fetching branches');
       } finally {
-        setLoading(false);
+        setBranchesLoading(false);
       }
     };
 
     fetchBranches();
-  }, [setLoading]);
+  }, []);
 
   //link destination branch directly if use has only one branch
   useEffect(() => {
@@ -68,8 +74,23 @@ const PurchaseDetails = ({
     </button>
   );
 
-  const handleSavePurchaseRecord = () => {
-    setValidationsError('');
+  const onSavePurchaseRecord = () => {
+    setValidationsError(null);
+
+    const dateSelectionString = purchaseRecord?.date;
+    const selectedTimestamp = new Date(dateSelectionString).getTime();
+    const dateNow = Date.now();
+
+    // Validate purchase date and ensure date is not in future
+    if (Number.isNaN(selectedTimestamp) || selectedTimestamp > dateNow) {
+      setValidationsError(
+        'Please select a valid purchase date. Purchase date cannot be in the future, '
+      );
+
+      //clear the date field if invalid date is selected
+      onChangePurchaseRecord('date', null);
+      return;
+    }
 
     const compulsoryFields = [
       {
@@ -107,41 +128,21 @@ const PurchaseDetails = ({
           (field.isStringValue && !verifyInputText(field.value).passed)
         ) {
           setValidationsError(`Error: Please enter valid ${field?.name}`);
-          return;
+          return false;
+        } else {
+          return true;
         }
       }
     };
 
-    validateCompulsoryFields();
+    const passeedValidation = validateCompulsoryFields();
 
-    const dateSelectionString = purchaseRecord?.date;
-    const selectedTimestamp = new Date(dateSelectionString).getTime();
-    const dateNow = Date.now();
-
-    // Validate purchase date and ensure date is not in future
-    if (Number.isNaN(selectedTimestamp) || selectedTimestamp > dateNow) {
-      setValidationsError(
-        'Please select a valid purchase date. Purchase date cannot be in the future, '
-      );
-
-      //clear the date field if invalid date is selected
-      onChangePurchaseRecord('date', null);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // TODO: implement save purchase order
-
-      console.log('Saving purchase record:', purchaseRecord);
-    } catch (err) {
-      console.error('Error saving purchase record', err);
-    } finally {
-      setLoading(false);
+    if (passeedValidation) {
+      setOpenSavePurchaseRecordModal(true);
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading || branchesLoading) return <Spinner />;
 
   return (
     <div className="max-h-screen overflow-y-auto no-scrollbar relative">
@@ -295,7 +296,6 @@ const PurchaseDetails = ({
       <div className="w-full flex items-center py-1"></div>
 
       {/* Save purchase button and error display */}
-
       <div className="w-full py-2 sticky bottom-0 bg-text-white flex flex-col justify-end items-end px-5 gap-2">
         {/* error display */}
         <p className="">
@@ -305,7 +305,7 @@ const PurchaseDetails = ({
           icon={FaSave}
           iconAfterText={false}
           buttonStyle={`w-1/4 bg-brand-green hover:bg-green-shadow1`}
-          onClick={handleSavePurchaseRecord}
+          onClick={onSavePurchaseRecord}
         />
       </div>
     </div>

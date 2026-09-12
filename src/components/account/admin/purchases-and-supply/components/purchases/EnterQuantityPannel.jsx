@@ -9,8 +9,9 @@ const EnterQuantityPannel = ({
   onChangePurchaseRecord,
   purchaseRecord,
   setOpenEnterQuantityPannel,
+  setValidationsError = () => {},
 }) => {
-  const [validationError, setValidationError] = React.useState(null);
+  const [purchaseDetailError, setPurchaseDetailError] = React.useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,13 +22,14 @@ const EnterQuantityPannel = ({
   };
 
   const onUpdatePurchaseItems = (e) => {
-    setValidationError(null);
+    setPurchaseDetailError(null);
+
     if (!material.quantity || Number(material.quantity) <= 0) {
-      setValidationError('Please enter valid quantity.');
+      setPurchaseDetailError('Please enter valid quantity.');
       return;
     }
     if (!material.totalCost || Number(material.totalCost) <= 0) {
-      setValidationError('Please enter valid total cost.');
+      setPurchaseDetailError('Please enter valid total cost.');
       return;
     }
 
@@ -36,7 +38,7 @@ const EnterQuantityPannel = ({
       const selectedTimestamp = new Date(material.expiryDate).getTime();
       const dateNow = Date.now();
       if (selectedTimestamp <= dateNow) {
-        setValidationError('Error, expiry date cannot be in the past.');
+        setPurchaseDetailError('Error, expiry date cannot be in the past.');
         return;
       }
     }
@@ -83,6 +85,7 @@ const EnterQuantityPannel = ({
 
     onChangePurchaseRecord('items', updatedItemsList);
     setOpenEnterQuantityPannel(false);
+    setValidationsError(null);
     onCloseSelectItemPannel(e); // Close the SelectItemPannel after adding the item
   };
 
@@ -182,9 +185,9 @@ const EnterQuantityPannel = ({
         </li>
       </ul>
 
-      {validationError && (
+      {purchaseDetailError && (
         <span className="text-sm font-semibold w-full text-center">
-          <ErrorInterface error={validationError} />
+          <ErrorInterface error={purchaseDetailError} />
         </span>
       )}
 

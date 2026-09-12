@@ -1,7 +1,5 @@
 'use client';
 
-import { fetchSuppliersData } from './sampleData';
-
 // safely access sessionStorage in client-side code
 // This function checks if the code is running in a browser environment
 const getToken = () => {
@@ -11,23 +9,20 @@ const getToken = () => {
   return null;
 };
 
-export const fetchSuppliersByCompanyIdService = async (searchTerm) => {
+export const fetchSuppliersByCompanyIdService = async (searchParams) => {
   const token = getToken();
+  const params = new URLSearchParams(searchParams);
   try {
-    /*const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/status`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/suppliers/search?${params}`,
       {
-        method: 'PATCH',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          product_ids: productIds,
-          status: status,
-        }),
       }
-    );*/
+    );
 
     if (response.ok) {
       const responseData = await response.json();
@@ -41,4 +36,18 @@ export const fetchSuppliersByCompanyIdService = async (searchTerm) => {
     console.error('Error:', error);
     return { error: 'error fetching suppliers, please try again' };
   }
+};
+
+export const savePurchaseRecordService = async (purchaseRecord) => {
+  // TODO: Uncomment the fetch request below and remove the console.log when the API is ready
+  console.log(purchaseRecord);
+  const sampleErrorResponse = {
+    error: 'error saving purchase record, please try again later',
+  };
+  const sampleSuccessResponse = {
+    data: {
+      message: 'Purchase record saved successfully',
+    },
+  };
+  return sampleSuccessResponse;
 };
