@@ -106,7 +106,7 @@ const PurchaseDetails = ({
       {
         isStringValue: false,
         name: 'purchase items',
-        value: purchaseRecord?.items?.length > 0,
+        value: purchaseRecord?.items?.length > 0 ? true : false,
       },
       {
         isStringValue: true,
@@ -121,23 +121,29 @@ const PurchaseDetails = ({
     ];
 
     const validateCompulsoryFields = () => {
+      let errorCollection = [];
       for (const field of compulsoryFields) {
         if (
           !field?.value ||
           field.value === null ||
           (field.isStringValue && !verifyInputText(field.value).passed)
         ) {
-          setValidationsError(`Error: Please enter valid ${field?.name}`);
-          return false;
+          errorCollection.push(`Error: Please enter valid ${field?.name}`);
         } else {
-          return true;
+          continue;
         }
       }
+
+      if (errorCollection.length > 0) {
+        setValidationsError(errorCollection[0]);
+        return false;
+      }
+      return true;
     };
 
-    const passeedValidation = validateCompulsoryFields();
+    const passedValidation = validateCompulsoryFields();
 
-    if (passeedValidation) {
+    if (passedValidation) {
       setOpenSavePurchaseRecordModal(true);
     }
   };

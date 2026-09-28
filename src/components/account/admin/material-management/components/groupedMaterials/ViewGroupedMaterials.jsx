@@ -11,6 +11,7 @@ import PageDescription from '@/components/account/PageDescription';
 import ExportContent from '@/components/account/ExportContent';
 import DeleteModal from '@/components/account/DeleteModal';
 import ComponentMaterialsModal from './ComponentMaterialsModal';
+import SubMenuQuickLinks from '../SubMenuQuicklinks';
 
 const ViewGroupedMaterials = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -129,11 +130,11 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
           );
           setSelectedMaterials([]);
         }
-        if (data.materialsWithStock.length > 0) {
-          const materialsWithStockId = data.materialsWithStock.map(
+        if (data?.materialsWithStock?.length > 0) {
+          const materialsWithStockId = data?.materialsWithStock?.map(
             (material) => material.material_id
           );
-          const collectErrorMessages = data.materialsWithStock.map(
+          const collectErrorMessages = data?.materialsWithStock?.map(
             (material) => material.message
           );
 
@@ -187,10 +188,23 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
         <Header />
       </div>
       <div className="w-full">
-        <SubHeader title={'List of Grouped Materials'} />
+        <SubHeader
+          title={'List of Grouped Materials'}
+          ExtraComponents={
+            <SubMenuQuickLinks
+              currentPageLabel="Grouped materials"
+              otherLinks={[
+                {
+                  label: 'Ungrouped materials',
+                  link: '/pages/account/admin/manage-materials/view-materials',
+                },
+              ]}
+            />
+          }
+        />
       </div>
-      <div className="flex flex-row w-full h-full gap-5">
-        <div className="min-w-fit">
+      <div className="flex flex-row w-full h-full gap-5 relative">
+        <div className="min-w-fit absolute top-0 left-0 z-50">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}

@@ -1,9 +1,9 @@
 import React from 'react';
 import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import NewPurchase from './components/purchases/NewPurchase';
+import NewPurchaseRecord from './components/purchases/NewPurchaseRecord';
 
-const NewPurchasePage = () => {
+const NewPurchaseRecordPage = () => {
   const pageDescription =
     'Create and manage new purchase orders by selecting suppliers, specifying destinations, and adding purchase items to the order.';
 
@@ -23,10 +23,10 @@ const NewPurchasePage = () => {
         <AdminSideBar selectedMenu="purchases-and-supply" />
       </div>
       <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
-        <NewPurchase pageDescription={pageDescription} />
+        <NewPurchaseRecord pageDescription={pageDescription} />
       </div>
     </div>
   );
 };
 
-export default NewPurchasePage;
+export default NewPurchaseRecordPage;

@@ -10,6 +10,7 @@ import { deleteMaterials, getMaterials } from '@/services/materialServices';
 import Spinner from '@/components/account/Spinner';
 import { useRouter } from 'next/navigation';
 import DeleteModal from '@/components/account/DeleteModal';
+import SubMenuQuickLinks from './SubMenuQuicklinks';
 
 const ViewMaterial = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -168,17 +169,30 @@ const ViewMaterial = ({ pageDescription }) => {
         <Header />
       </div>
       <div className="w-full">
-        <SubHeader title={'List of Materials'} />
+        <SubHeader
+          title={'List of Materials'}
+          ExtraComponents={
+            <SubMenuQuickLinks
+              currentPageLabel="Ungrouped materials"
+              otherLinks={[
+                {
+                  label: 'Grouped materials',
+                  link: '/pages/account/admin/manage-materials/view-grouped-materials',
+                },
+              ]}
+            />
+          }
+        />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
-        <div className="min-w-fit">
+      <div className="flex flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit absolute left-0 top-0 z-50">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col h-full w-full">
+        <div className="flex flex-col h-full w-full relative">
           <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
             <div className="flex flex-row gap-5 w-full justify-between items-center">
               <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
@@ -388,7 +402,9 @@ const ViewMaterial = ({ pageDescription }) => {
               </div>
             )}
           </div>
-          <PageDescription pageDescription={pageDescription} />
+          <div className="sticky bottom-0">
+            <PageDescription pageDescription={pageDescription} />
+          </div>
         </div>
       </div>
 

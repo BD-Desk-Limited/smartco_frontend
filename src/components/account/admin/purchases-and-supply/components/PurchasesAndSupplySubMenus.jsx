@@ -3,7 +3,7 @@ const TOP_MENU_URL = '/pages/account/admin/purchases';
 export const PURCHASES_AND_SUPPLY_SUBMENUS = [
   {
     name: 'new-purchase',
-    label: 'New Purchases',
+    label: 'Record a purchase',
     link: `${TOP_MENU_URL}/new-purchase`,
   },
   {

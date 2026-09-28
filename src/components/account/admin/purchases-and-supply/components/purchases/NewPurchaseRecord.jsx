@@ -22,7 +22,7 @@ import SelectItemPannel from './SelectItemPannel';
 import { savePurchaseRecordService } from '@/services/purchaseAndSupplyServices';
 import WarningWithFeedbackModal from '@/components/account/WarningWithFeedbackModal';
 
-const NewPurchase = ({ pageDescription }) => {
+const NewPurchaseRecord = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
   const [suppliers, setSuppliers] = React.useState([]);
   const [materials, setMaterials] = useState([]);
@@ -407,4 +407,4 @@ const NewPurchase = ({ pageDescription }) => {
   );
 };
 
-export default NewPurchase;
+export default NewPurchaseRecord;

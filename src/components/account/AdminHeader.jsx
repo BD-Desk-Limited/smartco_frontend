@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStepBackward } from 'react-icons/fa';
+import { FaReply } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
 const Header = () => {
@@ -10,11 +10,12 @@ const Header = () => {
       <span
         onClick={() => router.back()}
         title="Back to previous page"
-        className="bg-text-white border border-gray-border 
-        p-2 shadow-md
-        rounded-full absolute left-2 cursor-pointer hover:bg-gray-border"
+        className="bg-text-white
+        p-2 shadow-sm
+        rounded-l-xl absolute left-2 cursor-pointer hover:bg-gray-border text-base text-brand-blue flex flex-row gap-2"
       >
-        <FaStepBackward className="text-lg text-brand-blue" />
+        <FaReply className="" />
+        <span>Back</span>
       </span>
       <div>Searchbar</div>
       <div className="flex flex-row justify-between items-center gap-5">

@@ -9,6 +9,7 @@ const getToken = () => {
   return null;
 };
 
+// fetch suppliers that belong to a company by id and search term
 export const fetchSuppliersByCompanyIdService = async (searchParams) => {
   const token = getToken();
   const params = new URLSearchParams(searchParams);
@@ -38,16 +39,33 @@ export const fetchSuppliersByCompanyIdService = async (searchParams) => {
   }
 };
 
+//save a purchase record
 export const savePurchaseRecordService = async (purchaseRecord) => {
-  // TODO: Uncomment the fetch request below and remove the console.log when the API is ready
   console.log(purchaseRecord);
-  const sampleErrorResponse = {
-    error: 'error saving purchase record, please try again later',
-  };
-  const sampleSuccessResponse = {
-    data: {
-      message: 'Purchase record saved successfully',
-    },
-  };
-  return sampleSuccessResponse;
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/material-purchases/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(purchaseRecord),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching suppliers, please try again' };
+  }
 };
