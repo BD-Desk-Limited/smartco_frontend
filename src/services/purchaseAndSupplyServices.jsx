@@ -66,6 +66,36 @@ export const savePurchaseRecordService = async (purchaseRecord) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error fetching suppliers, please try again' };
+    return { error: 'error saving purchase record, please try again' };
+  }
+};
+
+// fetch all purchase records based on filters and search term
+export const fetchPurchaseRecordsService = async (searchBody) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/material-purchases/search`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(searchBody),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching purchase records, please try again' };
   }
 };

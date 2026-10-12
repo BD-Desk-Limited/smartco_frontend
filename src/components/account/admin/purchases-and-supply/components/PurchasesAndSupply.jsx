@@ -1,29 +1,159 @@
 import Header from '@/components/account/AdminHeader';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SubHeader from '../../SubHeader';
 import SideBar from '../../SideBar';
 import PageDescription from '@/components/account/PageDescription';
 import { PURCHASES_AND_SUPPLY_SUBMENUS } from './PurchasesAndSupplySubMenus';
-import { useRouter } from 'next/navigation';
-import { FaFilter, FaSearch } from 'react-icons/fa';
 import Spinner from '@/components/account/Spinner';
-import Button from '@/components/account/Button';
+import PurchaseAndSupplyTable from './PurchaseAndSupplyTable';
+import PurchasesAndSupplyFilters from './PurchasesAndSupplyFilters';
+import { getUserBranchesService } from '@/services/branchServices';
+import {
+  fetchPurchaseRecordsService,
+  fetchSuppliersByCompanyIdService,
+} from '@/services/purchaseAndSupplyServices';
+import { formatDate } from '@/utilities/formatTime';
+import Pagination from '@/components/account/Pagination';
+import ErrorModal from '@/components/account/ErrorModal';
+import PurchaseAndSupplyDetailSideView from './PurchaseAndSupplyDetailSideView';
 
+// declaring constants
+const STATUS_OPTIONS = [
+  {
+    label: 'Pending',
+    value: 'pending',
+    color: 'bg-yellow-500  text-text-white',
+  },
+  {
+    label: 'Approved',
+    value: 'approved',
+    color: 'bg-green-500  text-text-white',
+  },
+  {
+    label: 'Fulfilled',
+    value: 'fulfilled',
+    color: 'bg-blue-500  text-text-white',
+  },
+  {
+    label: 'Disputed',
+    value: 'disputed',
+    color: 'bg-text-white text-text-black border border-border-gray',
+  },
+  {
+    label: 'Cancelled',
+    value: 'cancelled',
+    color: 'bg-gray-500  text-text-white',
+  },
+];
+
+const buildInitialFilters = () => {
+  const now = new Date();
+  return {
+    searchTerm: '',
+    status: '', // '' = all statuses
+    suppliers: [], // [] = all
+    branches: [], // [] = all the user can access (server enforces access)
+    from: formatDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+    to: formatDate(now),
+    page: 1,
+    limit: 50,
+  };
+};
 const PurchasesAndSupply = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
-  const [selectedStatusTypes, setSelectedStatusTypes] = useState('All');
-  const [loading, setLoaading] = useState(false);
-  const Router = useRouter();
+  const [userBranches, setUserBranches] = useState([]);
+  const [allSuppliers, setAllSuppliers] = useState([]);
+  const [draftFilters, setDraftFilters] = useState(buildInitialFilters);
+  const [selectedFilters, setSelectedFilters] = useState(draftFilters);
+  const [allPurchases, setAllPurchases] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingPurchases, setLoadingPurchases] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const allPossibleStatusType = [
-    'pending',
-    'approved',
-    'fulfilled',
-    'disputed',
-  ];
+  const onChangeFilter = (field, value) => {
+    setDraftFilters((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const filteredPurchases = [];
+  // dropdown source lists, fetched once in parallel
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchFilterOptions = async () => {
+      setLoadingOptions(true);
+      const [branchesResult, suppliersResult] = await Promise.allSettled([
+        getUserBranchesService(),
+        fetchSuppliersByCompanyIdService({
+          searchTerm: '',
+          page: 1,
+          limit: 50,
+        }),
+      ]);
+      if (cancelled) return;
+
+      if (branchesResult.value?.data) {
+        setUserBranches(branchesResult.value.data);
+      } else {
+        console.error(
+          'Error fetching branches:',
+          branchesResult.value?.error || branchesResult.reason
+        );
+        setErrorMessage(
+          branchesResult.value?.error ||
+            branchesResult.reason ||
+            'Error fetching branches'
+        );
+      }
+
+      // endpoint returns { suppliers, pagination }
+      const suppliers = suppliersResult.value?.data?.suppliers;
+      if (suppliers) {
+        setAllSuppliers(suppliers);
+      } else {
+        console.error(
+          'Error fetching suppliers:',
+          suppliersResult.value?.error || suppliersResult.reason
+        );
+      }
+      setLoadingOptions(false);
+    };
+
+    fetchFilterOptions();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // purchases, refetched whenever the applied filters change
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchPurchases = async () => {
+      setLoadingPurchases(true);
+      try {
+        const response = await fetchPurchaseRecordsService(selectedFilters);
+        if (cancelled) return;
+        if (response.error) {
+          console.error('Error fetching purchases:', response.error);
+          setErrorMessage(response.error || 'Error fetching purchases record');
+          setAllPurchases([]);
+        } else if (response.data) {
+          setAllPurchases(response.data.purchases || []);
+          setPagination(response.data.pagination || null);
+        }
+      } catch (error) {
+        console.error('Error fetching purchases:', error);
+      } finally {
+        if (!cancelled) setLoadingPurchases(false);
+      }
+    };
+
+    fetchPurchases();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedFilters]);
 
   return (
     <div className="h-full w-full">
@@ -31,7 +161,7 @@ const PurchasesAndSupply = ({ pageDescription }) => {
         <Header />
       </div>
       <div className="w-full">
-        <SubHeader title={'My Purchases'} />
+        <SubHeader title={'Purchase Orders List'} />
       </div>
       <div className="flex flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit">
@@ -44,111 +174,70 @@ const PurchasesAndSupply = ({ pageDescription }) => {
         </div>
         <div className="flex flex-col h-full w-full relative">
           <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
-            <div className="flex flex-row gap-5 w-full justify-between items-center">
-              {/**Search Input  */}
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
-                <FaSearch width={15} height={15} />
-                <input
-                  type="text"
-                  placeholder="Search by order ID/Supplier name"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="focus:outline-none ml-2 w-full text-sm"
-                />
-              </div>
+            <PurchasesAndSupplyFilters
+              selectedFilters={selectedFilters}
+              draftFilters={draftFilters}
+              setSelectedFilters={setSelectedFilters}
+              setDraftFilters={setDraftFilters}
+              onChangeFilter={onChangeFilter}
+              allSuppliers={allSuppliers}
+              formatDate={formatDate}
+              userBranches={userBranches}
+              STATUS_OPTIONS={STATUS_OPTIONS}
+            />
 
-              {/** status filter */}
-              <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
-                <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
-                  <FaFilter alt="sort" width={15} height={15} />
-                  <select
-                    value={selectedStatusTypes}
-                    className="focus:outline-none cursor-pointer"
-                  >
-                    <option value={''}>All Status</option>
-                    {allPossibleStatusType?.map((type) => (
-                      <option key={type} className="">
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/** quick buttons */}
-              <div className="h-full text-sm border border-gray-shadow7 rounded-md flex justify-between gap-3 p-1">
-                <button
-                  onClick={() =>
-                    Router.push('/pages/account/admin/purchases/new-purchase')
-                  }
-                  className="shadow-md bg-brand-gray text-text-white rounded-md hover:bg-gray-shadow2 p-0.5"
-                >
-                  Record new purchase
-                </button>
-
-                <button className="shadow-md bg-brand-gray text-text-white rounded-md hover:bg-gray-shadow2 p-0.5">
-                  Start new order
-                </button>
-              </div>
-            </div>
-
-            {loading ? (
+            {loadingOptions || loadingPurchases ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow10 text-sm text-text-gray ">
-                      <th className="px-4 py-2 border border-gray-shadow7">
-                        Order I D
-                      </th>
-                      <th className="px-4 py-2 border border-gray-shadow7">
-                        Supplier
-                      </th>
-                      <th className="px-4 py-2 border border-gray-shadow7">
-                        Date
-                      </th>
-                      <th className="px-4 py-2 border border-gray-shadow7">
-                        Expected Delivery
-                      </th>
-                      <th className="px-4 py-2 border border-gray-shadow7">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
+              <PurchaseAndSupplyTable
+                allPurchases={allPurchases}
+                STATUS_OPTIONS={STATUS_OPTIONS}
+                formatDate={formatDate}
+                setSelectedOrder={setSelectedOrder}
+              />
+            )}
 
-                  <tbody className="text-text-gray">
-                    {filteredPurchases.length > 0 ? (
-                      <>
-                        {filteredPurchases.map((purchase) => (
-                          <tr
-                            key={purchase._id}
-                            className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
-                          >
-                            <td className="px-4 py-2">
-                              <span>{purchase._id}</span>
-                            </td>
-                          </tr>
-                        ))}
-                      </>
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={5}>
-                          No purchase record found for this period.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+            {pagination && (
+              <Pagination
+                currentPage={selectedFilters.page}
+                totalPages={pagination?.totalPages || 1}
+                onPageChange={(page) =>
+                  setSelectedFilters((prev) => ({ ...prev, page }))
+                }
+              />
             )}
           </div>
-
           <div className="sticky bottom-0">
             <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-center items-center ">
+          <ErrorModal
+            message={errorMessage}
+            title={'Error'}
+            buttonStyle={'bg-error'}
+            onClose={() => setErrorMessage(null)}
+            buttonText={'Close'}
+            subText={'Please try again'}
+          />
+        </div>
+      )}
+
+      {selectedOrder && (
+        <div
+          className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center "
+          onClick={() => setSelectedOrder(null)}
+        >
+          <PurchaseAndSupplyDetailSideView
+            order={selectedOrder}
+            setOrder={setSelectedOrder}
+            STATUS_OPTIONS={STATUS_OPTIONS}
+          />
+        </div>
+      )}
     </div>
   );
 };
