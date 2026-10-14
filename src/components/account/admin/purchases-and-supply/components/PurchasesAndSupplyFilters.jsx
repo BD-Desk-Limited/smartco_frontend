@@ -9,6 +9,7 @@ import {
   FaSearch,
   FaChevronDown,
   FaChevronLeft,
+  FaDownload,
   FaShippingFast,
 } from 'react-icons/fa';
 
@@ -22,6 +23,8 @@ const PurchasesAndSupplyFilters = ({
   formatDate,
   userBranches,
   STATUS_OPTIONS,
+  onExport,
+  preparingExport,
 }) => {
   const Router = useRouter();
   const OPEN_MARKET_ID = 'open_market';
@@ -48,7 +51,6 @@ const PurchasesAndSupplyFilters = ({
     draftFilters.suppliers.length > 0 && !allSuppliersSelected;
 
   const toggleBranch = (id) =>
-    console.log('toggleBranch', id) ||
     setDraftFilters((prev) => ({
       ...prev,
       branches: prev.branches.includes(id)
@@ -327,6 +329,14 @@ const PurchasesAndSupplyFilters = ({
       </div>
 
       <div className="text-sm rounded-md flex justify-center gap-2 max-w-[300px] h-full">
+        <button
+          onClick={onExport}
+          disabled={preparingExport}
+          className="px-2 shadow-md border border-gray-border rounded-md p-1 whitespace-nowrap flex items-center gap-1 hover:bg-gray-shadow10 disabled:opacity-50"
+        >
+          <FaDownload aria-hidden="true" />
+          {preparingExport ? 'Preparing...' : 'Print / Export'}
+        </button>
         <button
           onClick={() =>
             Router.push('/pages/account/admin/purchases/new-purchase')

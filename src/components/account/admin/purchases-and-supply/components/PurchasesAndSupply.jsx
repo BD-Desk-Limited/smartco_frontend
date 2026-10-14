@@ -16,13 +16,18 @@ import { formatDate } from '@/utilities/formatTime';
 import Pagination from '@/components/account/Pagination';
 import ErrorModal from '@/components/account/ErrorModal';
 import PurchaseAndSupplyDetailSideView from './PurchaseAndSupplyDetailSideView';
+import ExportContent from '@/components/account/ExportContent';
 
 // declaring constants
+const OPEN_MARKET_ID = 'open_market';
+const EXPORT_PAGE_SIZE = 100; // server maximum
+const MAX_EXPORT_PAGES = 50; // safety cap: 5,000 rows
+
 const STATUS_OPTIONS = [
   {
     label: 'Pending',
     value: 'pending',
-    color: 'bg-yellow-500  text-text-white',
+    color: 'bg-yellow-500  text-text-white ',
   },
   {
     label: 'Approved',
@@ -59,6 +64,10 @@ const buildInitialFilters = () => {
     limit: 50,
   };
 };
+
+// avoids float artifacts like 12.299999 in exports
+const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
 const PurchasesAndSupply = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const [userBranches, setUserBranches] = useState([]);
@@ -71,6 +80,9 @@ const PurchasesAndSupply = ({ pageDescription }) => {
   const [loadingPurchases, setLoadingPurchases] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  // one export modal serves both the list and the side view
+  const [exportConfig, setExportConfig] = useState(null);
+  const [preparingExport, setPreparingExport] = useState(false);
 
   const onChangeFilter = (field, value) => {
     setDraftFilters((prev) => ({ ...prev, [field]: value }));
@@ -155,6 +167,94 @@ const PurchasesAndSupply = ({ pageDescription }) => {
     };
   }, [selectedFilters]);
 
+  // ---------- list export ----------
+
+  // every page of the applied filters (the table only shows one page)
+  const fetchAllPurchases = async (filters) => {
+    const rows = [];
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const res = await fetchPurchaseRecordsService({
+        ...filters,
+        page,
+        limit: EXPORT_PAGE_SIZE,
+      });
+      if (res.error) throw new Error(String(res.error));
+      rows.push(...(res.data?.purchases || []));
+      totalPages = res.data?.pagination?.totalPages || 1;
+      page += 1;
+    } while (page <= totalPages && page <= MAX_EXPORT_PAGES);
+    return rows;
+  };
+
+  const buildListExport = (rows) => {
+    const f = selectedFilters;
+    const statusLabel =
+      STATUS_OPTIONS.find((s) => s.value === f.status)?.label || 'All';
+    const branchNames = f.branches
+      .map((id) => userBranches.find((b) => b._id === id)?.name)
+      .filter(Boolean);
+    const supplierNames = f.suppliers
+      .map((id) =>
+        id === OPEN_MARKET_ID
+          ? 'Open market'
+          : allSuppliers.find((s) => s._id === id)?.name
+      )
+      .filter(Boolean);
+    // cancelled orders are left out of the grand total
+    const grandTotal = rows
+      .filter((r) => r.status !== 'cancelled')
+      .reduce((sum, r) => sum + (r.totalCost || 0), 0);
+
+    return {
+      title: 'Purchase Orders',
+      fileName: `purchase-orders_${f.from || 'start'}_to_${f.to || 'today'}`,
+      metadata: {
+        Period: `${f.from || 'Start'} to ${f.to || 'Today'}`,
+        Status: statusLabel,
+        Branches: branchNames.length ? branchNames : 'All',
+        Suppliers: supplierNames.length ? supplierNames : 'All',
+        Orders: String(rows.length),
+        'Total (excluding cancelled)': commaNumberFormat(grandTotal, 2),
+      },
+      emptyMessage: 'No purchase orders found',
+      data: rows.map((r) => ({
+        'Order ID': r.purchaseID || '-',
+        Branch: r.receivingBranch?.name || 'N/A',
+        Supplier: r.supplierName || 'N/A',
+        Type: r.isOpenMarket ? 'Open market' : 'Supplier',
+        Date: r.supplyDate ? formatDate(new Date(r.supplyDate)) : '-',
+        Status: capitalizeFirst(r.status) || '-',
+        Items: r.itemCount ?? 0,
+        Total: round2(r.totalCost), // number, so Excel can sum it
+      })),
+    };
+  };
+
+  const handleExportList = async () => {
+    setPreparingExport(true);
+    try {
+      // a single page already holds the whole result, so skip the extra requests
+      const rows =
+        (pagination?.totalPages || 1) <= 1
+          ? allPurchases
+          : await fetchAllPurchases(selectedFilters);
+
+      if (rows.length === 0) {
+        setErrorMessage(
+          'There are no purchase orders to export for this selection.'
+        );
+        return;
+      }
+      setExportConfig(buildListExport(rows));
+    } catch (err) {
+      setErrorMessage(err.message || 'Could not prepare the export');
+    } finally {
+      setPreparingExport(false);
+    }
+  };
+
   return (
     <div className="h-full w-full">
       <div className="w-full sticky top-0 z-50">
@@ -184,6 +284,8 @@ const PurchasesAndSupply = ({ pageDescription }) => {
               formatDate={formatDate}
               userBranches={userBranches}
               STATUS_OPTIONS={STATUS_OPTIONS}
+              onExport={handleExportList}
+              preparingExport={preparingExport}
             />
 
             {loadingOptions || loadingPurchases ? (
@@ -214,7 +316,7 @@ const PurchasesAndSupply = ({ pageDescription }) => {
       </div>
 
       {errorMessage && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-center items-center ">
+        <div className="inset-0 fixed bg-black bg-opacity-50 z-[70] flex justify-center items-center ">
           <ErrorModal
             message={errorMessage}
             title={'Error'}
@@ -235,6 +337,17 @@ const PurchasesAndSupply = ({ pageDescription }) => {
             order={selectedOrder}
             setOrder={setSelectedOrder}
             STATUS_OPTIONS={STATUS_OPTIONS}
+            onExport={setExportConfig}
+          />
+        </div>
+      )}
+
+      {/* rendered last and above the side view, so it opens on top of it */}
+      {exportConfig && (
+        <div className="inset-0 fixed bg-black bg-opacity-50 z-[60] flex justify-center items-center">
+          <ExportContent
+            {...exportConfig}
+            onClose={() => setExportConfig(null)}
           />
         </div>
       )}
