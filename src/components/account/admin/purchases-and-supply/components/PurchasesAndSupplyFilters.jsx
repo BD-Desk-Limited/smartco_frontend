@@ -328,11 +328,11 @@ const PurchasesAndSupplyFilters = ({
         </div>
       </div>
 
-      <div className="text-sm rounded-md flex justify-center gap-2 max-w-[300px] h-full">
+      <div className="text-sm rounded-md flex flex-col justify-center gap-2 max-w-[100px] h-full">
         <button
           onClick={onExport}
           disabled={preparingExport}
-          className="px-2 shadow-md border border-gray-border rounded-md p-1 whitespace-nowrap flex items-center gap-1 hover:bg-gray-shadow10 disabled:opacity-50"
+          className="shadow-md border border-gray-border rounded-md p-1 whitespace-nowrap flex items-center gap-1 hover:bg-gray-shadow10 disabled:opacity-50 w-fit text-center"
         >
           <FaDownload aria-hidden="true" />
           {preparingExport ? 'Preparing...' : 'Print / Export'}
@@ -341,7 +341,7 @@ const PurchasesAndSupplyFilters = ({
           onClick={() =>
             Router.push('/pages/account/admin/purchases/new-purchase')
           }
-          className="px-1 shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue p-1 whitespace-nowrap"
+          className="shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue p-2 whitespace-nowrap w-fit text-center"
         >
           Record new purchase
         </button>

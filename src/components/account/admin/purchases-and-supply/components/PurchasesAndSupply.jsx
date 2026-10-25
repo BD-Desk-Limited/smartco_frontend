@@ -17,6 +17,8 @@ import Pagination from '@/components/account/Pagination';
 import ErrorModal from '@/components/account/ErrorModal';
 import PurchaseAndSupplyDetailSideView from './PurchaseAndSupplyDetailSideView';
 import ExportContent from '@/components/account/ExportContent';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { capitalizeFirst } from '@/utilities/stringUtils';
 
 // declaring constants
 const OPEN_MARKET_ID = 'open_market';

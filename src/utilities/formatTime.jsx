@@ -59,3 +59,25 @@ export const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+const toYMD = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+/**
+ * Returns the current date (local) as a yyyy-mm-dd string
+ * @returns {string}
+ */
+export const getDateNow = () => toYMD(new Date());
+
+/**
+ * Returns the first day of the current month (local) as a yyyy-mm-dd string
+ * @returns {string}
+ */
+export const getFirstDayOfMonth = () => {
+  const now = new Date();
+  return toYMD(new Date(now.getFullYear(), now.getMonth(), 1));
+};
