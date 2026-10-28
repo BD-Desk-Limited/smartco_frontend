@@ -103,9 +103,7 @@ export const selfRegisterationCustomerService = async (customerData) => {
 export const validateCustomerSelfRegistrationTokenService = async (
   registrationToken
 ) => {
-  const token = getToken();
   try {
-    console.log('Validating registration token:', registrationToken);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/customers/validate-registration-token/${registrationToken}`,
       {
@@ -127,5 +125,127 @@ export const validateCustomerSelfRegistrationTokenService = async (
   } catch (error) {
     console.error('Error:', error);
     return { error: 'error validating registration token, please try again' };
+  }
+};
+
+// fetch customers using criterials.
+export const fetchCustomersService = async (body) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/search`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching customers, please try again later' };
+  }
+};
+
+//fetch customer profile by Id. Accepts months to cover as criterial e.g `?months=12` for last 12months
+export const fetchCustomerProfileService = async (body) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/${body.customerId}/profile?months=${body.months}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error fetching customer profile, please try again later' };
+  }
+};
+
+// fetch customer Transactions by Id. filter by date and page limit body: { from, to, page, limit }   (YYYY-MM-DD, whole days inclusive)
+export const fetchCustomerTransactionsService = async (body) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/${body.customerId}/transactions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching customer transactions, please try again later',
+    };
+  }
+};
+
+// GET all customer groups for
+export const fetchCustomerGroupsService = async (body) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/groups`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching customer groups, please try again later',
+    };
   }
 };

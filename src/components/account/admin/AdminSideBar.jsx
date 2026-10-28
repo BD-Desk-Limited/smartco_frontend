@@ -122,7 +122,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       superAdminOnly: false,
       nonSuperAdminOnly: true,
     
-    }, {
+    },*/
+    {
       name: 'my-customers',
       icon: <FaAddressBook className="text-text-white" />,
       iconActive: <FaAddressBook className="text-brand-blue" />,
@@ -131,8 +132,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Customer_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    
-    },*/
+    },
     {
       name: 'tax-management',
       icon: <FaPercent className="text-text-white" />,

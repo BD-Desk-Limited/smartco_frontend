@@ -47,4 +47,9 @@ export const allAccess = [
     accessGranted: true,
     allowedGrantOthers: true,
   },
+  {
+    accessName: 'Customer_Management',
+    accessGranted: true,
+    allowedGrantOthers: true,
+  },
 ];

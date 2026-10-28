@@ -16,7 +16,7 @@ const SideBar = ({ selectedSubMenu, isOpen, setIsOpen, sideBarSubmenus }) => {
           initial={{ x: '-10%', y: '-10%' }}
           animate={{ x: 0, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-brand-green h-[80vh] w-full flex flex-col rounded-md m-2 py-1 text-text-white gap-3"
+          className="bg-brand-green h-[80vh] flex flex-col rounded-md m-2 py-1 text-text-white gap-3 w-36"
         >
           <p className="cursor-pointer w-full justify-end flex px-3">
             <Image
@@ -32,7 +32,7 @@ const SideBar = ({ selectedSubMenu, isOpen, setIsOpen, sideBarSubmenus }) => {
             <div
               key={index}
               onClick={() => handleSelectSubMenu(submenu)}
-              className={`p-1 rounded-sm mx-0.5 cursor-pointer hover:bg-text-white hover:text-brand-green ${selectedSubMenu === submenu.name ? 'bg-text-white text-brand-green' : ''}`}
+              className={`p-1 rounded-sm mx-0.5 hover:shadow-md cursor-pointer hover:bg-text-white hover:text-brand-green ${selectedSubMenu === submenu.name ? 'bg-text-white text-brand-green' : ''}`}
             >
               {submenu.label}
             </div>
@@ -41,7 +41,7 @@ const SideBar = ({ selectedSubMenu, isOpen, setIsOpen, sideBarSubmenus }) => {
       ) : (
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className="cursor-pointer py-2 px-3 bg-brand-green rounded-md m-0.5"
+          className="cursor-pointer py-2 px-3 bg-brand-green rounded-md m-0.5 w-10"
         >
           <Image
             src="/assets/double_arrow_right.png"
