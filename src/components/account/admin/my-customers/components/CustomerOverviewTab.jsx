@@ -112,7 +112,7 @@ const CustomerOverview = ({
         </ResponsiveContainer>
       </ChartCard>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 z-40">
         <ChartCard title="Visits by weekday (all time)">
           <ResponsiveContainer>
             <BarChart data={profile.weekdays}>

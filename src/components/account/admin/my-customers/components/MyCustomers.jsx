@@ -1,6 +1,6 @@
 import Header from '@/components/account/AdminHeader';
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaFilter, FaHome, FaSort, FaUser } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaHome, FaSort } from 'react-icons/fa';
 import SubHeader from '../../SubHeader';
 import SideBar from '../../SideBar';
 import MY_CUSTOMER_SUBMENUS from './MY_CUSTOMER_SUBMENUS';
@@ -9,13 +9,12 @@ import Spinner from '@/components/account/Spinner';
 import Pagination from '@/components/account/Pagination';
 import ErrorModal from '@/components/account/ErrorModal';
 import { getUserBranchesService } from '@/services/branchServices';
-import {
-  fetchCustomersService,
-  fetchCustomerGroupsService,
-} from '@/services/customerServices';
+import { fetchCustomersService } from '@/services/customerServices';
+import { fetchGroupsService } from '@/services/customerServices';
 import { formatDate } from '@/utilities/formatTime';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import CustomerProfileSideView from './CustomerProfileSideView';
+import { useRouter } from 'next/navigation';
 
 const SORT_OPTIONS = [
   { value: 'name', label: 'Name (A-Z)' },
@@ -43,6 +42,7 @@ const MyCustomers = ({ pageDescription }) => {
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const Router = useRouter();
 
   const onChangeFilter = (field, value) =>
     setDraftFilters((prev) => ({ ...prev, [field]: value }));
@@ -54,7 +54,7 @@ const MyCustomers = ({ pageDescription }) => {
     (async () => {
       const [branchesResult, groupsResult] = await Promise.allSettled([
         getUserBranchesService(),
-        fetchCustomerGroupsService(),
+        fetchGroupsService(),
       ]);
       if (cancelled) return;
       if (branchesResult.value?.data)
@@ -63,7 +63,8 @@ const MyCustomers = ({ pageDescription }) => {
         setErrorMessage(
           branchesResult.value?.error || 'Error fetching branches'
         );
-      if (groupsResult.value?.data) setGroups(groupsResult.value.data);
+      if (groupsResult.value?.data)
+        setGroups(groupsResult.value.data.groups || []);
     })();
     return () => {
       cancelled = true;
@@ -202,25 +203,32 @@ const MyCustomers = ({ pageDescription }) => {
                 <table className="w-full">
                   <thead className="sticky top-0 bg-white">
                     <tr className="text-left bg-gray-shadow10 text-sm text-text-gray">
-                      <th className="px-4 py-2 border border-gray-shadow8">
-                        Customers
+                      <th className="px-2 py-2 border border-gray-shadow8">
+                        Customer
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
                         Registered at
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
                         Branches
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
                         Visits
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
                         Total spent
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
                         Last visit
                       </th>
-                      <th className="px-4 py-2 text-center border border-gray-shadow8">
+                      <th
+                        onClick={() =>
+                          Router.push(
+                            '/pages/account/admin/my-customers/customer-groups'
+                          )
+                        }
+                        className="px-4 py-2 tex2-center border border-gray-shadow8 cursor-pointer hover:bg-blue-shadow6"
+                      >
                         Groups
                       </th>
                     </tr>
@@ -233,38 +241,35 @@ const MyCustomers = ({ pageDescription }) => {
                           onClick={() => setSelectedCustomer(c)}
                           className="border-b border-gray-border text-sm cursor-pointer hover:bg-green-shadow8"
                         >
-                          <td className="px-4 py-2 flex flex-row gap-2 items-end">
-                            <FaUser className="text-lg" />
-                            <span>
-                              <span className="block text-text-black">
-                                {c.name}
-                              </span>
-                              <span className="text-xs font-semibold">
-                                {c.customerNumber}
-                              </span>
+                          <td className="px-2 py-2">
+                            <span className="block text-text-black">
+                              {c.name}
+                            </span>
+                            <span className="text-xs font-semibold">
+                              {c.customerNumber}
                             </span>
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-2 py-2 text-center">
                             {c.registeredBranch?.name || 'N/A'}
                           </td>
                           <td
-                            className="px-4 py-2 text-center"
+                            className="px-2 py-2 text-center"
                             title={c.branches.map((b) => b.name).join(', ')}
                           >
                             {c.branches.length}
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-2 py-2 text-center">
                             {c.stats.visits}
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-2 py-2 text-center">
                             {commaNumberFormat(c.stats.totalSpent, 2)}
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-2 py-2 text-center">
                             {c.stats.lastVisit
                               ? formatDate(new Date(c.stats.lastVisit))
                               : '-'}
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-2 py-2 text-center">
                             {c.groups.length
                               ? c.groups.map((g) => g.name).join(', ')
                               : '-'}
@@ -298,6 +303,7 @@ const MyCustomers = ({ pageDescription }) => {
           </div>
         </div>
       </div>
+
       {errorMessage && (
         <div className="inset-0 fixed bg-black bg-opacity-50 z-[70] flex justify-center items-center">
           <ErrorModal
@@ -310,6 +316,7 @@ const MyCustomers = ({ pageDescription }) => {
           />
         </div>
       )}
+
       {selectedCustomer && (
         <div
           className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center"

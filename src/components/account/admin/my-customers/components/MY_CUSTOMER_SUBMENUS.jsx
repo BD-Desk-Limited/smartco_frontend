@@ -7,11 +7,15 @@ const MY_CUSTOMER_SUBMENUS = [
     link: `${TOP_MENU_URL}`,
   },
   {
+    name: 'customer-groups',
+    label: 'Customer Groups',
+    link: `${TOP_MENU_URL}/customer-groups`,
+  },
+  {
     name: 'customer-rewards',
     label: 'Customer Rewards',
     link: `${TOP_MENU_URL}/customer-rewards`,
   },
-
   {
     name: 'message-customer',
     label: 'Message Customer',

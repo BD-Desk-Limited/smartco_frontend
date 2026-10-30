@@ -101,15 +101,14 @@ const CustomerProfileSideView = ({ customer, onClose }) => {
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-2/3 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-4 overflow-y-auto rounded-l-lg"
+      className="relative w-2/3 h-full bg-text-white flex flex-col px-4 pb-4 text-sm text-text-gray gap-4 overflow-y-auto scrollbar-thin rounded-l-lg"
     >
-      <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
-        <FaTimes className="text-text-white" onClick={onClose} />
-      </div>
-
       {/* identity: name and number only, never contact details */}
-      <div className=" sticky top-0 bg-text-white shadow-sm">
-        <div className="pr-8 text-text-black">
+      <div className=" sticky top-0 bg-text-white shadow-sm px-1 pt-4">
+        <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer">
+          <FaTimes className="text-text-white" onClick={onClose} />
+        </div>
+        <div className="pr-8 text-text-black py-4">
           <h3 className="text-lg font-semibold flex flex-row items-baseline gap-2">
             {' '}
             <FaUser /> <span>{header.name}</span>

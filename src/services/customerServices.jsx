@@ -133,7 +133,7 @@ export const fetchCustomersService = async (body) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/search`,
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/list`,
       {
         method: 'POST',
         headers: {
@@ -220,11 +220,11 @@ export const fetchCustomerTransactionsService = async (body) => {
 };
 
 // GET all customer groups for
-export const fetchCustomerGroupsService = async (body) => {
+export const fetchGroupsService = async (search) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customer-directory/groups`,
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups${search ? `/?search=${encodeURIComponent(search)}` : '/'}`,
       {
         method: 'GET',
         headers: {
@@ -246,6 +246,217 @@ export const fetchCustomerGroupsService = async (body) => {
     console.error('Error:', error);
     return {
       error: 'error fetching customer groups, please try again later',
+    };
+  }
+};
+
+export const fetchGroupBranchOptionsService = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/branches`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching group branches, please try again later',
+    };
+  }
+};
+
+export const fetchGroupMembersService = async (id, filters) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/${id}/members/list`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(filters),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching group members, please try again later',
+    };
+  }
+};
+export const addGroupMembersService = async (id, customerIds) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/${id}/members`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ customerIds: customerIds }),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error adding group members, please try again later',
+    };
+  }
+};
+export const removeGroupMembersService = async (id, customerIds) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/${id}/members/remove`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ customerIds: customerIds }),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error removing group members, please try again later',
+    };
+  }
+};
+export const deleteGroupService = async (id, customerIds) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ customerIds: customerIds }),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error deleting group, please try again later',
+    };
+  }
+};
+export const createGroupService = async (payload) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error creating group, please try again later',
+    };
+  }
+};
+export const updateGroupService = async (id, payload) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-groups/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error updating group, please try again later',
     };
   }
 };
