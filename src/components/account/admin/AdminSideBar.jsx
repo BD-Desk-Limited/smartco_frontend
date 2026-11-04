@@ -232,6 +232,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             alt="logo"
             width={30}
             height={30}
+            style={{ height: 'auto' }}
           />
           {isOpen && (
             <Image

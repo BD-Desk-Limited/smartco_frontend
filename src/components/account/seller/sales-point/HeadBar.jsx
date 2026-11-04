@@ -79,6 +79,7 @@ const HeadBar = ({
           width={40}
           height={40}
           className="object-contain"
+          style={{ height: 'auto' }}
         />
 
         <strong className="text-white">POS</strong>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes, FaSearch } from 'react-icons/fa';
+import { FaTimes, FaSearch, FaUsers } from 'react-icons/fa';
 import Spinner from '@/components/account/Spinner';
 import Pagination from '@/components/account/Pagination';
 import {
@@ -139,14 +139,17 @@ const CustomerGroupSideView = ({
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto"
+      className="relative w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin rounded-l-lg"
     >
       <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
         <FaTimes className="text-text-white" onClick={onClose} />
       </div>
 
       <div className="pr-8">
-        <h3 className="text-lg font-semibold text-text-black">{group.name}</h3>
+        <h3 className="text-lg font-semibold text-text-black flex flex-row items-center gap-2">
+          <FaUsers className="text-brand-green" />
+          <span>{group.name}</span>
+        </h3>
         {group.description && (
           <p className="whitespace-pre-wrap break-words">{group.description}</p>
         )}

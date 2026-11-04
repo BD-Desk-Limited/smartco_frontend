@@ -108,6 +108,7 @@ const Welcome = () => {
                 alt="logo"
                 width={50}
                 height={50}
+                style={{ height: 'auto' }}
               />
               <p className="text-xl font-bold">SmartCo.</p>
             </div>

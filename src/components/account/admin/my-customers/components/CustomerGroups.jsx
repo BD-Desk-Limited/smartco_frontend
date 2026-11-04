@@ -14,6 +14,7 @@ import {
 import { formatDate } from '@/utilities/formatTime';
 import CustomerGroupFormModal from './CustomerGroupFormModal';
 import CustomerGroupSideView from './CustomerGroupSideView';
+import { FaUserGroup, FaUsers } from 'react-icons/fa6';
 
 const CustomerGroups = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -143,13 +144,21 @@ const CustomerGroups = ({ pageDescription }) => {
                           onClick={() => setSelectedGroupId(g._id)}
                           className="border-b border-gray-border text-sm cursor-pointer hover:bg-gray-shadow10"
                         >
-                          <td className="px-4 py-3">
-                            <span className="block text-text-black">
-                              {g.name}
+                          <td className="px-4 py-3 flex flex-row items-center gap-2">
+                            <span>
+                              <FaUsers className="text-lg text-brand-green" />
                             </span>
-                            {g.description && (
-                              <span className="text-xs">{g.description}</span>
-                            )}
+                            <span className="flex flex-col text-text-black">
+                              <span className="font-semibold">{g.name}</span>
+
+                              <span>
+                                {g.description && (
+                                  <span className="text-xs">
+                                    {g.description}
+                                  </span>
+                                )}
+                              </span>
+                            </span>
                           </td>
                           <td className="px-4 py-3">
                             {g.isGlobal ? (

@@ -240,6 +240,7 @@ const ResetPassword = ({ token }) => {
           alt="Logo"
           width={250}
           height={250}
+          style={{ height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[10vh] right-[-20vw] z-0">
@@ -248,6 +249,7 @@ const ResetPassword = ({ token }) => {
           alt="Logo"
           width={650}
           height={650}
+          style={{ height: 'auto' }}
         />
       </div>
     </div>

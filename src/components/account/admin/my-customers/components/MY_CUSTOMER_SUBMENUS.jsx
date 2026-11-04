@@ -12,14 +12,14 @@ const MY_CUSTOMER_SUBMENUS = [
     link: `${TOP_MENU_URL}/customer-groups`,
   },
   {
-    name: 'customer-rewards',
-    label: 'Customer Rewards',
-    link: `${TOP_MENU_URL}/customer-rewards`,
-  },
-  {
     name: 'message-customer',
     label: 'Message Customer',
     link: `${TOP_MENU_URL}/message-customer`,
+  },
+  {
+    name: 'customer-rewards',
+    label: 'Customer Rewards',
+    link: `${TOP_MENU_URL}/customer-rewards`,
   },
 ];
 
