@@ -5,7 +5,8 @@ import { PageAccessRequirement } from '../../PageAccessRequirement';
 import MyCustomers from './components/MyCustomers';
 
 const CustomerManagementPage = () => {
-  const pageDescription = ' ';
+  const pageDescription =
+    'This page allows you to manage your customers. You can view customer details, edit information, and perform other administrative tasks related to customer management.';
 
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(

@@ -32,7 +32,7 @@ const SideBar = ({ selectedSubMenu, isOpen, setIsOpen, sideBarSubmenus }) => {
             <div
               key={index}
               onClick={() => handleSelectSubMenu(submenu)}
-              className={`p-1 rounded-sm mx-0.5 hover:shadow-md cursor-pointer hover:bg-text-white hover:text-brand-green ${selectedSubMenu === submenu.name ? 'bg-text-white text-brand-green' : ''}`}
+              className={`p-1 rounded-sm mx-0.5 hover:shadow-md cursor-pointer hover:bg-text-white hover:text-brand-green ${selectedSubMenu === submenu.name ? 'bg-green-shadow5 text-brand-green' : ''}`}
             >
               {submenu.label}
             </div>

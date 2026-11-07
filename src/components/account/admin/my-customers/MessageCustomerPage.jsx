@@ -5,7 +5,8 @@ import { PageAccessRequirement } from '../../PageAccessRequirement';
 import MessageCustomer from './components/MessageCustomer';
 
 const MessageCustomerPage = () => {
-  const pageDescription = ' ';
+  const pageDescription =
+    'This page allows you to send messages to your customers. You can compose a new message or make use of existing templates set by admins, select the recipients, and send it directly from this interface. Please ensure that you have the necessary permissions to access this feature.';
 
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(
