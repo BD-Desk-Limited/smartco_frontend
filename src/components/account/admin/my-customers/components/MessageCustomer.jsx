@@ -34,8 +34,21 @@ const CustomerMessages = ({ pageDescription }) => {
     }
   }, []);
   useEffect(() => {
-    loadOptions();
-  }, [loadOptions]);
+    let active = true;
+
+    fetchComposeOptionsService().then((res) => {
+      if (!active) return;
+      if (res.error) setError(String(res.error));
+      else {
+        setError('');
+        setOptions(res.data);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSent = (campaign, message) => {
     setNotice(message || 'Your message is being sent...');

@@ -304,15 +304,18 @@ const MessageHistory = ({ isAdmin, openCampaignId, onOpened, refreshKey }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(openCampaignId || null);
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
     if (openCampaignId) {
-      setSelectedId(openCampaignId);
-      onOpened?.();
+      const timeoutId = window.setTimeout(() => {
+        onOpened?.();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
-  }, [openCampaignId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [openCampaignId, onOpened]);
 
   useEffect(() => {
     const fetch = async () => {
