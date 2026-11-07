@@ -2,7 +2,7 @@
 // pages/unsubscribe.js  (public: no login, no site header)
 // The link in every message is  {FRONTEND_URL}/pages/auth/unsubscribe?token=...
 // Nothing changes just by opening the page (mail scanners open links); the customer presses the button.
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   fetchUnsubscribeInfoService,
@@ -96,4 +96,11 @@ const UnsubscribePage = () => {
   );
 };
 
-export default UnsubscribePage;
+// Wrap the UnsubscribePage component with Suspense to handle loading state
+const UnsubscribePageWithSuspense = () => (
+  <Suspense fallback={<p>Loading...</p>}>
+    <UnsubscribePage />
+  </Suspense>
+);
+
+export default UnsubscribePageWithSuspense;
