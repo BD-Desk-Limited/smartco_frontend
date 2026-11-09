@@ -11,14 +11,14 @@ import MessageHistory from './MessageHistory';
 import MessageComposer from './MessageComposer';
 
 const TABS = [
-  { value: 'compose', label: 'New message' },
   { value: 'history', label: 'Sent messages' },
+  { value: 'compose', label: 'New message' },
   { value: 'templates', label: 'Templates' },
 ];
 
 const CustomerMessages = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
-  const [tab, setTab] = useState('compose');
+  const [tab, setTab] = useState('history');
   const [options, setOptions] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');

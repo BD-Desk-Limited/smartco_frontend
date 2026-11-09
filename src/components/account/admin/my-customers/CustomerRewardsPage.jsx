@@ -2,7 +2,7 @@
 import React from 'react';
 import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import CustomerReward from './components/CustomerReward';
+import CustomerReward from './components/CustomerRewards';
 
 const CustomerRewardsPage = () => {
   const pageDescription =

@@ -931,3 +931,386 @@ export const sendMessageService = async (payload) => {
 // { allowReplies, replyEmail, replyPhone }
 export const saveReplySettingsService = (payload) => request('PUT', '/settings', payload);
 */
+
+{
+  /**
+  Customer rewards services
+*/
+}
+
+// get options needed for promo creation { currency, branches, groups, permissions: { canManage } }
+export const fetchPromoOptionsService = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/options`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promo options, please try again later',
+    };
+  }
+};
+
+// fetch all promor a user is authorised to see
+export const fetchPromosService = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promos information, please try again later',
+    };
+  }
+};
+
+// fetch customer promo by id
+export const fetchPromoByIdService = async (id) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promo information, please try again later',
+    };
+  }
+};
+
+// action: 'activate' | 'pause' | 'end'
+export const changePromoStatusService = async (id, action) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}/status`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ action: action }),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error changing promo status, please try again later',
+    };
+  }
+};
+
+//delete a listed promo
+export const deletePromoService = async (id) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error deleting promo, please try again later',
+    };
+  }
+};
+
+//show those qualified for a promo, based on what user is authorised to see
+export const previewPromoQualifiersService = async (id) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}/preview`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promo qualifiers, please try again later',
+    };
+  }
+};
+
+//award promo to selected customers, with option to save qualifiers as a group { saveAsGroup?: { name } }
+export const awardPromoService = async (id, payload = {}) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}/award`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error awarding promo, please try again later',
+    };
+  }
+};
+
+// { status, searchTerm, page, limit } -> { rewards, counts, pagination }
+export const fetchPromoRewardsService = async (id, filters) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}/rewards/list`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(filters),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promo rewards, please try again later',
+    };
+  }
+};
+
+// revoke rewards from a customer
+export const revokeRewardService = async (rewardId) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/rewards/${rewardId}/revoke`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error revoking promo rewards, please try again later',
+    };
+  }
+};
+
+export const createPromoService = async (payload) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error creating promo, please try again later',
+    };
+  }
+};
+
+export const updatePromoService = async (id, payload) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error updating promo, please try again later',
+    };
+  }
+};
+
+// admins: get products for the free-product and "must buy" pickers, with their components and choices
+export const searchPromoProductsService = async (search = '') => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/products?search=${encodeURIComponent(search)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching promo products details, please try again later',
+    };
+  }
+};
