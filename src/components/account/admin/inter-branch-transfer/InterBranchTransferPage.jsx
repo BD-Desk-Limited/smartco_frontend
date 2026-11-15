@@ -19,7 +19,7 @@ const InterBranchTransferPage = () => {
   return (
     <div className="flex flex-row gap-0 bg-background-1">
       <div>
-        <AdminSideBar selectedMenu="reports" />
+        <AdminSideBar selectedMenu="inter-branch-transfers" />
       </div>
       <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
         <StockTransfers pageDescription={pageDescription} />

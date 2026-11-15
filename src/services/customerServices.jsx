@@ -11,12 +11,16 @@ const getToken = () => {
 
 //Get customer by customerNumber, email, or phone
 export const getCustomerByCustomerNumberEmailOrPhoneService = async (
+  branchId,
   customerNumberOrEmailOrPhone
 ) => {
   const token = getToken();
   try {
+    const query = branchId ? `?branch=${encodeURIComponent(branchId)}` : '';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customers/${customerNumberOrEmailOrPhone}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/customers/${encodeURIComponent(
+        customerNumberOrEmailOrPhone
+      )}${query}`,
       {
         method: 'GET',
         headers: {

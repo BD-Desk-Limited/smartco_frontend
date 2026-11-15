@@ -63,7 +63,6 @@ const Payment = ({
   React.useEffect(() => {
     setIsHydrated(true);
   }, []);
-  console.log('Cart data in Payment component:', cart);
 
   // if cart is empty, switch to sales items tab
   React.useEffect(() => {
@@ -291,6 +290,8 @@ const Payment = ({
       // Layer 3: Encrypted localStorage (final fallback. only if API and IDB both fail, to avoid data loss)
       // Layer 4: Background sync on reconnection (recovers localStorage backup to API when connectivity is restored, and retries any failed sync attempts, ensuring data eventually reaches backend even if all layers fail at the moment of transaction creation)
       */
+      console.log('Cart to submit', cartToSubmit);
+      //return;
 
       const persistSalesResult =
         await persistTransactionMultiLayer(cartToSubmit);
