@@ -91,29 +91,28 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
     promo?.offer?.amountDiscount ? String(promo.offer.amountDiscount) : ''
   );
   const [offerText, setOfferText] = useState(promo?.offer?.description || '');
-  const [freeProduct, setFreeProduct] = useState(
-    promo?.offer?.freeProduct
-      ? {
-          _id: String(promo.offer.freeProduct._id),
-          name:
-            lookups.products.find((p) => p._id === promo.offer.freeProduct._id)
-              ?.name || 'Free product',
-          components: null,
-        }
-      : null
+  // the free products. Each: { _id, name, quantity, components (null until loaded), allowed: { componentId: [materialId] } }
+  const [freeProducts, setFreeProducts] = useState(
+    (promo?.offer?.freeProducts || []).map((fp) => ({
+      _id: String(fp._id),
+      name:
+        lookups.products.find((p) => String(p._id) === String(fp._id))?.name ||
+        'Free product',
+      quantity: fp.quantity || 1,
+      components: null,
+      allowed: Object.fromEntries(
+        (fp.allowedComponents || []).map((a) => [
+          a._id,
+          a.allowedMaterialChoices.map(String),
+        ])
+      ),
+    }))
   );
-  const [quantity, setQuantity] = useState(
-    promo?.offer?.freeProduct?.quantity || 1
-  );
-  // componentId -> [materialId, ...] the customer may choose from
-  const [allowed, setAllowed] = useState(
-    Object.fromEntries(
-      (promo?.offer?.freeProduct?.allowedComponents || []).map((a) => [
-        a._id,
-        a.allowedMaterialChoices,
-      ])
-    )
-  );
+  // how many of them the customer gets: every one, or any N that they choose at the till
+  const [pick, setPick] = useState({
+    mode: promo?.offer?.pick?.mode || 'all',
+    count: promo?.offer?.pick?.count || 1,
+  });
 
   // the rules
   const [mode, setMode] = useState(c.mode || 'all');
@@ -134,9 +133,13 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
     on: !!c.products?.enabled,
     products: (c.products?.products || []).map((id) => ({
       _id: String(id),
-      name: lookups.products.find((p) => p._id === id)?.name || 'Product',
+      name:
+        lookups.products.find((p) => String(p._id) === String(id))?.name ||
+        'Product',
     })),
+    match: c.products?.match || 'any',
     count: c.products?.count || 1,
+    minQuantity: c.products?.minQuantity || 1,
   });
   const [inGroups, setInGroups] = useState({
     on: !!c.customerGroups?.enabled,
@@ -165,42 +168,68 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // when editing a draft free-product promo, load the product's components so the choices can be changed
+  // when editing a draft, load each free product's components so its choices can be changed
   useEffect(() => {
-    if (!freeProduct || freeProduct.components) return undefined;
+    const missing = freeProducts.filter((fp) => !fp.components);
+    if (missing.length === 0 || started) return undefined;
     let cancelled = false;
-    searchPromoProductsService(freeProduct.name).then((res) => {
-      if (cancelled) return;
-      const found = (res.data || []).find((p) => p._id === freeProduct._id);
-      if (found) setFreeProduct(found);
-    });
+    missing.forEach((fp) =>
+      searchPromoProductsService(fp.name).then((res) => {
+        const found = (res.data || []).find((p) => p._id === fp._id);
+        if (cancelled || !found) return;
+        setFreeProducts((prev) =>
+          prev.map((x) =>
+            x._id === fp._id ? { ...x, components: found.components } : x
+          )
+        );
+      })
+    );
     return () => {
       cancelled = true;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const pickFreeProduct = (product) => {
-    setFreeProduct(product);
-    // start with every option allowed; the admin unticks the ones that should not be free
-    setAllowed(
-      Object.fromEntries(
-        product.components.map((comp) => [
-          comp._id,
-          comp.materialChoices.map((m) => m.materialId),
-        ])
-      )
+  // add or remove a free product; a new one starts with every option allowed (untick the ones that should not be free)
+  const toggleFreeProduct = (product) =>
+    setFreeProducts((prev) =>
+      prev.some((p) => p._id === product._id)
+        ? prev.filter((p) => p._id !== product._id)
+        : [
+            ...prev,
+            {
+              _id: product._id,
+              name: product.name,
+              quantity: 1,
+              components: product.components,
+              allowed: Object.fromEntries(
+                product.components.map((comp) => [
+                  comp._id,
+                  comp.materialChoices.map((m) => m.materialId),
+                ])
+              ),
+            },
+          ]
     );
-  };
-  const toggleChoice = (componentId, materialId) =>
-    setAllowed((prev) => {
-      const list = prev[componentId] || [];
-      return {
-        ...prev,
-        [componentId]: list.includes(materialId)
-          ? list.filter((x) => x !== materialId)
-          : [...list, materialId],
-      };
-    });
+  const updateFreeProduct = (id, patch) =>
+    setFreeProducts((prev) =>
+      prev.map((p) => (p._id === id ? { ...p, ...patch } : p))
+    );
+  const toggleChoice = (productId, componentId, materialId) =>
+    setFreeProducts((prev) =>
+      prev.map((p) => {
+        if (p._id !== productId) return p;
+        const list = p.allowed[componentId] || [];
+        return {
+          ...p,
+          allowed: {
+            ...p.allowed,
+            [componentId]: list.includes(materialId)
+              ? list.filter((x) => x !== materialId)
+              : [...list, materialId],
+          },
+        };
+      })
+    );
   const toggleIn = (list, setList) => (id) =>
     setList(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
@@ -231,16 +260,20 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
               }
             : {
                 description: offerText,
-                freeProduct: {
-                  productId: freeProduct?._id,
-                  quantity: Number(quantity),
-                  allowedComponents: Object.entries(allowed)
+                freeProducts: freeProducts.map((fp) => ({
+                  productId: fp._id,
+                  quantity: Number(fp.quantity),
+                  allowedComponents: Object.entries(fp.allowed)
                     .filter(([, choices]) => choices.length > 0)
                     .map(([componentId, allowedMaterialChoices]) => ({
                       componentId,
                       allowedMaterialChoices,
                     })),
-                },
+                })),
+                pick:
+                  freeProducts.length > 1
+                    ? { mode: pick.mode, count: Number(pick.count) }
+                    : { mode: 'all', count: 1 },
               },
         criteria: {
           mode,
@@ -254,7 +287,9 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
           products: {
             enabled: buy.on,
             products: buy.products.map((p) => p._id),
+            match: buy.match,
             count: Number(buy.count),
+            minQuantity: Number(buy.minQuantity),
           },
           customerGroups: { enabled: inGroups.on, groups: inGroups.groups },
         },
@@ -295,19 +330,17 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
   );
 
   return (
-    <div className="relative bg-white p-5 pt-0 rounded-xl shadow-lg w-[780px] max-w-[96vw] max-h-[92vh] overflow-y-auto scrollbar-thin text-sm text-text-gray flex flex-col gap-3">
-      <div className="sticky top-0 bg-text-white py-2">
+    <div className="relative bg-white px-5 pb-5 rounded-lg shadow-lg w-[780px] max-w-[96vw] max-h-[92vh] overflow-y-auto scrollbar-thin text-sm text-text-gray flex flex-col gap-3">
+      <h2 className="text-lg py-2 font-semibold text-text-black sticky top-0 bg-text-white">
+        {editing ? 'Edit promo' : 'Create promo'}{' '}
         <button
           onClick={onClose}
           title="Close"
-          className="absolute top-0 right-0 p-1 rounded-full bg-brand-gray hover:bg-error"
+          className="absolute top-2 right-2 p-1 rounded-full bg-brand-gray hover:bg-error"
         >
           <FaTimes className="text-text-white" />
         </button>
-        <h2 className="text-lg font-semibold text-text-black">
-          {editing ? 'Edit promo' : 'Create promo'}
-        </h2>
-      </div>
+      </h2>
       {started && (
         <p className="border border-gray-border rounded-md p-2 bg-blue-shadow10">
           This promo has started, so its offer, rules, dates and branches are
@@ -399,36 +432,56 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
           <>
             {!lock && (
               <ProductPicker
-                selected={freeProduct ? [freeProduct] : []}
-                onToggle={pickFreeProduct}
+                multiple
+                selected={freeProducts}
+                onToggle={toggleFreeProduct}
               />
             )}
-            {freeProduct && (
-              <div className="border border-gray-border rounded-md p-2 flex flex-col gap-2">
+            {freeProducts.length === 0 && (
+              <p className="italic">
+                Search and tick the products to give away. You can choose
+                several.
+              </p>
+            )}
+
+            {freeProducts.map((fp) => (
+              <div
+                key={fp._id}
+                className="border border-gray-border rounded-md p-2 flex flex-col gap-2"
+              >
                 <div className="flex items-center gap-3">
-                  <strong className="text-text-black">
-                    {freeProduct.name}
-                  </strong>
+                  <strong className="text-text-black">{fp.name}</strong>
                   <label className="flex items-center gap-2">
                     Quantity
                     <input
                       type="number"
                       min="1"
                       max="50"
-                      value={quantity}
+                      value={fp.quantity}
                       disabled={lock}
-                      onChange={(e) => setQuantity(e.target.value)}
+                      onChange={(e) =>
+                        updateFreeProduct(fp._id, { quantity: e.target.value })
+                      }
                       className={`${field} h-8 w-20`}
                     />
                   </label>
+                  {!lock && (
+                    <button
+                      type="button"
+                      onClick={() => toggleFreeProduct({ _id: fp._id })}
+                      className="text-error underline"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
-                {freeProduct.components?.length > 0 && !lock && (
+                {fp.components?.length > 0 && !lock && (
                   <div className="flex flex-col gap-2">
                     <p className="text-xs">
                       Tick the options the customer may choose from for each
-                      part of the product.
+                      part of {fp.name}.
                     </p>
-                    {freeProduct.components.map((comp) => (
+                    {fp.components.map((comp) => (
                       <div key={comp._id}>
                         <p className="font-medium text-text-black">
                           {comp.categoryName || 'Component'}
@@ -442,11 +495,11 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
                             >
                               <input
                                 type="checkbox"
-                                checked={(allowed[comp._id] || []).includes(
+                                checked={(fp.allowed[comp._id] || []).includes(
                                   m.materialId
                                 )}
                                 onChange={() =>
-                                  toggleChoice(comp._id, m.materialId)
+                                  toggleChoice(fp._id, comp._id, m.materialId)
                                 }
                               />
                               {m.name}
@@ -457,6 +510,44 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
                     ))}
                   </div>
                 )}
+              </div>
+            ))}
+
+            {freeProducts.length > 1 && (
+              <div className="border border-gray-border rounded-md p-2 flex flex-col gap-2">
+                <p className="font-medium text-text-black">
+                  How many of these does the customer get?
+                </p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={pick.mode === 'all'}
+                    disabled={lock}
+                    onChange={() => setPick((v) => ({ ...v, mode: 'all' }))}
+                  />
+                  All {freeProducts.length} of them
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={pick.mode === 'any'}
+                    disabled={lock}
+                    onChange={() => setPick((v) => ({ ...v, mode: 'any' }))}
+                  />
+                  They choose any
+                  <input
+                    type="number"
+                    min="1"
+                    max={freeProducts.length}
+                    value={pick.count}
+                    disabled={lock || pick.mode !== 'any'}
+                    onChange={(e) =>
+                      setPick((v) => ({ ...v, count: e.target.value }))
+                    }
+                    className={`${field} h-8 w-20`}
+                  />
+                  of the {freeProducts.length} (different products)
+                </label>
               </div>
             )}
           </>
@@ -605,20 +696,52 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
             {buy.products.length > 0 && (
               <p>Chosen: {buy.products.map((p) => p.name).join(', ')}</p>
             )}
-            <label className="flex items-center gap-2">
-              Must buy at least
-              <input
-                type="number"
-                min="1"
-                value={buy.count}
-                disabled={lock}
-                onChange={(e) =>
-                  setBuy((v) => ({ ...v, count: e.target.value }))
-                }
-                className={`${field} h-8 w-20`}
-              />
-              units of these products, combined.
-            </label>
+            <div className="flex flex-col gap-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={buy.match === 'any'}
+                  disabled={lock}
+                  onChange={() => setBuy((v) => ({ ...v, match: 'any' }))}
+                />
+                Any
+                <input
+                  type="number"
+                  min="1"
+                  max={Math.max(1, buy.products.length)}
+                  value={buy.count}
+                  disabled={lock || buy.match !== 'any'}
+                  onChange={(e) =>
+                    setBuy((v) => ({ ...v, count: e.target.value }))
+                  }
+                  className={`${field} h-8 w-20`}
+                />
+                of the chosen products (different products)
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={buy.match === 'all'}
+                  disabled={lock}
+                  onChange={() => setBuy((v) => ({ ...v, match: 'all' }))}
+                />
+                Every one of the chosen products
+              </label>
+              <label className="flex items-center gap-2">
+                A product counts once the customer has bought at least
+                <input
+                  type="number"
+                  min="1"
+                  value={buy.minQuantity}
+                  disabled={lock}
+                  onChange={(e) =>
+                    setBuy((v) => ({ ...v, minQuantity: e.target.value }))
+                  }
+                  className={`${field} h-8 w-20`}
+                />
+                unit(s) of it
+              </label>
+            </div>
           </>
         )}
         {ruleBox(

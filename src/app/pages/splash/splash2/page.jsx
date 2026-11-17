@@ -105,7 +105,7 @@ export default function Home() {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={450}
-          height={450}
+          height={419}
           style={{ height: 'auto' }}
         />
       </div>
@@ -114,7 +114,7 @@ export default function Home() {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={450}
-          height={450}
+          height={419}
           style={{ height: 'auto' }}
         />
       </div>

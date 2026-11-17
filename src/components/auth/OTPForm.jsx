@@ -278,7 +278,7 @@ const OTPForm = () => {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={250}
-          height={250}
+          height={233}
           style={{ height: 'auto' }}
         />
       </div>
@@ -287,7 +287,7 @@ const OTPForm = () => {
           src="/assets/brand_mark2.png"
           alt="Logo"
           width={650}
-          height={650}
+          height={579}
           style={{ height: 'auto' }}
         />
       </div>

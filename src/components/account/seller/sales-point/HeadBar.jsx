@@ -77,7 +77,7 @@ const HeadBar = ({
           src="/assets/logo_white.png"
           alt="pos Logo"
           width={40}
-          height={40}
+          height={39}
           className="object-contain"
           style={{ height: 'auto' }}
         />

@@ -974,17 +974,18 @@ export const fetchPromoOptionsService = async () => {
 };
 
 // fetch all promor a user is authorised to see
-export const fetchPromosService = async () => {
+export const fetchPromosService = async (filters) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/fetch`,
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify(filters),
       }
     );
 

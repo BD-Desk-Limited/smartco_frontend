@@ -55,6 +55,8 @@ const MessageComposer = ({ options, onSent }) => {
 
   // recipients
   const [groups, setGroups] = useState(null);
+  const [allCustomers, setAllCustomers] = useState(false); // send to everyone the sender can reach
+  const [allBranches, setAllBranches] = useState([]); // optionally limited to these branches
   const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedCustomers, setSelectedCustomers] = useState([]); // { _id, name, customerNumber }
   const [pickerSearch, setPickerSearch] = useState('');
@@ -93,7 +95,7 @@ const MessageComposer = ({ options, onSent }) => {
 
   // individual customers to pick from
   useEffect(() => {
-    const fetch = async () => {
+    const runPick = () => {
       if (!pickerApplied) {
         setPicker(null);
         return;
@@ -114,13 +116,13 @@ const MessageComposer = ({ options, onSent }) => {
         cancelled = true;
       };
     };
-    fetch();
+    runPick();
   }, [pickerApplied, pickerPage]);
 
   // reply details: your saved defaults, else the single branch's contact, else the company's.
   // Stops following these once you type in the fields yourself.
   useEffect(() => {
-    const setStates = () => {
+    const check = () => {
       if (replyTouched) return;
       const chosen = branches.filter((b) => sendingBranches.includes(b._id));
       const branch = chosen.length === 1 ? chosen[0] : null;
@@ -131,23 +133,22 @@ const MessageComposer = ({ options, onSent }) => {
         settings.replyPhone || branch?.phone || companyContact.phone || ''
       );
     };
-    setStates();
+    check();
   }, [sendingBranches, replyTouched]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // any change to who receives it means the recipient check must be run again
   useEffect(() => {
-    const setStates = () => {
+    const update = () => {
       setPreview(null);
       setConfirming(false);
     };
-    setStates();
-  }, [channel, selectedGroups, selectedCustomers]);
+    update();
+  }, [channel, selectedGroups, selectedCustomers, allCustomers, allBranches]);
 
   const toggleGroup = (id) =>
     setSelectedGroups((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-
   const toggleCustomer = (c) =>
     setSelectedCustomers((prev) =>
       prev.some((x) => x._id === c._id)
@@ -192,9 +193,36 @@ const MessageComposer = ({ options, onSent }) => {
 
   const selection = {
     channel,
-    groups: selectedGroups,
-    customers: selectedCustomers.map((c) => c._id),
+    groups: allCustomers ? [] : selectedGroups,
+    customers: allCustomers ? [] : selectedCustomers.map((c) => c._id),
+    allCustomers: {
+      enabled: allCustomers,
+      branches: allCustomers ? allBranches : [],
+    },
   };
+  const nothingChosen =
+    !allCustomers &&
+    selectedGroups.length === 0 &&
+    selectedCustomers.length === 0;
+
+  // tick or untick every customer on the page of search results being shown
+  const pageCustomers = picker?.customers || [];
+  const pageAllSelected =
+    pageCustomers.length > 0 &&
+    pageCustomers.every((c) => selectedCustomers.some((x) => x._id === c._id));
+  const togglePage = () =>
+    setSelectedCustomers((prev) => {
+      if (pageAllSelected)
+        return prev.filter((x) => !pageCustomers.some((c) => c._id === x._id));
+      const add = pageCustomers
+        .filter((c) => !prev.some((x) => x._id === c._id))
+        .map((c) => ({
+          _id: c._id,
+          name: c.name,
+          customerNumber: c.customerNumber,
+        }));
+      return [...prev, ...add];
+    });
 
   const checkRecipients = async () => {
     setError('');
@@ -238,112 +266,181 @@ const MessageComposer = ({ options, onSent }) => {
     <div className="flex flex-col gap-4 text-sm text-text-gray">
       {/* ---------- recipients ---------- */}
       <Section title="1. Who should receive it?">
-        <div>
-          <p className="mb-1">Groups</p>
-          {groups === null ? (
-            <Spinner />
-          ) : groups.length === 0 ? (
-            <p className="italic">
-              There are no customer groups you can use yet.
-            </p>
-          ) : (
-            <div className="grid grid-cols-3 gap-1 max-h-40 overflow-y-auto border border-gray-border rounded-md p-2">
-              {groups.map((g) => (
-                <label
-                  key={g._id}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedGroups.includes(g._id)}
-                    onChange={() => toggleGroup(g._id)}
-                  />
-                  <span>
-                    {g.name} <span className="text-xs">({g.memberCount})</span>
-                  </span>
-                </label>
-              ))}
-            </div>
+        <div className="border border-gray-border rounded-md p-2 flex flex-col gap-2">
+          <label className="flex items-center gap-2 cursor-pointer font-medium text-text-black">
+            <input
+              type="checkbox"
+              checked={allCustomers}
+              onChange={(e) => setAllCustomers(e.target.checked)}
+            />
+            All customers I can reach
+          </label>
+          {allCustomers && (
+            <>
+              {branches.length > 1 && (
+                <div>
+                  <p className="mb-1">
+                    Limit to these branches (leave all unticked for every branch
+                    you can reach)
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {branches.map((b) => (
+                      <label
+                        key={b._id}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={allBranches.includes(b._id)}
+                          onChange={() =>
+                            setAllBranches((prev) =>
+                              prev.includes(b._id)
+                                ? prev.filter((x) => x !== b._id)
+                                : [...prev, b._id]
+                            )
+                          }
+                        />
+                        {b.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <p className="text-xs">
+                One send can reach at most {limits.maxRecipients} customers. Use
+                &quot;Check recipients&quot; below to see how many this is. You
+                do not need to pick groups or individual customers.
+              </p>
+            </>
           )}
         </div>
 
-        <div>
-          <p className="mb-1">Individual customers</p>
-          <div className="h-8 px-2 border border-gray-border rounded-md flex items-center">
-            <FaSearch aria-hidden="true" />
-            <input
-              type="text"
-              placeholder="Search by name or customer number, then press Enter"
-              value={pickerSearch}
-              onChange={(e) => setPickerSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setPickerApplied(pickerSearch.trim());
-                  setPickerPage(1);
-                }
-              }}
-              className="focus:outline-none ml-2 w-full"
-            />
-          </div>
-          {pickerLoading && <Spinner />}
-          {picker?.customers?.length > 0 && (
-            <ul className="border border-gray-border rounded-md mt-1 max-h-44 overflow-y-auto">
-              {picker.customers.map((c) => (
-                <li
-                  key={c._id}
-                  className="border-b border-gray-border last:border-b-0"
-                >
-                  <label className="flex items-center gap-2 p-2 cursor-pointer">
+        <div
+          className={
+            allCustomers
+              ? 'opacity-40 pointer-events-none flex flex-col gap-2'
+              : 'flex flex-col gap-2'
+          }
+          aria-disabled={allCustomers}
+        >
+          <div>
+            <p className="mb-1">Groups</p>
+            {groups === null ? (
+              <Spinner />
+            ) : groups.length === 0 ? (
+              <p className="italic">
+                There are no customer groups you can use yet.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-1 max-h-40 overflow-y-auto border border-gray-border rounded-md p-2">
+                {groups.map((g) => (
+                  <label
+                    key={g._id}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <input
                       type="checkbox"
-                      checked={selectedCustomers.some((x) => x._id === c._id)}
-                      onChange={() => toggleCustomer(c)}
+                      checked={selectedGroups.includes(g._id)}
+                      onChange={() => toggleGroup(g._id)}
                     />
-                    <span className="text-text-black">{c.name}</span>
-                    <span className="text-xs">{c.customerNumber}</span>
+                    <span>
+                      {g.name}{' '}
+                      <span className="text-xs">({g.memberCount})</span>
+                    </span>
                   </label>
-                </li>
-              ))}
-            </ul>
-          )}
-          {picker && picker.customers?.length === 0 && (
-            <p className="italic mt-1">No customers found.</p>
-          )}
-          {picker?.pagination?.totalPages > 1 && (
-            <div className="flex gap-2 mt-1">
-              <button
-                disabled={pickerPage <= 1}
-                onClick={() => setPickerPage((p) => p - 1)}
-                className="px-2 border border-gray-border rounded-md disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <button
-                disabled={pickerPage >= picker.pagination.totalPages}
-                onClick={() => setPickerPage((p) => p + 1)}
-                className="px-2 border border-gray-border rounded-md disabled:opacity-40"
-              >
-                Next
-              </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <p className="mb-1">Individual customers</p>
+            <div className="h-8 px-2 border border-gray-border rounded-md flex items-center">
+              <FaSearch aria-hidden="true" />
+              <input
+                type="text"
+                placeholder="Search by name or customer number, then press Enter"
+                value={pickerSearch}
+                onChange={(e) => setPickerSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setPickerApplied(pickerSearch.trim());
+                    setPickerPage(1);
+                  }
+                }}
+                className="focus:outline-none ml-2 w-full"
+              />
             </div>
-          )}
-          {selectedCustomers.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {selectedCustomers.map((c) => (
-                <span
-                  key={c._id}
-                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-shadow10"
+            {pickerLoading && <Spinner />}
+            {picker?.customers?.length > 0 && (
+              <label className="flex items-center gap-2 mt-1 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={pageAllSelected}
+                  onChange={togglePage}
+                />
+                Select all {picker.customers.length} on this page
+              </label>
+            )}
+            {picker?.customers?.length > 0 && (
+              <ul className="border border-gray-border rounded-md mt-1 max-h-44 overflow-y-auto">
+                {picker.customers.map((c) => (
+                  <li
+                    key={c._id}
+                    className="border-b border-gray-border last:border-b-0"
+                  >
+                    <label className="flex items-center gap-2 p-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedCustomers.some((x) => x._id === c._id)}
+                        onChange={() => toggleCustomer(c)}
+                      />
+                      <span className="text-text-black">{c.name}</span>
+                      <span className="text-xs">{c.customerNumber}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {picker && picker.customers?.length === 0 && (
+              <p className="italic mt-1">No customers found.</p>
+            )}
+            {picker?.pagination?.totalPages > 1 && (
+              <div className="flex gap-2 mt-1">
+                <button
+                  disabled={pickerPage <= 1}
+                  onClick={() => setPickerPage((p) => p - 1)}
+                  className="px-2 border border-gray-border rounded-md disabled:opacity-40"
                 >
-                  {c.name}
-                  <FaTimes
-                    className="cursor-pointer"
-                    aria-label={`Remove ${c.name}`}
-                    onClick={() => toggleCustomer(c)}
-                  />
-                </span>
-              ))}
-            </div>
-          )}
+                  Previous
+                </button>
+                <button
+                  disabled={pickerPage >= picker.pagination.totalPages}
+                  onClick={() => setPickerPage((p) => p + 1)}
+                  className="px-2 border border-gray-border rounded-md disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+            {selectedCustomers.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {selectedCustomers.map((c) => (
+                  <span
+                    key={c._id}
+                    className="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-shadow10"
+                  >
+                    {c.name}
+                    <FaTimes
+                      className="cursor-pointer"
+                      aria-label={`Remove ${c.name}`}
+                      onClick={() => toggleCustomer(c)}
+                    />
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <p className="text-xs">
           You can only reach customers from your own branches. Customers who
@@ -542,10 +639,7 @@ const MessageComposer = ({ options, onSent }) => {
         <div className="flex items-center gap-3">
           <button
             onClick={checkRecipients}
-            disabled={
-              previewing ||
-              (selectedGroups.length === 0 && selectedCustomers.length === 0)
-            }
+            disabled={previewing || nothingChosen}
             className="px-3 py-1 rounded-lg border border-brand-blue text-brand-blue disabled:opacity-40"
           >
             {previewing ? 'Checking...' : 'Check recipients'}
@@ -581,7 +675,10 @@ const MessageComposer = ({ options, onSent }) => {
             {preview.overLimit && (
               <p className="text-error">
                 That is more than the {limits.maxRecipients} customers allowed
-                in one send. Choose fewer groups or customers.
+                in one send.{' '}
+                {allCustomers
+                  ? 'Limit it to specific branches, or choose groups instead.'
+                  : 'Choose fewer groups or customers.'}
               </p>
             )}
           </div>

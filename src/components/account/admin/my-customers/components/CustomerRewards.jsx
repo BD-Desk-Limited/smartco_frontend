@@ -11,9 +11,31 @@ import {
   fetchPromosService,
 } from '@/services/customerServices';
 import { formatDate } from '@/utilities/formatTime';
-import { FaGift } from 'react-icons/fa';
+import { FaChevronDown, FaChevronLeft, FaGift } from 'react-icons/fa';
 import PromoDetailSideView, { PHASE } from './PromoDetailSideView';
 import PromoFormModal from './PromoFormModal';
+import { capitalizeFirst } from '@/utilities/stringUtils';
+
+const formatInputDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const today = new Date();
+
+const buildInitialFilter = () => {
+  return {
+    status: 'all',
+    dateRange: {
+      from: formatInputDate(new Date(today.getFullYear(), 0, 1)),
+      to: formatInputDate(today),
+    },
+  };
+};
+
+const PROMO_STATUSES = ['draft', 'active', 'paused', 'ended'];
 
 const CustomerRewards = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -29,6 +51,10 @@ const CustomerRewards = ({ pageDescription }) => {
   const [reload, setReload] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(null); // null | { promo } (promo null = create)
+  const [openStatusesDropDown, setOpenStatusesDropDown] = useState(false);
+  const [filterDraft, setFilterDraft] = useState(buildInitialFilter);
+  const [filter, setFilter] = useState(buildInitialFilter);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetch = () => {
@@ -44,25 +70,84 @@ const CustomerRewards = ({ pageDescription }) => {
   }, []);
 
   useEffect(() => {
-    const fetch = () => {
+    const fetch = async () => {
       let cancelled = false;
-      fetchPromosService().then((res) => {
-        if (cancelled) return;
-        if (res.error) setError(String(res.error));
-        else {
-          setError('');
-          setPromos(res.data.promos);
-          setBranchNames(res.data.branchNames || []);
-        }
-      });
+      try {
+        setLoading(true);
+        await fetchPromosService(filter).then((res) => {
+          if (cancelled) return;
+          if (res.error) setError(String(res.error));
+          else {
+            setError('');
+            setPromos(res.data.promos);
+            setBranchNames(res.data.branchNames || []);
+          }
+        });
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+        setOpenStatusesDropDown(false);
+      }
+
       return () => {
         cancelled = true;
       };
     };
     fetch();
-  }, [reload]);
+  }, [filter, reload, setLoading]);
 
   const refresh = () => setReload((r) => r + 1);
+
+  const applyFilter = () => {
+    setFilter({
+      status: filterDraft.status,
+      dateRange: {
+        from:
+          filterDraft.dateRange.from ||
+          formatInputDate(new Date(today.getFullYear(), 0, 1)),
+        to: filterDraft.dateRange.to || formatInputDate(today),
+      },
+    });
+  };
+
+  const onStatusChange = (value, checked) => {
+    setFilterDraft((prev) => {
+      if (value === 'all') {
+        return { ...prev, status: checked ? 'all' : [] };
+      }
+
+      const selectedStatuses =
+        prev.status === 'all' ? PROMO_STATUSES : prev.status;
+      const nextStatuses = checked
+        ? [...selectedStatuses, value]
+        : selectedStatuses.filter((status) => status !== value);
+
+      return {
+        ...prev,
+        status:
+          nextStatuses.length === PROMO_STATUSES.length ? 'all' : nextStatuses,
+      };
+    });
+  };
+
+  const resetFilter = () => {
+    const reset = buildInitialFilter();
+    setOpenStatusesDropDown(false);
+    setFilterDraft(reset);
+    setFilter(reset);
+  };
+
+  const onDateChange = (field, value) => {
+    setFilterDraft((prev) => ({
+      ...prev,
+      dateRange: {
+        ...prev.dateRange,
+        [field]: value,
+      },
+    }));
+  };
+
   const branchText = (p) =>
     p.isGlobal
       ? 'All branches'
@@ -82,7 +167,7 @@ const CustomerRewards = ({ pageDescription }) => {
   };
 
   return (
-    <div>
+    <div className="">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
@@ -118,8 +203,114 @@ const CustomerRewards = ({ pageDescription }) => {
               )}
             </div>
 
+            {/* filter */}
+            <div className="flex flex-wrap items-center gap-2 rounded-md border border-gray-border p-2">
+              <div className="flex min-w-[180px] flex-col gap-1">
+                <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
+                  Status
+                </label>
+                <div className="group relative">
+                  <summary
+                    onClick={() => {
+                      setOpenStatusesDropDown((prev) => !prev);
+                    }}
+                    className="flex h-9 cursor-pointer list-none items-center justify-between rounded-md border border-gray-border bg-white px-2 text-sm text-text-black focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                  >
+                    <span className="flex justify-between w-full">
+                      {filterDraft.status === 'all'
+                        ? 'All statuses'
+                        : filterDraft.status.length === 0
+                          ? 'Select statuses'
+                          : filterDraft.status.length === 1
+                            ? capitalizeFirst(filterDraft.status[0])
+                            : `${filterDraft.status.length} statuses selected`}
+                      {openStatusesDropDown ? (
+                        <FaChevronDown />
+                      ) : (
+                        <FaChevronLeft />
+                      )}
+                    </span>
+                  </summary>
+
+                  {openStatusesDropDown && (
+                    <div className="absolute left-0 top-full z-40 mt-1 max-h-60 w-full min-w-[180px] overflow-y-auto rounded-md border border-gray-border bg-white p-2 shadow-lg">
+                      <label className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-1 py-1">
+                        <input
+                          type="checkbox"
+                          checked={filterDraft.status === 'all'}
+                          onChange={(e) =>
+                            onStatusChange('all', e.target.checked)
+                          }
+                        />
+                        All statuses
+                      </label>
+                      {PROMO_STATUSES.map((value) => (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-1 py-1"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              filterDraft.status === 'all' ||
+                              filterDraft.status.includes(value)
+                            }
+                            onChange={(e) =>
+                              onStatusChange(value, e.target.checked)
+                            }
+                          />
+                          {capitalizeFirst(value)}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex min-w-[170px] flex-col gap-1">
+                <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
+                  From
+                </label>
+                <input
+                  type="date"
+                  value={filterDraft.dateRange.from}
+                  onChange={(e) => onDateChange('from', e.target.value)}
+                  className="h-9 rounded-md border border-gray-border bg-white px-2 text-sm text-text-black focus:outline-none"
+                  aria-label="Filter promos from date"
+                />
+              </div>
+
+              <div className="flex min-w-[170px] flex-col gap-1">
+                <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
+                  To
+                </label>
+                <input
+                  type="date"
+                  value={filterDraft.dateRange.to}
+                  onChange={(e) => onDateChange('to', e.target.value)}
+                  className="h-9 rounded-md border border-gray-border bg-white px-2 text-sm text-text-black focus:outline-none"
+                  aria-label="Filter promos to date"
+                />
+              </div>
+
+              <div className="ml-auto flex items-end gap-2">
+                <button
+                  onClick={applyFilter}
+                  className="h-9 rounded-md bg-brand-blue px-4 text-sm font-medium text-white hover:bg-blue-shadow1"
+                >
+                  Apply filter
+                </button>
+                <button
+                  onClick={resetFilter}
+                  className="h-9 rounded-md border border-gray-border bg-white px-4 text-sm font-medium text-text-gray hover:bg-gray-shadow10"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
             {error && <p className="text-error">{error}</p>}
-            {!promos && !error ? (
+            {loading || (!promos && !error) ? (
               <Spinner />
             ) : (
               <div className="max-h-[70vh] overflow-y-auto scrollbar-thin my-2">

@@ -56,10 +56,18 @@ const describeRules = (promo, currency) => {
     lines.push(
       `Visits at least ${c.branchesVisited.count} of: ${names(c.branchesVisited.branches, l.branches)}`
     );
-  if (c.products?.enabled)
+  if (c.products?.enabled) {
+    const listed = names(c.products.products, l.products);
+    const each =
+      c.products.minQuantity > 1
+        ? `, at least ${c.products.minQuantity} of each`
+        : '';
     lines.push(
-      `Buys at least ${c.products.count} unit(s) of: ${names(c.products.products, l.products)}`
+      c.products.match === 'all'
+        ? `Buys every one of: ${listed}${each}`
+        : `Buys any ${c.products.count} of: ${listed}${each}`
     );
+  }
   if (c.customerGroups?.enabled)
     lines.push(`Is in group: ${names(c.customerGroups.groups, l.groups)}`);
   return lines;
@@ -236,31 +244,52 @@ const PromoDetailSideView = ({
                 {promo.offer.description}
               </strong>
             </p>
-            {promo.description && (
-              <p className="whitespace-pre-wrap break-words">
-                {promo.description}
+
+            <div className="bg-gray-shadow9 text-text-black p-2 rounded-md my-2 flex flex-col gap-1">
+              {promo.description && (
+                <p className="whitespace-pre-wrap break-words bg-gray-shadow9">
+                  {promo.description}
+                </p>
+              )}
+
+              {promo.type === 'product' &&
+                promo.offer.freeProducts?.length > 0 && (
+                  <p className="bg-gray-shadow9">
+                    Free items:{' '}
+                    {promo.offer.freeProducts
+                      .map(
+                        (fp) =>
+                          `${names([fp._id], promo.lookups.products)}${fp.quantity > 1 ? ` x${fp.quantity}` : ''}`
+                      )
+                      .join(', ')}
+                    {promo.offer.freeProducts.length > 1 &&
+                      (promo.offer.pick?.mode === 'any'
+                        ? ` · the customer chooses ${promo.offer.pick.count} out of ${promo.offer.freeProducts.length} options`
+                        : ' · the customer gets all of them')}
+                  </p>
+                )}
+
+              <p className="bg-gray-shadow9">
+                {formatDate(new Date(promo.startsAt))} to{' '}
+                {formatDate(new Date(promo.endsAt))} · each reward lasts{' '}
+                {promo.validityDays} days
               </p>
-            )}
-            <p>
-              {formatDate(new Date(promo.startsAt))} to{' '}
-              {formatDate(new Date(promo.endsAt))} · each reward lasts{' '}
-              {promo.validityDays} days
-            </p>
-            <p>
-              Branches:{' '}
-              {promo.isGlobal
-                ? 'all branches'
-                : names(
-                    promo.branches.map((b) => b._id ?? b),
-                    promo.lookups.branches
-                  )}
-            </p>
-            <p>
-              Limits: {promo.limits.maxPerCustomer} per customer
-              {promo.limits.maxTotal
-                ? `, ${promo.limits.maxTotal} in total`
-                : ', no total limit'}
-            </p>
+              <p>
+                Qualifying Branches:{' '}
+                {promo.isGlobal
+                  ? 'all branches'
+                  : names(
+                      promo.branches.map((b) => b._id ?? b),
+                      promo.lookups.branches
+                    )}
+              </p>
+              <p>
+                Limits: {promo.limits.maxPerCustomer} per customer
+                {promo.limits.maxTotal
+                  ? `, ${promo.limits.maxTotal} in total`
+                  : ', no total limit'}
+              </p>
+            </div>
           </div>
 
           <div>
@@ -287,7 +316,7 @@ const PromoDetailSideView = ({
           <div className="grid grid-cols-4 gap-2 text-center">
             {[
               ['Given', promo.awardedCount],
-              ['Available', rewards?.counts?.available || 0],
+              ['Available (unused)', rewards?.counts?.available || 0],
               ['Used', rewards?.counts?.redeemed || 0],
               ['Expired', rewards?.counts?.expired || 0],
             ].map(([label, value]) => (

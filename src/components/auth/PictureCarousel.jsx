@@ -26,7 +26,7 @@ const PictureCarousel = () => {
         src={pictures[currentIndex]}
         alt={`Picture ${currentIndex + 1}`}
         fill
-        sizes="100vw"
+        sizes="30vw"
         className="rounded-[10%] z-20"
         style={{ objectFit: 'cover' }}
       />
@@ -36,7 +36,7 @@ const PictureCarousel = () => {
           src="/assets/logo_white.png"
           alt="Logo"
           width={200}
-          height={200}
+          height={195}
           style={{ height: 'auto' }}
         />
       </div>
@@ -45,7 +45,7 @@ const PictureCarousel = () => {
           src="/assets/brand_mark2.png"
           alt="Logo"
           width={600}
-          height={600}
+          height={535}
           loading="eager"
           style={{ height: 'auto' }}
         />
@@ -55,7 +55,7 @@ const PictureCarousel = () => {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={200}
-          height={200}
+          height={186}
           style={{ height: 'auto' }}
         />
       </div>

@@ -16,7 +16,13 @@ const ChatIcon = () => {
         ease: 'easeInOut',
       }}
     >
-      <Image src="/assets/chatbox.png" alt="" width={80} height={80} />
+      <Image
+        src="/assets/chatbox.png"
+        alt=""
+        width={80}
+        height={70}
+        style={{ height: 'auto' }}
+      />
     </motion.div>
   );
 };
