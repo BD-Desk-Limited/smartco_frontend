@@ -24,12 +24,16 @@ const ProductPicker = ({ multiple, selected, onToggle }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const run = async () => {
-    setLoading(true);
-    const res = await searchPromoProductsService(search.trim());
-    setResults(res.data || []);
-    setLoading(false);
-  };
+  useEffect(() => {
+    const run = async () => {
+      setLoading(true);
+      const res = await searchPromoProductsService(search.trim());
+      setResults(res.data || []);
+      setLoading(false);
+    };
+
+    if (search && search.length >= 3) run();
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -37,7 +41,7 @@ const ProductPicker = ({ multiple, selected, onToggle }) => {
         <FaSearch aria-hidden="true" />
         <input
           type="text"
-          placeholder="Search products, then press Enter"
+          placeholder="Enter at least 3 characters to search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && run()}
