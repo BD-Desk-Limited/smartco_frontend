@@ -45,9 +45,9 @@ const LoginExisting = ({ seller, setSeller }) => {
           <Image
             src="/assets/back_green.png"
             alt="back"
-            width={15}
-            height={20}
-            className=""
+            width={20}
+            height={30}
+            style={{ width: 15, height: 'auto' }}
           />
         </p>
         <h1 className="flex text-xl font-bold w-full justify-center items-center text-center text-brand-green">
@@ -60,8 +60,9 @@ const LoginExisting = ({ seller, setSeller }) => {
             src={seller?.imageURL || '/assets/anonymous.png'}
             alt="seller"
             width={150}
-            height={100}
-            className="rounded-[100%]"
+            height={150}
+            className="rounded-[100%] object-cover"
+            style={{ width: 150, height: 150 }}
           />
         </div>
         <span className="text-base w-full text-brand-green font-semibold">

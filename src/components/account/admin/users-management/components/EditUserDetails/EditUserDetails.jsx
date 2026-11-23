@@ -39,6 +39,7 @@ const EditUserDetails = ({ pageDescription, userData }) => {
   }, [userData]);
 
   const handleOpenModal = () => {
+    console.log('Data', updatedUserData);
     setError(null);
     if (userData === updatedUserData) {
       setError('You have not made any changes to the user details.');
@@ -74,7 +75,7 @@ const EditUserDetails = ({ pageDescription, userData }) => {
       );
     }
     // validate team
-    const validateTeam = verifyInputText(updatedUserData.team);
+    const validateTeam = verifyInputText(updatedUserData.team.name);
     if (updatedUserData.team && !validateTeam.passed) {
       inputValidationErrors.push(
         validateTeam.message + ' Please select a valid team name.'

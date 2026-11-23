@@ -35,19 +35,19 @@ const PictureCarousel = () => {
         <Image
           src="/assets/logo_white.png"
           alt="Logo"
-          width={200}
-          height={195}
-          style={{ height: 'auto' }}
+          width={331}
+          height={322}
+          style={{ width: 200, height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[20vh] z-10 right-[-15vw]">
         <Image
           src="/assets/brand_mark2.png"
           alt="Logo"
-          width={600}
-          height={535}
+          width={1057}
+          height={942}
           loading="eager"
-          style={{ height: 'auto' }}
+          style={{ width: 600, height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[-8vh] right-[-5vw] z-40">

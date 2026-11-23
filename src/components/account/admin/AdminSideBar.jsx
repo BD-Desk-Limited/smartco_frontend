@@ -230,9 +230,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
           <Image
             src={'/assets/logo_white.png'}
             alt="logo"
-            width={30}
-            height={29}
-            style={{ height: 'auto' }}
+            width={331}
+            height={322}
+            style={{ width: 30, height: 'auto' }}
           />
           {isOpen && (
             <Image

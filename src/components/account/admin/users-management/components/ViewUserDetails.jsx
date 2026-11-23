@@ -58,7 +58,8 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
                   alt={'user'}
                   width={150}
                   height={150}
-                  className="rounded-full"
+                  className="rounded-full object-cover"
+                  style={{ width: 150, height: 150 }}
                 />
                 <ul className="flex flex-col px-5 gap-2 text-text-gray">
                   <li className="text-lg font-semibold">

@@ -931,11 +931,6 @@ export const sendMessageService = async (payload) => {
   }
 };
 
-/**
-// { allowReplies, replyEmail, replyPhone }
-export const saveReplySettingsService = (payload) => request('PUT', '/settings', payload);
-*/
-
 {
   /**
   Customer rewards services
@@ -1316,6 +1311,108 @@ export const searchPromoProductsService = async (search = '') => {
     console.error('Error:', error);
     return {
       error: 'error fetching promo products details, please try again later',
+    };
+  }
+};
+
+// admins: sales where a reward needed a second look (most often one reward used on two tills before they synced)
+// { status: 'open' | 'reviewed', page, limit } -> { rows, pagination }
+export const fetchFlaggedRedemptionsService = async (filters = {}) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/flags/list`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(filters),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching flagged promo rewards, please try again later',
+    };
+  }
+};
+
+// mark one flag as looked at, with an optional note (300 characters max)
+export const reviewFlaggedRedemptionService = async (
+  transactionId,
+  rewardId,
+  note = ''
+) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/flags/${transactionId}/${rewardId}/review`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ note: note }),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error updating flagged promo rewards, please try again later',
+    };
+  }
+};
+
+// admins and managers: everything given out as rewards in a period (managers only see their own branches)
+// { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD', branchIds?, promoId? } -> { totals, byPromo, byBranch, byDay, byProduct }
+export const fetchRewardsGivenReportService = async (payload) => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/customer-promos/report`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData.data };
+    } else {
+      const errorData = await response.json();
+      const errorMessage = errorData.message;
+      return { error: errorMessage };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      error: 'error fetching rewards report, please try again later',
     };
   }
 };

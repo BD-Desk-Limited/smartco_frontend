@@ -14,6 +14,8 @@ import printReceipt from '../receipt-management/PrintReceipt';
 import SendReceipt from '../receipt-management/SendReceipt';
 import { sendReceiptService } from '@/services/transactionServices';
 import { useNewCustomerRegistration } from '@/contexts/newCustomerRegistrationContect';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { flattenProductOffers, getCashOfferLines } from '../cart/offerHelpers';
 
 const SuccessfullPaymentCard = ({
   paymentData,
@@ -30,7 +32,7 @@ const SuccessfullPaymentCard = ({
   const { showNotification } = useNotification();
   const { setRegistrationData } = useNewCustomerRegistration();
   const [openSendReceipt, setOpenSendReceipt] = React.useState(false);
-  const [isSendingEmail, setIsSendingEmail] = React.useState(false);
+  const [isSending, setIsSending] = React.useState(false);
 
   const handleOpenNewCustomerRegistration = () => {
     const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
@@ -77,32 +79,56 @@ const SuccessfullPaymentCard = ({
   const isScheduled =
     paymentData?.selectedFulfillmentTime === 'Now' ? false : true;
 
-  const cashDiscounts = () => {
-    const cashOffers =
-      paidOrderDetails?.linkedCustomer?.appliedOffers?.filter(
-        (offer) => offer.type === 'cash'
-      ) || [];
+  const cashOffers = () =>
+    paidOrderDetails?.linkedCustomer?.appliedOffers?.filter(
+      (offer) => offer.type === 'cash'
+    ) || [];
 
-    return getTotalCashOfferDiscount(cashOffers, paidOrderDetails?.items) || 0;
-  };
+  const cashDiscounts = () =>
+    getTotalCashOfferDiscount(cashOffers(), paidOrderDetails?.items) || 0;
 
-  const productOffers = () => {
-    const offers =
-      paidOrderDetails?.linkedCustomer?.appliedOffers?.filter(
-        (offer) => offer.type === 'product'
-      ) || [];
-    const result = offers?.map((offer) => {
-      const productDetails = offer?.productDetails;
-      return {
-        ...productDetails,
-        selectedChoices: Object.values(productDetails.selectedChoices) || [],
-      };
-    });
-    return result;
-  };
+  // VAT on the subtotal after cash discounts, the same way the cart and the saved sale work it out
+  const vatAmount = () =>
+    getVATAmount(paidOrderDetails?.items, cashOffers(), workBranchVATRate) || 0;
+
+  // every free product handed over, one entry per product (rewards can hold several picks)
+  const productOffers = () =>
+    flattenProductOffers(paidOrderDetails?.linkedCustomer?.appliedOffers || []);
+
+  // one line per applied cash offer with its own amount
+  const cashOfferLines = () =>
+    getCashOfferLines(
+      paidOrderDetails?.linkedCustomer?.appliedOffers || [],
+      subtotal(paidOrderDetails?.items) || 0
+    );
+
+  const currency = paidOrderDetails?.items?.[0]?.product?.currency || '';
+
+  const freeItemsForReceipt = () =>
+    productOffers().map((offer) => ({
+      name: offer?.product?.name || 'Free item',
+      quantity: offer?.quantity || 1,
+      price: 'FREE',
+      isFree: true,
+      promo: offer?.description || '',
+      options: (offer?.selectedChoices || []).map((choice) => ({
+        additionalPrice: 0, // choices on a reward item are free too
+        name: choice?.material?.name || 'Option',
+      })),
+    }));
+
+  const discountsForReceipt = () =>
+    cashOfferLines().map((line) => ({
+      description: line.description,
+      label: line.label,
+      amount: commaNumberFormat(line.amount, 2),
+    }));
 
   const getReceiptData = () => ({
     transactionId: paidOrderDetails?.orderId,
+    // structured copies for receipt templates that want to lay these out themselves
+    freeItems: freeItemsForReceipt(),
+    discounts: discountsForReceipt(),
     metaData: {
       title: isScheduled
         ? `Advanced order note for - ${orderDateString(paymentData?.orderScheduledDateTime)}, ${orderTime(paymentData?.orderScheduledDateTime)}`
@@ -113,51 +139,65 @@ const SuccessfullPaymentCard = ({
       date: `${orderDateString(paymentData?.paymentStatus?.time)}, ${orderTime(paymentData?.paymentStatus?.time)}`,
       cashierName: user?.fullName || ' ',
     },
-    listOfItems:
-      paidOrderDetails?.items?.map((item) => ({
+    // free items go in the item list too (price 'FREE') so every receipt channel shows them
+    listOfItems: [
+      ...(paidOrderDetails?.items?.map((item) => ({
         name: item?.product?.name || 'Item...',
         quantity: item?.quantity || 0,
-        price: itemTotalCost(item) || 0,
+        price: commaNumberFormat(itemTotalCost(item), 2) || 0,
         options:
           item?.choices?.map((choiceObj) => ({
             additionalPrice: choiceObj?.choice?.additionalPrice || 0,
             name: choiceObj?.choice?.material?.name || 'Option',
           })) || [],
-      })) || [],
+      })) || []),
+      ...freeItemsForReceipt(),
+    ],
     endNotes: [
       {
         label: 'Subtotal:',
-        value: `${subtotal(paidOrderDetails?.items)?.toFixed(2)}`,
+        value: `${commaNumberFormat(subtotal(paidOrderDetails?.items), 2)}`,
       },
       {
-        label: `Tax (${workBranchVATRate?.toFixed(2)}%)`,
-        value: `${getVATAmount(
-          paidOrderDetails?.items,
-          [],
-          workBranchVATRate
-        )?.toFixed(2)}`,
+        label: `Tax (${commaNumberFormat(workBranchVATRate, 2)}%)`,
+        value: `${commaNumberFormat(
+          vatAmount(),
+          2
+        )}`,
       },
-      productsTax(paidOrderDetails?.items) > 0 && {
-        label: 'Products Tax:',
-        value: `${productsTax(paidOrderDetails?.items)?.toFixed(2)}`,
-      },
-      cashDiscounts() > 0 && {
-        label: 'Cash Discounts:',
-        value: `- ${cashDiscounts()?.toFixed(2)}`,
-      },
+      productsTax(paidOrderDetails?.items) > 0
+        ? {
+            label: 'Products Tax:',
+            value: `${commaNumberFormat(productsTax(paidOrderDetails?.items), 2)}`,
+          }
+        : false,
+      // one line per cash offer, then the combined total when there is more than one
+      ...discountsForReceipt().map((d) => ({
+        label: `Discount - ${d.description}${d.label ? ` (${d.label})` : ''}:`,
+        value: `- ${d.amount}`,
+      })),
+      cashOfferLines().length > 1
+        ? {
+            label: 'Total Discounts:',
+            value: `- ${commaNumberFormat(cashDiscounts(), 2)}`,
+          }
+        : false,
       {
         label: 'Total Amount:',
-        value: `${paymentData?.total?.toFixed(2) || '0.00'}`,
+        value: `${commaNumberFormat(paymentData?.total, 2) || '0.00'}`,
       },
-      isScheduled && {
-        label: 'Amount Paid Now:',
-        value: `${paymentData?.paymentStatus?.amountPaid?.toFixed(2) || '0.00'}`,
-      },
-      isScheduled &&
-        unpaidBalance > 0 && {
-          label: 'Unpaid Balance:',
-          value: `${unpaidBalance?.toFixed(2)}`,
-        },
+      isScheduled
+        ? {
+            label: 'Amount Paid Now:',
+            value: `${commaNumberFormat(paymentData?.paymentStatus?.amountPaid, 2) || '0.00'}`,
+          }
+        : false,
+      isScheduled
+        ? unpaidBalance > 0 && {
+            label: 'Unpaid Balance:',
+            value: `${commaNumberFormat(unpaidBalance, 2)}`,
+          }
+        : false,
     ].filter(Boolean),
     footer: 'Thank you for your purchase! Visit again!',
   });
@@ -171,7 +211,12 @@ const SuccessfullPaymentCard = ({
           item.options?.length > 0
             ? ` (${item.options.map((option) => option.name).join(', ')})`
             : '';
-        return `${index + 1}. ${item.name}${optionsText} x${item.quantity} - ${item.price?.toFixed?.(2) || Number(item.price || 0).toFixed(2)}`;
+        if (item.isFree) {
+          const promoText = item.promo ? ` [${item.promo}]` : '';
+          return `${index + 1}. ${item.name}${optionsText} x${item.quantity} - FREE${promoText}`;
+        }
+        // price is already a formatted string (e.g. "1,250.00")
+        return `${index + 1}. ${item.name}${optionsText} x${item.quantity} - ${item.price}`;
       })
       .join('\n');
 
@@ -202,54 +247,73 @@ const SuccessfullPaymentCard = ({
   };
 
   const handleSendEmailReceipt = async () => {
-    setIsSendingEmail(true);
+    setIsSending(true);
 
-    const receiptData = getReceiptData();
-    const response = await sendReceiptService({
-      transactionId: paidOrderDetails?.orderId,
-      channel: 'email',
-      recipient: {
-        email: paidOrderDetails?.linkedCustomer?.email,
-        customerId: paidOrderDetails?.linkedCustomer?._id,
-        customerName: paidOrderDetails?.linkedCustomer?.name,
-      },
-      receiptData: receiptData,
-    });
+    try {
+      const receiptData = getReceiptData();
+      const response = await sendReceiptService({
+        transactionId: paidOrderDetails?.orderId,
+        channel: 'email',
+        recipient: {
+          email: paidOrderDetails?.linkedCustomer?.email,
+          customerId: paidOrderDetails?.linkedCustomer?._id,
+          customerName: paidOrderDetails?.linkedCustomer?.name,
+        },
+        receiptData: receiptData,
+      });
 
-    if (response?.error) {
-      showNotification('error', 'Email Send Failed', response.error, 4000);
-      setIsSendingEmail(false);
-      return;
+      if (response?.error) {
+        showNotification('error', 'Email Send Failed', response.error, 4000);
+        setIsSending(false);
+        return;
+      }
+
+      showNotification(
+        'success',
+        'Receipt Sent',
+        `Receipt sent to ${paidOrderDetails?.linkedCustomer?.email} successfully`,
+        3000
+      );
+      setOpenSendReceipt(false);
+      setShowReceipt({ success: false, order: null });
+    } catch (error) {
+      console.error(error || 'error sending receipt');
+    } finally {
+      setIsSending(false);
     }
-
-    showNotification(
-      'success',
-      'Receipt Sent',
-      `Receipt sent to ${paidOrderDetails?.linkedCustomer?.email} successfully`,
-      3000
-    );
-    setIsSendingEmail(false);
-    setOpenSendReceipt(false);
-    setShowReceipt({ success: false, order: null });
   };
 
   //TODO: Implement WhatsApp receipt sending functionality in the service and handle response accordingly
   const handleSendWhatsappReceipt = async () => {
-    showNotification(
-      'success',
-      'WhatsApp Receipt sent',
-      'Receipt sent via WhatsApp successfully',
-      3000
-    );
+    setIsSending(true);
+    try {
+      showNotification(
+        'Warning',
+        'WhatsApp Service unavailable',
+        'Whatsapp receipt method is currently unavailable...',
+        3000
+      );
 
-    setOpenSendReceipt(false);
-    setShowReceipt({ success: false, order: null });
+      setOpenSendReceipt(false);
+      setShowReceipt({ success: false, order: null });
+    } catch (error) {
+      console.error(error || 'error sending whatsapp receipt');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handlePrintReceipt = () => {
-    const receiptData = getReceiptData();
-    printReceipt(receiptData);
-    setShowReceipt({ success: false, order: null });
+    setIsSending(true);
+    try {
+      const receiptData = getReceiptData();
+      printReceipt(receiptData);
+      setShowReceipt({ success: false, order: null });
+    } catch (error) {
+      console.error(error || 'error printing receipt');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -269,6 +333,9 @@ const SuccessfullPaymentCard = ({
         orderDateString={orderDateString}
         orderTime={orderTime}
         cashDiscounts={cashDiscounts}
+        cashOfferLines={cashOfferLines}
+        vatAmount={vatAmount}
+        currency={currency}
         productOffers={productOffers}
         workBranchVATRate={workBranchVATRate}
         handleOpenNewCustomerRegistration={handleOpenNewCustomerRegistration}
@@ -283,7 +350,7 @@ const SuccessfullPaymentCard = ({
             onClose={() => setOpenSendReceipt(false)}
             onSendEmail={handleSendEmailReceipt}
             onSendWhatsapp={handleSendWhatsappReceipt}
-            isSendingEmail={isSendingEmail}
+            isSending={isSending}
           />
         </div>
       )}

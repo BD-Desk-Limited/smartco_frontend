@@ -106,9 +106,9 @@ const Welcome = () => {
               <Image
                 src="/assets/logo_white.png"
                 alt="logo"
-                width={50}
-                height={49}
-                style={{ height: 'auto' }}
+                width={331}
+                height={322}
+                style={{ width: 50, height: 'auto' }}
               />
               <p className="text-xl font-bold">SmartCo.</p>
             </div>

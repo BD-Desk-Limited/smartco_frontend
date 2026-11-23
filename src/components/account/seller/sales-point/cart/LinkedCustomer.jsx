@@ -12,6 +12,7 @@ const LinkedCustomer = ({
   const { showNotification } = useNotification();
 
   const onCustomerUnlink = () => {
+    // scheduled order should not be allowed modification
     if (cart?.restoredFromScheduledOrder) {
       showNotification(
         'warning',
@@ -20,9 +21,9 @@ const LinkedCustomer = ({
         10000
       );
       return;
+    } else {
+      handleUnlinkCustomer();
     }
-
-    handleUnlinkCustomer;
   };
 
   const onEditCustomerClick = () => {

@@ -62,7 +62,19 @@ const CustomerOverview = ({
           value={s.firstVisit ? formatDate(new Date(s.firstVisit)) : '-'}
         />
         <StatCard label="Refunded" value={commaNumberFormat(s.refunded, 2)} />
-        <StatCard label="Offers earned" value={header.offersCount ?? 0} />
+        <StatCard
+          label="Offers earned"
+          value={header.rewards?.earned ?? header.offersCount ?? 0}
+          hint={
+            header.rewards
+              ? `${header.rewards.available} available · ${header.rewards.redeemed} used${
+                  header.rewards.expired
+                    ? ` · ${header.rewards.expired} expired`
+                    : ''
+                }`
+              : undefined
+          }
+        />
       </div>
 
       <div className="flex items-center justify-between">

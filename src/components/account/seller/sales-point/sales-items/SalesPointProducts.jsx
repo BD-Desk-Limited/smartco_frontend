@@ -190,7 +190,7 @@ const SalesPointProducts = ({
           {/* Product list */}
           {filteredProducts && filteredProducts.length > 0 ? (
             <ul className="w-full h-[calc(100vh-250px)] mb-10 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 scrollbar-thin overflow-y-auto">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <li
                   key={product._id}
                   onClick={() => handleProductClick(product)}
@@ -215,6 +215,7 @@ const SalesPointProducts = ({
                       title={product.name}
                       width={1000}
                       height={100}
+                      loading={index < 6 ? 'eager' : 'lazy'}
                       className="w-full h-32 object-fill rounded-t-xl rounded-b-none"
                     />
                   </div>

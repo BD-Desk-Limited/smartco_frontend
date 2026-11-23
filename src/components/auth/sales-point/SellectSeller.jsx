@@ -36,7 +36,8 @@ const SelectSeller = ({ selectedSeller, setSelectedSeller, sellersInfo }) => {
                       alt={seller.name}
                       width={30}
                       height={30}
-                      className="rounded-[100%]"
+                      className="rounded-[100%] object-cover"
+                      style={{ width: 30, height: 30 }}
                     />
                   </div>
                   <div>

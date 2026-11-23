@@ -63,7 +63,7 @@ const CustomerMessages = ({ pageDescription }) => {
         <Header />
       </div>
       <div className="w-full">
-        <SubHeader title={'Messages'} />
+        <SubHeader title={'Customer Messages'} />
       </div>
       <div className="flex flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit absolute left-0 top-0 z-50">
