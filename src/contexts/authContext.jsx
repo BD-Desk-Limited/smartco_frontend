@@ -3,6 +3,7 @@ import React, { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { getUserService } from '@/services/authServices';
+import { logoutService } from '@/services/sessionServices';
 
 // Create a context for authentication
 const AuthContext = createContext(null);
@@ -118,7 +119,14 @@ export const AuthProvider = ({ children }) => {
     };
   }, [router, pathname]);
 
+  // End the session on the server too, so it shows as signed out on the sessions screen.
+  // Fire and forget: the token is read synchronously before it is removed below.
+  const endServerSession = () => {
+    if (sessionStorage.getItem('token')) logoutService();
+  };
+
   const logOut = () => {
+    endServerSession();
     sessionStorage.removeItem('token');
     localStorage.removeItem('userMode');
     setIsAuthenticated(false);
@@ -129,6 +137,9 @@ export const AuthProvider = ({ children }) => {
   const logOutSalesPoint = () => {
     const workBranchKey = `workBranch_${user?._id}`;
 
+    // No endServerSession() here: the sales point keeps an encrypted copy of this token for
+    // offline login. Ending the session would make that copy fail to sync sales once the
+    // device is back online. The session simply expires with the token (24h).
     sessionStorage.removeItem('token');
     localStorage.removeItem('userMode');
     setIsAuthenticated(false);

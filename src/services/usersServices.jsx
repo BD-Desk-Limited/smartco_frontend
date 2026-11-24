@@ -13,16 +13,13 @@ const getToken = () => {
 export const getAllUsersByCompanyId = async () => {
   const token = getToken();
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (response.ok) {
       const responseData = await response.json();
@@ -50,10 +47,10 @@ export const toggleUserStatus = async (userIds, status) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           userIds: userIds,
           status: status,
-         }),
+        }),
       }
     );
 
@@ -76,18 +73,14 @@ export const createUserService = async (body) => {
   const token = getToken();
 
   try {
-    
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
 
     if (response.ok) {
       const responseData = await response.json();
@@ -107,17 +100,14 @@ export const createUserService = async (body) => {
 export const deleteUsersById = async (userIds) => {
   const token = getToken();
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ userIds: userIds }),
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userIds: userIds }),
+    });
 
     if (response.ok) {
       const responseData = await response.json();
@@ -173,7 +163,7 @@ export const updateUserService = async (userId, body, file) => {
     if (file) {
       formData.append('file', file);
     }
-    
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
       {
@@ -197,22 +187,106 @@ export const updateUserService = async (userId, body, file) => {
     console.error('Error:', error);
     return { error: 'error updating user data, please try again' };
   }
-}
+};
+
+// Update the logged-in user's profile picture
+export const updateProfilePictureService = async (file) => {
+  const token = getToken();
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/me/profile-picture`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      return { error: errorData.message };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error updating profile picture, please try again' };
+  }
+};
+
+// Update the logged-in admin's own details (fullName, email, phoneNumber)
+export const updateMyProfileService = async (body) => {
+  const token = getToken();
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      return { error: errorData.message };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error updating profile, please try again' };
+  }
+};
+
+// Delete the logged-in user's profile picture
+export const deleteProfilePictureService = async () => {
+  const token = getToken();
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/me/profile-picture`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { data: responseData };
+    } else {
+      const errorData = await response.json();
+      return { error: errorData.message };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return { error: 'error deleting profile picture, please try again' };
+  }
+};
 
 //users teams
 export const getAllTeamsByCompanyID = async () => {
   const token = getToken();
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/teams`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (response.ok) {
       const responseData = await response.json();

@@ -2,244 +2,262 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import OTPInput from './OTPInput';
-import { resendOTPService, verifyOTPService } from '@/services/authServices';
 import { useRouter } from 'next/navigation';
+import OTPInput from './OTPInput';
+import MfaMethodSwitcher, { MFA_METHOD_LABELS } from './MfaMethodSwitcher';
+import { sendMfaCodeService, verifyMfaService } from '@/services/mfaServices';
+import {
+  clearMfaChallenge,
+  loadMfaChallenge,
+  saveMfaChallenge,
+} from '@/utilities/mfaChallengeStorage';
+import { saveRememberToken } from '@/utilities/deviceInfo';
 import { useAuth } from '@/contexts/authContext';
 import Spinner from '../account/Spinner';
 
+const RESEND_COOLDOWN = 30; // seconds before "Resend code" is allowed again
+const emptyCode = () => new Array(6).fill('');
+
+const secondsUntil = (date) =>
+  date ? Math.max(0, Math.round((new Date(date) - Date.now()) / 1000)) : 0;
+
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+};
+
 const OTPForm = () => {
   const { setUser } = useAuth();
-  const [otp, setOtp] = useState(new Array(6).fill('')); // Array length depends on the number of inputs needed
-
-  const [email, setEmail] = useState('');
-  const [userId, setUserId] = useState('');
-  const [trustedDevice, setTrustedDevice] = useState(null);
-
-  const [expiryTime, setExpiryTime] = useState(300); // 5 minutes in seconds
-  const [isResendDisabled, setIsResendDisabled] = useState(true);
+  const router = useRouter();
+  const [challenge, setChallenge] = useState(null);
+  const [otp, setOtp] = useState(emptyCode());
+  const [answer, setAnswer] = useState('');
+  const [expiresIn, setExpiresIn] = useState(0);
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
-  const [purpose, setPurpose] = useState('');
-  const [redirecting, setRedirecting] = useState(false);
-  const router = useRouter();
+  const [rememberThisDevice, setRememberThisDevice] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedEmail = sessionStorage.getItem('email');
-      const storedUserId = sessionStorage.getItem('userId');
-      const storedTrustedDevice = sessionStorage.getItem('trustedDevice');
-      const verificationPurpose = sessionStorage.getItem(
-        'verification-purpose'
-      );
-
-      // Check if the user is logged in
-      if (!storedUserId) {
-        router.push('/pages/auth/login');
-      } else {
-        setEmail(storedEmail);
-        setUserId(storedUserId);
-        setTrustedDevice(storedTrustedDevice);
-        setPurpose(verificationPurpose);
-      }
+    const stored = loadMfaChallenge();
+    if (!stored) {
+      router.push('/pages/auth/login');
+      return;
     }
+    setChallenge(stored);
+    setExpiresIn(secondsUntil(stored.codeExpiresAt));
   }, [router]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setExpiryTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      setExpiresIn((t) => (t > 0 ? t - 1 : 0));
+      setCooldown((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-  };
+  const isQuestion = challenge?.method === 'security_question';
+  const canSubmit = isQuestion ? answer.trim().length > 0 : !otp.includes('');
 
-  useEffect(() => {
-    if (expiryTime === 0) {
-      setIsResendDisabled(false);
-    }
-  }, [expiryTime]);
-
-  const handleOTPResend = async () => {
-    const body = {
-      user: { email: email, _id: userId },
-      trustedDevice,
-    };
-
-    setLoading(true);
-    setError('');
-    setMessage('');
-    try {
-      const response = await resendOTPService(body);
-      if (response.error) {
-        setError(response.error);
-        return;
-      } else if (response.data) {
-        setMessage('OTP resent successfully!!!');
-        setLoading(false);
-      }
-    } catch (error) {
-      setError('error resending OTP, please try again');
-      setLoading(false);
-      return;
-    }
-    setExpiryTime(540); // Reset the timer
-    setIsResendDisabled(true); // Disable the resend button
-  };
-
-  const handleCancel = () => {
-    sessionStorage.clear();
-    setOtp(new Array(6).fill(''));
+  const backToLogin = () => {
+    clearMfaChallenge();
     window.location.href = '/pages/auth/login';
   };
 
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    const body = {
-      OTP: Number(otp.join('')),
-      userId,
-      trustedDevice,
-      verificationPurpose: purpose,
-    };
+  const handleFailure = (response) => {
+    setError(response.error);
+    if (response.restart) setTimeout(backToLogin, 2500);
+  };
 
+  // Resend on the same method, or switch to another one.
+  const handleSend = async (method) => {
     setLoading(true);
     setError('');
     setMessage('');
-    // Handle the verification process
     try {
-      const response = await verifyOTPService(body);
-      if (response.error) {
-        setError(response.error);
-        return;
-      }
-      if (response?.data) {
-        setMessage('OTP verified successfully!!! logging in...');
-        setSuccess(true);
-        setLoading(false);
-        setRedirecting(true);
+      const response = await sendMfaCodeService(challenge.challengeId, method);
+      if (response.error) return handleFailure(response);
 
-        console.log('OTP verified successfully:', response.data.user);
-        // set user and token in session storage for use in the login attempt notification page. It will be cleared once the user logs in successfully or closes the page.
-        sessionStorage.setItem('token', response?.data?.token);
-        setUser(response?.data?.user);
-
-        // If the device is not trusted redirect to login attempt notification where admin can register the device and other users gets notified that the device is untrusted.
-        if (response?.data.trustedDevice !== 'true') {
-          router.push('/pages/auth/login-attempt-notification');
-          return;
-        }
-
-        // if the device is trusted log them in, then redirect based on role.
-        if (
-          response?.data.trustedDevice === 'true' &&
-          response?.data?.user?.role === 'admin'
-        ) {
-          router.push('/pages/account/admin');
-        } else if (
-          response?.data.trustedDevice === 'true' &&
-          response?.data?.user?.role === 'manager'
-        ) {
-          router.push('/pages/account/manager');
-        } else {
-          setError('unauthorized user role, please contact admin');
-          return;
-        }
-
-        setRedirecting(false);
-        return;
-      }
-
-      //clean up the session storage
-      sessionStorage.removeItem('email');
-      sessionStorage.removeItem('userId');
-      sessionStorage.removeItem('trustedDevice');
-      sessionStorage.removeItem('verification-purpose');
-    } catch (error) {
-      setError('error verifying OTP, please try again');
-      setLoading(false);
-      return;
+      const next = { ...challenge, ...response.data };
+      saveMfaChallenge(next, challenge.purpose);
+      setChallenge(next);
+      setOtp(emptyCode());
+      setAnswer('');
+      setExpiresIn(secondsUntil(response.data.codeExpiresAt));
+      setCooldown(RESEND_COOLDOWN);
+      setMessage(response.data.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const redirectAfterLogin = (data) => {
+    // Untrusted device: admins register it, others are told it is not authorized.
+    if (data.trustedDevice !== 'true') {
+      router.push('/pages/auth/login-attempt-notification');
+    } else if (data.user?.role === 'admin') {
+      router.push('/pages/account/admin');
+    } else if (data.user?.role === 'manager') {
+      router.push('/pages/account/manager');
+    } else {
+      setSuccess(false);
+      setError('unauthorized user role, please contact admin');
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setLoading(true);
+    setError('');
+    setMessage('');
+    try {
+      const response = await verifyMfaService(challenge.challengeId, {
+        ...(isQuestion ? { answer } : { code: otp.join('') }),
+        rememberDevice: rememberThisDevice,
+      });
+      if (response.error) {
+        setOtp(emptyCode());
+        return handleFailure(response);
+      }
+
+      clearMfaChallenge();
+      saveRememberToken(response.data.rememberToken, response.data.rememberedUntil);
+      sessionStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
+      setMessage('Verified successfully! logging in...');
+      setSuccess(true);
+      redirectAfterLogin(response.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!challenge) return <Spinner />;
+
   return (
     <div className="relative overflow-hidden flex items-center justify-center h-full w-full z-20">
       {!success ? (
-        <div className="relative overflow-hidden flex items-center justify-center h-full w-full z-20">
-          <div className="bg-brand-blue h-[50%] w-[30%] rounded-lg">
-            <h1 className="h-[15%] text-text-white text-center flex items-center justify-center">
-              Two step verification 2FA
+        <div className="relative overflow-hidden flex flex-col items-center justify-center h-full w-full z-20">
+          <form
+            onSubmit={handleVerify}
+            className="bg-brand-blue min-h-[50%] w-[90%] md:w-[30%] rounded-lg flex flex-col"
+          >
+            <h1 className="py-3 text-text-white text-center">
+              Two step verification · {MFA_METHOD_LABELS[challenge.method]}
             </h1>
-            <div className="h-[70%] bg-white flex flex-col items-center justify-between p-3">
-              <span className="text-sm text-center">
-                Enter the verification code sent to
-                <strong> {email} </strong>
-                below
-              </span>
-              <div className="flex flex-col items-center gap-2">
-                <span className="flex flex-col items-center gap-0.5">
-                  <OTPInput otp={otp} setOtp={setOtp} />
-                  <span className="text-sm">
-                    Code expires in{' '}
-                    <strong>{`0${formatTime(expiryTime)}`}</strong>
+            <div className="flex-1 bg-white flex flex-col items-center justify-between gap-4 p-4">
+              {isQuestion ? (
+                <label className="flex flex-col gap-2 w-full text-sm text-center">
+                  <strong>{challenge.question}</strong>
+                  <input
+                    type="text"
+                    value={answer}
+                    autoFocus
+                    autoComplete="off"
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder="Your answer"
+                    className="border border-brand-blue rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                  />
+                  <span className="text-xs text-text-gray">
+                    Answers are not case sensitive.
                   </span>
-                </span>
-
-                <span>
-                  Code not received?{' '}
-                  <button
-                    onClick={handleOTPResend}
-                    disabled={isResendDisabled}
-                    className={`${
-                      isResendDisabled
-                        ? 'cursor-not-allowed'
-                        : 'cursor-pointer hover:font-semibold'
-                    } text-brand-green`}
-                  >
-                    Resend Code
-                  </button>
-                </span>
-                <div className="w-full text-center">
-                  {error && (
-                    <span className="text-error w-full text-center text-base items-center flex justify-center gap-2">
-                      <Image
-                        src={'/assets/error.png'}
-                        alt="errorr"
-                        width={20}
-                        height={20}
-                      />
-                      <span>{error}</span>
+                </label>
+              ) : (
+                <>
+                  <span className="text-sm text-center">
+                    Enter the 6-digit code sent to
+                    <strong> {challenge.destination} </strong>
+                  </span>
+                  <span className="flex flex-col items-center gap-1">
+                    <OTPInput otp={otp} setOtp={setOtp} />
+                    <span className="text-sm">
+                      {expiresIn > 0 ? (
+                        <>
+                          Code expires in{' '}
+                          <strong>{formatTime(expiresIn)}</strong>
+                        </>
+                      ) : (
+                        <span className="text-error">
+                          Code expired, request a new one
+                        </span>
+                      )}
                     </span>
-                  )}
-                  {message && <span className="text-success">{message}</span>}
-                </div>
+                  </span>
+                  <span className="text-sm">
+                    Code not received?{' '}
+                    <button
+                      type="button"
+                      onClick={() => handleSend(challenge.method)}
+                      disabled={loading || cooldown > 0}
+                      className={`${
+                        loading || cooldown > 0
+                          ? 'cursor-not-allowed text-text-gray'
+                          : 'cursor-pointer hover:font-semibold text-brand-green'
+                      }`}
+                    >
+                      Resend code{cooldown > 0 ? ` (${cooldown}s)` : ''}
+                    </button>
+                  </span>
+                </>
+              )}
+
+              <MfaMethodSwitcher
+                methods={challenge.methods}
+                current={challenge.method}
+                onSelect={handleSend}
+                disabled={loading}
+              />
+
+              {challenge.purpose === 'login' && (
+                <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberThisDevice}
+                    onChange={(e) => setRememberThisDevice(e.target.checked)}
+                    className="h-4 w-4 accent-brand-blue"
+                  />
+                  Remember this device for 24 hours
+                  <span className="text-xs text-text-gray">(not on shared computers)</span>
+                </label>
+              )}
+
+              <div className="w-full text-center text-sm">
+                {error && (
+                  <span className="text-error w-full items-center flex justify-center gap-2">
+                    <Image src="/assets/error.png" alt="" width={20} height={20} />
+                    <span>{error}</span>
+                  </span>
+                )}
+                {message && <span className="text-success">{message}</span>}
               </div>
+
               <div className="flex items-center justify-center w-full gap-10">
                 <button
-                  onClick={handleCancel}
-                  className="rounded-lg border border-blue-shadow10 p-2 hover:bg-blue-shadow9 px-5 py-2"
+                  type="button"
+                  onClick={backToLogin}
+                  className="rounded-lg border border-blue-shadow10 hover:bg-blue-shadow9 px-5 py-2"
                 >
                   Cancel
                 </button>
                 <button
-                  disabled={loading || otp.includes('')}
-                  onClick={handleVerify}
-                  className={`${otp.includes('') ? 'cursor-not-allowed' : 'cursor-pointer'} rounded-lg px-5 py-2 hover:bg-blue-shadow4 bg-brand-blue text-text-white`}
+                  type="submit"
+                  disabled={loading || !canSubmit}
+                  className={`${
+                    loading || !canSubmit
+                      ? 'cursor-not-allowed opacity-70'
+                      : 'cursor-pointer hover:bg-blue-shadow4'
+                  } rounded-lg px-5 py-2 bg-brand-blue text-text-white`}
                 >
-                  Verify
+                  {loading ? 'Please wait...' : 'Verify'}
                 </button>
               </div>
             </div>
-          </div>
-          {purpose === 'register' && (
+          </form>
+          {challenge.purpose === 'registration' && (
             <div className="flex justify-center items-center gap-2 pt-5">
               <span className="h-2 w-2 bg-brand-blue rounded-[100%]"></span>
               <span className="h-0.5 w-10 bg-brand-blue"></span>
@@ -257,20 +275,13 @@ const OTPForm = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 1 }}
           >
-            <Image
-              src={'/assets/verified.png'}
-              alt=""
-              width={150}
-              height={150}
-            />
+            <Image src="/assets/verified.png" alt="" width={150} height={150} />
           </motion.h1>
           <div className="text-center text-text-gray">{message}</div>
-          {redirecting && (
-            <div className="mt-4">
-              <Spinner />
-              <p className="text-sm text-gray-600 mt-2">Redirecting ...</p>
-            </div>
-          )}
+          <div className="mt-4">
+            <Spinner />
+            <p className="text-sm text-gray-600 mt-2">Redirecting ...</p>
+          </div>
         </div>
       )}
       <div className="absolute bottom-[40vh] left-[10vw] z-0">

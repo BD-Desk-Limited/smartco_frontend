@@ -8,7 +8,7 @@ import {
   verifyInputText,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import UsersManagementSidebar from '../UsersManagementSidebar';
 import ErrorModal from '@/components/account/ErrorModal';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteMaterials, getAllMaterials } from '@/services/materialServices';
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '../../../SubHeader';
 import MaterialSidebar from '../materialSidebar';
 import Image from 'next/image';

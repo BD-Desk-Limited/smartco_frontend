@@ -154,9 +154,9 @@ const HeadBar = ({
           <Image
             src={user?.profilePictureUrl}
             alt="User Avatar"
-            width={40}
-            height={40}
-            className="object-contain rounded-full"
+            width={30}
+            height={30}
+            className="border bg-text-white rounded-full h-10 w-10 object-contain"
           />
         ) : (
           <span className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-bold border">

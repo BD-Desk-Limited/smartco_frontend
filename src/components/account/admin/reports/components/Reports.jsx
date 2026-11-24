@@ -1,4 +1,4 @@
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import React, { useState, useEffect } from 'react';
 import SubHeader from '../../SubHeader';
 import SideBar from '../../SideBar';

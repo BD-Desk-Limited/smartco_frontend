@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PageDescription from '@/components/account/PageDescription';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '../../../SubHeader';
 import SideBar from '../../../SideBar';
 import { PURCHASES_AND_SUPPLY_SUBMENUS } from '../PurchasesAndSupplySubMenus';

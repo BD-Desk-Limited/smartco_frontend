@@ -1,6 +1,6 @@
 import PageDescription from '@/components/account/PageDescription';
 import React from 'react';
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '../../../SubHeader';
 import MaterialSidebar from '../materialSidebar';
 import CreateGroupedMaterialForm from './CreateGroupedMaterialForm';

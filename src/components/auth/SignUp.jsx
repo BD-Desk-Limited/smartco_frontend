@@ -13,6 +13,7 @@ import {
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
 import { signupService } from '@/services/authServices';
+import { saveMfaChallenge } from '@/utilities/mfaChallengeStorage';
 import CurrencyLocationMatch from './CurrencyLocationMatch';
 
 const SignUp = () => {
@@ -157,10 +158,7 @@ const SignUp = () => {
       if (response && response.data) {
         setMessage(response.data.message);
 
-        sessionStorage.setItem('email', response.data?.user?.email);
-        sessionStorage.setItem('userId', response.data?.user?._id);
-        sessionStorage.setItem('trustedDevice', response.data?.trustedDevice);
-        sessionStorage.setItem('verification-purpose', 'registration');
+        saveMfaChallenge(response.data, 'registration');
 
         setSuccess(true);
         const timer = setTimeout(() => {

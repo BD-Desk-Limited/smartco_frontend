@@ -1,3 +1,5 @@
+import { deviceHeaders, getDeviceInfo } from '@/utilities/deviceInfo';
+
 // safely access sessionStorage in client-side code
 // This function checks if the code is running in a browser environment
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -23,7 +25,7 @@ export const loginService = async (form) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, deviceInfo: getDeviceInfo() }),
       }
     );
     if (response.ok) {
@@ -39,60 +41,6 @@ export const loginService = async (form) => {
     return {
       error: 'Internal server error, please try again or contact support',
     };
-  }
-};
-
-export const resendOTPService = async (body) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-otp`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error resending OTP, please try again' };
-  }
-};
-
-export const verifyOTPService = async (body) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-otp`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error verifying OTP, please try again' };
   }
 };
 
@@ -242,6 +190,7 @@ export const getUserService = async (token) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
+        ...deviceHeaders(), // keeps this device's clock current on the sessions screen
       },
     });
 
@@ -269,7 +218,7 @@ export const salesPointLoginService = async (body) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...body, deviceInfo: getDeviceInfo() }),
       }
     );
 

@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/authContext';
 import { loginService } from '@/services/authServices';
 import { useCompanyData } from '@/contexts/companyDataContext';
+import { saveMfaChallenge } from '@/utilities/mfaChallengeStorage';
+import { getRememberTokens } from '@/utilities/deviceInfo';
 
 const LoginForm = () => {
   const [form, setForm] = React.useState({ email: '', password: '' });
@@ -31,6 +33,8 @@ const LoginForm = () => {
         email: form?.email,
         password: form?.password,
         deviceId: companyData?.authorizationToken,
+        // Lets the server skip MFA if this browser was remembered in the last 24 hours
+        rememberTokens: getRememberTokens(),
       };
       const response = await loginService(body);
 
@@ -39,19 +43,14 @@ const LoginForm = () => {
         return;
       } else if (response?.data) {
         if (response?.data?.verifyOTP) {
-          sessionStorage.setItem('userId', response?.data?.user?._id);
-          sessionStorage.setItem(
-            'trustedDevice',
-            response?.data?.trustedDevice
-          );
-          sessionStorage.setItem('email', response?.data?.user?.email);
-          sessionStorage.setItem('verification-purpose', 'login');
+          // Second factor required: keep only the server-issued challenge.
+          saveMfaChallenge(response.data, 'login');
           setMessage(response?.data?.message);
           setSuccess(true);
 
           setTimeout(() => {
             router.push('/pages/auth/verify-otp');
-          }, 7000);
+          }, 3000);
           return;
         } else if (response?.data?.token) {
 

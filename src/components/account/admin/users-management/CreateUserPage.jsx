@@ -1,4 +1,4 @@
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import React from 'react';
 import CreateUser from './components/create-user/CreateUser';

@@ -1,4 +1,4 @@
-import Header from '@/components/account/AdminHeader';
+import Header from '@/components/account/admin/AdminHeader';
 import React, { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import SubHeader from '../../SubHeader';

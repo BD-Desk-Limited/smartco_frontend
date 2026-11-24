@@ -1,8 +1,5 @@
+import OfflineScreen from '@/components/account/OfflineScreen';
+
 export default function OfflinePage() {
-  return (
-    <div style={{ padding: 24 }}>
-      <h1>You are offline</h1>
-      <p>Please reconnect to continue.</p>
-    </div>
-  );
+  return <OfflineScreen message="Please reconnect to continue." />;
 }
