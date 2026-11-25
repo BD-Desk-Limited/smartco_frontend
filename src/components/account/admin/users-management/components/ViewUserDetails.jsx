@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import UsersManagementSidebar from './UsersManagementSidebar';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import Button from '@/components/account/Button';
@@ -58,7 +58,8 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
                   alt={'user'}
                   width={150}
                   height={150}
-                  className="rounded-full"
+                  className="rounded-full object-cover"
+                  style={{ width: 150, height: 150 }}
                 />
                 <ul className="flex flex-col px-5 gap-2 text-text-gray">
                   <li className="text-lg font-semibold">

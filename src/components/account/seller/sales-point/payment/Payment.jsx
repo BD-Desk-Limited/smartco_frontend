@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BillAndSummary from '../cart/BillAndSummary';
 import {
   productsTax,
@@ -21,6 +21,8 @@ import CardPayment from './payment-methods/CardPayment';
 import POSPayment from './payment-methods/POSPayment';
 import BankTransfer from './payment-methods/BankTransfer';
 import { persistTransactionMultiLayer } from '@/services/transactionPersistenceService';
+import { buildRewardSelections } from '../cart/offerHelpers';
+import { useAuth } from '@/contexts/authContext';
 
 const Payment = ({
   cart,
@@ -34,6 +36,7 @@ const Payment = ({
   handleCheckout,
   workBranch,
 }) => {
+  const { user } = useAuth(); // the seller logged in at this till right now
   const Now = new Date().toISOString().slice(0, 16);
   const [isHydrated, setIsHydrated] = React.useState(false);
   const [paymentType, setPaymentType] = React.useState(
@@ -54,6 +57,7 @@ const Payment = ({
   );
   const [openPaymentMethodOverlay, setOpenPaymentMethodOverlay] =
     React.useState(true);
+  const [loading, setLoading] = useState(false);
 
   const workBranchVATRate =
     workBranch && workBranch.taxBand?.rates[0]?.rate
@@ -63,7 +67,6 @@ const Payment = ({
   React.useEffect(() => {
     setIsHydrated(true);
   }, []);
-  console.log('Cart data in Payment component:', cart);
 
   // if cart is empty, switch to sales items tab
   React.useEffect(() => {
@@ -235,11 +238,20 @@ const Payment = ({
       ...cart,
       linkedCustomer: cart?.linkedCustomer?._id || null,
       orderId: cart?.orderId,
+      // WHO made this sale, stamped now. The sale may sync much later (offline), after this seller has logged out
+      // and someone else is logged in, so the server must not guess it from whoever syncs.
+      seller: user?._id || user?.id,
       branch: workBranch?._id,
       totalAmount: cart?.payment?.total || 0,
       transactionType: 'sale',
       offersApplied:
         cart?.linkedCustomer?.appliedOffers?.map((offer) => offer._id) || [],
+      // which free products (and ingredient choices) were handed over for each product reward.
+      // Without this the server flags every product reward 'missing_selection' and deducts no stock for it.
+      // [{ rewardId, products: [{ productId, selectedOptions: [{ optionId, quantity, optionAdditionalPrice }] }] }]
+      rewardSelections: buildRewardSelections(
+        cart?.linkedCustomer?.appliedOffers || []
+      ),
       payment: cart?.payment || null,
       items:
         cart?.items?.map((item) => {
@@ -261,7 +273,7 @@ const Payment = ({
                 quantity,
               };
             }) || []
-          ).filter((choice) => choice.optionId !== null); // filter out any null choices resulting from empty strings
+          ).filter((choice) => choice && choice.optionId !== null); // drop skipped ('' -> null) and empty choices
           return {
             product,
             selectedOptions,
@@ -284,6 +296,7 @@ const Payment = ({
     };
 
     try {
+      setLoading(true);
       /*
       // MULTI-LAYER PERSISTENCE: Ensures transaction is saved across all available storage layers
       // Layer 1: IndexedDB (primary, offline first)
@@ -335,6 +348,8 @@ const Payment = ({
       // Even on error, proceed to show receipt - payment was confirmed in payment gateway
       // Persistence errors should not block user experience at this point
       setShowReceipt(successfullyPaidOrderStatus);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -343,6 +358,7 @@ const Payment = ({
     cart,
     mode,
     paymentMethod: { ...SelectedPaymentMethod },
+    loading,
   };
 
   if (!isHydrated || !cart) {

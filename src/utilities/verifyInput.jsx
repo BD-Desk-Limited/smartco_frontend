@@ -81,7 +81,7 @@ export function verifyInputText(inputText) {
   }
 
   // Permissive regex that allows most common text characters
-  const allowed = /^[A-Za-z0-9\s.,''""’’&@#$%*()[\]{}|<>?!;:_/+\-=]*$/;
+  const allowed = /^[A-Za-z0-9\s.,''""’’&@%*()|?!;:_/+\-=]*$/;
   const verified = allowed.test(value);
 
   return {

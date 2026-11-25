@@ -6,6 +6,7 @@ import {
 } from '@/services/authServices';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import PasswordRules, { passwordMeetsRules } from './PasswordRules';
 
 const ResetPassword = ({ token }) => {
   const [newPassword, setNewPassword] = useState('');
@@ -55,15 +56,19 @@ const ResetPassword = ({ token }) => {
   const handlePasswordReset = async (e) => {
     e.preventDefault();
 
+    if (!passwordMeetsRules(newPassword)) {
+      setError('Your new password does not meet all the requirements below.');
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+    setError(null);
     setLoading(true);
 
     try {
       const body = { newPassword, confirmPassword, token };
-      console.log('Body:', body);
       const response = await resetPasswordService(body);
 
       if (response?.error) {
@@ -115,7 +120,7 @@ const ResetPassword = ({ token }) => {
 
             <div className="w-full bg-white flex flex-col items-center justify-between p-3">
               <span className="text-sm text-center text-[#7D8482]">
-                New Password must be at least 8 characters
+                Choose a new password that meets the requirements below
               </span>
               <div className="flex flex-col items-center h-[50%] justify-between gap-4 mt-4 w-[80%]">
                 <div className="w-full gap-2 flex flex-col">
@@ -182,6 +187,11 @@ const ResetPassword = ({ token }) => {
                   </div>
                 </div>
 
+                <PasswordRules
+                  password={newPassword}
+                  confirmPassword={confirmPassword}
+                />
+
                 <div className="w-full text-center">
                   {error && (
                     <span className="text-error w-full text-center text-base items-center flex justify-center gap-2">
@@ -205,9 +215,13 @@ const ResetPassword = ({ token }) => {
                   Cancel
                 </button>
                 <button
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    !passwordMeetsRules(newPassword) ||
+                    newPassword !== confirmPassword
+                  }
                   onClick={handlePasswordReset}
-                  className="rounded-lg px-5 py-2 hover:bg-blue-shadow4 bg-brand-blue text-text-white"
+                  className="rounded-lg px-5 py-2 hover:bg-blue-shadow4 bg-brand-blue text-text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -239,15 +253,17 @@ const ResetPassword = ({ token }) => {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={250}
-          height={250}
+          height={233}
+          style={{ height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[10vh] right-[-20vw] z-0">
         <Image
           src="/assets/brand_mark2.png"
           alt="Logo"
-          width={650}
-          height={650}
+          width={1057}
+          height={942}
+          style={{ width: 650, height: 'auto' }}
         />
       </div>
     </div>

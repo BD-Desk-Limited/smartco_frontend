@@ -8,13 +8,21 @@ const Button = ({
   onClick,
   buttonStyle,
   children,
+  icon,
+  iconAfterText = false,
+  iconStyle,
 }) => {
+  const renderIcon = () => {
+    const Icon = icon; // capitalize so JSX treats it as a component
+    return icon ? <Icon className={iconStyle || ''} /> : null;
+  };
+
   return (
     <button
       onClick={onClick}
       type={`${type || 'button'}`}
       disabled={loading}
-      className={`h-10 rounded-md text-md text-white px-2 ${
+      className={`h-10 text-center rounded-md text-md text-white px-2 ${
         loading ? 'cursor-not-allowed' : 'hover:bg-blue-shadow1'
       } items-center justify-center bg-brand-blue ${buttonStyle} shadow-md flex items-center justify-center`}
     >
@@ -26,7 +34,11 @@ const Button = ({
       ) : children ? (
         children
       ) : (
-        `${text || 'Submit'}`
+        <span className="flex flex-row justify-center items-center gap-2">
+          {!iconAfterText && <span>{renderIcon()}</span>}
+          {text !== '' && <span>{text || 'Submit'}</span>}
+          {iconAfterText && <span>{renderIcon()}</span>}
+        </span>
       )}
     </button>
   );

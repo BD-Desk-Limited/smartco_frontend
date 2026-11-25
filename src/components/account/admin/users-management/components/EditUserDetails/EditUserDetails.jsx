@@ -1,6 +1,6 @@
 import React from 'react';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import PageDescription from '@/components/account/PageDescription';
 import EditUserForm from './EditUserForm';
@@ -49,39 +49,39 @@ const EditUserDetails = ({ pageDescription, userData }) => {
     let inputValidationErrors = [];
 
     // validate email
-    const validateEmail = verifyEmail(updatedUserData.email);
+    const validateEmail = verifyEmail(updatedUserData?.email);
     if (!validateEmail.passed) {
       inputValidationErrors.push(
-        validateEmail.message + ' Please enter a valid email address.'
+        validateEmail?.message + ' Please enter a valid email address.'
       );
     }
 
     // validate phone number
     if (
-      updatedUserData.phoneNumber &&
-      !verifyPhoneNumber(updatedUserData.phoneNumber).passed
+      updatedUserData?.phoneNumber &&
+      !verifyPhoneNumber(updatedUserData?.phoneNumber)?.passed
     ) {
       inputValidationErrors.push(
-        verifyPhoneNumber(updatedUserData.phoneNumber).message +
+        verifyPhoneNumber(updatedUserData?.phoneNumber)?.message +
           ' Please enter a valid phone number.'
       );
     }
     // validate full name
-    const validateFullName = verifyInputText(updatedUserData.fullName);
-    if (!validateFullName.passed) {
+    const validateFullName = verifyInputText(updatedUserData?.fullName);
+    if (!validateFullName?.passed) {
       inputValidationErrors.push(
-        validateFullName.message + ' Please enter a valid full name.'
+        validateFullName?.message + ' Please enter a valid full name.'
       );
     }
     // validate team
-    const validateTeam = verifyInputText(updatedUserData.team);
-    if (updatedUserData.team && !validateTeam.passed) {
+    const validateTeam = verifyInputText(updatedUserData?.team?.name);
+    if (updatedUserData?.team && !validateTeam?.passed) {
       inputValidationErrors.push(
-        validateTeam.message + ' Please select a valid team name.'
+        validateTeam?.message + ' Please select a valid team name.'
       );
     }
 
-    if (inputValidationErrors.length > 0) {
+    if (inputValidationErrors?.length > 0) {
       setError(inputValidationErrors[0]);
       setOpenConfirmationModal(false);
       return;

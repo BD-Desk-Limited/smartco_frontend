@@ -1,3 +1,10 @@
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+
+// prices arrive either as numbers or as already-formatted strings ("1,250.00", "FREE");
+// commaNumberFormat returns null for strings, so only format real numbers
+const formatPrice = (price) =>
+  typeof price === 'number' ? commaNumberFormat(price, 2) : (price ?? '');
+
 /**
  * Prints a formatted receipt to a thermal printer or standard printer
  * @param {Object} metaData - Receipt header information
@@ -92,13 +99,18 @@ const printReceipt = ({
                                 <td style="padding-bottom: ${item.options?.length > 0 ? '0' : '5px'};">
                                     <div>${item.name}</div>
                                     ${
+                                      item.isFree && item.promo
+                                        ? `<div style="font-size: 10px; font-style: italic; color: #555;">Reward: ${item.promo}</div>`
+                                        : ''
+                                    }
+                                    ${
                                       item.options?.length > 0
                                         ? `<ul style="margin: 2px 0 4px 0; padding-left: 14px; list-style-type: disc;">
                                             ${item.options
                                               .map(
                                                 (option) => `
                                                     <li style="font-size: 10px; color: #555;">
-                                                        ${option.name}${option.additionalPrice > 0 ? ` (+${option.additionalPrice.toFixed(2)})` : ''}
+                                                        ${option.name}${option.additionalPrice > 0 ? ` (+${commaNumberFormat(option.additionalPrice, 2)})` : ''}
                                                     </li>
                                                 `
                                               )
@@ -108,7 +120,7 @@ const printReceipt = ({
                                     }
                                 </td>
                                 <td style="vertical-align: top; padding-top: 2px;">${item.quantity}</td>
-                                <td style="vertical-align: top; padding-top: 2px;">${item.price.toFixed(2)}</td>
+                                <td style="vertical-align: top; padding-top: 2px;${item.isFree ? ' font-weight: bold;' : ''}">${formatPrice(item.price)}</td>
                             </tr>
                         `
                       )

@@ -187,7 +187,7 @@ export const getMaterials = async () => {
   }
 };
 
-//get material by id
+//get material details by id
 export const getMaterialById = async (id) => {
   const token = getToken();
   try {
@@ -214,9 +214,9 @@ export const getMaterialById = async (id) => {
     console.error('Error:', error);
     return { error: 'error getting material, please try again' };
   }
-};  
+};
 
-//get grouped material by id
+//get grouped material details by id
 export const getGroupedMaterialById = async (id) => {
   const token = getToken();
   try {
@@ -300,7 +300,7 @@ export const getGroupedMaterials = async () => {
     console.error('Error:', error);
     return { error: 'error getting materials, please try again' };
   }
-}
+};
 
 //update material
 export const updateMaterial = async (id, body, file) => {
@@ -312,7 +312,7 @@ export const updateMaterial = async (id, body, file) => {
     if (file) {
       formData.append('file', file);
     }
-    
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/materials/${id}`,
       {
@@ -363,9 +363,11 @@ export const getMaterialComponentsBreakdown = async (id) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error getting material components breakdown, please try again' };
+    return {
+      error: 'error getting material components breakdown, please try again',
+    };
   }
-}
+};
 
 //delete materials (only allowed if stock is 0)
 export const deleteMaterials = async (material_ids) => {
@@ -397,25 +399,30 @@ export const deleteMaterials = async (material_ids) => {
   }
 };
 
-//Add a new batch to a material
-export const addBatchToMaterial = async (materialId, body) => {
+//fetch material full details by id, + stock batch details
+export const getMaterialDetailsAndStockById = async (
+  materialId,
+  requestedBranchesRaw
+) => {
   const token = getToken();
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches`,
+      `${process.env.NEXT_PUBLIC_API_URL}/materials/detailed-stock/${materialId}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          requestedBranchesRaw: requestedBranchesRaw,
+        }),
       }
     );
 
     if (response.ok) {
       const responseData = await response.json();
-      return { data: responseData };
+      return { data: responseData.data };
     } else {
       const errorData = await response.json();
       const errorMessage = errorData.message;
@@ -423,94 +430,6 @@ export const addBatchToMaterial = async (materialId, body) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { error: 'error adding batch, please try again' };
-  }
-};
-
-//Get all batches of a material
-export const getMaterialBatches = async (materialId) => {
-  const token = getToken();
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error getting material batches, please try again' };
-  }
-};
-
-//Update a batch of a material
-export const updateMaterialBatch = async (materialId, batchId, body) => {
-  const token = getToken();
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches/${batchId}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error updating material batch, please try again' };
-  }
-};
-
-//Delete a batch of a material
-export const deleteMaterialBatch = async (materialId, batchId) => {
-  const token = getToken();
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/materials/${materialId}/batches/${batchId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return { data: responseData };
-    } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      return { error: errorMessage };
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    return { error: 'error deleting material batch, please try again' };
+    return { error: 'error getting material stock details, please try again' };
   }
 };

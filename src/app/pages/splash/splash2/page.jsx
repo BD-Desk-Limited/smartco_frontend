@@ -105,7 +105,8 @@ export default function Home() {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={450}
-          height={450}
+          height={419}
+          style={{ height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[25vh] right-[-10vw]">
@@ -113,7 +114,8 @@ export default function Home() {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={450}
-          height={450}
+          height={419}
+          style={{ height: 'auto' }}
         />
       </div>
     </div>

@@ -247,12 +247,19 @@ const CustomerLookUp = ({
                               >
                                 {offer.freeProduct && (
                                   <div className="flex flex-row items-center gap-4 mb-2 h-16 w-16 justify-center">
-                                    {getProductDetails(offer._id)?.imageURL ? (
+                                    {getProductDetails(offer.freeProduct._id)
+                                      ?.imageURL ? (
                                       <Image
                                         src={
-                                          getProductDetails(offer._id)?.imageURL
+                                          getProductDetails(
+                                            offer.freeProduct._id
+                                          )?.imageURL
                                         }
-                                        alt={getProductDetails(offer._id)?.name}
+                                        alt={
+                                          getProductDetails(
+                                            offer.freeProduct._id
+                                          )?.name
+                                        }
                                         width={100}
                                         height={100}
                                         className="rounded-lg"

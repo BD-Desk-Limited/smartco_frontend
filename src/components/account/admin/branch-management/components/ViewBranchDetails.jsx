@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/account/Header';
+import Header from '@/components/account/admin/AdminHeader';
 import SubHeader from '@/components/account/admin/SubHeader';
 import BranchSidebar from './BranchSideBar';
 import PageDescription from '@/components/account/PageDescription';
@@ -112,8 +112,9 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
             >
               <Image
                 src={'/assets/back_green.png'}
-                height={10}
-                width={10}
+                width={20}
+                height={30}
+                style={{ width: 10, height: 'auto' }}
                 alt="branch"
               />
               <span>Back</span>

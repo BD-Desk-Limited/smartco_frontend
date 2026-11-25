@@ -25,25 +25,29 @@ const PictureCarousel = () => {
       <Image
         src={pictures[currentIndex]}
         alt={`Picture ${currentIndex + 1}`}
-        layout="fill"
-        objectFit="cover"
+        fill
+        sizes="30vw"
         className="rounded-[10%] z-20"
+        style={{ objectFit: 'cover' }}
       />
       <div className="absolute inset-0 bg-brand-blue opacity-[73%] rounded-[10%] z-30"></div>
       <div className="absolute inset-0 flex items-center justify-center z-40">
         <Image
           src="/assets/logo_white.png"
           alt="Logo"
-          width={200}
-          height={200}
+          width={331}
+          height={322}
+          style={{ width: 200, height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[20vh] z-10 right-[-15vw]">
         <Image
           src="/assets/brand_mark2.png"
           alt="Logo"
-          width={600}
-          height={600}
+          width={1057}
+          height={942}
+          loading="eager"
+          style={{ width: 600, height: 'auto' }}
         />
       </div>
       <div className="absolute bottom-[-8vh] right-[-5vw] z-40">
@@ -51,7 +55,8 @@ const PictureCarousel = () => {
           src="/assets/brand_mark1.png"
           alt="Logo"
           width={200}
-          height={200}
+          height={186}
+          style={{ height: 'auto' }}
         />
       </div>
     </div>

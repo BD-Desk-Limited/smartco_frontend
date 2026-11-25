@@ -73,7 +73,6 @@ const Cart = ({
     };
   }, [setScanMode]);
 
-  console.log('Cart from schedule:', cart.payment);
   // if cart is empty, switch to sales items tab
   useEffect(() => {
     if (cart?.items?.length === 0 || cart?.items === undefined) {
@@ -107,10 +106,10 @@ const Cart = ({
         return;
       }
 
-      const response =
-        await getCustomerByCustomerNumberEmailOrPhoneService(
-          customerSearchTerm
-        );
+      const response = await getCustomerByCustomerNumberEmailOrPhoneService(
+        workBranch?._id,
+        customerSearchTerm
+      );
 
       if (response && response.data) {
         setCustomerData(response.data);

@@ -57,13 +57,28 @@ export default function RootLayout({ children }) {
         </ThemeProvider>
         <TransactionSyncInitializer />
 
-        {/* Service Worker Registration for Offline Support */}
+        {/* Service Worker Registration for Offline Support.
+            Production only: in dev, chunk filenames aren't content-hashed, so the
+            SW's cache-first strategy serves stale JS after upgrades/edits and
+            breaks hydration. In dev we actively unregister any existing SW. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `if ('serviceWorker' in navigator) {
+            __html:
+              process.env.NODE_ENV === 'production'
+                ? `if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
               navigator.serviceWorker.register('/sw.js');
             });
+          }`
+                : `if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              regs.forEach(function(r) { r.unregister(); });
+            });
+            if (window.caches) {
+              caches.keys().then(function(keys) {
+                keys.forEach(function(k) { caches.delete(k); });
+              });
+            }
           }`,
           }}
         />

@@ -19,6 +19,7 @@ import {
   subtotal,
   taxfreeProduct,
 } from '../cart/CartBillCalculationFunctions';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
 
 const SuccessfulPaymentDisplay = ({
   paymentData,
@@ -35,6 +36,9 @@ const SuccessfulPaymentDisplay = ({
   orderDateString,
   orderTime,
   cashDiscounts,
+  cashOfferLines,
+  vatAmount,
+  currency,
   productOffers,
   workBranchVATRate,
   handleOpenNewCustomerRegistration,
@@ -79,12 +83,12 @@ const SuccessfulPaymentDisplay = ({
               </span>
               <span>
                 <strong>Amount paid: </strong>
-                {paymentData?.paymentStatus?.amountPaid?.toFixed(2)}
+                {commaNumberFormat(paymentData?.paymentStatus?.amountPaid, 2)}
               </span>
               {unpaidBalance > 0 && (
                 <span className="">
                   <strong>Unpaid Balance: </strong>
-                  {unpaidBalance.toFixed(2)}
+                  {commaNumberFormat(unpaidBalance, 2)}
                 </span>
               )}
 
@@ -104,7 +108,7 @@ const SuccessfulPaymentDisplay = ({
           )}
           <p>
             <strong>Total Amount: </strong>
-            {paymentData?.total?.toFixed(2)}
+            {commaNumberFormat(paymentData?.total, 2)}
           </p>
         </div>
 
@@ -203,24 +207,24 @@ const SuccessfulPaymentDisplay = ({
                 <div className="flex flex-col items-center gap-1">
                   <p className="font-bold text-sm">
                     {item?.product?.currency}
-                    {itemTotalCost(item)?.toFixed(2)}
+                    {commaNumberFormat(itemTotalCost(item), 2)}
                   </p>
                   <p className="text-xs text-text-gray">
                     {item.quantity} x {item?.product?.currency}
-                    {itemUnitCost(item)?.toFixed(2)}
+                    {commaNumberFormat(itemUnitCost(item), 2)}
                   </p>
                   {productItemTax(item) > 0 && !taxfreeProduct(item) && (
                     <p className="text-xs text-text-gray">
                       tax: {` `}
                       {item.quantity} x {item?.product?.currency}
-                      {productItemTax(item)?.toFixed(2)}
+                      {commaNumberFormat(productItemTax(item), 2)}
                     </p>
                   )}
                 </div>
               </div>
             ))}
             {/* Display applied product offers */}
-            {productOffers()?.length > 0 && (
+            {productOffers()?.length > 0 ? (
               <div className="flex flex-col sticky bottom-0">
                 {productOffers()?.map((offer, index) => (
                   <div
@@ -243,25 +247,37 @@ const SuccessfulPaymentDisplay = ({
                       )}
                     </div>
 
-                    <div className="flex-1 flex-col items-start gap-1">
+                    <div className="flex-1 flex-col items-start gap-1 min-w-0">
                       <p className="text-base">{offer.product?.name}</p>
+                      {offer?.description && (
+                        <p className="text-xs text-green-600 truncate max-w-[250px]">
+                          {offer.description}
+                        </p>
+                      )}
                       {/* choices display until width is exhausted */}
                       <p className="text-sm font-thin text-text-gray truncate max-w-[250px]">
                         {(Array.isArray(offer?.selectedChoices)
                           ? offer.selectedChoices
                           : []
                         )
-                          .map((obj) => obj.material?.name)
+                          .map((obj) => obj?.material?.name)
+                          .filter(Boolean)
                           .join(', ')
                           .slice(0, 40)}
                       </p>
                     </div>
-                    <FaGift className="text-green-500" />
-                    <p className="text-sm font-semibold text-green-500">Free</p>
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="flex items-center gap-1 text-sm font-semibold text-green-500">
+                        <FaGift /> Free
+                      </p>
+                      <p className="text-xs text-text-gray">
+                        qty: {offer?.quantity || 1}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -271,39 +287,60 @@ const SuccessfulPaymentDisplay = ({
           <p className="flex items-center justify-between w-full">
             <span className="text-sm">Sub Total</span>
             <span className="text-sm text-text-gray ml-1 font-semibold">
-              {subtotal(paidOrderDetails?.items)?.toFixed(2)}
+              {commaNumberFormat(subtotal(paidOrderDetails?.items), 2)}
             </span>
           </p>
           <p className="flex items-center justify-between w-full">
             <span className="text-sm">
-              Tax ({workBranchVATRate?.toFixed(2)}%)
+              Tax ({commaNumberFormat(workBranchVATRate, 2)}%)
             </span>
             <span className="text-sm text-text-gray ml-1 font-semibold">
-              {getVATAmount(
-                paidOrderDetails?.items,
-                [],
-                workBranchVATRate
-              )?.toFixed(2)}
+              {commaNumberFormat(
+                vatAmount(),
+                2
+              )}
             </span>
           </p>
           {productsTax(paidOrderDetails?.items) &&
-            productsTax(paidOrderDetails?.items) > 0 && (
-              <p className="flex items-center justify-between w-full">
-                <span className="text-sm">Products Tax</span>{' '}
-                <span className="text-sm text-text-gray ml-1 font-semibold">
-                  {productsTax(paidOrderDetails?.items)?.toFixed(2)}
-                </span>
-              </p>
-            )}
-          {cashDiscounts() > 0 && (
-            <p className="text-sm flex flex-row justify-between">
-              <span>Discount:</span>{' '}
+          productsTax(paidOrderDetails?.items) > 0 ? (
+            <p className="flex items-center justify-between w-full">
+              <span className="text-sm">Products Tax</span>{' '}
               <span className="text-sm text-text-gray ml-1 font-semibold">
-                {'-'}
-                {cashDiscounts()?.toFixed(2)}
+                {commaNumberFormat(productsTax(paidOrderDetails?.items), 2)}
               </span>
             </p>
-          )}
+          ) : null}
+          {/* one line per applied cash offer */}
+          {cashOfferLines().map((line) => (
+            <p
+              key={line.offerId}
+              className="text-sm flex flex-row justify-between gap-2"
+            >
+              <span className="truncate">
+                Discount - {line.description}
+                {line.label && (
+                  <span className="text-xs text-text-gray">
+                    {' '}
+                    ({line.label})
+                  </span>
+                )}
+              </span>
+              <span className="text-sm text-green-600 ml-1 font-semibold whitespace-nowrap">
+                -{currency}
+                {commaNumberFormat(line.amount, 2)}
+              </span>
+            </p>
+          ))}
+          {cashOfferLines().length > 1 ? (
+            <p className="text-sm flex flex-row justify-between">
+              <span>Total Discounts:</span>{' '}
+              <span className="text-sm text-text-gray ml-1 font-semibold">
+                {'-'}
+                {currency}
+                {commaNumberFormat(cashDiscounts(), 2)}
+              </span>
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

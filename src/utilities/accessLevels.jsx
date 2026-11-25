@@ -36,4 +36,20 @@ export const allAccess = [
     accessGranted: true,
     allowedGrantOthers: true,
   },
+  {
+    accessName: 'Reports',
+    accessGranted: true,
+    allowedGrantOthers: true,
+  },
+
+  {
+    accessName: 'Inter-Branch_Transfers',
+    accessGranted: true,
+    allowedGrantOthers: true,
+  },
+  {
+    accessName: 'Customer_Management',
+    accessGranted: true,
+    allowedGrantOthers: true,
+  },
 ];

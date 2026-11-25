@@ -50,6 +50,7 @@ const EditUserForm = ({userData, updatedUserData, setUpdatedUserData, handleUpda
            alt={'user'}
            width={100}
            height={100}
+           style={{ width: 100, height: 100 }}
            className='rounded-full p-1 object-cover max-h-50 max-w-50 shadow-brand-green shadow-sm hover:scale-105 transition-all duration-200 ease-in-out cursor-pointer'
            onClick={() => {setOpenImageUploadModal(true)}}
          />

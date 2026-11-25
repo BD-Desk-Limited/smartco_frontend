@@ -69,16 +69,17 @@ const HeadBar = ({
         alt="pos Logo"
         width={20}
         height={20}
-        className="object-contain"
+        className="h-5 w-5 object-contain"
       />
 
       <div className="flex items-center space-x-2 text-lg">
         <Image
           src="/assets/logo_white.png"
           alt="pos Logo"
-          width={40}
-          height={40}
+          width={331}
+          height={322}
           className="object-contain"
+          style={{ width: 40, height: 'auto' }}
         />
 
         <strong className="text-white">POS</strong>
@@ -102,9 +103,9 @@ const HeadBar = ({
                 ease: 'easeInOut',
               }}
               key={item.name}
-              className={`cursor-pointer font-bold flex items-center space-x-2 py-3 px-2 relative${
+              className={`cursor-pointer font-bold flex items-center space-x-2 py-3 px-2 relative ${
                 activeMenuItem === item.name
-                  ? 'border border-2 border-brand-green text-brand-green px-2 rounded-md shadow-md'
+                  ? 'border-2 border-brand-green text-brand-green px-2 rounded-md shadow-md'
                   : ''
               }`}
               onClick={() => setActiveMenuItem(item.name)}
@@ -122,6 +123,7 @@ const HeadBar = ({
                     alt={`${item.name} icon`}
                     width={25}
                     height={25}
+                    className="h-[25px] w-[25px] object-contain"
                   />
                 </div>
               )}
@@ -152,9 +154,9 @@ const HeadBar = ({
           <Image
             src={user?.profilePictureUrl}
             alt="User Avatar"
-            width={40}
-            height={40}
-            className="object-contain rounded-full"
+            width={30}
+            height={30}
+            className="border bg-text-white rounded-full h-10 w-10 object-contain"
           />
         ) : (
           <span className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-bold border">

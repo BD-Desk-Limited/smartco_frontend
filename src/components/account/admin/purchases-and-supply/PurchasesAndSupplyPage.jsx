@@ -4,7 +4,8 @@ import { PageAccessRequirement } from '../../PageAccessRequirement';
 import PurchasesAndSupply from './components/PurchasesAndSupply';
 
 const PurchasesAndSupplyPage = () => {
-  const pageDescription = ' ';
+  const pageDescription =
+    'This page allows you to manage purchases and supply. You can view purchase orders, manage suppliers, track inventory levels, and perform other administrative tasks related to purchases and supply management. Supply are materials that come in from suppliers, vendors, or open market. Purchases are the act of buying or acquiring goods or services from suppliers, vendors, or other sources. This does not include materials from established branch locations within your organization. Materials from established branch locations within your organization are considered inter-branch transfers, and should be managed through the inter-branch transfers section.';
 
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement(

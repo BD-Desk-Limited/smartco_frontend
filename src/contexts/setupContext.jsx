@@ -36,17 +36,19 @@ export const SetupProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useAuth();
-  const { internetStatus, userMode } = useInternetStatus();
+  const { internetStatus } = useInternetStatus();
   const router = useRouter();
   const pathname = usePathname();
 
   // routes that should bypass all setup checks and be accessible regardless of setup status, user role, or internet status
-  const shouldBypassSetupChecks =
+  // userMode 'offline' is a sales point setting kept in localStorage; it can be left over from
+  // a sales point session, so it must not switch off the setup check on admin/manager pages
+  // (the dashboard then waited forever for a check that never ran).
+  const isSalesPointRoute =
     pathname?.startsWith('/pages/account/sales-point') ||
-    pathname?.startsWith('/pages/auth/login/sales-point') ||
-    user?.role === 'seller' ||
-    internetStatus === 'offline' ||
-    userMode === 'offline';
+    pathname?.startsWith('/pages/auth/login/sales-point');
+  const shouldBypassSetupChecks =
+    isSalesPointRoute || user?.role === 'seller' || internetStatus === 'offline';
 
   //Helper Function to get allowed pages from sessionStorage
   const getAllowedPages = useCallback(() => {
@@ -105,6 +107,11 @@ export const SetupProvider = ({ children }) => {
       if (response.data) {
         setSetupComplete(Boolean(response.data.isMandatorySetUpComplete));
         setSetupProgress(response.data);
+      } else {
+        // An error response (e.g. 401/500) used to leave setupComplete null, and the
+        // dashboard then showed its spinner forever. Surface it instead.
+        console.error('Setup status request failed:', response.error);
+        setError(response.error || 'Could not load setup status');
       }
     } catch (error) {
       console.error('Error checking setup status:', error);

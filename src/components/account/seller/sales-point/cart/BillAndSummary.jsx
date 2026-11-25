@@ -1,4 +1,5 @@
-import Button from '@/components/account/Button';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { flattenProductOffers } from './offerHelpers';
 import Image from 'next/image';
 import React from 'react';
 import {
@@ -39,10 +40,10 @@ const BillAndSummary = ({
       .slice(0, 50);
   };
 
-  const freeProductsOffers =
-    linkedCustomerData?.appliedOffers?.filter(
-      (offer) => offer.type === 'product'
-    ) || [];
+  // one card per free product handed over (a reward can carry several)
+  const freeProductsOffers = flattenProductOffers(
+    linkedCustomerData?.appliedOffers
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cashDiscounts =
@@ -115,17 +116,17 @@ const BillAndSummary = ({
           <ul className="flex flex-row overflow-x-auto scrollbar-thin list-none p-0 m-0 gap-2">
             {freeProductsOffers?.map((offer) => (
               <li
-                key={offer?._id}
+                key={`${offer?.offerId}-${offer?.product?._id}`}
                 className="mb-0 w-32 flex-shrink-0 border rounded-md p-1 flex flex-col items-start gap-1 text-small shadow-sm animate-pulse relative"
               >
                 <p className="absolute top-0 right-0 px-2 rounded-full bg-error font-semibold text-white">
-                  {offer?.freeProduct?.quantity}
+                  {offer?.quantity}
                 </p>
                 {/* Image or icon for the free product */}
-                {offer?.productDetails?.product?.imageURL ? (
+                {offer?.product?.imageURL ? (
                   <Image
-                    src={offer?.productDetails?.product?.imageURL}
-                    alt={offer?.productDetails?.product?.name}
+                    src={offer?.product?.imageURL}
+                    alt={offer?.product?.name}
                     width={20}
                     height={20}
                     className="w-fit h-20 rounded-md object-contain"
@@ -136,13 +137,9 @@ const BillAndSummary = ({
                   </div>
                 )}
                 <p className="text-xs">{offer?.description?.slice(0, 25)}...</p>
-                <p className="text-sm">
-                  {offer?.productDetails?.product?.name}
-                </p>
+                <p className="text-sm">{offer?.product?.name}</p>
                 <p className="text-xs flex-wrap">
-                  {getSelectedChoicesLabel(
-                    offer?.productDetails?.selectedChoices
-                  )}
+                  {getSelectedChoicesLabel(offer?.selectedChoices)}
                 </p>
                 <p className="text-sm font-semibold text-brand-green">Free</p>
               </li>
@@ -153,13 +150,13 @@ const BillAndSummary = ({
 
       {/* Bill summary + applied cash offers */}
       <div className="h-full overflow-y-auto scrollbar-thin relative ">
-        {cashDiscounts.length > 0 && (
+        {cashDiscounts.length > 0 ? (
           <div className="overflow-y-auto scrollbar-thin gap-1 flex flex-col">
             <h3 className="text-sm font-semibold text-brand-green items-baseline flex flex-row">
               <FaMoneyBillWaveAlt className="inline-block mr-1" />
               Applied cash Offers:
               <span className="font-normal">
-                {' -' + getTotalCashOfferDiscount()?.toFixed(2)}
+                {' -' + commaNumberFormat(getTotalCashOfferDiscount(), 2)}
               </span>
             </h3>
 
@@ -171,59 +168,60 @@ const BillAndSummary = ({
                 >
                   {offer?.percentageDiscount > 0 && (
                     <span>
-                      {offer?.percentageDiscount.toFixed(2) + '% off |'}
+                      {commaNumberFormat(offer?.percentageDiscount, 2) +
+                        '% off |'}
                     </span>
                   )}
                   {offer?.amountDiscount > 0 && (
                     <span>
                       {offer?.currency}
                       {` `}
-                      {offer?.amountDiscount.toFixed(2) + ' off'}
+                      {commaNumberFormat(offer?.amountDiscount, 2) + ' off'}
                     </span>
                   )}
                 </li>
               ))}
             </ul>
           </div>
-        )}
+        ) : null}
 
         <div className="mt-2 border-t pt-2">
           <h3 className="font-semibold mb-2">Bill Summary</h3>
           <p className="text-sm border-b flex flex-row justify-between">
             <span>Sub-total:</span>{' '}
-            <strong>{subtotal(cartItems)?.toFixed(2)}</strong>
+            <strong>{commaNumberFormat(subtotal(cartItems), 2)}</strong>
           </p>
-          {getTotalCashOfferDiscount() > 0 && (
+          {getTotalCashOfferDiscount() > 0 ? (
             <p className="text-sm border-b flex flex-row justify-between">
               <span>Discount:</span>{' '}
               <strong>
                 {'-'}
-                {getTotalCashOfferDiscount()?.toFixed(2)}
+                {commaNumberFormat(getTotalCashOfferDiscount(), 2)}
               </strong>
             </p>
-          )}
+          ) : null}
 
-          {productsTax(cartItems) && productsTax(cartItems) > 0 && (
+          {productsTax(cartItems) && productsTax(cartItems) > 0 ? (
             <p className="text-sm border-b flex flex-row justify-between">
               <span>Products Tax:</span>{' '}
-              <strong>{productsTax(cartItems)?.toFixed(2)}</strong>
+              <strong>{commaNumberFormat(productsTax(cartItems), 2)}</strong>
             </p>
-          )}
-          {getVATAmount() && getVATAmount() > 0 && (
+          ) : null}
+          {getVATAmount() && getVATAmount() > 0 ? (
             <p className="text-sm border-b flex flex-row justify-between">
               <span>V.A.T ({workBranchVATRate}%):</span>{' '}
-              <strong>{getVATAmount()?.toFixed(2)}</strong>
+              <strong>{commaNumberFormat(getVATAmount(), 2)}</strong>
             </p>
-          )}
+          ) : null}
 
           <p className="text flex flex-row justify-between">
             <span className="font-bold"> Total:</span>{' '}
-            <strong>{getTotal()?.toFixed(2)}</strong>
+            <strong>{commaNumberFormat(getTotal(), 2)}</strong>
           </p>
         </div>
 
         {/* Buttons */}
-        {showButtons && (
+        {showButtons ? (
           <div className="flex flex-row justify-between items-baseline bottom-0 absolute bg-opacity-95 backdrop-blur-lg w-full text-sm">
             <button
               className="px-1 py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white flex items-center gap-1 h-fit"
@@ -241,7 +239,7 @@ const BillAndSummary = ({
               Checkout
             </button>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

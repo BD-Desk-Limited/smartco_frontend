@@ -18,6 +18,10 @@ import {
   FaChevronRight,
   FaChevronLeft,
   FaHome,
+  FaShippingFast,
+  FaWindows,
+  FaChartLine,
+  FaExchangeAlt,
 } from 'react-icons/fa';
 
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
@@ -28,8 +32,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   const menuList = [
     {
       name: 'dashboard',
-      icon: <FaHome className="text-text-white" />,
-      iconActive: <FaHome className="text-brand-blue" />,
+      icon: <FaWindows className="text-text-white" />,
+      iconActive: <FaWindows className="text-brand-blue" />,
       link: '/',
       label: 'Dashboard',
       requiredAccess: null,
@@ -38,8 +42,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     },
     {
       name: 'branch-management',
-      icon: <FaCodeBranch className="text-text-white" />,
-      iconActive: <FaCodeBranch className="text-brand-blue" />,
+      icon: <FaHome className="text-text-white" />,
+      iconActive: <FaHome className="text-brand-blue" />,
       link: '/branch-management',
       label: 'Branch Management',
       requiredAccess: 'Branch_Management',
@@ -58,24 +62,24 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     },
     {
       name: 'purchases-and-supply',
-      icon: <FaShoppingCart className="text-text-white" />,
-      iconActive: <FaShoppingCart className="text-brand-blue" />,
+      icon: <FaShippingFast className="text-text-white" />,
+      iconActive: <FaShippingFast className="text-brand-blue" />,
       link: '/purchases',
       label: 'Purchases and Supply',
       requiredAccess: '',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    } /*
+    },
     {
-      name: 'branch-transfers',
-      icon: <FaShoppingCart className="text-text-white" />,
-      iconActive: <FaShoppingCart className="text-brand-blue" />,
-      link: '/branch-transfers',
-      label: 'Branch Transfers',
+      name: 'inter-branch-transfers',
+      icon: <FaExchangeAlt className="text-text-white" />,
+      iconActive: <FaExchangeAlt className="text-brand-blue" />,
+      link: '/inter-branch-transfers',
+      label: 'Inter-Branch Transfers',
       requiredAccess: '',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    },*/,
+    },
     {
       name: 'materials-management',
       icon: <FaBoxes className="text-text-white" />,
@@ -89,13 +93,14 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     {
       name: 'reports',
       icon: <FaChartBar className="text-text-white" />,
-      iconActive: <FaChartBar className="text-brand-blue" />,
+      iconActive: <FaChartLine className="text-brand-blue" />,
       link: '/reports',
       label: 'Reports',
       requiredAccess: 'Reports',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },*/,
+    ,
     {
       name: 'users-management',
       icon: <FaUsers className="text-text-white" />,
@@ -117,7 +122,8 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       superAdminOnly: false,
       nonSuperAdminOnly: true,
     
-    }, {
+    },*/
+    {
       name: 'my-customers',
       icon: <FaAddressBook className="text-text-white" />,
       iconActive: <FaAddressBook className="text-brand-blue" />,
@@ -126,8 +132,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Customer_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    
-    },*/
+    },
     {
       name: 'tax-management',
       icon: <FaPercent className="text-text-white" />,
@@ -225,8 +230,9 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
           <Image
             src={'/assets/logo_white.png'}
             alt="logo"
-            width={30}
-            height={30}
+            width={331}
+            height={322}
+            style={{ width: 30, height: 'auto' }}
           />
           {isOpen && (
             <Image

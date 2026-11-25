@@ -46,9 +46,9 @@ const LoginNew = () => {
           <Image
             src="/assets/back_green.png"
             alt="back"
-            width={15}
-            height={20}
-            className=""
+            width={20}
+            height={30}
+            style={{ width: 15, height: 'auto' }}
           />
         </p>
         <h1 className="flex text-sm font-bold w-full justify-center items-center text-center text-brand-green">

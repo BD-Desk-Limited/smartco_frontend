@@ -8,6 +8,7 @@ import {
   FaShoppingBag,
   FaTrashAlt,
 } from 'react-icons/fa';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
 
 const CartProductList = ({
   cart,
@@ -145,7 +146,9 @@ const CartProductList = ({
               <span className="text-sm font-semibold">Quantity</span>
               <button
                 className="hover:bg-green-shadow1 transition-colors duration-200 bg-brand-green rounded-md px-1 py-1"
-                onClick={() => handleQuantityDecrease(item)?.toFixed(2)}
+                onClick={() =>
+                  commaNumberFormat(handleQuantityDecrease(item), 0)
+                }
               >
                 <FaMinus className={`text-sm text-white`} />
               </button>
@@ -154,7 +157,9 @@ const CartProductList = ({
               </span>
               <button
                 className="hover:bg-green-shadow1 transition-colors duration-200 bg-brand-green rounded-md px-1 py-1"
-                onClick={() => handleQuantityIncrease(item)?.toFixed(2)}
+                onClick={() =>
+                  commaNumberFormat(handleQuantityIncrease(item), 0)
+                }
               >
                 <FaPlus className={`text-sm text-white`} />
               </button>
@@ -164,17 +169,17 @@ const CartProductList = ({
           <div className="flex flex-col items-center gap-1">
             <p className="font-bold">
               {item?.product?.currency}
-              {itemTotalCost(item)?.toFixed(2)}
+              {commaNumberFormat(itemTotalCost(item), 2)}
             </p>
             <p className="text-sm">
               {item.quantity} x {item?.product?.currency}
-              {itemUnitCost(item)?.toFixed(2)}
+              {commaNumberFormat(itemUnitCost(item), 2)}
             </p>
             {productItemTax(item) > 0 && !taxfreeProduct(item) && (
               <p className="text-sm">
                 product tax: {` `}
                 {item.quantity} x {item?.product?.currency}
-                {productItemTax(item)?.toFixed(2)}
+                {commaNumberFormat(productItemTax(item), 2)}
               </p>
             )}
 
