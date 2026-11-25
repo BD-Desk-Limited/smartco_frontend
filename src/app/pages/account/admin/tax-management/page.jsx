@@ -1,4 +1,5 @@
 'use client';
+// @search vat, tax bands, levies
 import React from 'react';
 import TaxManagementPage from '@/components/account/admin/tax-management/TaxManagementPage';
 

@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaRegUser, FaUser } from 'react-icons/fa';
 import SubHeader from '../../SubHeader';
@@ -22,8 +23,30 @@ const resolvePath = (items, path) => {
   return chain;
 };
 
+// Path (array of names) to the menu item called `name`, e.g. 'sessions' -> ['security', 'sessions'].
+const findPathTo = (items, name, parents = []) => {
+  for (const item of items || []) {
+    const path = [...parents, item.name];
+    if (item.name === name) return path;
+    const found = findPathTo(item.subMenus, name, path);
+    if (found) return found;
+  }
+  return null;
+};
+
 const MyProfile = () => {
   const [activePath, setActivePath] = useState(['personal-information']);
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
+
+  // ?tab=<name> opens that tab (used by the header search). Done during render
+  // when the param changes, so it also works when already on My Profile.
+  const [appliedTab, setAppliedTab] = useState(null);
+  if (tab !== appliedTab) {
+    setAppliedTab(tab);
+    const path = tab && findPathTo(PROFILE_MENU_ITEMS, tab);
+    if (path) setActivePath(path);
+  }
   const [hoverPath, setHoverPath] = useState([]);
   const closeTimer = useRef(null);
 

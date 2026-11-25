@@ -1,4 +1,5 @@
 'use client';
+// @search sms, email, campaign, broadcast, send message
 import MessageCustomerPage from '@/components/account/admin/my-customers/MessageCustomerPage';
 import React from 'react';
 

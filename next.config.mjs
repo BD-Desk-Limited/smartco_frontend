@@ -1,3 +1,8 @@
+import {
+  generateSearchIndex,
+  watchSearchIndex,
+} from './scripts/generateSearchIndex.mjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true, //enables strict mode in react js to catch bugs in the development phase itself
@@ -23,4 +28,17 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Header search: build the page list from the folders under app/pages/account/admin
+// on every `next dev` / `next build`, and keep it updated while dev is running.
+// See scripts/generateSearchIndex.mjs.
+const withServerStartTasks = (phase) => {
+  generateSearchIndex();
+
+  // watches for updates in development phase
+  if (phase === 'phase-development-server') {
+    watchSearchIndex();
+  }
+  return nextConfig;
+};
+
+export default withServerStartTasks;
