@@ -8,9 +8,9 @@ import {
   completePasswordChangeService,
   startPasswordChangeService,
 } from '@/services/passwordServices';
-import PasswordInput from './password/PasswordInput';
+import PasswordInput from './PasswordInput';
 import PasswordRules, { passwordMeetsRules } from '@/components/auth/PasswordRules';
-import IdentityCheck from './password/IdentityCheck';
+import IdentityCheck from './IdentityCheck';
 
 const RESEND_COOLDOWN = 30;
 const emptyCode = () => new Array(6).fill('');

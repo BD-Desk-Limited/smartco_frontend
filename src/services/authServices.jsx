@@ -126,6 +126,27 @@ export const verifyPasswordResetLinkService = async (token) => {
   }
 };
 
+// "Log out from all devices" link from the login notification email.
+// -> { data: { message } } | { error, alreadyDone? } (alreadyDone: the link was used before)
+export const logOutAllDevicesService = async (token) => {
+  try {
+    const response = await fetch(`${API_BASE}/auth/logout-all-devices`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (response.ok) return { data: payload };
+    return {
+      error: payload?.message || 'Something went wrong, please try again',
+      alreadyDone: Boolean(payload?.alreadyDone),
+    };
+  } catch (error) {
+    console.error('Log out of all devices failed:', error);
+    return { error: 'Network error, please check your connection and try again' };
+  }
+};
+
 // Reset password takes in the token, old password and the new password
 export const resetPasswordService = async (body) => {
   try {

@@ -1,9 +1,9 @@
-import DeviceAuthorizations from './DeviceAuthorizations';
-import MultiFactorAuthentication from './MultiFactorAuthentication';
-import MySessions from './MySessions';
+import DeviceAuthorizations from './devices/DeviceAuthorizations';
+import MultiFactorAuthentication from './mfa/MultiFactorAuthentication';
+import MySessions from './sessions/MySessions';
 import NotificationsSetting from './NotificationsSetting';
 import PersonalInformation from './PersonalInformation';
-import ResetPassword from './ResetPassword';
+import ResetPassword from './password/ResetPassword';
 
 export const PROFILE_MENU_ITEMS = [
   {

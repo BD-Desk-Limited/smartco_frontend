@@ -4,6 +4,6 @@ export const REPORTS_SUBMENUS = [
   {
     name: 'sales_reports',
     label: 'Sales reports',
-    link: `${BASE_URL}/sales`,
+    link: `${BASE_URL}/`,
   },
 ];

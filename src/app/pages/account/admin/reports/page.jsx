@@ -1,12 +1,12 @@
 'use client';
 // @search analytics, statistics, sales report, revenue, profit
 import React from 'react';
-import ReportsPage from '@/components/account/admin/reports/ReportsPage';
+import SalesReportsPage from '@/components/account/admin/reports/SalesReportsPage';
 
 const page = () => {
   return (
     <div>
-      <ReportsPage />
+      <SalesReportsPage />
     </div>
   );
 };

@@ -10,9 +10,9 @@ import {
   revokeTrustedDeviceService,
   updateTrustedDeviceService,
 } from '@/services/trustedDeviceServices';
-import DeviceFilters from './devices/DeviceFilters';
-import DeviceRow from './devices/DeviceRow';
-import EditDeviceModal from './devices/EditDeviceModal';
+import DeviceFilters from './DeviceFilters';
+import DeviceRow from './DeviceRow';
+import EditDeviceModal from './EditDeviceModal';
 
 const COLUMNS = [
   'Device',

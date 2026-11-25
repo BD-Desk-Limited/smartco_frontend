@@ -5,9 +5,9 @@
   // in dev it re-runs whenever a page is added, renamed or removed.
   
   // Optional comments a page.jsx can carry (anywhere in the file):
-  //   // @search staff, employees, workers   -> extra words that should find it
-  //   // @search-title Bulk Branch Upload    -> name shown instead of the folder name
-  //   // @search-hide                        -> keep this page out of search
+    * //@search staff, employees, workers  ---> extra words that should find it
+    * //@search-title Bulk Branch Upload   ---> name shown instead of the folder name
+    * //@search-hide                       ---> keep this page out of search
   
   To run by hand: node scripts/generateSearchIndex.mjs [--watch]
 */

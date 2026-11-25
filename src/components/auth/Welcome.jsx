@@ -137,17 +137,18 @@ const Welcome = () => {
         <p className="text-text-white text-center">Continue to</p>
         <Link href="/pages/auth/login">
           <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-            Admin console
-          </button>
-        </Link>
-        <Link href="/pages/auth/login">
-          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
-            Manager dashboard
+            Admin/Manager Login
           </button>
         </Link>
         <Link href="/pages/auth/login/sales-point">
           <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Sales point
+          </button>
+        </Link>
+
+        <Link href="/pages/splash/open-pages/local-data-management">
+          <button className="w-full text-sm text-brand-blue font-semibold hover:bg-brand-blue hover:text-white">
+            local data management
           </button>
         </Link>
       </div>

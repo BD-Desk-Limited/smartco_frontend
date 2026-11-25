@@ -9,10 +9,10 @@ import {
   saveSecurityQuestionsService,
   updateMfaSettingsService,
 } from '@/services/mfaServices';
-import MfaToggle from './mfa/MfaToggle';
-import MfaMethodOptions from './mfa/MfaMethodOptions';
-import SecurityQuestionsForm from './mfa/SecurityQuestionsForm';
-import PasswordConfirmModal from './mfa/PasswordConfirmModal';
+import MfaToggle from './MfaToggle';
+import MfaMethodOptions from './MfaMethodOptions';
+import SecurityQuestionsForm from './SecurityQuestionsForm';
+import PasswordConfirmModal from './PasswordConfirmModal';
 
 // Copy for each action that needs the password before it runs.
 const CONFIRMATIONS = {

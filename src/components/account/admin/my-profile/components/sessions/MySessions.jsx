@@ -10,7 +10,7 @@ import {
   revokeOtherSessionsService,
   revokeSessionService,
 } from '@/services/sessionServices';
-import SessionRow from './sessions/SessionRow';
+import SessionRow from './SessionRow';
 
 const COLUMNS = ['IP Address', 'Last Accessed', 'Device', 'Action'];
 
@@ -83,9 +83,9 @@ const MySessions = () => {
   const rows = showEnded ? [...active, ...ended] : active;
 
   return (
-    <div className="flex flex-col gap-5 text-text-gray w-full relative">
-      <section className="flex flex-row items-start justify-between gap-4 flex-wrap border-b border-gray-border pb-4">
-        <div className="flex flex-row gap-3 sticky top-[-1]">
+    <div className="flex flex-col gap-5 text-text-gray w-full">
+      <section className="flex flex-row items-start justify-between gap-4 flex-wrap border-b border-gray-border pb-4 sticky top-[-20] z-40 bg-text-white">
+        <div className="flex flex-row gap-3">
           <FaLaptopHouse className="text-2xl mt-1 text-brand-blue" />
           <div className="flex flex-col gap-1">
             <h2 className="text-lg font-semibold text-text-black">

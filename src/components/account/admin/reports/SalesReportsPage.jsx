@@ -1,10 +1,10 @@
 import React from 'react';
 import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import Reports from '../reports/components/Reports';
+import SalesReports from './components/sales-reports/SalesReports';
 
-const PurchasesAndSupplyPage = () => {
-  const pageDescription = ' ';
+const SalesReportsPage = () => {
+  const pageDescription = '';
 
   // Check if the user has access to this page
   const accessCheckFailed = PageAccessRequirement('admin', 'Reports');
@@ -19,10 +19,10 @@ const PurchasesAndSupplyPage = () => {
         <AdminSideBar selectedMenu="reports" />
       </div>
       <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
-        <Reports pageDescription={pageDescription} />
+        <SalesReports pageDescription={pageDescription} />
       </div>
     </div>
   );
 };
 
-export default PurchasesAndSupplyPage;
+export default SalesReportsPage;

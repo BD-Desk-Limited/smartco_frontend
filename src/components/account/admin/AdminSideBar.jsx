@@ -5,14 +5,10 @@ import { useAuth } from '@/contexts/authContext';
 import { useRouter } from 'next/navigation';
 import Spinner from '../Spinner';
 import {
-  FaCodeBranch,
-  FaShoppingCart,
   FaChartBar,
   FaUsers,
   FaAddressBook,
   FaPercent,
-  FaCog,
-  FaUserAltSlash,
   FaShoppingBag,
   FaBoxes,
   FaChevronRight,
@@ -24,8 +20,35 @@ import {
   FaExchangeAlt,
 } from 'react-icons/fa';
 
+// Small pause before collapsing, so brushing the mouse past the edge doesn't make it flicker.
+const CLOSE_DELAY_MS = 150;
+
 const AdminSideBar = ({ selectedMenu, openSideBar }) => {
+  // isOpen drives the width (animated). showLabels stays true until the panel has
+  // finished closing, so the labels slide away with it instead of vanishing first.
   const [isOpen, setIsOpen] = useState(openSideBar || false);
+  const [showLabels, setShowLabels] = useState(openSideBar || false);
+  const closeTimer = React.useRef(null);
+
+  const openPanel = () => {
+    clearTimeout(closeTimer.current);
+    setShowLabels(true);
+    setIsOpen(true);
+  };
+  const closePanel = () => setIsOpen(false);
+
+  // Expands while the mouse is over it, collapses when the mouse leaves.
+  const handleMouseEnter = openPanel;
+  const handleMouseLeave = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(closePanel, CLOSE_DELAY_MS);
+  };
+  const handleTransitionEnd = (e) => {
+    if (e.target === e.currentTarget && e.propertyName === 'width' && !isOpen) {
+      setShowLabels(false);
+    }
+  };
+  React.useEffect(() => () => clearTimeout(closeTimer.current), []);
   const { user, logOut, isLoading } = useAuth();
   const [userRole, setUserRole] = useState('');
 
@@ -41,22 +64,12 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       nonSuperAdminOnly: false,
     },
     {
-      name: 'branch-management',
-      icon: <FaHome className="text-text-white" />,
-      iconActive: <FaHome className="text-brand-blue" />,
-      link: '/branch-management',
-      label: 'Branch Management',
-      requiredAccess: 'Branch_Management',
-      superAdminOnly: false,
-      nonSuperAdminOnly: false,
-    },
-    {
-      name: 'my-products',
-      icon: <FaShoppingBag className="text-text-white" />,
-      iconActive: <FaShoppingBag className="text-brand-blue" />,
-      link: '/product-management',
-      label: 'My Products',
-      requiredAccess: 'Product_Management',
+      name: 'reports',
+      icon: <FaChartBar className="text-text-white" />,
+      iconActive: <FaChartLine className="text-brand-blue" />,
+      link: '/reports',
+      label: 'Reports',
+      requiredAccess: 'Reports',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
     },
@@ -81,6 +94,26 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       nonSuperAdminOnly: false,
     },
     {
+      name: 'my-customers',
+      icon: <FaAddressBook className="text-text-white" />,
+      iconActive: <FaAddressBook className="text-brand-blue" />,
+      link: '/my-customers',
+      label: 'My Customers',
+      requiredAccess: 'Customer_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
+    },
+    {
+      name: 'my-products',
+      icon: <FaShoppingBag className="text-text-white" />,
+      iconActive: <FaShoppingBag className="text-brand-blue" />,
+      link: '/product-management',
+      label: 'My Products',
+      requiredAccess: 'Product_Management',
+      superAdminOnly: false,
+      nonSuperAdminOnly: false,
+    },
+    {
       name: 'materials-management',
       icon: <FaBoxes className="text-text-white" />,
       iconActive: <FaBoxes className="text-brand-blue" />,
@@ -89,18 +122,7 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       requiredAccess: 'Materials_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    } /*
-    {
-      name: 'reports',
-      icon: <FaChartBar className="text-text-white" />,
-      iconActive: <FaChartLine className="text-brand-blue" />,
-      link: '/reports',
-      label: 'Reports',
-      requiredAccess: 'Reports',
-      superAdminOnly: false,
-      nonSuperAdminOnly: false,
-    },*/,
-    ,
+    },
     {
       name: 'users-management',
       icon: <FaUsers className="text-text-white" />,
@@ -124,16 +146,6 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
     
     },*/
     {
-      name: 'my-customers',
-      icon: <FaAddressBook className="text-text-white" />,
-      iconActive: <FaAddressBook className="text-brand-blue" />,
-      link: '/my-customers',
-      label: 'My Customers',
-      requiredAccess: 'Customer_Management',
-      superAdminOnly: false,
-      nonSuperAdminOnly: false,
-    },
-    {
       name: 'tax-management',
       icon: <FaPercent className="text-text-white" />,
       iconActive: <FaPercent className="text-brand-blue" />,
@@ -141,18 +153,17 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
       label: 'Tax Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    } /*
+    },
     {
-      
-      name: 'settings',
-      icon: <FaCog className="text-text-white" />,
-      iconActive: <FaCog className="text-brand-blue" />,
-      link: '/settings',
-      label: 'Settings',
+      name: 'branch-management',
+      icon: <FaHome className="text-text-white" />,
+      iconActive: <FaHome className="text-brand-blue" />,
+      link: '/branch-management',
+      label: 'Branch Management',
+      requiredAccess: 'Branch_Management',
       superAdminOnly: false,
       nonSuperAdminOnly: false,
-    
-    },*/,
+    },
   ];
 
   React.useEffect(() => {
@@ -219,101 +230,113 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
   }
 
   return (
-    <div
-      className={`bg-brand-blue h-screen flex flex-col justify-center items-center ${isOpen ? 'w-48' : 'w-16'}`}
-    >
+    // The outer box always keeps the collapsed width (w-16), so the page never shifts.
+    // The panel inside widens over the page content while hovered.
+    <div className="relative w-16 h-screen shrink-0">
       <div
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center px-4 pt-5 pb-16 gap-2 cursor-pointer"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onTransitionEnd={handleTransitionEnd}
+        // 950ms width animation: draws out from / back into the left edge.
+        // whitespace-nowrap keeps labels on one line while the panel is still narrow.
+        className={`bg-brand-blue h-screen flex flex-col justify-center items-center absolute inset-y-0 left-0 z-[70] overflow-hidden whitespace-nowrap transition-[width,box-shadow] duration-[500ms] ease-in-out ${isOpen ? 'w-48 shadow-xl' : 'w-16'}`}
       >
-        <div className="flex flex-row justify-center items-center">
-          <Image
-            src={'/assets/logo_white.png'}
-            alt="logo"
-            width={331}
-            height={322}
-            style={{ width: 30, height: 'auto' }}
-          />
-          {isOpen && (
+        {/* Click toggles too, for touch screens where there is no hover */}
+        <div
+          onClick={() => (isOpen ? closePanel() : openPanel())}
+          className="flex justify-between items-center px-4 pt-5 pb-16 gap-2 cursor-pointer"
+        >
+          <div className="flex flex-row justify-center items-center">
             <Image
-              src={'/assets/logo_long.png'}
+              src={'/assets/logo_white.png'}
               alt="logo"
-              width={80}
-              height={20}
+              width={331}
+              height={322}
+              style={{ width: 30, height: 'auto' }}
             />
+            {showLabels && (
+              <Image
+                src={'/assets/logo_long.png'}
+                alt="logo"
+                width={80}
+                height={20}
+              />
+            )}
+          </div>
+          {!isOpen ? (
+            <FaChevronRight className="text-white" />
+          ) : (
+            <FaChevronLeft className="text-white" />
           )}
         </div>
-        {!isOpen ? (
-          <FaChevronRight className="text-white" />
-        ) : (
-          <FaChevronLeft className="text-white" />
-        )}
-      </div>
 
-      {/* Render the menu items */}
-      <div className="h-full flex flex-col justify-between w-full text-text-white">
-        <div className="flex flex-col gap-1">
-          {menuList.map((menu, index) => (
-            <div
-              key={index}
-              className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-1 px-1 ${isOpen ? '' : 'flex justify-center items-center'} ${selectedMenu === menu.name ? 'bg-white text-brand-blue' : ''}`}
-              onClick={() => handleMenuClick(menu)}
-            >
-              {hasAccessToMenu(menu) && hasRequiredRole(menu) ? (
-                <div
-                  className="flex flex-row items-center  py-2"
-                  title={!isOpen ? `${menu?.label}` : ''}
-                >
-                  {selectedMenu === menu.name ? menu.iconActive : menu.icon}
-                  {isOpen && <p className="ml-2 text-sm">{menu?.label}</p>}
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
+        {/* Render the menu items */}
+        <div className="h-full flex flex-col justify-between w-full text-text-white">
+          <div className="flex flex-col gap-1">
+            {menuList.map((menu, index) => (
+              <div
+                key={index}
+                className={`text-base gap-0 hover:bg-brand-green hover:text-white cursor-pointer my-0 rounded-md mx-1 px-1 ${showLabels ? '' : 'flex justify-center items-center'} ${selectedMenu === menu.name ? 'bg-white text-brand-blue' : ''}`}
+                onClick={() => handleMenuClick(menu)}
+              >
+                {hasAccessToMenu(menu) && hasRequiredRole(menu) ? (
+                  <div
+                    className="flex flex-row items-center  py-2"
+                    title={!showLabels ? `${menu?.label}` : ''}
+                  >
+                    {selectedMenu === menu.name ? menu.iconActive : menu.icon}
+                    {showLabels && (
+                      <p className="ml-2 text-sm">{menu?.label}</p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
 
-        {/* footer section */}
-        <div className="flex flex-col gap-5 py-5 mx-5 border-t border-text-white justify-between">
-          <div className="flex flex-col gap-2">
-            <div
-              className="flex flex-row items-center gap-1 cursor-pointer hover:bg-error hover:text-text-white rounded-md py-2"
-              title={!isOpen ? 'Logout' : ''}
-              onClick={logOut}
-            >
-              <Image
-                src="/assets/logout.png"
-                alt="logout"
-                width={15}
-                height={15}
-              />
-              {isOpen && <p className="text-sm">Logout</p>}
-            </div>
-            {user?.superAdmin && (
+          {/* footer section */}
+          <div className="flex flex-col gap-5 py-5 mx-5 border-t border-text-white justify-between">
+            <div className="flex flex-col gap-2">
               <div
                 className="flex flex-row items-center gap-1 cursor-pointer hover:bg-error hover:text-text-white rounded-md py-2"
-                title={!isOpen ? 'deactivavte account' : ''}
+                title={!showLabels ? 'Logout' : ''}
+                onClick={logOut}
               >
                 <Image
-                  src="/assets/toggle-off.png"
-                  alt="help"
+                  src="/assets/logout.png"
+                  alt="logout"
+                  width={15}
+                  height={15}
+                />
+                {showLabels && <p className="text-sm">Logout</p>}
+              </div>
+              {user?.superAdmin && (
+                <div
+                  className="flex flex-row items-center gap-1 cursor-pointer hover:bg-error hover:text-text-white rounded-md py-2"
+                  title={!showLabels ? 'deactivavte account' : ''}
+                >
+                  <Image
+                    src="/assets/toggle-off.png"
+                    alt="help"
+                    width={20}
+                    height={15}
+                  />
+                  {showLabels && <p className="text-sm">Deactivate Account</p>}
+                </div>
+              )}
+            </div>
+            <div>
+              <div
+                className={`flex ${showLabels ? ' flex-row gap-3' : 'flex-col gap-1'} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}
+              >
+                <Image
+                  src="/assets/profile.png"
+                  alt="profile"
                   width={20}
                   height={15}
                 />
-                {isOpen && <p className="text-sm">Deactivate Account</p>}
+                <p className="text-sm">{userRole}</p>
               </div>
-            )}
-          </div>
-          <div>
-            <div
-              className={`flex ${isOpen ? ' flex-row gap-3' : 'flex-col gap-1'} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}
-            >
-              <Image
-                src="/assets/profile.png"
-                alt="profile"
-                width={20}
-                height={15}
-              />
-              <p className="text-sm">{userRole}</p>
             </div>
           </div>
         </div>
