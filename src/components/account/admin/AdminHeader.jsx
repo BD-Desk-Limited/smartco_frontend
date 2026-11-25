@@ -1,8 +1,9 @@
 import React from 'react';
-import { FaBell, FaRegBell, FaReply } from 'react-icons/fa';
+import { FaRegBell, FaReply } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
 import Image from 'next/image';
+import AppSearch from './AppSearch';
 
 const Header = () => {
   const router = useRouter();
@@ -21,12 +22,12 @@ const Header = () => {
         <span>Back</span>
       </span>
 
-      <div className="flex flex-row gap-5">
-        <div>Search bar here</div>
+      <div className="flex flex-row gap-5 items-center">
+        <AppSearch />
         <div className="flex flex-row justify-between items-center gap-5">
           {/* Notification bell */}
           <p>
-            <FaRegBell className="text-lg rotate-12 h-10 cursor-pointer hover:text-green-shadow1 rounded-full " />
+            <FaRegBell className="text-lg rotate-0 h-10 cursor-pointer hover:text-green-shadow1 rounded-full " />
           </p>
 
           {/* user profile */}

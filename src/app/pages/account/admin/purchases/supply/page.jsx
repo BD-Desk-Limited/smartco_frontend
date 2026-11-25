@@ -1,4 +1,5 @@
 "use client";
+// @search-hide (placeholder page, needs a supplier id)
 //import { useSearchParams } from 'next/navigation';
 import React from 'react'
 

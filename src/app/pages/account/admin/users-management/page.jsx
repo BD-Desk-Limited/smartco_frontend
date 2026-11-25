@@ -1,4 +1,5 @@
 "use client";
+// @search staff, employees, workers, team, sellers, managers
 import React from 'react';
 import UserManagementPage from '@/components/account/admin/users-management/UserManagementPage';
 
