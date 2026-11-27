@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'; // v3.x+ API: autoTable(doc, {...})
 import { FaFileExcel, FaFilePdf, FaPrint } from 'react-icons/fa';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 // metadata values can be a string or an array; arrays are joined with ", "
 const fmt = (v) => [].concat(v ?? []).join(', ');
@@ -160,7 +161,7 @@ const ExportContent = ({
   };
 
   return (
-    <div className="relative bg-white p-5 rounded-lg shadow-lg w-[90vw]">
+    <div className="relative bg-white p-3 sm:p-5 rounded-lg shadow-lg w-[94vw] sm:w-[90vw] max-h-[94dvh] overflow-y-auto">
       <button
         onClick={onClose}
         title="Close"
@@ -172,7 +173,7 @@ const ExportContent = ({
         {title}
       </h2>
 
-      <div className="p-5">
+      <div className="p-1 sm:p-5">
         {metadataEntries.length > 0 && (
           <div className="text-sm font-medium text-text-gray max-h-[25vh] overflow-y-auto scrollbar-thin">
             <hr className="my-1" />
@@ -186,38 +187,21 @@ const ExportContent = ({
         )}
 
         {keys.length > 0 ? (
-          <div className="max-h-[45vh] overflow-y-auto scrollbar-thin">
-            <table className="min-w-full bg-white border border-gray-border">
-              <thead className="sticky top-0 bg-background-1">
-                <tr>
-                  {keys.map((key) => (
-                    <th
-                      key={key}
-                      className="px-4 py-2 border-b border-gray-border text-left text-sm font-semibold text-text-gray"
-                    >
-                      {key}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-shadow10 cursor-text"
-                  >
-                    {keys.map((key) => (
-                      <td
-                        key={key}
-                        className="px-4 py-2 border-b border-gray-border text-sm text-text-gray"
-                      >
-                        {cell(item[key])}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="max-h-[45vh] overflow-auto">
+            {/* the preview of what gets exported: a table from md up, cards on phones */}
+            <ResponsiveTable
+              align="left"
+              dense
+              maxHeightClass=""
+              rows={data}
+              getRowKey={(_, i) => i}
+              columns={keys.map((key, i) => ({
+                key,
+                header: key,
+                mobile: i === 0 ? 'title' : 'field',
+                cell: (item) => cell(item[key]),
+              }))}
+            />
           </div>
         ) : (
           <p className="py-4 text-center text-sm italic text-text-gray">

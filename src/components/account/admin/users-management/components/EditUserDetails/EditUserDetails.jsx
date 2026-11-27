@@ -129,14 +129,14 @@ const EditUserDetails = ({ pageDescription, userData }) => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto no-scrollbar relative">
+    <div className="h-full overflow-y-auto relative">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
       <div className="w-full sticky top-14 bg-white z-50">
         <SubHeader title={'Update User Details'} />
       </div>
-      <div className="flex flex-row max-h-[85vh] overflow-y-auto scrollbar-thin gap-0 w-full h-full relative my-2">
+      <div className="flex flex-col md:flex-row md:max-h-[85vh] md:overflow-y-auto gap-0 w-full h-full relative my-2">
         <div className="min-w-fit">
           <UsersManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -144,12 +144,12 @@ const EditUserDetails = ({ pageDescription, userData }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col h-full w-full overflow-y-auto no-scrollbar relative">
-          <h1 className="px-5 text-text-black">
+        <div className="flex flex-col h-full w-full md:overflow-y-auto relative">
+          <h1 className="px-2 md:px-5 text-text-black">
             Click on any field to update user details...
           </h1>
-          <div className="mx-5 my-2 rounded-md h-full w-full flex flex-row justify-between gap-5 max-h-[calc(100vh-10rem)]">
-            <div className="w-full max-h-auto overflow-y-auto scrollbar-thin">
+          <div className="px-2 md:px-0 md:mx-5 my-2 rounded-md h-full w-full flex flex-col lg:flex-row justify-between gap-5 pb-6 lg:pb-0 lg:max-h-[calc(100vh-10rem)]">
+            <div className="w-full lg:overflow-y-auto">
               <EditUserForm
                 userData={userData}
                 updatedUserData={updatedUserData}
@@ -192,9 +192,7 @@ const EditUserDetails = ({ pageDescription, userData }) => {
             />
           </div>
 
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

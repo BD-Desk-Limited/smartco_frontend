@@ -38,11 +38,14 @@ const BranchChips = ({ device }) => {
   );
 };
 
-// One trusted device in the Device Authorization table.
-const DeviceRow = ({ device, canManage, busy, onEdit, onRevoke }) => (
-  <tr className="text-sm text-text-black border-b border-gray-border last:border-b-0">
-    <td className="py-3 pr-4">
-      <div className="flex items-center gap-2">
+// Columns of the Device Authorization table (a table from md up, cards on phones).
+export const deviceColumns = [
+  {
+    key: 'device',
+    header: 'Device',
+    mobile: 'title',
+    cell: (device) => (
+      <span className="flex flex-wrap items-center gap-2">
         <FaDesktop className="text-brand-blue shrink-0" />
         <span className="font-medium break-words">{device.deviceName}</span>
         {device.isCurrent && (
@@ -50,49 +53,64 @@ const DeviceRow = ({ device, canManage, busy, onEdit, onRevoke }) => (
             This device
           </span>
         )}
-      </div>
-    </td>
-    <td className="py-3 pr-4">
-      <BranchChips device={device} />
-    </td>
-    <td className="py-3 pr-4 whitespace-nowrap">{device.addedBy?.fullName || '—'}</td>
-    <td className="py-3 pr-4 whitespace-nowrap">{formatDate(device.createdAt)}</td>
-    <td className="py-3 pr-4 whitespace-nowrap" title={device.lastUsedAt ? formatDeviceTime(device.lastUsedAt) : ''}>
-      {device.lastUsedAt ? (
-        <>
+      </span>
+    ),
+  },
+  {
+    key: 'branches',
+    header: 'Branches',
+    mobile: 'wide',
+    cell: (device) => <BranchChips device={device} />,
+  },
+  {
+    key: 'addedBy',
+    header: 'Added by',
+    cell: (device) => device.addedBy?.fullName || '—',
+  },
+  {
+    key: 'added',
+    header: 'Date added',
+    cell: (device) => formatDate(device.createdAt),
+  },
+  {
+    key: 'lastUsed',
+    header: 'Last used',
+    cell: (device) =>
+      device.lastUsedAt ? (
+        <span title={formatDeviceTime(device.lastUsedAt)}>
           {timeAgo(device.lastUsedAt)}
           {device.lastUsedBy && (
-            <span className="block text-xs text-text-gray">by {device.lastUsedBy.fullName}</span>
+            <span className="block text-xs text-text-gray">
+              by {device.lastUsedBy.fullName}
+            </span>
           )}
-        </>
+        </span>
       ) : (
         <span className="text-text-gray">Not recorded yet</span>
-      )}
-    </td>
-    <td className="py-3 text-center whitespace-nowrap">
-      {canManage ? (
-        <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => onEdit(device)}
-            className="text-sm text-brand-blue hover:underline"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onRevoke(device)}
-            className="text-sm text-text-gray hover:text-error hover:underline disabled:opacity-60"
-          >
-            {busy ? 'Revoking…' : 'Revoke'}
-          </button>
-        </div>
-      ) : (
-        <span className="text-xs text-text-gray">View only</span>
-      )}
-    </td>
-  </tr>
-);
+      ),
+  },
+];
 
-export default DeviceRow;
+// Edit / Revoke for one device (the Action column / bottom of the card).
+export const DeviceActions = ({ device, canManage, busy, onEdit, onRevoke }) =>
+  canManage ? (
+    <>
+      <button
+        type="button"
+        onClick={() => onEdit(device)}
+        className="text-sm text-brand-blue hover:underline px-1"
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => onRevoke(device)}
+        className="text-sm text-text-gray hover:text-error hover:underline disabled:opacity-60 px-1"
+      >
+        {busy ? 'Revoking…' : 'Revoke'}
+      </button>
+    </>
+  ) : (
+    <span className="text-xs text-text-gray">View only</span>
+  );

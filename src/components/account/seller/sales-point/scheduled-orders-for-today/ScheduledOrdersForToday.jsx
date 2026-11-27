@@ -11,7 +11,9 @@ import Image from 'next/image';
 import {
   checkOrderStatusService,
   getOrdersForTodayByBranchIdService,
+  localYmd,
 } from '@/services/orderScheduleServices';
+import { useAuth } from '@/contexts/authContext';
 import {
   productsTax,
   itemUnitCost,
@@ -19,6 +21,32 @@ import {
   taxfreeProduct,
 } from '../cart/CartBillCalculationFunctions';
 import Spinner from '@/components/account/Spinner';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { methodLabel } from '@/utilities/paymentMethods';
+
+const MAX_RANGE_DAYS = 93; // the server allows the same
+const daysBetween = (fromYmd, toYmd) =>
+  Math.round((new Date(toYmd) - new Date(fromYmd)) / 86400000) + 1;
+const shiftDays = (days) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return localYmd(d);
+};
+const showDate = (ymd) => new Date(`${ymd}T00:00`).toLocaleDateString();
+
+// what the customer has paid towards a scheduled order
+const paidSoFar = (order) => order?.payment?.amountPaid || 0; // paid less refunded
+
+// payments and refunds on an order, oldest first
+const paymentHistory = (order) =>
+  [
+    ...(order?.payment?.entries || []).map((e) => ({ ...e, at: e.paidAt })),
+    ...(order?.payment?.refunds || []).map((r) => ({
+      ...r,
+      at: r.refundedAt,
+      refund: true,
+    })),
+  ].sort((a, b) => new Date(a.at) - new Date(b.at));
 
 const ScheduledOrdersForToday = ({
   setActiveMenuItem,
@@ -30,6 +58,20 @@ const ScheduledOrdersForToday = ({
   mode,
 }) => {
   const { showNotification } = useNotification();
+  const { user } = useAuth();
+  // a manager or admin can look at other days: to fulfil an order whose customer came after (or
+  // before) its date. A cashier sees today's only.
+  const canPickDates =
+    ['manager', 'admin'].includes(user?.role) || user?.superAdmin === true;
+  const today = localYmd();
+  const [dates, setDates] = React.useState({ from: today, to: today });
+  const datesValid =
+    Boolean(dates.from && dates.to) &&
+    dates.from <= dates.to &&
+    daysBetween(dates.from, dates.to) <= MAX_RANGE_DAYS;
+  const shownFrom = canPickDates && datesValid ? dates.from : today;
+  const shownTo = canPickDates && datesValid ? dates.to : today;
+  const isTodayOnly = shownFrom === today && shownTo === today;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [scheduledOrdersForToday, setScheduledOrdersForToday] = React.useState(
     []
@@ -48,10 +90,13 @@ const ScheduledOrdersForToday = ({
       if (workBranch?._id) {
         try {
           const response = await getOrdersForTodayByBranchIdService(
-            workBranch._id
+            workBranch._id,
+            { from: shownFrom, to: shownTo }
           );
           if (response.data) {
             setScheduledOrdersForToday(response.data);
+          } else if (response.error) {
+            showNotification('error', 'Error', response.error, 4000);
           }
         } catch (error) {
           console.error('Error fetching scheduled orders for today:', error);
@@ -68,7 +113,7 @@ const ScheduledOrdersForToday = ({
     };
 
     fetchScheduledOrders();
-  }, [workBranch?._id, setScheduledOrdersForToday, showNotification]);
+  }, [workBranch?._id, shownFrom, shownTo, showNotification]);
 
   const filteredOrders = scheduledOrdersForToday?.filter((order) => {
     const lowerSearchTerm = searchTerm.toLowerCase();
@@ -114,26 +159,40 @@ const ScheduledOrdersForToday = ({
     try {
       setLoading(true);
       const { data, error } = await getOrdersForTodayByBranchIdService(
-        workBranch._id
+        workBranch._id,
+        { from: shownFrom, to: shownTo }
       );
 
       if (data) {
         //map through the orderIds to see if the current order matches any orderId still scheduled for today. If it doesn't then it means the order has already been fulfilled and we should prevent moving it to cart and show error notification instead.
-        const isOrderStillScheduled = data.some(
+        // restore from this fresh copy, not the list loaded earlier: its version, payments and
+        // refunds are as they are right now
+        const latest = data.find(
           (scheduledOrder) => scheduledOrder.orderId === order.orderId
         );
+        const isOrderStillScheduled = Boolean(latest);
 
         if (isOrderStillScheduled) {
           // mark the order as restored from scheduled order
           setCart((prev) => ({
             ...prev,
-            orderId: order.orderId,
+            orderId: latest.orderId,
+            // the version this checkout is made on: if the order changes before it syncs
+            // (cancelled, fulfilled elsewhere), the server ignores the checkout
+            orderRevision: latest.revision,
             restoredFromScheduledOrder: true,
             restoredFromScheduledOrderAt: new Date().toISOString(),
-            items: order?.items || [],
-            linkedCustomer: order?.linkedCustomer || null,
-            payment: { ...order.payment, selectedFulfillmentTime: 'Now' },
-            amountPaid: order?.payment?.partialAmountPaid,
+            items: latest?.items || [],
+            linkedCustomer: latest?.linkedCustomer || null,
+            payment: {
+              ...latest.payment, // includes entries and refunds, shown on the payment page
+              selectedFulfillmentTime: 'Now',
+              // chosen afresh at this checkout: how much is paid NOW (if it is scheduled again)
+              selectedPaymentPlan: null,
+              partialAmountNow: 0,
+            },
+            // paid less refunded; the payment page adds only what is collected now
+            amountPaid: paidSoFar(latest),
           }));
 
           showNotification(
@@ -147,8 +206,8 @@ const ScheduledOrdersForToday = ({
         } else if (!isOrderStillScheduled) {
           showNotification(
             'error',
-            'Order Already Fulfilled',
-            'This order has already been fulfilled and cannot be moved to cart.',
+            'Order No Longer Scheduled',
+            'This order has been fulfilled, cancelled or moved to a day outside the dates shown, so it cannot be moved to cart.',
             6000
           );
         }
@@ -203,9 +262,63 @@ const ScheduledOrdersForToday = ({
           />
         </div>
 
+        {canPickDates && (
+          <div className="px-3 pb-2 flex flex-wrap items-end gap-2 text-sm">
+            <label className="flex flex-col">
+              <span className="text-xs opacity-70">Due from</span>
+              <input
+                type="date"
+                value={dates.from}
+                max={dates.to || undefined}
+                onChange={(e) =>
+                  setDates((d) => ({ ...d, from: e.target.value }))
+                }
+                className="p-1 rounded-md border-2 border-gray-300 text-text-gray"
+              />
+            </label>
+            <label className="flex flex-col">
+              <span className="text-xs opacity-70">to</span>
+              <input
+                type="date"
+                value={dates.to}
+                min={dates.from || undefined}
+                onChange={(e) =>
+                  setDates((d) => ({ ...d, to: e.target.value }))
+                }
+                className="p-1 rounded-md border-2 border-gray-300 text-text-gray"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setDates({ from: today, to: today })}
+              className="px-2 py-1 rounded-md border border-brand-green text-brand-green"
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setDates({ from: shiftDays(-30), to: shiftDays(-1) })
+              }
+              className="px-2 py-1 rounded-md border border-brand-green text-brand-green"
+              title="Orders due in the last 30 days that are still open (not fulfilled or cancelled)"
+            >
+              Past due (30 days)
+            </button>
+            {!datesValid && (
+              <span className="text-xs text-red-500 w-full">
+                Pick a start date on or before the end date, at most{' '}
+                {MAX_RANGE_DAYS} days apart. Showing today.
+              </span>
+            )}
+          </div>
+        )}
+
         <hr className="my-2 border-gray-300" />
         <p className="font-semibold">
-          {`Scheduled Orders for Today  (${scheduledOrdersForToday?.length || 0})`}
+          {isTodayOnly
+            ? `Scheduled Orders for Today  (${scheduledOrdersForToday?.length || 0})`
+            : `Scheduled Orders due ${showDate(shownFrom)} - ${showDate(shownTo)}  (${scheduledOrdersForToday?.length || 0})`}
         </p>
 
         {loading ? (
@@ -261,6 +374,11 @@ const ScheduledOrdersForToday = ({
                       </span>
                       <span className="text-sm opacity-70">
                         {order.orderId}
+                        {order.isOverdue && (
+                          <span className="ml-2 text-xs rounded px-1.5 py-0.5 bg-red-100 text-red-700">
+                            Past due
+                          </span>
+                        )}
                       </span>
                       <span className="text-sm opacity-70">{`Items in Order: ${order.items?.length || 0}`}</span>
                       {order.linkedCustomer && (
@@ -346,22 +464,43 @@ const ScheduledOrdersForToday = ({
             <div className="rounded-md border my-2 text-sm font-semibold">
               <div className="p-2 flex flex-col gap-1">
                 <span>
-                  <span className="font-thin">Payment Method: </span>
-                  {selectedScheduledOrder?.payment?.paymentType || 'N/A'}
+                  <span className="font-thin">Payment: </span>
+                  {selectedScheduledOrder?.payment?.selectedPaymentPlan
+                    ?.label || 'N/A'}
                 </span>
                 <span>
-                  <span className="font-thin">Paid: </span>
-                  {selectedScheduledOrder?.payment?.selectedPaymentPlan
-                    ?.value || 'N/A'}
+                  <span className="font-thin">Paid so far: </span>
+                  {commaNumberFormat(paidSoFar(selectedScheduledOrder), 2)}
                 </span>
                 <span>
                   <span className="font-thin">Balance to pay: </span>
-                  {(
-                    selectedScheduledOrder?.payment?.total -
-                    selectedScheduledOrder?.payment?.selectedPaymentPlan
-                      ?.amountPaid
-                  )?.toFixed(2) || 'N/A'}
+                  {commaNumberFormat(
+                    selectedScheduledOrder?.payment?.balanceDue || 0,
+                    2
+                  )}
+                  <span className="font-thin text-xs block">
+                    At the prices when scheduled; the final price is
+                    today&apos;s.
+                  </span>
                 </span>
+                {paymentHistory(selectedScheduledOrder).length > 0 && (
+                  <ul className="mt-1 border-t pt-1 font-normal">
+                    {paymentHistory(selectedScheduledOrder).map((line, i) => (
+                      <li
+                        key={`${line.at}-${i}`}
+                        className={`flex justify-between gap-2 ${line.refund ? 'text-red-500' : ''}`}
+                      >
+                        <span className="opacity-70">
+                          {new Date(line.at).toLocaleString()}
+                          {line.refund ? ' · Refund' : ''}
+                        </span>
+                        <span>
+                          {`${line.refund ? '-' : ''}${commaNumberFormat(line.amount, 2)} (${methodLabel(line.method)})`}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
             <BillAndSummary

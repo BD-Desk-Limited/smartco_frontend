@@ -1,5 +1,6 @@
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React from 'react';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ComponentsAndPriceHistoryTable = ({
   filterPriceHistoryByBand,
@@ -11,41 +12,35 @@ const ComponentsAndPriceHistoryTable = ({
   return (
     <div className="w-full text-text-gray relative max-h-[50%] scroollbar-thin">
       <h2 className="text-sm text-brand-green mb-2">Price history</h2>
-      <table className="w-full mb-3 my-1">
-        <thead className="sticky top-1">
-          <tr className="bg-gray-shadow10 border-y border-y-gray-border">
-            <th className="p-1 text-left">Base Price</th>
-            <th className="p-1 text-left">Effective Date</th>
-            <th className="p-1 text-left">Set By</th>
-          </tr>
-        </thead>
-
-        <tbody className="border-b">
-          {filterPriceHistoryByBand().length > 0 ? (
-            filterPriceHistoryByBand().map((bandHistory, idx) => (
-              <tr key={idx} className="">
-                <td className="p-1">
-                  {bandHistory?.price
-                    ? `${currencySymbol}${bandHistory.price.toFixed(2)}`
-                    : 'N/A'}
-                </td>
-                <td className="p-1">
-                  {ISOStringToLocalTime(bandHistory.effectiveDate)}
-                </td>
-                <td className="p-1">
-                  {bandHistory.setBy?.fullName || 'unknown'}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={3} className="text-text-gray p-5">
-                No price history available for {band.band || 'this band'} !!!
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <ResponsiveTable
+        className="mb-3 my-1"
+        align="left"
+        dense
+        maxHeightClass=""
+        rows={filterPriceHistoryByBand()}
+        getRowKey={(_, i) => i}
+        emptyMessage={`No price history available for ${band.band || 'this band'} !!!`}
+        columns={[
+          {
+            key: 'price',
+            header: 'Base Price',
+            mobile: 'title',
+            cell: (h) =>
+              h?.price ? `${currencySymbol}${h.price.toFixed(2)}` : 'N/A',
+          },
+          {
+            key: 'date',
+            header: 'Effective Date',
+            mobile: 'subtitle',
+            cell: (h) => ISOStringToLocalTime(h.effectiveDate),
+          },
+          {
+            key: 'setBy',
+            header: 'Set By',
+            cell: (h) => h.setBy?.fullName || 'unknown',
+          },
+        ]}
+      />
 
       {/* Components and options price change */}
       <div className="w-full text-text-gray relative max-h-[50%] scroollbar-thin">
@@ -63,7 +58,7 @@ const ComponentsAndPriceHistoryTable = ({
             {(taxAndPriceHistory || [])?.components?.map((component, index) => (
               <div key={index} className="p-1 rounded-lg">
                 <div className="border-y w-full p-1 bg-gray-shadow10">
-                  <div className="flex flex-row justify-between items-center w-full">
+                  <div className="flex flex-row flex-wrap gap-3 justify-between items-center w-full">
                     <h3 className="font-semibold">
                       {component?.categoryName || 'Unnamed Category'}
                       {' - '}
@@ -80,81 +75,53 @@ const ComponentsAndPriceHistoryTable = ({
                     component?.materialChoices.length > 0 ? (
                       <>
                         {component.materialChoices.map((materialObj, idx) => (
-                          <table key={idx} className="w-full mb-3 my-1">
-                            <thead className="sticky top-1 text-sm font-light">
-                              <tr>
-                                <td>
-                                  Item:{' '}
-                                  {materialObj?.material?.name ||
-                                    'Unnamed Material'}
-                                </td>
-                              </tr>
-                              <tr className="text-text-gray text-left">
-                                <td>Qty: {materialObj?.quantity || 0}</td>
-                              </tr>
-                              <tr className="border-y border-y-gray-border font-thin">
-                                <td className="p-1 text-left">
-                                  Additional amount
-                                </td>
-                                <td className="p-1 text-left">
-                                  Effective date
-                                </td>
-                                <td className="p-1 text-left">Set By</td>
-                              </tr>
-                            </thead>
-
-                            {filterComponentAdditionalPriceHistoryByBand(
-                              materialObj?.additionalPrice
-                            )?.length > 0 ? (
-                              <tbody className="w-full">
-                                {filterComponentAdditionalPriceHistoryByBand(
+                          <div key={idx} className="w-full mb-3 my-1 text-sm">
+                            <p>
+                              Item:{' '}
+                              {materialObj?.material?.name || 'Unnamed Material'}
+                            </p>
+                            <p className="text-text-gray mb-1">
+                              Qty: {materialObj?.quantity || 0}
+                            </p>
+                            <ResponsiveTable
+                              align="left"
+                              dense
+                              maxHeightClass=""
+                              rows={
+                                filterComponentAdditionalPriceHistoryByBand(
                                   materialObj?.additionalPrice
-                                ).map((priceHistory, pIdx) => (
-                                  <tr
-                                    key={pIdx}
-                                    className="text-left text-sm text-text-gray w-full"
-                                  >
-                                    <td className="w-1/3">
-                                      {priceHistory?.price
-                                        ? `+${currencySymbol}${priceHistory.price.toFixed(2)}`
-                                        : `+${currencySymbol}0.00`}
-                                    </td>
-                                    <td className="w-1/3">
-                                      {ISOStringToLocalTime(
-                                        priceHistory?.effectiveDate
-                                      ) || ' - '}
-                                    </td>
-                                    <td className="w-1/3">
-                                      {priceHistory?.setBy?.fullName || ' - '}
-                                    </td>
-                                  </tr>
-                                ))}
-                                {component.materialChoices.length - 1 !==
-                                  idx && (
-                                  <tr className="w-full">
-                                    <td
-                                      colSpan={3}
-                                      className="w-full text-center"
-                                    >
-                                      OR
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            ) : (
-                              <tbody>
-                                <tr>
-                                  <td
-                                    colSpan={3}
-                                    className="text-text-gray p-5"
-                                  >
-                                    No additional price history available for{' '}
-                                    {band.band || 'this band'} !!!
-                                  </td>
-                                </tr>
-                              </tbody>
+                                ) || []
+                              }
+                              getRowKey={(_, i) => i}
+                              emptyMessage={`No additional price history available for ${band.band || 'this band'} !!!`}
+                              columns={[
+                                {
+                                  key: 'amount',
+                                  header: 'Additional amount',
+                                  mobile: 'title',
+                                  cell: (h) =>
+                                    h?.price
+                                      ? `+${currencySymbol}${h.price.toFixed(2)}`
+                                      : `+${currencySymbol}0.00`,
+                                },
+                                {
+                                  key: 'date',
+                                  header: 'Effective date',
+                                  mobile: 'subtitle',
+                                  cell: (h) =>
+                                    ISOStringToLocalTime(h?.effectiveDate) || ' - ',
+                                },
+                                {
+                                  key: 'setBy',
+                                  header: 'Set By',
+                                  cell: (h) => h?.setBy?.fullName || ' - ',
+                                },
+                              ]}
+                            />
+                            {component.materialChoices.length - 1 !== idx && (
+                              <p className="w-full text-center py-1">OR</p>
                             )}
-                          </table>
+                          </div>
                         ))}
                       </>
                     ) : (

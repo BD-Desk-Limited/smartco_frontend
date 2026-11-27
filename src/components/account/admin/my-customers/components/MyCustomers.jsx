@@ -15,6 +15,8 @@ import { formatDate } from '@/utilities/formatTime';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import CustomerProfileSideView from './CustomerProfileSideView';
 import { useRouter } from 'next/navigation';
+import FilterSheet from '@/components/account/admin/ui/FilterSheet';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const SORT_OPTIONS = [
   { value: 'name', label: 'Name (A-Z)' },
@@ -98,7 +100,25 @@ const MyCustomers = ({ pageDescription }) => {
   }, [selectedFilters]);
 
   const box =
-    'h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray';
+    'h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray bg-white w-full md:w-auto';
+
+  // rendered twice: next to the Filters button on phones, inline on md+
+  const searchBox = (extraClass = '') => (
+    <div
+      className={`h-10 md:h-8 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray bg-white px-3 w-full ${extraClass}`}
+    >
+      <FaSearch aria-hidden="true" />
+      <input
+        type="search"
+        placeholder="Search by name or customer number"
+        aria-label="Search customers"
+        value={draftFilters.searchTerm}
+        onChange={(e) => onChangeFilter('searchTerm', e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+        className="focus:outline-none ml-2 w-full bg-transparent"
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -108,8 +128,8 @@ const MyCustomers = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'My Customers'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute left-0 top-0 z-50">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:left-0 md:top-0 md:z-50">
           <SideBar
             selectedSubMenu="my-customers"
             isOpen={openSidebar}
@@ -118,174 +138,160 @@ const MyCustomers = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
-            {/* filters */}
-            <div className="flex flex-row gap-2 items-center border border-gray-border rounded-md p-2">
-              <div className={`${box} w-1/3 px-3`}>
-                <FaSearch aria-hidden="true" />
-                <input
-                  type="text"
-                  placeholder="Search by name or customer number"
-                  value={draftFilters.searchTerm}
-                  onChange={(e) => onChangeFilter('searchTerm', e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                  className="focus:outline-none ml-2 w-full"
-                />
-              </div>
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
+            {/* filters: inline from md up, a bottom sheet on phones */}
+            <FilterSheet
+              activeCount={
+                [
+                  selectedFilters.searchTerm,
+                  selectedFilters.branch,
+                  selectedFilters.group,
+                ].filter(Boolean).length
+              }
+              leading={searchBox('h-10')}
+              onApply={applyFilters}
+            >
+              <div className="flex flex-col md:flex-row gap-3 md:gap-2 md:items-center md:border md:border-gray-border rounded-md md:p-2">
+                {searchBox('hidden md:flex md:w-1/3')}
 
-              {userBranches.length > 1 && (
+                {userBranches.length > 1 && (
+                  <div className={box}>
+                    <FaHome aria-hidden="true" className="mr-2 text-brand-blue" />
+                    <select
+                      value={draftFilters.branch}
+                      onChange={(e) => onChangeFilter('branch', e.target.value)}
+                      className="focus:outline-none cursor-pointer w-full bg-transparent"
+                      aria-label="Filter by branch"
+                    >
+                      <option value="">All branches</option>
+                      {userBranches.map((b) => (
+                        <option key={b._id} value={b._id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {groups.length > 0 && (
+                  <div className={box}>
+                    <FaFilter aria-hidden="true" className="mr-2" />
+                    <select
+                      value={draftFilters.group}
+                      onChange={(e) => onChangeFilter('group', e.target.value)}
+                      className="focus:outline-none cursor-pointer w-full bg-transparent"
+                      aria-label="Filter by customer group"
+                    >
+                      <option value="">All groups</option>
+                      {groups.map((g) => (
+                        <option key={g._id} value={g._id}>
+                          {g.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <div className={box}>
-                  <FaHome aria-hidden="true" className="mr-2 text-brand-blue" />
+                  <FaSort aria-hidden="true" className="mr-2" />
                   <select
-                    value={draftFilters.branch}
-                    onChange={(e) => onChangeFilter('branch', e.target.value)}
-                    className="focus:outline-none cursor-pointer"
-                    aria-label="Filter by branch"
+                    value={draftFilters.sortBy}
+                    onChange={(e) => onChangeFilter('sortBy', e.target.value)}
+                    className="focus:outline-none cursor-pointer w-full bg-transparent"
+                    aria-label="Sort customers"
                   >
-                    <option value="">All branches</option>
-                    {userBranches.map((b) => (
-                      <option key={b._id} value={b._id}>
-                        {b.name}
+                    {SORT_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
                       </option>
                     ))}
                   </select>
                 </div>
-              )}
 
-              {groups.length > 0 && (
-                <div className={box}>
-                  <FaFilter aria-hidden="true" className="mr-2" />
-                  <select
-                    value={draftFilters.group}
-                    onChange={(e) => onChangeFilter('group', e.target.value)}
-                    className="focus:outline-none cursor-pointer"
-                    aria-label="Filter by customer group"
-                  >
-                    <option value="">All groups</option>
-                    {groups.map((g) => (
-                      <option key={g._id} value={g._id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <div className={box}>
-                <FaSort aria-hidden="true" className="mr-2" />
-                <select
-                  value={draftFilters.sortBy}
-                  onChange={(e) => onChangeFilter('sortBy', e.target.value)}
-                  className="focus:outline-none cursor-pointer"
-                  aria-label="Sort customers"
+                <button
+                  onClick={applyFilters}
+                  className="hidden md:block px-4 h-8 text-sm bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
                 >
-                  {SORT_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  Apply filter
+                </button>
               </div>
-
-              <button
-                onClick={applyFilters}
-                className="px-4 h-8 text-sm bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
-              >
-                Apply filter
-              </button>
-            </div>
+            </FilterSheet>
 
             {/* table */}
             {loading ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow10 text-sm text-text-gray">
-                      <th className="px-2 py-2 border border-gray-shadow8">
-                        Customer
-                      </th>
-                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
-                        Registered at
-                      </th>
-                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
-                        Branches
-                      </th>
-                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
-                        Visits
-                      </th>
-                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
-                        Total spent
-                      </th>
-                      <th className="px-4 py-2 tex2-center border border-gray-shadow8">
-                        Last visit
-                      </th>
-                      <th
+              <ResponsiveTable
+                rows={customers}
+                emptyMessage="No customers found."
+                onRowClick={(c) => setSelectedCustomer(c)}
+                columns={[
+                  {
+                    key: 'customer',
+                    header: 'Customer',
+                    align: 'left',
+                    mobile: 'title',
+                    cell: (c) => (
+                      <>
+                        <span className="block text-text-black">{c.name}</span>
+                        <span className="text-xs font-semibold text-text-gray">
+                          {c.customerNumber}
+                        </span>
+                      </>
+                    ),
+                  },
+                  {
+                    key: 'registered',
+                    header: 'Registered at',
+                    cell: (c) => c.registeredBranch?.name || 'N/A',
+                  },
+                  {
+                    key: 'branches',
+                    header: 'Branches',
+                    cell: (c) => (
+                      <span title={c.branches.map((b) => b.name).join(', ')}>
+                        {c.branches.length}
+                      </span>
+                    ),
+                  },
+                  { key: 'visits', header: 'Visits', cell: (c) => c.stats.visits },
+                  {
+                    key: 'spent',
+                    header: 'Total spent',
+                    mobile: 'badge',
+                    cellClass: () => 'font-semibold',
+                    cell: (c) => commaNumberFormat(c.stats.totalSpent, 2),
+                  },
+                  {
+                    key: 'lastVisit',
+                    header: 'Last visit',
+                    cell: (c) =>
+                      c.stats.lastVisit
+                        ? formatDate(new Date(c.stats.lastVisit))
+                        : '-',
+                  },
+                  {
+                    key: 'groups',
+                    header: (
+                      <button
+                        type="button"
                         onClick={() =>
                           Router.push(
                             '/pages/account/admin/my-customers/customer-groups'
                           )
                         }
-                        className="px-4 py-2 tex2-center border border-gray-shadow8 cursor-pointer hover:bg-blue-shadow6"
+                        className="hover:text-brand-blue underline-offset-2 hover:underline"
+                        title="Manage customer groups"
                       >
                         Groups
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-text-gray">
-                    {customers.length > 0 ? (
-                      customers.map((c) => (
-                        <tr
-                          key={c._id}
-                          onClick={() => setSelectedCustomer(c)}
-                          className="border-b border-gray-border text-sm cursor-pointer hover:bg-green-shadow8"
-                        >
-                          <td className="px-2 py-2">
-                            <span className="block text-text-black">
-                              {c.name}
-                            </span>
-                            <span className="text-xs font-semibold">
-                              {c.customerNumber}
-                            </span>
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            {c.registeredBranch?.name || 'N/A'}
-                          </td>
-                          <td
-                            className="px-2 py-2 text-center"
-                            title={c.branches.map((b) => b.name).join(', ')}
-                          >
-                            {c.branches.length}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            {c.stats.visits}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            {commaNumberFormat(c.stats.totalSpent, 2)}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            {c.stats.lastVisit
-                              ? formatDate(new Date(c.stats.lastVisit))
-                              : '-'}
-                          </td>
-                          <td className="px-2 py-2 text-center">
-                            {c.groups.length
-                              ? c.groups.map((g) => g.name).join(', ')
-                              : '-'}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={7}>
-                          No customers found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      </button>
+                    ),
+                    mobileLabel: 'Groups',
+                    cell: (c) =>
+                      c.groups.length ? c.groups.map((g) => g.name).join(', ') : '-',
+                  },
+                ]}
+              />
             )}
 
             {pagination && (
@@ -298,9 +304,7 @@ const MyCustomers = ({ pageDescription }) => {
               />
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 
@@ -320,7 +324,7 @@ const MyCustomers = ({ pageDescription }) => {
       {selectedCustomer && (
         <div
           className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center"
-          onClick={() => setSelectedCustomer(null)}
+          onClick={(e) => e.target === e.currentTarget && setSelectedCustomer(null)}
         >
           <CustomerProfileSideView
             key={selectedCustomer._id}

@@ -121,9 +121,9 @@ const EditGroupedMaterialForm = (
     };
 
   return (
-    <form className='flex flex-col gap-5 w-[65%] max-h-[75vh] overflow-auto scrollbar-thin p-5'>
-        <div className='flex flex-row justify-between gap-10'>
-            <div className='flex w-[40%]'>
+    <form className='flex flex-col gap-5 w-full md:w-[65%] max-h-[75vh] overflow-auto scrollbar-thin p-5'>
+        <div className='flex flex-col md:flex-row justify-between gap-5 md:gap-10'>
+            <div className='flex w-full md:w-[40%]'>
                 <div className='flex flex-col justify-start items-center w-full'> 
                   {uploadNewImage?
                     <div className='flex flex-col gap-1 w-full justify-center items-center'>
@@ -134,7 +134,7 @@ const EditGroupedMaterialForm = (
                             alt='Material Image'
                             height={150} 
                             width={150}
-                            className='rounded-[100%] h-[150px] w-[150px]' 
+                            className='rounded-[100%] h-[150px] w-[150px] max-w-full' 
                           />
                         }
                       </div>
@@ -157,7 +157,7 @@ const EditGroupedMaterialForm = (
                         alt={updatedMaterialData.name || 'Material Image'}
                         width={200}
                         height={200}
-                        className='rounded-[100%] h-[200px] w-[200px]'
+                        className='rounded-[100%] h-[200px] w-[200px] max-w-full'
                       />
                       <span 
                         onClick={() => setUploadNewImage(true)}
@@ -319,7 +319,7 @@ const EditGroupedMaterialForm = (
               <h2 className='text-text-black text-md text-center'>
                 Add a new component materials for your grouped material. After you have finished, click submit on the summary panel on the right to update the material. 
               </h2>
-              <div className='flex flex-row gap-3 items-center'>
+              <div className='flex flex-row flex-wrap gap-3 items-end justify-center w-full'>
                 <div>
                   <label className='text-text-black text-sm'>Add component Materials</label>
                   <select 

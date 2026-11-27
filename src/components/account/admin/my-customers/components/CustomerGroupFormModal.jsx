@@ -55,7 +55,7 @@ const CustomerGroupFormModal = ({
     'w-full px-2 border border-gray-border rounded-md text-sm focus:outline-none focus:ring focus:border-brand-blue';
 
   return (
-    <div className="relative bg-white p-5 rounded-lg shadow-lg w-[520px] max-w-[95vw] max-h-[90vh] overflow-y-auto text-sm text-text-gray">
+    <div className="relative bg-white p-5 rounded-none sm:rounded-lg shadow-lg w-full h-full sm:h-auto sm:w-[520px] sm:max-w-[95vw] sm:max-h-[90vh] overflow-y-auto text-sm text-text-gray">
       <button
         onClick={onClose}
         title="Close"

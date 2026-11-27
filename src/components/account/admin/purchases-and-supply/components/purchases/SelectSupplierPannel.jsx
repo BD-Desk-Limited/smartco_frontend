@@ -45,13 +45,13 @@ const SelectSupplierPannel = ({
       onClick={(e) => {
         e.stopPropagation();
       }}
-      className="bg-white w-[80%] h-[90%] rounded-lg p-5 relative"
+      className="bg-white w-full h-full sm:w-[80%] sm:h-[90%] sm:rounded-lg p-4 sm:p-5 pt-12 sm:pt-5 relative flex flex-col"
     >
       {/* Close button */}
       <span
         onClick={() => setOpenSupplierSelectPannel(false)}
         title="close"
-        className="absolute top-0 right-0 p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
+        className="absolute top-2 right-2 sm:top-0 sm:right-0 p-3 sm:p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
       >
         <FaTimes className="text-text-white" />
       </span>
@@ -62,7 +62,7 @@ const SelectSupplierPannel = ({
           e.preventDefault();
           fetchSuppliers(1, searchTerm);
         }}
-        className="h-8 px-3 border-2 border-gray-border rounded-md flex flex-row items-center w-full"
+        className="h-11 sm:h-8 px-3 border-2 border-gray-border rounded-md flex flex-row items-center w-full shrink-0"
       >
         <FaSearch className="text-text-gray" />
         <input
@@ -93,7 +93,7 @@ const SelectSupplierPannel = ({
       </span>
 
       {/* List of suppliers */}
-      <div className="h-[80%] relative mt-5 overflow-y-auto scrollbar-thin">
+      <div className="flex-1 min-h-0 sm:flex-none sm:h-[80%] relative mt-5 overflow-y-auto scrollbar-thin">
         <li
           onClick={() => onSelectSupplier(OPEN_MARKET_DATA)}
           className="py-2 mx-2 border-y-1 border-y px-2 cursor-pointer flex flex-row items-center gap-3 hover:bg-gray-shadow9 hover:text-text-black sticky top-0 bg-white z-10"

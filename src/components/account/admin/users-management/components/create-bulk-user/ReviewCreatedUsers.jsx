@@ -1,6 +1,7 @@
 import ExportContent from '@/components/account/ExportContent';
 import React from 'react';
 import { PhoneNumber } from 'react-phone-number-input';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ReviewCreatedUsers = ({
   newUsers,
@@ -35,74 +36,48 @@ const ReviewCreatedUsers = ({
           />
         </div>
       ) : (
-        <div className="bg-text-white rounded-lg max-w-[600px] h-[60vh] w-full flex flex-col items-center gap-4">
+        <div className="bg-text-white rounded-lg max-w-[600px] min-h-[60vh] w-[calc(100%-1rem)] flex flex-col items-center gap-4 pb-4">
           <h2 className="bg-brand-blue w-full text-center py-2 text-text-white rounded-t-lg">
             Review Created Users
           </h2>
-          <span>
+          <span className="px-4 text-center">
             some of the users you uploaded were not created. please review them
           </span>
 
-          <div>
-            <table className="w-full my-10">
-              <thead>
-                <tr className="text-text-gray bg-text-white text-sm">
-                  <th className="p-2 border border-brand-gray">
-                    News Users created
-                  </th>
-                  <th className="p-2 border border-brand-gray">
-                    Users Already existing
-                  </th>
-                  <th className="p-2 border border-brand-gray">{`Users with Error(not created)`}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="text-center ">
-                  <td className="p-2">
-                    <span className="font-semibold">
-                      {newUsers?.length} users{' '}
-                    </span>
-                    <br />
-                    <strong
-                      className="text-sm hover:underline cursor-pointer text-text-blue"
-                      onClick={() => {
-                        setDataToView(newUsers);
-                      }}
-                    >
-                      View Users
-                    </strong>
-                  </td>
-                  <td className="p-2">
-                    <span className="font-semibold">
-                      {existingUsers?.length} users
-                    </span>
-                    <br />
-                    <strong
-                      className="text-sm hover:underline cursor-pointer text-text-blue"
-                      onClick={() => {
-                        setDataToView(existingUsers);
-                      }}
-                    >
-                      View Users
-                    </strong>
-                  </td>
-                  <td className="p-2">
-                    <span className="font-semibold">
-                      {usersWithErrors?.length} users
-                    </span>
-                    <br />
-                    <strong
-                      className="text-sm hover:underline cursor-pointer text-text-blue"
-                      onClick={() => {
-                        setDataToView(usersWithErrors);
-                      }}
-                    >
-                      View Users
-                    </strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="w-full px-3">
+            <ResponsiveTable
+              className="w-full my-6 md:my-10"
+              layout="table"
+              align="left"
+              dense
+              maxHeightClass=""
+              getRowKey={(r) => r.label}
+              rows={[
+                { label: 'New users created', users: newUsers },
+                { label: 'Users already existing', users: existingUsers },
+                { label: 'Users with error (not created)', users: usersWithErrors },
+              ]}
+              columns={[
+                { key: 'label', header: 'Result', cell: (r) => r.label },
+                {
+                  key: 'count',
+                  header: 'Users',
+                  align: 'center',
+                  cellClass: () => 'font-semibold',
+                  cell: (r) => r.users?.length || 0,
+                },
+              ]}
+              actionsHeader=""
+              actions={(r) => (
+                <button
+                  type="button"
+                  className="text-sm font-semibold hover:underline text-text-blue whitespace-nowrap px-1"
+                  onClick={() => setDataToView(r.users)}
+                >
+                  View Users
+                </button>
+              )}
+            />
           </div>
           <div className="flex flex-col items-center gap-2">
             <button

@@ -7,6 +7,7 @@ import PageDescription from '@/components/account/PageDescription';
 import Button from '@/components/account/Button';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewUserDetails = ({ pageDescription, userData }) => {
   const selectedSubMenu = {
@@ -34,14 +35,14 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
     [];
 
   return (
-    <div className="max-h-screen no-scrollbar">
+    <div className="max-h-full ">
       <div className="w-full h-full sticky top-0 z-50">
         <Header />
       </div>
       <div className="w-full">
         <SubHeader title={'View User Details'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <UsersManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -50,8 +51,8 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="p-5 mx-5 rounded-md h-full w-full flex flex-row gap-5">
-            <div className="flex flex-col gap-5 min-h-[60vh] min-w-[27%]">
+          <div className="p-2 md:p-5 md:mx-5 rounded-md h-full w-full flex flex-col lg:flex-row gap-5 pb-6">
+            <div className="flex flex-col gap-5 lg:min-h-[60vh] lg:min-w-[27%]">
               <div className="bg-white shadow-md rounded-lg p-2 relative">
                 <Image
                   src={userData?.profilePictureUrl || '/assets/anonymous.png'}
@@ -121,57 +122,50 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
 
             {/* Only super admin can view permissions here, because they belong to all teams. All other admin can view permission of their team members in the my team section */}
             {userData?.role === 'admin' && isSuperAdmin === true && (
-              <div className="w-full min-h-full text-text-gray mr-5 flex flex-col gap-0 rounded-lg">
+              <div className="w-full min-w-0 lg:min-h-full text-text-gray lg:mr-5 flex flex-col gap-0 rounded-lg">
                 <h3 className="w-fit bg-white p-2 rounded-t-lg border border-inherit font-semibold">
                   User permissions
                 </h3>
-                <div className="bg-white w-full min-h-[90%] max-h-[90%] overflow-y-auto no-scrollbar shadow-lg border rounded-b-lg rounded-tr-lg border-inherit p-2">
+                <div className="bg-white w-full lg:min-h-[90%] lg:max-h-[90%] overflow-y-auto shadow-lg border rounded-b-lg rounded-tr-lg border-inherit p-2">
                   <h3 className="mb-3">
                     View access permissions granted to this user
                   </h3>
                   {userData?.accessLevel?.length ? (
-                    <table className="w-full">
-                      <thead className="border-2 border-y-gray-shadow9 text-sm bg-gray-shadow9  text-text-black">
-                        <tr>
-                          <th className="py-1 text-left">Access Type</th>
-                          <th className="py-1 text-left">Access Granted</th>
-                          <th className="py-1 text-left">
-                            Allowed to Grant Others
-                          </th>
-                          <th className="py-1 text-left">Granted By</th>
-                          <th className="py-1 text-left">Last Updated</th>
-                          <th className="py-1 text-left">Updated By</th>
-                        </tr>
-                      </thead>
-                      <tbody className="border border-text-gray text-sm">
-                        {accessLevels?.length &&
-                          accessLevels?.map((access, index) => (
-                            <tr
-                              key={index}
-                              className="hover:bg-background-1 hover:cursor-pointer"
-                            >
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.accessName}
-                              </td>
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.accessGranted ? 'Yes' : 'No'}
-                              </td>
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.allowedGrantOthers ? 'Yes' : 'No'}
-                              </td>
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.grantedBy}
-                              </td>
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.lastModified.toLocaleString()}
-                              </td>
-                              <td className="border border-t-background-1 py-1 px-1">
-                                {access.modifiedBy}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                    <ResponsiveTable
+                      align="left"
+                      dense
+                      maxHeightClass=""
+                      rows={accessLevels || []}
+                      getRowKey={(_, i) => i}
+                      columns={[
+                        {
+                          key: 'name',
+                          header: 'Access Type',
+                          mobile: 'title',
+                          cell: (a) => a.accessName,
+                        },
+                        {
+                          key: 'granted',
+                          header: 'Access Granted',
+                          mobile: 'badge',
+                          cell: (a) => (a.accessGranted ? 'Yes' : 'No'),
+                          cellClass: (a) => (a.accessGranted ? 'text-success' : 'text-error'),
+                        },
+                        {
+                          key: 'grantOthers',
+                          header: 'Allowed to Grant Others',
+                          mobileLabel: 'Can grant others',
+                          cell: (a) => (a.allowedGrantOthers ? 'Yes' : 'No'),
+                        },
+                        { key: 'grantedBy', header: 'Granted By', cell: (a) => a.grantedBy },
+                        {
+                          key: 'updated',
+                          header: 'Last Updated',
+                          cell: (a) => a.lastModified.toLocaleString(),
+                        },
+                        { key: 'updatedBy', header: 'Updated By', cell: (a) => a.modifiedBy },
+                      ]}
+                    />
                   ) : (
                     <div className="flex flex-col gap-2 items-center justify-center py-20 text-error font-semibold">
                       <span className="text-center">
@@ -183,13 +177,13 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
               </div>
             )}
             {userData?.role !== 'admin' && (
-              <div className="shadow-lg w-full rounded-lg bg-text-white mr-5 p-5">
+              <div className="shadow-lg w-full rounded-lg bg-text-white lg:mr-5 p-3 md:p-5">
                 {userData?.branch?.length > 0 ? (
                   <div className="h-full flex flex-col justify-between">
                     <h3 className="mb-3 font-semibold text-text-gray">
                       Branches User is associated with
                     </h3>
-                    <ul className="flex flex-col gap-2 h-[90%] overflow-y-auto scrollbar-thin">
+                    <ul className="flex flex-col gap-2 lg:h-[90%] overflow-y-auto">
                       {userData?.branch?.map((branch, index) => (
                         <li
                           key={index}
@@ -253,9 +247,7 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
               buttonStyle={`bg-brand-gray px-5 text-brand-blue hover:bg-gray-shadow7`}
             />
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
     </div>

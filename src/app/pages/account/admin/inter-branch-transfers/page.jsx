@@ -5,7 +5,7 @@ import InterBranchTransferPage from '@/components/account/admin/inter-branch-tra
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <InterBranchTransferPage />
     </div>
   );

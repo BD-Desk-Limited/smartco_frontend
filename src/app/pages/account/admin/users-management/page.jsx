@@ -5,7 +5,7 @@ import UserManagementPage from '@/components/account/admin/users-management/User
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
         <UserManagementPage />
     </div>
   )

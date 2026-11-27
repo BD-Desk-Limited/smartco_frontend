@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import AdminSideBar from '../AdminSideBar';
 import ViewMaterialDetails from './components/ViewMaterialDetails';
 import { getMaterialDetailsAndStockById } from '@/services/materialServices';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
@@ -9,9 +8,6 @@ import Spinner from '../../Spinner';
 import { getUserBranchesService } from '@/services/branchServices';
 
 const ViewMaterialDetailsPage = () => {
-  const [selectedMenu, setSelectedMenu] = React.useState(
-    'materials-management'
-  );
 
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -102,13 +98,7 @@ const ViewMaterialDetailsPage = () => {
   ) : (
     <div>
       {id ? (
-        <div className="flex flex-row gap-0 bg-background-1">
-          <div>
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
+        <div className="flex flex-row gap-0 bg-background-1 h-full">
           <div className="w-full">
             <ViewMaterialDetails
               materialData={materialData}

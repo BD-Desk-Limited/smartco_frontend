@@ -23,6 +23,7 @@ import Image from 'next/image';
 import SetPrices from '../create-products/SetPrices';
 import SelectComponents from '../create-products/SelectComponents';
 import ProductSidePreview from '../create-products/ProductSidePreview';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const EditableProductDetails = ({ pageDescription }) => {
   const searchParams = useSearchParams();
@@ -423,8 +424,8 @@ const EditableProductDetails = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Edit Product'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute top-0 z-20">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:top-0 md:z-20">
           <ProductManagementSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
@@ -432,10 +433,10 @@ const EditableProductDetails = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="h-full flex flex-col gap-3 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-            <div className="p-1 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
+          <div className="h-full flex flex-col gap-3 pb-6">
+            <div className="p-1 h-full flex flex-col gap-2 relative">
               {/* Header Section (name + actions) */}
-              <div className="bg-text-white py-1 px-5 sticky top-0 z-10 w-full flex flex-row items-center justify-between mb-2">
+              <div className="bg-text-white py-1 px-2 md:px-5 md:sticky md:top-14 z-10 w-full flex flex-row flex-wrap gap-2 items-center justify-between mb-2">
                 <h3 className="flex flex-row items-center gap-4">
                   <span className="text-lg font-semibold flex flex-col mx-5">
                     <span className="ml-2">
@@ -460,7 +461,7 @@ const EditableProductDetails = ({ pageDescription }) => {
                   </div>
                 )}
 
-                <ul className="flex flex-row gap-3 list-none">
+                <ul className="flex flex-row flex-wrap gap-2 md:gap-3 list-none">
                   <li>
                     <button
                       onClick={handleOpenWarning}
@@ -478,9 +479,9 @@ const EditableProductDetails = ({ pageDescription }) => {
                 </ul>
               </div>
 
-              <div className="flex flex-row w-full px-5 gap-5">
+              <div className="flex flex-col lg:flex-row w-full px-2 md:px-5 gap-5">
                 {/* Left: Image, Category, Description */}
-                <div className="w-1/5 gap-5 flex flex-col">
+                <div className="w-full lg:w-1/5 gap-5 flex flex-col">
                   <div className="bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <span
@@ -581,8 +582,8 @@ const EditableProductDetails = ({ pageDescription }) => {
                 </div>
 
                 {/* Center: Components, Prices & Tax with edit overlays */}
-                <div className="w-3/5 bg-white rounded-lg shadow-lg p-3 text-sm">
-                  <div className="flex flex-row items-center justify-between mb-2">
+                <div className="w-full lg:w-3/5 bg-white rounded-lg shadow-lg p-3 text-sm">
+                  <div className="flex flex-row flex-wrap gap-2 items-center justify-between mb-2">
                     <h4 className="font-semibold text-brand-green">
                       {tabs.map((tab, idx) => (
                         <span
@@ -615,25 +616,28 @@ const EditableProductDetails = ({ pageDescription }) => {
                       <div className="mb-3">
                         <p className="font-semibold">Base prices by bands</p>
                         {product?.pricing?.length > 0 ? (
-                          <table className="w-full mb-2">
-                            <thead>
-                              <tr className="bg-background-2 border-y border-y-gray-border">
-                                <th className="p-1 text-left">Price Band</th>
-                                <th className="p-1 text-left">Base Price</th>
-                              </tr>
-                            </thead>
-                            <tbody className="border-b">
-                              {product.pricing.map((band, i) => (
-                                <tr key={i}>
-                                  <td className="p-1">{band.band}</td>
-                                  <td className="p-1">
+                          <ResponsiveTable
+                            className="mb-2"
+                            layout="table"
+                            align="left"
+                            dense
+                            maxHeightClass=""
+                            rows={product.pricing}
+                            getRowKey={(_, i) => i}
+                            columns={[
+                              { key: 'band', header: 'Price Band', cell: (band) => band.band },
+                              {
+                                key: 'price',
+                                header: 'Base Price',
+                                cell: (band) => (
+                                  <>
                                     {companyDetails?.currency?.symbol || '$'}
                                     {Number(band.price || 0).toFixed(2)}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                                  </>
+                                ),
+                              },
+                            ]}
+                          />
                         ) : (
                           <p className="text-text-gray">No price bands yet.</p>
                         )}
@@ -665,51 +669,47 @@ const EditableProductDetails = ({ pageDescription }) => {
                     <div>
                       <p className="font-semibold mb-2">Tax Bands Applied</p>
                       {product?.productTax?.length > 0 ? (
-                        <table className="w-full mb-2">
-                          <thead>
-                            <tr className="bg-background-2 border-y border-y-gray-border">
-                              <th className="p-1 text-left">Tax Band</th>
-                              <th className="p-1 text-left">Tax Percentage</th>
-                              <th className="p-1 text-left">
-                                Additional Tax Amount
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="border-b">
-                            {product.productTax.map((tax, i) =>
-                              tax.isTaxExcluded ? (
-                                <tr key={i}>
-                                  <td className="p-1">
-                                    {taxBands.find(
-                                      (tb) => tb._id === tax.taxBand
-                                    )?.name || 'Unknown Tax Band'}{' '}
-                                  </td>
-                                  <td
-                                    className="p-1 text-center italic"
-                                    colSpan={3}
-                                  >
-                                    Tax Excluded
-                                  </td>
-                                </tr>
-                              ) : (
-                                <tr key={i}>
-                                  <td className="p-1">
-                                    {taxBands.find(
-                                      (tb) => tb._id === tax.taxBand
-                                    )?.name || 'Unknown Tax Band'}
-                                  </td>
-                                  <td className="p-1">{tax.taxPercentage}%</td>
-                                  <td className="p-1">
+                        <ResponsiveTable
+                          className="mb-2"
+                          align="left"
+                          dense
+                          maxHeightClass=""
+                          rows={product.productTax}
+                          getRowKey={(_, i) => i}
+                          columns={[
+                            {
+                              key: 'band',
+                              header: 'Tax Band',
+                              mobile: 'title',
+                              cell: (tax) =>
+                                taxBands.find((tb) => tb._id === tax.taxBand)?.name ||
+                                'Unknown Tax Band',
+                            },
+                            {
+                              key: 'percentage',
+                              header: 'Tax Percentage',
+                              cell: (tax) =>
+                                tax.isTaxExcluded ? (
+                                  <span className="italic">Tax Excluded</span>
+                                ) : (
+                                  `${tax.taxPercentage}%`
+                                ),
+                            },
+                            {
+                              key: 'additional',
+                              header: 'Additional Tax Amount',
+                              cell: (tax) =>
+                                tax.isTaxExcluded ? (
+                                  '-'
+                                ) : (
+                                  <>
                                     {companyDetails?.currency?.symbol || '$'}
-                                    {Number(
-                                      tax.additionalTaxAmount || 0
-                                    ).toFixed(2)}
-                                  </td>
-                                </tr>
-                              )
-                            )}
-                          </tbody>
-                        </table>
+                                    {Number(tax.additionalTaxAmount || 0).toFixed(2)}
+                                  </>
+                                ),
+                            },
+                          ]}
+                        />
                       ) : (
                         <p className="text-text-gray">
                           No tax bands applied yet.
@@ -721,7 +721,7 @@ const EditableProductDetails = ({ pageDescription }) => {
                   {/* Overlays */}
                   {openComponentsOverlay && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-                      <div className="bg-brand-blue rounded-md shadow-lg w-[50vw] max-h-[85vh] overflow-y-auto p-2">
+                      <div className="bg-brand-blue rounded-md shadow-lg w-[calc(100%-1rem)] max-w-lg lg:w-[50vw] lg:max-w-none max-h-[85vh] overflow-y-auto p-2">
                         <div className="flex justify-end">
                           <button
                             onClick={() => setOpenComponentsOverlay(false)}
@@ -749,7 +749,7 @@ const EditableProductDetails = ({ pageDescription }) => {
 
                   {openPriceOverlay && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-                      <div className="bg-brand-blue rounded-md shadow-lg w-[40vw] max-h-[85vh] overflow-y-auto p-2">
+                      <div className="bg-brand-blue rounded-md shadow-lg w-[calc(100%-1rem)] max-w-lg lg:w-[40vw] lg:max-w-none max-h-[85vh] overflow-y-auto p-2">
                         <div className="flex justify-end">
                           <button
                             onClick={() => setOpenPriceOverlay(false)}
@@ -783,9 +783,7 @@ const EditableProductDetails = ({ pageDescription }) => {
                 />
               </div>
             </div>
-            <div>
-              <PageDescription pageDescription={pageDescription} />
-            </div>
+            <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { allAccess } from '@/utilities/accessLevels';
 import ErrorInterface from '@/components/account/errorInterface';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
   const [accessLevels, setAccessLevels] = React.useState([]);
@@ -221,10 +222,10 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-2 mr-10 relative h-full">
+    <div className="bg-white shadow-md rounded-lg p-2 lg:mr-10 relative h-full">
       <h2 className="text-text-gray">Edit user access permissions</h2>
-      <div className="flex flex-col gap-2 mt-2 overflow-y-auto scrollbar-thin max-h-[90%] relative">
-        <span className="text-sm text-warning sticky top-0">
+      <div className="flex flex-col gap-2 mt-2 relative">
+        <span className="text-sm text-warning">
           <strong>Note:</strong>{' '}
           <span>
             This user might have other access permissions you cannot see. You
@@ -241,51 +242,55 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
           </div>
         )}
         {userAccessLevelToDisplay?.length > 0 ? (
-          <div className="w-full mt-4 overflow-y-auto max-h-[30%] scrollbar-thin sticky top-0">
-            <ul className="flex flex-row bg-gray-shadow5 text-left text-text-gray border-b px-5">
-              <li className="w-1/3 text-left">Access Name</li>
-              <li className="w-1/3 text-center">Access Granted</li>
-              <li className="w-1/3 text-center">Allowed to Grant Others</li>
-            </ul>
-            {userAccessLevelToDisplay?.map((access, index) => (
-              <ul
-                key={index}
-                className="flex flex-row bg-background-gray text-left text-base py-1 text-text-gray border-b justify-between px-5"
-              >
-                <li className="w-1/3 text-left">
-                  {access.accessName.split('_')[0] +
-                    ' ' +
-                    access.accessName.split('_')[1]}
-                </li>
-                <li className="w-1/3 text-center">
-                  <span></span>
+          <ResponsiveTable
+            className="w-full mt-4"
+            dense
+            maxHeightClass="md:max-h-[40vh]"
+            rows={userAccessLevelToDisplay}
+            getRowKey={(a) => a.accessName}
+            columns={[
+              {
+                key: 'name',
+                header: 'Access Name',
+                align: 'left',
+                mobile: 'title',
+                cell: (a) => a.accessName.split('_')[0] + ' ' + a.accessName.split('_')[1],
+              },
+              {
+                key: 'granted',
+                header: 'Access Granted',
+                cell: (a) => (
                   <input
                     type="checkbox"
+                    aria-label={`Access granted: ${a.accessName}`}
                     checked={
-                      accessLevels?.find(
-                        (a) => a.accessName === access.accessName
-                      )?.accessGranted || false
+                      accessLevels?.find((x) => x.accessName === a.accessName)
+                        ?.accessGranted || false
                     }
-                    onChange={() => handleAccessChange(access.accessName)}
-                    className="form-checkbox h-4 w-4"
+                    onChange={() => handleAccessChange(a.accessName)}
+                    className="form-checkbox h-5 w-5 md:h-4 md:w-4"
                   />
-                </li>
-                <li className="w-1/3 text-center">
-                  <span></span>
+                ),
+              },
+              {
+                key: 'grantOthers',
+                header: 'Allowed to Grant Others',
+                mobileLabel: 'Can grant others',
+                cell: (a) => (
                   <input
                     type="checkbox"
+                    aria-label={`Allowed to grant others: ${a.accessName}`}
                     checked={
-                      accessLevels?.find(
-                        (a) => a.accessName === access.accessName
-                      )?.allowedGrantOthers || false
+                      accessLevels?.find((x) => x.accessName === a.accessName)
+                        ?.allowedGrantOthers || false
                     }
-                    onChange={() => handleGrantOthersChange(access.accessName)}
-                    className="form-checkbox h-4 w-4"
+                    onChange={() => handleGrantOthersChange(a.accessName)}
+                    className="form-checkbox h-5 w-5 md:h-4 md:w-4"
                   />
-                </li>
-              </ul>
-            ))}
-          </div>
+                ),
+              },
+            ]}
+          />
         ) : (
           <div className="mt-4 text-text-gray text-center p-10 w-full">
             No access levels available for this user.
@@ -294,7 +299,7 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
 
         {/* Display the access levels the authenticated user can grant to others */}
         {otherAccessAuthUserCanGrant()?.length > 0 ? (
-          <div className="mt-4 max-h-[50%] overflow-y-auto scrollbar-thin relative">
+          <div className="mt-4 relative">
             <h3 className="text-text-gray sticky top-0">
               Other access levels you can grant this user:
             </h3>
@@ -311,51 +316,54 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
               </div>
             ) : (
               <>
-                <ul className="flex flex-row bg-gray-shadow5 text-left text-text-gray border-b px-5 sticky top-0">
-                  <li className="w-1/3 text-left">Access Name</li>
-                  <li className="w-1/3 text-center">Grant user</li>
-                  <li className="w-1/3 text-center">
-                    Allow user to Grant Others
-                  </li>
-                </ul>
-                {otherAccessAuthUserCanGrant()?.map((access, index) => (
-                  <ul
-                    key={index}
-                    className="flex flex-row bg-background-gray text-left text-base py-1 text-text-gray border-b justify-between px-5"
-                  >
-                    <li className="w-1/3 text-left">
-                      {access.accessName.split('_')[0] +
-                        ' ' +
-                        access.accessName.split('_')[1]}
-                    </li>
-                    <li className="w-1/3 text-center">
-                      <span></span>
-                      <input
-                        type="checkbox"
-                        checked={accessLevels
-                          ?.map((a) => a.accessName)
-                          .includes(access.accessName)}
-                        onChange={() => handleAccessChange(access.accessName)}
-                        className="form-checkbox h-4 w-4"
-                      />
-                    </li>
-                    <li className="w-1/3 text-center">
-                      <span></span>
-                      <input
-                        type="checkbox"
-                        checked={
-                          accessLevels?.find(
-                            (a) => a.accessName === access.accessName
-                          )?.allowedGrantOthers || false
-                        }
-                        onChange={() =>
-                          handleGrantOthersChange(access.accessName)
-                        }
-                        className="form-checkbox h-4 w-4"
-                      />
-                    </li>
-                  </ul>
-                ))}
+                <ResponsiveTable
+                  className="w-full"
+                  dense
+                  maxHeightClass="md:max-h-[40vh]"
+                  rows={otherAccessAuthUserCanGrant()}
+                  getRowKey={(a) => a.accessName}
+                  columns={[
+                    {
+                      key: 'name',
+                      header: 'Access Name',
+                      align: 'left',
+                      mobile: 'title',
+                      cell: (a) => a.accessName.split('_')[0] + ' ' + a.accessName.split('_')[1],
+                    },
+                    {
+                      key: 'grant',
+                      header: 'Grant user',
+                      cell: (a) => (
+                        <input
+                          type="checkbox"
+                          aria-label={`Grant user: ${a.accessName}`}
+                          checked={accessLevels
+                            ?.map((x) => x.accessName)
+                            .includes(a.accessName)}
+                          onChange={() => handleAccessChange(a.accessName)}
+                          className="form-checkbox h-5 w-5 md:h-4 md:w-4"
+                        />
+                      ),
+                    },
+                    {
+                      key: 'grantOthers',
+                      header: 'Allow user to Grant Others',
+                      mobileLabel: 'Can grant others',
+                      cell: (a) => (
+                        <input
+                          type="checkbox"
+                          aria-label={`Allow user to grant others: ${a.accessName}`}
+                          checked={
+                            accessLevels?.find((x) => x.accessName === a.accessName)
+                              ?.allowedGrantOthers || false
+                          }
+                          onChange={() => handleGrantOthersChange(a.accessName)}
+                          className="form-checkbox h-5 w-5 md:h-4 md:w-4"
+                        />
+                      ),
+                    },
+                  ]}
+                />
               </>
             )}
           </div>

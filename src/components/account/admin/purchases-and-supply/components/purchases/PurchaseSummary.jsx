@@ -1,7 +1,8 @@
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import React from 'react';
 
-const PurchaseSummary = ({ data }) => {
+// asRow: a <tr> for the table footer (default); false gives a plain block (phone list).
+const PurchaseSummary = ({ data, asRow = true }) => {
   const purchaseItems = data?.items;
 
   const calculateTotalCost = () => {
@@ -22,6 +23,15 @@ const PurchaseSummary = ({ data }) => {
 
     return commaNumberFormat(total, 2) || 0.0;
   };
+
+  if (!asRow) {
+    return (
+      <div className="w-full flex flex-row justify-between items-center gap-3 font-semibold text-text-black">
+        <span>{purchaseItems?.length} Items</span>
+        <span>Total cost: {calculateTotalCost()}</span>
+      </div>
+    );
+  }
 
   return (
     <tr className="w-full h-full flex flex-row justify-center items-center gap-5 font-semibold">

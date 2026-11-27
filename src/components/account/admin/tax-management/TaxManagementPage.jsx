@@ -1,5 +1,4 @@
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import TaxManagement from './components/TaxManagement';
 
@@ -15,11 +14,8 @@ const TaxManagementPage = () => {
   }
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1">
-      <div>
-        <AdminSideBar selectedMenu="tax-management" />
-      </div>
-      <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+    <div className="flex flex-row gap-0 bg-background-1 h-full">
+      <div className="w-full h-full overflow-y-auto ">
         <TaxManagement pageDescription={pageDescription} />
       </div>
     </div>

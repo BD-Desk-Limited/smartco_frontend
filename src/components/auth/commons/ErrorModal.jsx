@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const ErrorModal = ({ message, title, buttonStyle, onClose }) => {
   return (
-    <div className="bg-white min-w-[25%] min-h-[40%] rounded-md shadow-md flex flex-col items-center justify-center p-5 gap-5">
+    <div className="bg-white w-[calc(100%-2rem)] max-w-md sm:w-auto sm:min-w-[25%] min-h-[40%] rounded-md shadow-md flex flex-col items-center justify-center p-5 gap-5">
       <h1 className="font-semibold">{title}</h1>
       <Image src="/assets/warning.png" alt="error" width={50} height={50} />
       <p className="text-sm">{message}</p>

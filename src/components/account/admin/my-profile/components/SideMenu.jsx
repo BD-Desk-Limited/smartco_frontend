@@ -75,7 +75,7 @@ const SideMenu = ({
                   exit="exit"
                   className="absolute left-full top-0 pl-2 z-50"
                 >
-                  <div className="min-w-[200px] bg-text-white rounded-lg shadow-lg border border-gray-border">
+                  <div className="md:min-w-[200px] bg-text-white rounded-lg shadow-lg border border-gray-border">
                     <SideMenu
                       items={item.subMenus}
                       depth={depth + 1}

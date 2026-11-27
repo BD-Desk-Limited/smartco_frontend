@@ -14,11 +14,11 @@ const BulkBranchUploadModal = () => {
 
   return (
     <>
-      <div className="bg-text-white rounded-md flex flex-col justify-center items-center w-[35vw]">
-        <h1 className="bg-brand-blue w-full text-center text-text-white rounded-t-md h-[8vh] flex justify-center items-center">
+      <div className="bg-text-white rounded-md flex flex-col justify-center items-center w-[calc(100%-1rem)] max-w-lg lg:w-[35vw] lg:max-w-none">
+        <h1 className="bg-brand-blue w-full text-center text-text-white rounded-t-md min-h-12 py-3 px-3 flex justify-center items-center">
           Bulk Branches Upload
         </h1>
-        <div className="h-[45vh] flex flex-col justify-center items-center gap-8 w-full px-10">
+        <div className="min-h-[45vh] py-6 flex flex-col justify-center items-center gap-6 md:gap-8 w-full px-4 md:px-10">
           <p className="w-full text-center">
             For fast and seamless creation of branches in bulk, we have provided
             a template for you to fill and upload
@@ -42,7 +42,7 @@ const BulkBranchUploadModal = () => {
             View Detailed Upload Instructions
           </button>
 
-          <div className="w-full flex flex-row justify-center gap-5 text-sm">
+          <div className="w-full flex flex-row flex-wrap justify-center gap-3 md:gap-5 text-sm">
             <a
               onClick={() => Router.push('/pages/account/admin/branch-management/create-branch/bulk')}
               href="/documents/smartco_branch_upload_sheet.xlsx"
@@ -65,7 +65,7 @@ const BulkBranchUploadModal = () => {
             </button>
           </div>
         </div>
-        <div className="bg-brand-blue w-full text-center text-text-white rounded-b-md h-[8vh] flex justify-center items-center">
+        <div className="bg-brand-blue w-full text-center text-text-white rounded-b-md min-h-12 py-3 px-3 flex justify-center items-center">
           <p className="text-xs">Need help? Click &quot;View Detailed Upload Instructions&quot; above</p>
         </div>
       </div>

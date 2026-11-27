@@ -143,7 +143,7 @@ const MultiFactorAuthentication = () => {
   return (
     <div className="flex flex-col gap-6 text-text-gray w-full">
       {/* Master switch */}
-      <section className="flex flex-row items-start justify-between gap-4 border-b border-gray-border pb-5 sticky top-[-5] bg-text-white">
+      <section className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-gray-border pb-5 sticky top-[-5] bg-text-white">
         <div className="flex flex-row gap-3">
           <FaShieldAlt
             className={`text-2xl mt-1 ${settings.enabled ? 'text-brand-green' : 'text-text-gray'}`}

@@ -9,6 +9,7 @@ import Button from '@/components/account/Button';
 import { createBranchService } from '@/services/branchServices';
 import SuccessModal from '@/components/account/SuccessModal';
 import ErrorInterface from '@/components/account/errorInterface';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkBranchesUploadReview = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
@@ -100,7 +101,7 @@ const BulkBranchesUploadReview = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Bulk Upload Review'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <BranchSidebar
             selectedSubMenu={selectedSubMenu}
@@ -108,7 +109,7 @@ const BulkBranchesUploadReview = ({ pageDescription }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col w-full h-full mx-5">
+        <div className="flex flex-col w-full h-full px-2 md:px-5 pb-6">
           <div>
             {errorData && errorData.length > 0 && hasError && (
               <div className="flex justify-center items-center flex-col p-4 gap-4 w-full bg-text-white rounded-lg my-5">
@@ -121,49 +122,55 @@ const BulkBranchesUploadReview = ({ pageDescription }) => {
                     Please fix the errors and retry the upload
                   </p>
                 </div>
-                <table className="w-full flex flex-col gap-1">
-                  <thead className="w-full">
-                    <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                      <th>S/No</th>
-                      <th>Error Description</th>
-                      <th>Row to check</th>
-                    </tr>
-                  </thead>
-                  <tbody className="w-full max-h-[50vh] overflow-y-auto scrollbar-thin">
-                    {filteredErrorData.map((datasets, Index) => (
-                      <tr
-                        key={Index}
-                        className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm"
-                      >
-                        <td className="font-semibold w-5">{Index + 1}</td>
-                        <td className="">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.error}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                        <td className="max-w-60 overflow-x-auto">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.row}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ResponsiveTable
+                  className="w-full"
+                  align="left"
+                  dense
+                  maxHeightClass="md:max-h-[50vh]"
+                  rows={filteredErrorData}
+                  getRowKey={(_, i) => i}
+                  columns={[
+                    {
+                      key: 'sn',
+                      header: 'S/No',
+                      cell: (_, i) => i + 1,
+                      mobile: 'badge',
+                      cellClass: () => 'font-semibold',
+                    },
+                    {
+                      key: 'error',
+                      header: 'Error Description',
+                      mobile: 'title',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5 font-normal"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.error}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                    {
+                      key: 'row',
+                      header: 'Row to check',
+                      mobile: 'wide',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.row}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                  ]}
+                />
               </div>
             )}
           </div>
@@ -186,74 +193,59 @@ const BulkBranchesUploadReview = ({ pageDescription }) => {
                   <div className="font-semibold w-full">
                     Your Uploaded Branches
                   </div>
-                  <table
-                    className={`w-full flex flex-col gap-1 ${hasError ? 'max-h-[30vh]' : 'max-h-[60vh]'} overflow-y-auto scrollbar-thin`}
-                  >
-                    <thead className="w-full">
-                      <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                        <th className="font-semibold w-7">S/No</th>
-                        <th className="mx-1 w-[10%] text-left">Branch Name</th>
-                        <th className="mx-1 w-[10%] text-left">Branch I D</th>
-                        <th className="mx-1 w-[15%] text-left">Email</th>
-                        <th className="mx-1 w-[10%] text-left">Phone Number</th>
-                        <th className="mx-1 w-[10%] text-left">Band</th>
-                        <th className="mx-1 w-[10%] text-left">Tax Band</th>
-                        <th className="mx-1 w-[5%] text-left">Tax Rate(%)</th>
-                        <th className="mx-1 w-[15%] text-left">Address</th>
-                        <th className="mx-1 w-[5%] text-left">
-                          Opening Hour -
-                        </th>
-                        <th className="mx-1 w-[5%] text-left">Closing Hour</th>
-                      </tr>
-                    </thead>
-                    <tbody className="w-full max-h-50 overflow-y-auto scrollbar-thin">
-                      {bulkbranchData.map((branch, index) => (
-                        <tr
-                          key={index}
-                          className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm overflow-x-hidden"
-                        >
-                          <td className="font-semibold w-7">{index + 1}</td>
-                          <td className="mx-1 w-[10%] text-left">
-                            {branch.name}
-                          </td>
-                          <td className="mx-1 w-[10%] text-left">
-                            {branch.branchId}
-                          </td>
-                          <td className="mx-1 w-[15%] text-left">
-                            {branch.email}
-                          </td>
-                          <td className="mx-1 w-[10%] text-left">
-                            {branch.phoneNumber}
-                          </td>
-                          <td className="mx-1 w-[10%] text-left">
-                            {branch.band}
-                          </td>
-                          <td className="mx-1 w-[10%] text-left">
-                            {branch.taxBand}
-                          </td>
-                          <td className="mx-1 w-[5%] text-left">
-                            {branch.taxRate}
-                          </td>
-                          <td className="mx-1 w-[15%] text-left">
-                            {branch.address}
-                          </td>
-                          <td
-                            className={`${formatBusinessHours(branch?.openingHour).display === 'Invalid Time' ? 'text-red-500' : ''} mx-1 w-[5%] text-left`}
-                          >
-                            {`${formatBusinessHours(branch?.openingHour).display}`}
-                          </td>
-                          <td
-                            className={`${formatBusinessHours(branch?.closingHour).display === 'Invalid Time' ? 'text-red-500' : ''} mx-1 w-[5%] text-left`}
-                          >
-                            {`${formatBusinessHours(branch?.closingHour).display}`}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <ResponsiveTable
+                    className="w-full"
+                    align="left"
+                    dense
+                    maxHeightClass={
+                      hasError ? 'md:max-h-[30vh]' : 'md:max-h-[60vh]'
+                    }
+                    rows={bulkbranchData}
+                    getRowKey={(_, i) => i}
+                    columns={[
+                      {
+                        key: 'sn',
+                        header: 'S/No',
+                        cell: (_, i) => i + 1,
+                        mobile: 'badge',
+                        cellClass: () => 'font-semibold',
+                      },
+                      {
+                        key: 'name',
+                        header: 'Branch Name',
+                        cell: (b) => b.name,
+                        mobile: 'title',
+                      },
+                      { key: 'branchId', header: 'Branch ID', cell: (b) => b.branchId },
+                      { key: 'email', header: 'Email', cell: (b) => b.email, mobile: 'subtitle' },
+                      { key: 'phone', header: 'Phone Number', cell: (b) => b.phoneNumber },
+                      { key: 'band', header: 'Band', cell: (b) => b.band },
+                      { key: 'taxBand', header: 'Tax Band', cell: (b) => b.taxBand },
+                      { key: 'taxRate', header: 'Tax Rate(%)', cell: (b) => b.taxRate },
+                      { key: 'address', header: 'Address', cell: (b) => b.address, mobile: 'wide' },
+                      {
+                        key: 'open',
+                        header: 'Opening Hour',
+                        cell: (b) => formatBusinessHours(b?.openingHour).display,
+                        cellClass: (b) =>
+                          formatBusinessHours(b?.openingHour).display === 'Invalid Time'
+                            ? 'text-red-500'
+                            : '',
+                      },
+                      {
+                        key: 'close',
+                        header: 'Closing Hour',
+                        cell: (b) => formatBusinessHours(b?.closingHour).display,
+                        cellClass: (b) =>
+                          formatBusinessHours(b?.closingHour).display === 'Invalid Time'
+                            ? 'text-red-500'
+                            : '',
+                      },
+                    ]}
+                  />
 
                   {error && <ErrorInterface error={error} />}
-                  <div className="flex flex-row gap-4 justify-center">
+                  <div className="flex flex-row flex-wrap gap-4 justify-center">
                     <Button
                       text={'Retry Upload'}
                       onClick={() =>

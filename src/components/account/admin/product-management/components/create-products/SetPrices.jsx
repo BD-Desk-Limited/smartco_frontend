@@ -347,11 +347,11 @@ const SetPrices = ({
 
           <div className="flex flex-col gap-2 p-2 max-h-[30vh] overflow-y-auto scrollbar-thin w-full">
             <li className="list-none w-full flex flex-row gap-1">
-              <span className="w-1/3 text-white">Band</span>
-              <span className="w-1/3 font-serif font-semibold text-white">
+              <span className="w-full md:w-1/3 text-white">Band</span>
+              <span className="w-full md:w-1/3 font-serif font-semibold text-white">
                 Price
               </span>
-              <span className="w-1/3 text-white">Effective Date</span>
+              <span className="w-full md:w-1/3 text-white">Effective Date</span>
             </li>
             {bands.length > 0 &&
               bands.map(
@@ -361,7 +361,7 @@ const SetPrices = ({
                       key={index}
                       className="list-none w-full flex flex-row gap-1"
                     >
-                      <span className="bg-blue-shadow4 p-2 rounded-md w-1/3 text-white">
+                      <span className="bg-blue-shadow4 p-2 rounded-md w-full md:w-1/3 text-white">
                         {band}
                       </span>
                       <span className="flex font-serif font-semibold items-center text-white">
@@ -379,7 +379,7 @@ const SetPrices = ({
                         onChange={(e) =>
                           handleOnEnterPriceOrTax(e, band, 'price')
                         }
-                        className="w-1/3 rounded-md px-1 text-text-black"
+                        className="w-full md:w-1/3 rounded-md px-1 text-text-black"
                       />
                       <input
                         type="date"
@@ -397,7 +397,7 @@ const SetPrices = ({
                         onChange={(e) =>
                           handleOnEnterPriceOrTax(e, band, 'priceEffectiveDate')
                         }
-                        className="flex-1 w-1/3 rounded-md p-1 text-text-black"
+                        className="flex-1 w-full md:w-1/3 rounded-md p-1 text-text-black"
                       />
                     </li>
                   )

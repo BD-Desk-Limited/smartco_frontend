@@ -178,14 +178,14 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
   };
 
   return (
-    <div className="max-h-screen overflow-y-auto no-scrollbar w-full">
+    <div className="h-full overflow-y-auto w-full">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
       <div className="w-full">
         <SubHeader title={'Edit branch information'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <BranchSidebar
             selectedSubMenu={selectedSubMenu}
@@ -193,15 +193,15 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col h-full text-text-gray relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+        <div className="flex flex-col w-full h-full text-text-gray relative pb-6">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
             <h1 className="text-sm">
               Click on any field to update branch information
             </h1>
-            <form className="flex flex-row justify-between gap-5">
+            <form className="flex flex-col lg:flex-row justify-between gap-5">
               {/* Row 1 */}
               <div className="flex flex-col gap-5 w-full">
-                <div className="flex flex-row gap-5">
+                <div className="flex flex-col sm:flex-row gap-5">
                   <div className="flex flex-col gap-2">
                     <label htmlFor="branch-name" className="text-sm">
                       Branch I D
@@ -370,7 +370,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
                 {/* Opening and Closing hours */}
                 <div className="flex flex-col gap-3 bg-white shadow-md p-2 rounded-lg">
                   <h1 className="text-sm">Opening and Closing Hours</h1>
-                  <div className="flex flex-row gap-5">
+                  <div className="flex flex-row flex-wrap gap-5">
                     {/* Opening Time */}
                     <div className="flex flex-col gap-1">
                       <label className="text-sm text-success">
@@ -415,7 +415,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
 
                 {/*Buttons*/}
                 {updatedBranchData !== branchData && (
-                  <div className="flex flex-row justify-center gap-10 w-full my-2">
+                  <div className="flex flex-row flex-wrap justify-center gap-4 md:gap-10 w-full my-2">
                     <Button
                       text={'Save Changes'}
                       onClick={() => setOpenSubmitModal(true)}
@@ -434,9 +434,7 @@ const EditBranch = ({ branchData, setBranchData, pageDescription }) => {
               </div>
             </form>
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

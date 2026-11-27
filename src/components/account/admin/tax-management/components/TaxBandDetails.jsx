@@ -10,6 +10,7 @@ import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import WarningWithFeedbackModal from '@/components/account/WarningWithFeedbackModal';
 import { deleteTaxRateEntryService } from '@/services/taxBandServices';
 import DissociateBranchModal from './DissociateBranchModal';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const TaxBandDetails = ({
   band,
@@ -92,7 +93,7 @@ const TaxBandDetails = ({
   };
 
   return (
-    <div className="bg-text-white w-[90vw] h-[90%] p-5 rounded-lg relative">
+    <div className="bg-text-white w-full h-full md:w-[90vw] md:h-[90%] p-3 md:p-5 md:rounded-lg relative overflow-y-auto">
       {/* close button */}
       <button
         onClick={onClose}
@@ -100,7 +101,7 @@ const TaxBandDetails = ({
       >
         <FaTimes />
       </button>
-      <div className="flex flex-row gap-5 justify-center w-fit  mb-4">
+      <div className="flex flex-row flex-wrap gap-3 md:gap-5 justify-center w-fit pr-10 mb-4">
         <h2 className="text-lg text-brand-blue font-bold">{band.name}</h2>
         {/* action buttons */}
         <p
@@ -131,64 +132,68 @@ const TaxBandDetails = ({
       <p className="text-text-gray text-sm">{band.description}</p>
       <hr className="my-2" />
 
-      <div className="flex flex-row gap-5 max-h-[80%] overflow-y-auto scrollbar-thin w-full">
+      <div className="flex flex-col lg:flex-row gap-5 lg:max-h-[80%] lg:overflow-y-auto w-full">
         {/* tax rates history */}
-        <div className="p-2 w-[50%] h-full overflow-y-auto">
+        <div className="p-2 w-full lg:w-[50%] lg:h-full lg:overflow-y-auto">
           <h3 className="font-semibold mb-2">Tax Rates history</h3>
-          <div className="w-full border-collapse">
-            <ul className="w-full flex flex-row gap-0 bg-gray-shadow2 text-text-white text-sm font-semibold">
-              <li className="w-1/4 px-2 py-1 text-left border border-gray-border">
-                Rate
-              </li>
-              <li className="w-1/4 px-2 py-1 text-left border border-gray-border">
-                Effective Date
-              </li>
-              <li className="w-1/4 px-2 py-1 text-left border border-gray-border">
-                Set By
-              </li>
-              <li className="w-1/4 px-2 py-1 text-left border border-gray-border"></li>
-            </ul>
-
-            {band?.historicalRates
-              ?.sort(
-                (a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate)
-              )
-              ?.map((rate, index) => (
-                <ul
-                  key={index}
-                  className={`w-full flex flex-row gap-0 text-sm ${index % 2 !== 0 ? 'bg-gray-shadow9' : 'bg-white'} relative`}
-                >
-                  <li className="w-1/4 px-2 py-1 border border-gray-border">
+          <ResponsiveTable
+            align="left"
+            dense
+            maxHeightClass=""
+            rows={
+              band?.historicalRates
+                ? [...band.historicalRates].sort(
+                    (a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate)
+                  )
+                : []
+            }
+            getRowKey={(r, i) => r?._id ?? i}
+            emptyMessage="No tax rates yet."
+            columns={[
+              {
+                key: 'rate',
+                header: 'Rate',
+                mobile: 'title',
+                cell: (rate) => (
+                  <span className="flex items-center gap-2">
                     {`${rate.rate?.toFixed(2)}%` || 'rate not set'}
-                  </li>
-                  <li className="w-1/4 px-2 py-1 border border-gray-border">
-                    {ISOStringToLocalTime(rate.effectiveDate) || 'date not set'}
-                  </li>
-                  <li className="w-1/4 px-2 py-1 border border-gray-border flex justify-between items-center">
-                    <span>{rate.updatedBy?.fullName || 'unknown user'}</span>
-                  </li>
-                  <li className="w-1/4 px-2 py-1 border border-gray-border flex justify-center gap-5 items-center">
-                    <span
-                      onClick={() => onDeleteTaxRateEntryClick(rate._id)}
-                      title="delete tax rate entry"
-                    >
-                      <FaTrash className="text-red-500 hover:border shadow-md text-base cursor-pointer" />
-                    </span>
-                  </li>
-                  <span className="absolute right-1">
-                    {rate?._id === band?.effectiveRate?._id ? (
-                      <FaStar className="text-yellow-500 border shadow-md text-base" />
-                    ) : (
-                      ' '
+                    {rate?._id === band?.effectiveRate?._id && (
+                      <FaStar
+                        className="text-yellow-500 text-base"
+                        title="Current rate"
+                        aria-label="Current rate"
+                      />
                     )}
                   </span>
-                </ul>
-              ))}
-          </div>
+                ),
+              },
+              {
+                key: 'date',
+                header: 'Effective Date',
+                cell: (rate) => ISOStringToLocalTime(rate.effectiveDate) || 'date not set',
+              },
+              {
+                key: 'setBy',
+                header: 'Set By',
+                cell: (rate) => rate.updatedBy?.fullName || 'unknown user',
+              },
+            ]}
+            actionsHeader=""
+            actions={(rate) => (
+              <button
+                type="button"
+                onClick={() => onDeleteTaxRateEntryClick(rate._id)}
+                title="delete tax rate entry"
+                aria-label="Delete tax rate entry"
+              >
+                <FaTrash className="text-red-500 text-base" />
+              </button>
+            )}
+          />
         </div>
 
         {/* taxband associated branches */}
-        <div className="p-2 h-full overflow-y-auto w-[50%]">
+        <div className="p-2 lg:h-full lg:overflow-y-auto w-full lg:w-[50%]">
           <h3 className="font-semibold mb-2">
             Associated Branches{' '}
             {band?.associatedBranches?.length > 0 &&
@@ -207,6 +212,7 @@ const TaxBandDetails = ({
                   <span
                     onClick={() => onDissociateBranchFromTaxBandClick(branch)}
                     title="Remove branch from this tax band"
+                    className="ml-auto p-1"
                   >
                     <FaExchangeAlt className="text-red-500 hover:border shadow-md text-sm cursor-pointer" />
                   </span>

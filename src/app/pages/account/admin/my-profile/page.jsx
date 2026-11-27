@@ -7,7 +7,7 @@ import Spinner from '@/components/account/Spinner';
 // Suspense is required because the profile reads ?tab= (useSearchParams).
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <Suspense fallback={<Spinner />}>
         <MyProfilePage />
       </Suspense>

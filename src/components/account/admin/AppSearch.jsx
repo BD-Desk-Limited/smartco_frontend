@@ -22,6 +22,11 @@ const AppSearch = () => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [profileTabs, setProfileTabs] = useState([]);
+  // no keyboard shortcut hint on touch screens
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    setIsTouch(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
 
   // Profile tabs are loaded the first time the box is used, so the header
   // doesn't carry the profile screens' code on every page.
@@ -79,14 +84,15 @@ const AppSearch = () => {
   const showList = open && query.trim().length > 0;
 
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       <div className="rounded-3xl border-2 border-brand-green flex items-center px-3 gap-2">
-        <FaSearch className="text-brand-green" />
+        <FaSearch className="text-brand-green shrink-0" />
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          enterKeyHint="go"
           value={query}
-          placeholder="Search app (Ctrl+K)"
+          placeholder={isTouch ? 'Search app' : 'Search app (Ctrl+K)'}
           aria-label="Search app"
           role="combobox"
           aria-expanded={showList}
@@ -105,7 +111,8 @@ const AppSearch = () => {
           }}
           onBlur={() => setOpen(false)}
           onKeyDown={handleKeyDown}
-          className="focus:outline-none text-text-black text-sm py-1 w-44 sm:w-56 bg-transparent"
+          // text-base on phones stops iOS zooming into the field on focus
+          className="focus:outline-none text-text-black text-base sm:text-sm py-1 w-24 min-[400px]:w-36 sm:w-56 bg-transparent"
         />
       </div>
 
@@ -113,7 +120,8 @@ const AppSearch = () => {
         <ul
           id="app-search-results"
           role="listbox"
-          className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white rounded-lg shadow-lg border border-gray-border z-[60] py-1"
+          // phones: full width under the header; sm and up: dropdown under the box
+          className="fixed left-2 right-2 top-14 sm:absolute sm:left-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-80 max-h-[60dvh] sm:max-h-96 overflow-y-auto bg-white rounded-lg shadow-lg border border-gray-border z-[60] py-1"
         >
           {results.map((entry, index) => (
             <li

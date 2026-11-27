@@ -220,7 +220,7 @@ const CreateMaterial = ({ pageDescription }) => {
       <div>
         <SubHeader title={'Material Onboarding'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -229,13 +229,13 @@ const CreateMaterial = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col w-full h-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full">
             <h1 className="font-bold">Material Onboarding</h1>
             <span className="text-sm text-text-gray font-thin">
               Let&apos;s add a material to your store...
             </span>
             <form className="flex flex-col gap-5 my-5">
-              <div className="flex flex-row gap-10 w-full">
+              <div className="flex flex-col md:flex-row gap-5 md:gap-10 w-full">
                 <div className=" flex flex-col gap-5 w-full">
                   <div className="flex gap-1 flex-col w-full">
                     <label className="text-sm font-thin">Material Name</label>
@@ -463,9 +463,7 @@ const CreateMaterial = ({ pageDescription }) => {
               </button>
             </div>
           </div>
-          <div className="sticky bottom-0 w-full">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
       {openModal && (

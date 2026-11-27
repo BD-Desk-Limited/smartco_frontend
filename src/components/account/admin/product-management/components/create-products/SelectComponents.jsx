@@ -222,9 +222,9 @@ const SelectComponents = ({
       {!showSelectComponents[productIndex] ||
       !currentProduct?.components ||
       currentProduct.components.length === 0 ? (
-        <div className="flex w-full gap-4">
+        <div className="flex flex-col sm:flex-row w-full gap-4">
           {/* Raw Materials */}
-          <div className="w-1/2 flex flex-col">
+          <div className="w-full md:w-1/2 flex flex-col">
             <span className="text-sm text-text-white">Select Materials</span>
             <div className="flex items-center bg-gray-shadow9 border border-gray-border rounded px-2">
               <Image
@@ -257,7 +257,7 @@ const SelectComponents = ({
           </div>
 
           {/* Packaging */}
-          <div className="w-1/2 flex flex-col">
+          <div className="w-full md:w-1/2 flex flex-col">
             <span className="text-sm text-text-white">Select Packaging</span>
             <div className="flex items-center bg-gray-shadow9 border border-gray-border rounded px-2">
               <Image

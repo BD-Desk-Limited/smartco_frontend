@@ -4,7 +4,7 @@ import CreateNewTaxBandPage from '@/components/account/admin/tax-management/Crea
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <CreateNewTaxBandPage />
     </div>
   );

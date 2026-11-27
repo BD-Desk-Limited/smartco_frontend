@@ -181,7 +181,7 @@ const EditGroupedMaterial = ({ materialData, pageDescription }) => {
       <div>
         <SubHeader title={'Edit Grouped Material'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -190,12 +190,12 @@ const EditGroupedMaterial = ({ materialData, pageDescription }) => {
           />
         </div>
         <div className="flex flex-col w-full h-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md max-h-[85vh] overflow-y-auto no-scrollbar text-text-gray">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md text-text-gray">
             <h1 className="font-bold text-lg">{materialData?.name}</h1>
             <span className="text-sm">
               Edit this material in your stores, Click on any field to update
             </span>
-            <div className="flex flex-row gap-5 mt-5">
+            <div className="flex flex-col lg:flex-row gap-5 mt-5">
               <EditGroupedMaterialForm
                 materialData={materialData}
                 updatedMaterialData={updatedMaterialData}

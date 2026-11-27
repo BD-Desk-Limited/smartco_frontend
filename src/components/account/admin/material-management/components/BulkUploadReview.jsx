@@ -9,6 +9,7 @@ import Button from '@/components/account/Button';
 import { createMaterial } from '@/services/materialServices';
 import SuccessModal from '@/components/account/SuccessModal';
 import ErrorInterface from '@/components/account/errorInterface';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkUploadReview = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
@@ -80,7 +81,7 @@ const BulkUploadReview = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Bulk Upload Review'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -88,7 +89,7 @@ const BulkUploadReview = ({ pageDescription }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col w-full h-full mx-5">
+        <div className="flex flex-col w-full h-full px-2 md:px-5 pb-6">
           <div>
             {errorData && errorData.length > 0 && hasError && (
               <div className="flex justify-center items-center flex-col p-4 gap-4 w-full bg-text-white rounded-lg my-5">
@@ -101,49 +102,55 @@ const BulkUploadReview = ({ pageDescription }) => {
                     Please fix the errors and retry the upload
                   </p>
                 </div>
-                <table className="w-full flex flex-col gap-1">
-                  <thead className="w-full">
-                    <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                      <th>S/No</th>
-                      <th>Error Description</th>
-                      <th>Row to check</th>
-                    </tr>
-                  </thead>
-                  <tbody className="w-full max-h-[50vh] overflow-y-auto scrollbar-thin">
-                    {filteredErrorData.map((datasets, Index) => (
-                      <tr
-                        key={Index}
-                        className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm"
-                      >
-                        <td className="font-semibold w-5">{Index + 1}</td>
-                        <td className="">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.error}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                        <td className="max-w-60 overflow-x-auto">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.row}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ResponsiveTable
+                  className="w-full"
+                  align="left"
+                  dense
+                  maxHeightClass="md:max-h-[50vh]"
+                  rows={filteredErrorData}
+                  getRowKey={(_, i) => i}
+                  columns={[
+                    {
+                      key: 'sn',
+                      header: 'S/No',
+                      cell: (_, i) => i + 1,
+                      mobile: 'badge',
+                      cellClass: () => 'font-semibold',
+                    },
+                    {
+                      key: 'error',
+                      header: 'Error Description',
+                      mobile: 'title',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5 font-normal"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.error}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                    {
+                      key: 'row',
+                      header: 'Row to check',
+                      mobile: 'wide',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.row}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                  ]}
+                />
               </div>
             )}
           </div>
@@ -166,47 +173,40 @@ const BulkUploadReview = ({ pageDescription }) => {
                   <div className="font-semibold w-full">
                     Your Uploaded Materials
                   </div>
-                  <table
-                    className={`w-full flex flex-col gap-1 ${hasError ? 'max-h-[30vh]' : 'max-h-[60vh]'} overflow-y-auto scrollbar-thin`}
-                  >
-                    <thead className="w-full">
-                      <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                        <th className="text-left w-2">S/No</th>
-                        <th className="text-left w-1/6">Material Name</th>
-                        <th className="text-left w-1/8">Material Type</th>
-                        <th className="text-left w-1/6">Material Category</th>
-                        <th className="text-left w-1/8">Material Unit</th>
-                        <th className="text-left w-1/4">
-                          Material Description
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="w-full max-h-50 overflow-y-auto scrollbar-thin">
-                      {bulkMaterialData.map((material, index) => (
-                        <tr
-                          key={index}
-                          className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm"
-                        >
-                          <td className="text-left font-semibold w-2">
-                            {index + 1}
-                          </td>
-                          <td className="text-left w-1/6">{material.name}</td>
-                          <td className="text-left w-1/8">
-                            {material.materialType}
-                          </td>
-                          <td className="text-left w-1/6">
-                            {material.category}
-                          </td>
-                          <td className="text-left w-1/8">
-                            {material.unitOfMeasurement}
-                          </td>
-                          <td className="text-left w-1/4 overflow-x-auto ">
-                            {material.description}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <ResponsiveTable
+                    className="w-full"
+                    align="left"
+                    dense
+                    maxHeightClass={
+                      hasError ? 'md:max-h-[30vh]' : 'md:max-h-[60vh]'
+                    }
+                    rows={bulkMaterialData}
+                    getRowKey={(_, i) => i}
+                    columns={[
+                      {
+                        key: 'sn',
+                        header: 'S/No',
+                        cell: (_, i) => i + 1,
+                        mobile: 'badge',
+                        cellClass: () => 'font-semibold',
+                      },
+                      {
+                        key: 'name',
+                        header: 'Material Name',
+                        cell: (m) => m.name,
+                        mobile: 'title',
+                      },
+                      { key: 'type', header: 'Material Type', cell: (m) => m.materialType },
+                      { key: 'category', header: 'Material Category', cell: (m) => m.category },
+                      { key: 'unit', header: 'Material Unit', cell: (m) => m.unitOfMeasurement },
+                      {
+                        key: 'description',
+                        header: 'Material Description',
+                        cell: (m) => m.description,
+                        mobile: 'wide',
+                      },
+                    ]}
+                  />
 
                   {error && <ErrorInterface error={error} />}
 

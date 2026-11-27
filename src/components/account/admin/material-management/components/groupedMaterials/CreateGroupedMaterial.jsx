@@ -173,7 +173,7 @@ const CreateGroupedMaterial = ({ pageDescription }) => {
       <div>
         <SubHeader title={'Grouped material'} />
       </div>
-      <div className="flex flex-row gap-5 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-5 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -182,7 +182,7 @@ const CreateGroupedMaterial = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col w-full h-full gap-5">
-          <div className="flex flex-row gap-5 w-full max-h-[80vh] overflow-y-auto scrollbar-thin">
+          <div className="flex flex-col lg:flex-row gap-5 w-full px-2 md:px-0 pb-6">
             <CreateGroupedMaterialForm
               formData={formData}
               setFormData={setFormData}

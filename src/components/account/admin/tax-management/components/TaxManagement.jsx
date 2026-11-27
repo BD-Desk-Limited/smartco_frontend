@@ -24,6 +24,7 @@ import DeleteModal from '@/components/account/DeleteModal';
 import TaxBandDetails from './TaxBandDetails';
 import SuccessModal from '@/components/account/SuccessModal';
 import { useRouter } from 'next/navigation';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const TaxManagement = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
@@ -160,7 +161,7 @@ const TaxManagement = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Manage Tax Profile'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit">
           <SideBar
             selectedSubMenu="view-tax-band-details"
@@ -170,10 +171,10 @@ const TaxManagement = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-[80%] flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md flex flex-col gap-5">
             {/* search Input and filter */}
-            <div className="flex items-center justify-between gap-10">
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
+            <div className="flex items-center justify-between gap-3 md:gap-10">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex flex-row items-center w-full">
                 <FaSearch className="text-text-gray text-sm" />
                 <input
                   type="text"
@@ -184,7 +185,7 @@ const TaxManagement = ({ pageDescription }) => {
                 />
               </div>
               <button
-                className="h-8 py-1 px-2 border border-gray-border rounded-md flex flex-row items-center text-text-gray gap-1"
+                className="h-10 md:h-8 py-1 px-2 border border-gray-border rounded-md flex flex-row items-center text-text-gray gap-1 shrink-0"
                 onClick={() => handleOpenExportContent()}
               >
                 <FaFileExport />
@@ -196,116 +197,86 @@ const TaxManagement = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="overflow-x-auto w-full h-full min-h-[50vh] max-h-[60vh] overflow-y-auto scrollbar-thin relative">
-                <table className="w-full table-auto relative">
-                  <thead className="bg-background-1 sticky top-[-1px] z-10">
-                    <tr className="text-left text-text-gray text-sm font-medium border border-gray-border">
-                      <th className="px-2 py-2 border border-gray-border text-left">
-                        TAX PROFILE NAME
-                      </th>
-                      <th className="px-2 py-2 text-left border border-gray-border">
-                        TAX BAND RATE
-                      </th>
-                      <th className="px-2 py-2 text-left border border-gray-border">
-                        EFFECTIVE DATE
-                      </th>
-                      <th className="px-2 py-2 text-left border border-gray-border">
-                        ASSIGNED BRANCHES
-                      </th>
-                      <th className="px-2 py-2 text-left border border-gray-border"></th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="text-sm text-text-gray min-h-[40vh] w-full">
-                    {filteredTaxBands?.length > 0 ? (
-                      filteredTaxBands?.map((band) => (
-                        <tr
-                          key={band._id}
-                          onClick={() => setSelectedBand(band)}
-                          className={`border-b border-gray-border hover:bg-gray-shadow10 hover:text-text-black cursor-pointer items-center w-full`}
-                        >
-                          <td
-                            className={`px-2 py-1 text-left flex items-left gap-2`}
-                          >
-                            <span
-                              className={`px-2 py-2 text-center font-semibold`}
-                            >
-                              {band?.name || '-'}
-                            </span>
-                          </td>
-                          <td className={`px-2 py-1 text-left w-32`}>
-                            {`${band?.effectiveRate?.rate?.toFixed(2)}%` ||
-                              'rate not set'}
-                          </td>
-                          <td className={`px-2 py-1 text-left w-1/5`}>
-                            {ISOStringToLocalTime(
-                              band?.effectiveRate?.effectiveDate
-                            ) || 'effective date not set'}
-                          </td>
-                          <td className={`px-2 py-1 text-left w-1/5`}>
-                            {band?.associatedBranches?.length || 0}{' '}
-                            {band?.associatedBranches?.length > 1
-                              ? 'branches'
-                              : 'branch'}
-                          </td>
-
-                          {/* action buttons */}
-                          <td
-                            className={`px-2 py-1 text-left w-1/8 flex flex-row items-center justify-center gap-5`}
-                          >
-                            <span className="flex flex-row items-center gap-2 justify-around">
-                              <button
-                                onClick={(e) => {
-                                  handleEditTaxBandClick(e, band);
-                                }}
-                                className=""
-                              >
-                                <FaEdit className="cursor-pointer hover:text-error-hover" />
-                              </button>
-                            </span>
-                            <span className="flex flex-row items-center gap-2 justify-around">
-                              <button
-                                onClick={(e) => {
-                                  handleDeleteTaxBandClick(e, band);
-                                }}
-                                className=""
-                              >
-                                <FaTrash className="cursor-pointer hover:text-error-hover" />
-                              </button>
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        {
-                          <td colSpan={5} className="text-center py-32">
-                            <div className="flex flex-col w-full justify-center items-center gap-4">
-                              <span className="text-lg">No tax band found</span>
-                              <span
-                                onClick={() =>
-                                  router.push(
-                                    '/pages/account/admin/tax-management/create-tax-band'
-                                  )
-                                }
-                                className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
-                              >
-                                <FaPlus />
-                                <span>Create a tax band</span>
-                              </span>
-                            </div>
-                          </td>
-                        }
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              <ResponsiveTable
+                align="left"
+                maxHeightClass="md:max-h-[60vh]"
+                rows={filteredTaxBands || []}
+                onRowClick={(band) => setSelectedBand(band)}
+                emptyMessage={
+                  <span className="flex flex-col w-full justify-center items-center gap-4 font-normal">
+                    <span className="text-lg">No tax band found</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(
+                          '/pages/account/admin/tax-management/create-tax-band'
+                        )
+                      }
+                      className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-9 px-3 items-center hover:bg-blue-shadow1"
+                    >
+                      <FaPlus />
+                      <span>Create a tax band</span>
+                    </button>
+                  </span>
+                }
+                columns={[
+                  {
+                    key: 'name',
+                    header: 'Tax profile name',
+                    mobile: 'title',
+                    cellClass: () => 'font-semibold',
+                    cell: (band) => band?.name || '-',
+                  },
+                  {
+                    key: 'rate',
+                    header: 'Tax band rate',
+                    mobile: 'badge',
+                    cell: (band) =>
+                      `${band?.effectiveRate?.rate?.toFixed(2)}%` || 'rate not set',
+                  },
+                  {
+                    key: 'effective',
+                    header: 'Effective date',
+                    cell: (band) =>
+                      ISOStringToLocalTime(band?.effectiveRate?.effectiveDate) ||
+                      'effective date not set',
+                  },
+                  {
+                    key: 'branches',
+                    header: 'Assigned branches',
+                    cell: (band) => (
+                      <>
+                        {band?.associatedBranches?.length || 0}{' '}
+                        {band?.associatedBranches?.length > 1 ? 'branches' : 'branch'}
+                      </>
+                    ),
+                  },
+                ]}
+                actionsHeader=""
+                actions={(band) => (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => handleEditTaxBandClick(e, band)}
+                      title="Edit tax band"
+                      aria-label="Edit tax band"
+                    >
+                      <FaEdit className="hover:text-error-hover" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteTaxBandClick(e, band)}
+                      title="Delete tax band"
+                      aria-label="Delete tax band"
+                    >
+                      <FaTrash className="hover:text-error-hover" />
+                    </button>
+                  </>
+                )}
+              />
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import Spinner from '@/components/account/Spinner';
 import { getAllUsersByBranchId } from '@/services/branchServices';
 import React from 'react';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const Users = [
     {
@@ -151,57 +152,62 @@ const UsersInBranch = ({branchId}) => {
     const sortedUsers = Object.entries(fetchAllRoleTypes).sort((a, b) => a[0].localeCompare(b[0]));
     const sortedUsersArray = sortedUsers.map(([role, users]) => ({ role, users }));
 
-  return (
-    <div className='w-full h-full relative'>
-        <div className='text-base font-semibold p-2 bg-white text-text-blue sticky top-[-20px] z-20'>
-            <h1>Users in this branch - <strong>Total: {users?.length}</strong></h1>
-            
-        </div>
-        {loading? 
-            <Spinner /> :
-            (<table className='w-full border border-gray-border rounded-md shadow-md max-h-screen overflow-y-auto scrollbar-thin relative'>
-                <thead className='bg-blue-shadow8 font-bold my-1 sticky top-2 z-10'>
-                    <tr className='text-left'>
-                        <th className='text-sm font-semibold text-text-gray px-5 py-2'>Staff ID</th>
-                        <th className='text-sm font-semibold text-text-gray px-5 py-2'>Full Name</th>
-                        <th className='text-sm font-semibold text-text-gray px-5 py-2'>Email</th>
-                        <th className='text-sm font-semibold text-text-gray px-5 py-2'>Phone Number</th>
-                        <th className='text-sm font-semibold text-text-gray px-5 py-2'>Role</th>
-                    </tr>
-                </thead>
+  const cap = (s = '') => s.charAt(0).toUpperCase() + s.slice(1);
 
-                <tbody className='max-h-[50vh] overflow-y-auto scrollbar-thin z-0'>
-                    {
-                        users && users.length > 0 ? (
-                            sortedUsersArray.map((userGroup) => (
-                                <React.Fragment key={userGroup?.role}>
-                                    <tr className='bg-background-1'>
-                                        <td colSpan="5" className='text-text-gray text-sm pl-5 bg-blue-shadow10 w-full text-right px-2 italic font-semibold'>
-                                            {userGroup.role.charAt(0).toUpperCase() + userGroup.role.slice(1)}
-                                            <span> - {userGroup?.users?.length}</span>
-                                        </td>
-                                    </tr>
-                                    {userGroup.users.map((user) => (
-                                        <tr key={user._id} className='border-b border-gray-border hover:bg-background-2'>
-                                            <td className='text-sm text-text-gray px-5 py-2'>{user.staffId || 'N/A'}</td>
-                                            <td className='text-sm text-text-gray px-5 py-2'>{user.fullName || 'N/A'}</td>
-                                            <td className='text-sm text-text-gray px-5 py-2'>{user.email || 'N/A'}</td>
-                                            <td className='text-sm text-text-gray px-5 py-2'>{user.phoneNumber || 'N/A'}</td>
-                                            <td className='text-sm text-text-gray px-5 py-2'>{user.role.charAt(0).toUpperCase() + user.role.slice(1) || 'Unknown'}</td>
-                                        </tr>
-                                    ))}
-                                </React.Fragment>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className='text-center text-error py-2'>No users found in this branch</td>
-                            </tr>
-                        )
-                    }
-                </tbody>
-        </table>)}
+  return (
+    <div className="w-full h-full relative">
+      <div className="text-base font-semibold p-2 bg-white text-text-blue">
+        <h1>
+          Users in this branch - <strong>Total: {users?.length || 0}</strong>
+        </h1>
+      </div>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <ResponsiveTable
+          align="left"
+          dense
+          maxHeightClass="md:max-h-[60vh]"
+          emptyMessage="No users found in this branch"
+          groups={(users?.length > 0 ? sortedUsersArray : []).map((group) => ({
+            key: group.role,
+            label: `${cap(group.role)} - ${group.users?.length || 0}`,
+            rows: group.users,
+          }))}
+          columns={[
+            {
+              key: 'name',
+              header: 'Full Name',
+              cell: (u) => u.fullName || 'N/A',
+              mobile: 'title',
+            },
+            {
+              key: 'staffId',
+              header: 'Staff ID',
+              cell: (u) => u.staffId || 'N/A',
+              mobile: 'badge',
+            },
+            {
+              key: 'email',
+              header: 'Email',
+              cell: (u) => u.email || 'N/A',
+              mobile: 'subtitle',
+            },
+            {
+              key: 'phone',
+              header: 'Phone Number',
+              cell: (u) => u.phoneNumber || 'N/A',
+            },
+            {
+              key: 'role',
+              header: 'Role',
+              cell: (u) => cap(u.role) || 'Unknown',
+            },
+          ]}
+        />
+      )}
     </div>
-  )
+  );
 }
 
 export default UsersInBranch;

@@ -1,12 +1,10 @@
 import React from 'react';
 import Spinner from '../../Spinner';
 import { useAuth } from '@/contexts/authContext';
-import AdminSideBar from '../AdminSideBar';
 import MyProfile from './components/MyProfile';
 
 const MyProfilePage = () => {
   const { user, logOut, isLoading } = useAuth();
-  const [selectedMenu, setSelectedMenu] = React.useState('my-profile');
 
   if (!isLoading && (!user || user?.role !== 'admin')) {
     return (
@@ -32,14 +30,8 @@ const MyProfilePage = () => {
       {isLoading ? (
         <Spinner />
       ) : (
-        <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
-          <div className="h-full">
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
-          <div className="w-full h-full overflow-y-auto no-scrollbar">
+        <div className="flex flex-row gap-0 bg-background-1 h-full overflow-hidden ">
+          <div className="w-full h-full overflow-y-auto ">
             <MyProfile />
           </div>
         </div>

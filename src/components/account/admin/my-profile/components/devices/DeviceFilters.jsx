@@ -27,7 +27,7 @@ const DeviceFilters = ({
   return (
     <div className="flex flex-col gap-2 py-1">
       <div className="flex flex-row flex-wrap items-center gap-2">
-        <label className="relative flex-1 min-w-[180px]">
+        <label className="relative flex-1 md:min-w-[180px]">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-gray text-xs" />
           <input
             type="search"

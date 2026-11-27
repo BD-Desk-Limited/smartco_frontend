@@ -1,6 +1,5 @@
 import Header from '@/components/account/admin/AdminHeader';
 import React from 'react';
-import AdminSideBar from '../../AdminSideBar';
 import SubHeader from '../../SubHeader';
 import SideBar from '../../SideBar';
 import PageDescription from '@/components/account/PageDescription';
@@ -143,21 +142,15 @@ const EditTaxBand = ({
 
   return (
     <div className="flex flex-row gap-0 bg-background-1 h-full w-full overflow-hidden">
-      <div>
-        <AdminSideBar
-          selectedMenu={selectedMenu}
-          setSelectedMenu={setSelectedMenu}
-        />
-      </div>
 
-      <div className="flex flex-col h-screen overflow-y-auto no-scrollbar w-full relative">
+      <div className="flex flex-col h-full overflow-y-auto w-full relative">
         <div className="w-full sticky top-0 z-50">
           <Header />
         </div>
         <div className="w-full">
           <SubHeader title={'Update Tax band'} />
         </div>
-        <div className="flex flex-row gap-0 w-full h-full relative">
+        <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
           <div className="min-w-fit">
             <SideBar
               selectedSubMenu="create-tax-band"
@@ -187,9 +180,7 @@ const EditTaxBand = ({
                 }}
               />
             </div>
-            <div className="sticky bottom-0 w-full">
-              <PageDescription pageDescription={pageDescription} />
-            </div>
+            <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
       </div>

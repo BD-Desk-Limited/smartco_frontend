@@ -20,6 +20,8 @@ import {
   taxfreeProduct,
 } from '../cart/CartBillCalculationFunctions';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { SCHEDULED_PRICE_NOTICE } from './PaymentProgress';
+import { methodLabel } from '@/utilities/paymentMethods';
 
 const SuccessfulPaymentDisplay = ({
   paymentData,
@@ -43,6 +45,8 @@ const SuccessfulPaymentDisplay = ({
   workBranchVATRate,
   handleOpenNewCustomerRegistration,
 }) => {
+  const paidBefore = paymentData?.paymentStatus?.paidBefore || 0; // at earlier checkouts
+  const amountPaidNow = paymentData?.paymentStatus?.amountPaidNow || 0; // at this checkout
   return (
     <div
       className={`flex flex-row justify-center items-center gap-1 w-[640px] h-[90vh] p-3 rounded-lg ${mode === 'light' ? lightThemeStyle : darkThemeStyle} p-5 rounded-lg`}
@@ -75,41 +79,57 @@ const SuccessfulPaymentDisplay = ({
         </div>
 
         <div className="font-mono">
-          {isScheduled ? (
-            <p className="flex flex-col">
+          <p className="flex flex-col">
+            {isScheduled && (
               <span>
-                <strong>Payment Plan: </strong>
-                {`${paymentData?.selectedPaymentPlan?.label} (${paymentData?.paymentType})`}
+                <strong>Payment: </strong>
+                {paymentData?.selectedPaymentPlan?.label}
               </span>
+            )}
+            {/* the method only when money was taken at this checkout */}
+            {paymentData?.paymentType && (
               <span>
-                <strong>Amount paid: </strong>
-                {commaNumberFormat(paymentData?.paymentStatus?.amountPaid, 2)}
+                <strong>Payment Method: </strong>
+                {methodLabel(paymentData.paymentType)}
               </span>
-              {unpaidBalance > 0 && (
-                <span className="">
-                  <strong>Unpaid Balance: </strong>
-                  {commaNumberFormat(unpaidBalance, 2)}
-                </span>
-              )}
-
+            )}
+            {paidBefore > 0 && (
+              <span>
+                <strong>Paid earlier: </strong>
+                {commaNumberFormat(paidBefore, 2)}
+              </span>
+            )}
+            {(isScheduled || paidBefore > 0) && (
+              <span>
+                <strong>Paid now: </strong>
+                {commaNumberFormat(amountPaidNow, 2)}
+              </span>
+            )}
+            {isScheduled && unpaidBalance > 0 && (
+              <span className="">
+                <strong>Unpaid Balance: </strong>
+                {commaNumberFormat(unpaidBalance, 2)}
+              </span>
+            )}
+            {isScheduled && (
               <span className="font-semibold">
                 Scheduled for:{' '}
                 {orderDateString(paymentData?.orderScheduledDateTime)} at{' '}
                 {orderTime(paymentData?.orderScheduledDateTime)}
               </span>
-            </p>
-          ) : (
-            <p className="flex flex-col">
-              <span>
-                <strong>Payment Method: </strong>
-                {paymentData?.paymentType}
-              </span>
-            </p>
-          )}
+            )}
+          </p>
           <p>
-            <strong>Total Amount: </strong>
+            <strong>
+              {isScheduled ? 'Estimated Total: ' : 'Total Amount: '}
+            </strong>
             {commaNumberFormat(paymentData?.total, 2)}
           </p>
+          {isScheduled && (
+            <p className="text-xs text-text-gray mt-1">
+              {SCHEDULED_PRICE_NOTICE}
+            </p>
+          )}
         </div>
 
         {/*Action buttons*/}
@@ -295,10 +315,7 @@ const SuccessfulPaymentDisplay = ({
               Tax ({commaNumberFormat(workBranchVATRate, 2)}%)
             </span>
             <span className="text-sm text-text-gray ml-1 font-semibold">
-              {commaNumberFormat(
-                vatAmount(),
-                2
-              )}
+              {commaNumberFormat(vatAmount(), 2)}
             </span>
           </p>
           {productsTax(paidOrderDetails?.items) &&

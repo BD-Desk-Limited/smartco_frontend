@@ -7,6 +7,7 @@ import {
 } from '@/services/taxBandServices';
 import { verifyInputText } from '@/utilities/verifyInput';
 import React from 'react';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const CreateNewTaxBandForm = ({
   onClose,
@@ -131,7 +132,7 @@ const CreateNewTaxBandForm = ({
   };
 
   return (
-    <div className="w-[80vw] h-[80vh] relative bg-white rounded-lg shadow-lg flex flex-col p-5 items-center">
+    <div className="w-full h-full md:w-[80vw] md:h-[80vh] relative bg-white md:rounded-lg shadow-lg flex flex-col p-3 md:p-5 items-center overflow-y-auto">
       {!standAloneTaxManagement && (
         <button
           className="absolute top-0.5 right-0.5 bg-brand-gray rounded-[100%] px-4 py-2 text-text-white hover:bg-gray-shadow2 font-bold transition-all duration-300 ease-in-out"
@@ -143,13 +144,13 @@ const CreateNewTaxBandForm = ({
       )}
 
       <h1 className="text-brand-blue font-bold my-5">Tax Bands</h1>
-      <div className="w-full h-full flex flex-row shadow-lg rounded-lg p-1 border-2 border-gray-border">
-        <form className="w-[50%] text-sm" onSubmit={handleSubmit}>
+      <div className="w-full md:h-full flex flex-col md:flex-row gap-5 md:gap-0 shadow-lg rounded-lg p-2 md:p-1 border-2 border-gray-border">
+        <form className="w-full md:w-[50%] text-sm" onSubmit={handleSubmit}>
           <h2 className="text-brand-blue font-light w-full text-center">
             Create New Tax Band
           </h2>
           <div className="flex flex-col w-full gap-5 h-full items-center justify-center">
-            <div className="flex flex-col gap-1 w-[80%]">
+            <div className="flex flex-col gap-1 w-full md:w-[80%]">
               <label className="text-text-gray w-fit" htmlFor="name">
                 Tax Band Name
               </label>
@@ -164,7 +165,7 @@ const CreateNewTaxBandForm = ({
                 }
               />
             </div>
-            <div className="flex flex-col gap-1 w-[80%]">
+            <div className="flex flex-col gap-1 w-full md:w-[80%]">
               <label
                 className="text-text-gray text-sm w-fit"
                 htmlFor="rate"
@@ -183,7 +184,7 @@ const CreateNewTaxBandForm = ({
                 }
               />
             </div>
-            <div className="flex flex-col gap-1 w-[80%]">
+            <div className="flex flex-col gap-1 w-full md:w-[80%]">
               <label
                 className="text-text-gray text-sm w-fit"
                 htmlFor="date"
@@ -202,7 +203,7 @@ const CreateNewTaxBandForm = ({
                 }
               />
             </div>
-            <div className="flex flex-col gap-1 w-[80%]">
+            <div className="flex flex-col gap-1 w-full md:w-[80%]">
               <label
                 className="text-text-gray text-sm w-fit"
                 htmlFor="description"
@@ -234,57 +235,36 @@ const CreateNewTaxBandForm = ({
         <span className="h-full w-0.5 bg-gray-border mx-1"></span>
 
         {/* Existing tax bands */}
-        <div className="flex flex-col w-[50%]">
+        <div className="flex flex-col w-full md:w-[50%]">
           <h2 className="text-brand-blue font-light w-full text-center">
             Existing Tax Bands
           </h2>
           <div className="text-text-white text-sm">
-            <div className="max-h-[60vh] overflow-y-auto scrollbar-thin">
-              <table className="w-full relative">
-                <thead className="bg-blue-shadow3 text-text-white text-sm sticky top-0">
-                  <tr>
-                    <th className="p-1 w-1/6 text-left">Band Name</th>
-                    <th className="p-1 w-1/6 text-left ">Tax Rate</th>
-                    <th className="p-1 w-2/3 text-left">Description</th>
-                  </tr>
-                </thead>
-                <tbody className="text-brand-blue text-sm">
-                  {(!standAloneTaxManagement ? taxBands : localTaxBand)
-                    ?.length > 0 ? (
-                    (!standAloneTaxManagement ? taxBands : localTaxBand).map(
-                      (band, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-border hover:bg-gray-border cursor-pointer"
-                        >
-                          <td className="p-1 w-1/6 text-left">{band.name}</td>
-                          <td className="p-1 w-1/6 text-left">{band.rate}%</td>
-                          <td className="p-1 w-2/3 text-left">
-                            {band.description}
-                          </td>
-                        </tr>
-                      )
-                    )
-                  ) : (
-                    <tr className="border-b border-gray-border hover:bg-gray-border cursor-pointer">
-                      <td
-                        className="py-10 font-semibold text-center"
-                        colSpan={3}
-                      >
-                        You have no existing tax band please create a tax
-                        band!!!
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <ResponsiveTable
+              align="left"
+              dense
+              maxHeightClass="md:max-h-[60vh]"
+              className="text-text-black"
+              rows={(!standAloneTaxManagement ? taxBands : localTaxBand) || []}
+              getRowKey={(_, i) => i}
+              emptyMessage="You have no existing tax band please create a tax band!!!"
+              columns={[
+                { key: 'name', header: 'Band Name', mobile: 'title', cell: (b) => b.name },
+                { key: 'rate', header: 'Tax Rate', mobile: 'badge', cell: (b) => `${b.rate}%` },
+                {
+                  key: 'description',
+                  header: 'Description',
+                  mobile: 'wide',
+                  cell: (b) => b.description,
+                },
+              ]}
+            />
           </div>
         </div>
       </div>
 
       {success && (
-        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-70 absolute">
+        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-[70] fixed">
           <SuccessModal
             message={'Tax band created successfully!'}
             subText={'You can now assign this tax band to your branches.'}

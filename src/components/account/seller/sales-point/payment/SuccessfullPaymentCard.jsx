@@ -16,6 +16,7 @@ import { sendReceiptService } from '@/services/transactionServices';
 import { useNewCustomerRegistration } from '@/contexts/newCustomerRegistrationContect';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import { flattenProductOffers, getCashOfferLines } from '../cart/offerHelpers';
+import { SCHEDULED_PRICE_NOTICE } from './PaymentProgress';
 
 const SuccessfullPaymentCard = ({
   paymentData,
@@ -73,8 +74,11 @@ const SuccessfullPaymentCard = ({
       formatMatcher: 'basic',
     });
 
+  // paymentStatus.amountPaid: paid in total so far; amountPaidNow: at this checkout; paidBefore: earlier
   const unpaidBalance =
     paymentData?.total - paymentData?.paymentStatus?.amountPaid;
+  const paidBefore = paymentData?.paymentStatus?.paidBefore || 0;
+  const amountPaidNow = paymentData?.paymentStatus?.amountPaidNow || 0;
 
   const isScheduled =
     paymentData?.selectedFulfillmentTime === 'Now' ? false : true;
@@ -160,10 +164,7 @@ const SuccessfullPaymentCard = ({
       },
       {
         label: `Tax (${commaNumberFormat(workBranchVATRate, 2)}%)`,
-        value: `${commaNumberFormat(
-          vatAmount(),
-          2
-        )}`,
+        value: `${commaNumberFormat(vatAmount(), 2)}`,
       },
       productsTax(paidOrderDetails?.items) > 0
         ? {
@@ -183,13 +184,21 @@ const SuccessfullPaymentCard = ({
           }
         : false,
       {
-        label: 'Total Amount:',
+        // a scheduled order's price is only fixed when it is collected
+        label: isScheduled ? 'Estimated Total:' : 'Total Amount:',
         value: `${commaNumberFormat(paymentData?.total, 2) || '0.00'}`,
       },
-      isScheduled
+      // paid at earlier checkouts (a scheduled order's deposits), then at this one
+      paidBefore > 0
         ? {
-            label: 'Amount Paid Now:',
-            value: `${commaNumberFormat(paymentData?.paymentStatus?.amountPaid, 2) || '0.00'}`,
+            label: 'Paid Earlier:',
+            value: `${commaNumberFormat(paidBefore, 2)}`,
+          }
+        : false,
+      isScheduled || paidBefore > 0
+        ? {
+            label: 'Paid Now:',
+            value: `${commaNumberFormat(amountPaidNow, 2) || '0.00'}`,
           }
         : false,
       isScheduled
@@ -199,7 +208,9 @@ const SuccessfullPaymentCard = ({
           }
         : false,
     ].filter(Boolean),
-    footer: 'Thank you for your purchase! Visit again!',
+    footer: isScheduled
+      ? `${SCHEDULED_PRICE_NOTICE} Thank you for your order!`
+      : 'Thank you for your purchase! Visit again!',
   });
 
   const receiptText = (() => {

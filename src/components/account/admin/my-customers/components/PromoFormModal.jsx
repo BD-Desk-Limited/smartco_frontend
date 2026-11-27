@@ -334,7 +334,7 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
   );
 
   return (
-    <div className="relative bg-white px-5 pb-5 rounded-lg shadow-lg w-[780px] max-w-[96vw] max-h-[92vh] overflow-y-auto scrollbar-thin text-sm text-text-gray flex flex-col gap-3">
+    <div className="relative bg-white px-5 pb-5 rounded-none sm:rounded-lg shadow-lg w-full h-full sm:h-auto sm:w-[780px] sm:max-w-[96vw] sm:max-h-[92vh] overflow-y-auto scrollbar-thin text-sm text-text-gray flex flex-col gap-3">
       <h2 className="text-lg py-2 font-semibold text-text-black sticky top-0 bg-text-white">
         {editing ? 'Edit promo' : 'Create promo'}{' '}
         <button
@@ -354,7 +354,7 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
       )}
 
       <Section title="Basics">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1">
             Name
             <input
@@ -401,7 +401,7 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
         </div>
 
         {type === 'cash' ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="flex flex-col gap-1">
               Percentage off (%)
               <input
@@ -782,7 +782,7 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
       </Section>
 
       <Section title="3. When and where">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1">
             Starts
             <input
@@ -865,7 +865,7 @@ const PromoFormModal = ({ promo, options, onClose, onSaved }) => {
       </Section>
 
       <Section title="4. Limits">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1">
             Most rewards one customer can earn
             <input

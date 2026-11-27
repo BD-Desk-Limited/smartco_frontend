@@ -39,6 +39,10 @@ import { capitalizeFirst } from '@/utilities/stringUtils';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import TransferDetailSideView from './TransferDetailSideView';
 import RaiseTransferModal from './RaiseTransferModal';
+import FilterSheet from '../../ui/FilterSheet';
+import ResponsiveTable from '../../ui/ResponsiveTable';
+import SideView from '../../ui/SideView';
+import Modal from '../../ui/Modal';
 
 const TABS = [
   { value: 'incoming', label: 'Incoming Transfers' },
@@ -195,6 +199,88 @@ const StockTransfers = ({ pageDescription }) => {
     if (created) setSelectedTransfer(created);
   };
 
+  // rendered twice: next to the Filters button on phones, in the filter row on md+
+  const searchBox = (extraClass = '') => (
+    <div
+      className={`h-10 md:h-8 px-3 border border-gray-border rounded-md flex-row items-center bg-white ${extraClass}`}
+    >
+      <FaSearch aria-hidden="true" className="shrink-0" />
+      <input
+        type="search"
+        enterKeyHint="search"
+        placeholder="Search by transfer ID/branch"
+        aria-label="Search by transfer ID or branch"
+        value={draftFilters.searchTerm}
+        onChange={(e) => onChangeFilter('searchTerm', e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+        className="focus:outline-none ml-2 w-full text-base md:text-sm bg-transparent"
+      />
+    </div>
+  );
+
+  const statusCell = (t) => {
+    const option = STATUS_OPTIONS.find((s) => s.value === t.status);
+    return (
+      <span className="flex items-center justify-center whitespace-nowrap">
+        {option?.icon || null}
+        <span className={`px-2 md:px-4 py-1 md:py-2 ${option?.color || ' text-gray-500'}`}>
+          {option?.label || capitalizeFirst(t.status) || '-'}
+        </span>
+      </span>
+    );
+  };
+
+  const transferColumns = [
+    {
+      key: 'id',
+      header: 'Transfer ID',
+      align: 'left',
+      mobile: 'title',
+      cell: (t) => (
+        <>
+          {t.transferID}
+          {needsMyAction(t) && (
+            <span className="ml-2 text-xs text-brand-blue font-semibold">
+              Needs your action
+            </span>
+          )}
+        </>
+      ),
+    },
+    {
+      key: 'route',
+      header: 'From',
+      mobile: 'subtitle',
+      // phones show "From -> To" on one line; the table keeps two columns
+      cell: (t) => (
+        <>
+          <span className="md:hidden">
+            {t.fromBranch?.name || 'N/A'} → {t.toBranch?.name || 'N/A'}
+          </span>
+          <span className="hidden md:inline">{t.fromBranch?.name || 'N/A'}</span>
+        </>
+      ),
+    },
+    {
+      key: 'to',
+      header: 'To',
+      mobile: 'hidden',
+      cell: (t) => t.toBranch?.name || 'N/A',
+    },
+    {
+      key: 'raised',
+      header: 'Raised On',
+      cell: (t) => (t.createdAt ? formatDate(new Date(t.createdAt)) : '-'),
+    },
+    { key: 'items', header: 'Items', cell: (t) => t.itemCount ?? 0 },
+    {
+      key: 'total',
+      header: 'Total Value',
+      cell: (t) => (t.totalCost != null ? commaNumberFormat(t.totalCost, 2) : '-'),
+    },
+    { key: 'status', header: 'Status', mobile: 'badge', cell: statusCell },
+  ];
+
   return (
     <div className="h-full w-full">
       <div className="w-full sticky top-0 z-50">
@@ -205,11 +291,11 @@ const StockTransfers = ({ pageDescription }) => {
       </div>
       <div className="flex flex-row gap-0 w-full h-full relative">
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-4 md:gap-5">
             {/* tabs + raise button */}
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-between sm:items-center">
               <div
-                className="flex gap-1 border-b border-gray-border"
+                className="flex gap-1 border-b border-gray-border overflow-x-auto no-scrollbar"
                 role="tablist"
               >
                 {TABS.map((t) => (
@@ -218,7 +304,7 @@ const StockTransfers = ({ pageDescription }) => {
                     role="tab"
                     aria-selected={tab === t.value}
                     onClick={() => switchTab(t.value)}
-                    className={`px-4 py-2 text-sm ${
+                    className={`px-4 py-2 text-sm whitespace-nowrap ${
                       tab === t.value
                         ? 'border-b-2 border-brand-blue text-brand-blue font-semibold'
                         : 'text-text-gray'
@@ -230,7 +316,7 @@ const StockTransfers = ({ pageDescription }) => {
               </div>
               <button
                 onClick={() => setShowRaise(true)}
-                className="p-2 text-sm shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue whitespace-nowrap flex flex-row gap-2"
+                className="p-2 text-sm shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue whitespace-nowrap flex flex-row gap-2 self-end sm:self-auto"
               >
                 <FaScroll className="text-base text-text-white" />
                 Raise transfer
@@ -238,186 +324,100 @@ const StockTransfers = ({ pageDescription }) => {
             </div>
 
             {/* filters */}
-            <div className="flex flex-col gap-2 border border-gray-border rounded-md p-2">
-              <div className="flex flex-row gap-2 items-center w-full">
-                <div className="h-8 px-3 border border-gray-border rounded-md flex flex-row items-center w-1/3">
-                  <FaSearch aria-hidden="true" />
-                  <input
-                    type="text"
-                    placeholder="Search by transfer ID/branch"
-                    value={draftFilters.searchTerm}
-                    onChange={(e) =>
-                      onChangeFilter('searchTerm', e.target.value)
-                    }
-                    onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                    className="focus:outline-none ml-2 w-full text-sm"
-                  />
-                </div>
+            <div className="flex flex-col gap-2 md:border border-gray-border rounded-md md:p-2">
+              <FilterSheet
+                activeCount={
+                  (selectedFilters.branch ? 1 : 0) +
+                  (selectedFilters.from || selectedFilters.to ? 1 : 0) +
+                  (selectedFilters.status ? 1 : 0)
+                }
+                leading={searchBox('flex w-full')}
+                onApply={applyFilters}
+              >
+                <div className="flex flex-col md:flex-row gap-3 md:gap-2 md:items-center w-full">
+                  {searchBox('hidden md:flex md:w-1/3')}
 
-                {userBranches.length > 1 && (
-                  <div className="h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray">
-                    <FaHome
+                  {userBranches.length > 1 && (
+                    <div className="h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray bg-white">
+                      <FaHome
+                        aria-hidden="true"
+                        className="mr-2 text-brand-blue shrink-0"
+                      />
+                      <select
+                        value={draftFilters.branch}
+                        onChange={(e) => onChangeFilter('branch', e.target.value)}
+                        className="focus:outline-none cursor-pointer w-full md:w-auto bg-transparent"
+                        aria-label="Filter by your branch"
+                      >
+                        <option value="">All my branches</option>
+                        {userBranches.map((b) => (
+                          <option key={b._id} value={b._id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray bg-white">
+                    <FaCalendar
                       aria-hidden="true"
-                      className="mr-2 text-brand-blue"
+                      className="mr-2 text-brand-blue shrink-0"
                     />
+                    <DatePicker
+                      selectsRange
+                      startDate={parseDate(draftFilters.from)}
+                      endDate={parseDate(draftFilters.to)}
+                      onChange={([from, to]) => {
+                        onChangeFilter('from', from ? formatDate(from) : '');
+                        onChangeFilter('to', to ? formatDate(to) : '');
+                      }}
+                      placeholderText="Any date"
+                      dateFormat="yyyy-MM-dd"
+                      className="w-full md:w-40 focus:outline-none cursor-pointer"
+                      aria-label="Filter by date range"
+                    />
+                  </div>
+
+                  <div className="h-10 md:h-8 px-1 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray bg-white">
+                    <FaFilter aria-hidden="true" className="shrink-0" />
                     <select
-                      value={draftFilters.branch}
-                      onChange={(e) => onChangeFilter('branch', e.target.value)}
-                      className="focus:outline-none cursor-pointer"
-                      aria-label="Filter by your branch"
+                      value={draftFilters.status}
+                      onChange={(e) => onChangeFilter('status', e.target.value)}
+                      aria-label="Filter by status"
+                      className="focus:outline-none cursor-pointer w-full md:w-auto bg-transparent"
                     >
-                      <option value="">All my branches</option>
-                      {userBranches.map((b) => (
-                        <option key={b._id} value={b._id}>
-                          {b.name}
+                      <option value="">All Status</option>
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s.value} value={s.value}>
+                          {s.label}
                         </option>
                       ))}
                     </select>
                   </div>
-                )}
 
-                <div className="h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray">
-                  <FaCalendar
-                    aria-hidden="true"
-                    className="mr-2 text-brand-blue"
-                  />
-                  <DatePicker
-                    selectsRange
-                    startDate={parseDate(draftFilters.from)}
-                    endDate={parseDate(draftFilters.to)}
-                    onChange={([from, to]) => {
-                      onChangeFilter('from', from ? formatDate(from) : '');
-                      onChangeFilter('to', to ? formatDate(to) : '');
-                    }}
-                    placeholderText="Any date"
-                    dateFormat="yyyy-MM-dd"
-                    className="w-40 focus:outline-none cursor-pointer"
-                    aria-label="Filter by date range"
-                  />
-                </div>
-
-                <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray">
-                  <FaFilter aria-hidden="true" />
-                  <select
-                    value={draftFilters.status}
-                    onChange={(e) => onChangeFilter('status', e.target.value)}
-                    className="focus:outline-none cursor-pointer"
+                  {/* md+; phones apply from the sheet's "Show results" */}
+                  <button
+                    onClick={applyFilters}
+                    className="hidden md:block px-4 h-8 text-sm bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
                   >
-                    <option value="">All Status</option>
-                    {STATUS_OPTIONS.map((s) => (
-                      <option key={s.value} value={s.value}>
-                        {s.label}
-                      </option>
-                    ))}
-                  </select>
+                    Apply filter
+                  </button>
                 </div>
-
-                <button
-                  onClick={applyFilters}
-                  className="px-4 h-8 text-sm bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
-                >
-                  Apply filter
-                </button>
-              </div>
+              </FilterSheet>
             </div>
 
-            {/* table */}
+            {/* table (cards on phones) */}
             {loading ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow10 text-sm text-text-gray">
-                      <th className="px-4 py-4 border border-gray-shadow8">
-                        Transfer ID
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        From
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        To
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Raised On
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Items
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Total Value
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-text-gray">
-                    {transfers.length > 0 ? (
-                      transfers.map((t) => {
-                        const option = STATUS_OPTIONS.find(
-                          (s) => s.value === t.status
-                        );
-                        return (
-                          <tr
-                            key={t._id}
-                            onClick={() => setSelectedTransfer(t)}
-                            className="border-b border-gray-border text-sm cursor-pointer hover:bg-gray-shadow10"
-                          >
-                            <td className="px-4 py-3">
-                              {t.transferID}
-                              {needsMyAction(t) && (
-                                <span className="ml-2 text-xs text-brand-blue font-semibold">
-                                  Needs your action
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {t.fromBranch?.name || 'N/A'}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {t.toBranch?.name || 'N/A'}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {t.createdAt
-                                ? formatDate(new Date(t.createdAt))
-                                : '-'}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {t.itemCount ?? 0}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {t.totalCost != null
-                                ? commaNumberFormat(t.totalCost, 2)
-                                : '-'}
-                            </td>
-                            <td className="p-1">
-                              <div className="flex items-center justify-center">
-                                {option?.icon || null}
-                                <span
-                                  className={`px-4 py-2 ${
-                                    option?.color || ' text-gray-500'
-                                  }`}
-                                >
-                                  {option?.label ||
-                                    capitalizeFirst(t.status) ||
-                                    '-'}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={7}>
-                          No {tab} transfers found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              <ResponsiveTable
+                columns={transferColumns}
+                rows={transfers}
+                getRowKey={(t) => t._id}
+                onRowClick={setSelectedTransfer}
+                emptyMessage={`No ${tab} transfers found.`}
+              />
             )}
 
             {pagination && (
@@ -430,14 +430,12 @@ const StockTransfers = ({ pageDescription }) => {
               />
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 
       {errorMessage && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-[70] flex justify-center items-center">
+        <Modal bare zClass="z-[70]" label="Error" onClose={() => setErrorMessage(null)}>
           <ErrorModal
             message={errorMessage}
             title={'Error'}
@@ -446,13 +444,13 @@ const StockTransfers = ({ pageDescription }) => {
             buttonText={'Close'}
             subText={'Please try again'}
           />
-        </div>
+        </Modal>
       )}
 
       {selectedTransfer && (
-        <div
-          className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center"
-          onClick={() => setSelectedTransfer(null)}
+        <SideView
+          onClose={() => setSelectedTransfer(null)}
+          label="Transfer details"
         >
           <TransferDetailSideView
             key={selectedTransfer._id}
@@ -462,27 +460,27 @@ const StockTransfers = ({ pageDescription }) => {
             onAction={handleAction}
             onExport={setExportConfig}
           />
-        </div>
+        </SideView>
       )}
 
       {showRaise && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-[55] flex justify-center items-center">
+        <Modal bare zClass="z-[55]" label="Raise stock transfer">
           <RaiseTransferModal
             userBranches={userBranches}
             destinations={destinations}
             onClose={() => setShowRaise(false)}
             onRaised={handleRaised}
           />
-        </div>
+        </Modal>
       )}
 
       {exportConfig && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-[60] flex justify-center items-center">
+        <Modal bare zClass="z-[60]" label="Export" onClose={() => setExportConfig(null)}>
           <ExportContent
             {...exportConfig}
             onClose={() => setExportConfig(null)}
           />
-        </div>
+        </Modal>
       )}
     </div>
   );

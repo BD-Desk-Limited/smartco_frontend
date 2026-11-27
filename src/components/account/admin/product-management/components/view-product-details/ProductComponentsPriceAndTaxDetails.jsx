@@ -2,6 +2,7 @@ import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React from 'react';
 import ProductPriceHistory from './ProductPriceHistory';
 import Spinner from '@/components/account/Spinner';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
   const [activeTab, setActiveTab] = React.useState('components-and-price');
@@ -65,11 +66,11 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
       {!loading ? (
         <div className="text-sm">
           {/* Navigation Tabs */}
-          <div className="flex flex-row gap-4 mb-4 border-b">
+          <div className="flex flex-row gap-4 mb-4 border-b overflow-x-auto no-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
-                className={`py-2 text-sm font-semibold ${activeTab === tab.value ? 'text-brand-green border-b-2 border-brand-green' : 'bg-transparent text-text-gray'} hover:border-b-2 transition`}
+                className={`py-2 text-sm font-semibold whitespace-nowrap shrink-0 ${activeTab === tab.value ? 'text-brand-green border-b-2 border-brand-green' : 'bg-transparent text-text-gray'} hover:border-b-2 transition`}
                 onClick={() => setActiveTab(tab.value)}
               >
                 {tab.label}
@@ -94,43 +95,45 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                         </p>
                         {productData?.pricing?.length > 0 ? (
                           <div className="w-full text-text-gray">
-                            <table className="w-full mb-3 my-1">
-                              <thead>
-                                <tr className="bg-gray-shadow4 text-text-white border-y border-y-gray-border">
-                                  <th className="p-1 text-left">Price Band</th>
-                                  <th className="p-1 text-left">Base Price</th>
-                                  <th className="p-1 text-left">
-                                    Effective Date
-                                  </th>
-                                  <th className="p-1 text-left">Set By</th>
-                                </tr>
-                              </thead>
-                              <tbody className="border-b">
-                                {productData.pricing.map((band, index) => (
-                                  <tr
-                                    key={index}
-                                    onClick={() => setSelectedBand(band)}
-                                    title="Click to See history"
-                                    className="hover:bg-gray-shadow8 cursor-pointer"
-                                  >
-                                    <td className="p-1">
-                                      {band?.band || 'Unnamed Band'}
-                                    </td>
-                                    <td className="p-1">
-                                      {band?.price
-                                        ? `${currencySymbol}${band.price.toFixed(2)}`
-                                        : 'N/A'}
-                                    </td>
-                                    <td className="p-1">
-                                      {ISOStringToLocalTime(band.effectiveDate)}
-                                    </td>
-                                    <td className="p-1">
-                                      {band.setBy?.fullName || 'unknown'}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                            <ResponsiveTable
+                              className="mb-3 my-1"
+                              align="left"
+                              dense
+                              maxHeightClass=""
+                              rows={productData.pricing}
+                              getRowKey={(_, i) => i}
+                              onRowClick={(band) => setSelectedBand(band)}
+                              columns={[
+                                {
+                                  key: 'band',
+                                  header: 'Price Band',
+                                  mobile: 'title',
+                                  cell: (band) => band?.band || 'Unnamed Band',
+                                },
+                                {
+                                  key: 'price',
+                                  header: 'Base Price',
+                                  mobile: 'badge',
+                                  cell: (band) =>
+                                    band?.price
+                                      ? `${currencySymbol}${band.price.toFixed(2)}`
+                                      : 'N/A',
+                                },
+                                {
+                                  key: 'date',
+                                  header: 'Effective Date',
+                                  cell: (band) => ISOStringToLocalTime(band.effectiveDate),
+                                },
+                                {
+                                  key: 'setBy',
+                                  header: 'Set By',
+                                  cell: (band) => band.setBy?.fullName || 'unknown',
+                                },
+                              ]}
+                            />
+                            <p className="text-xs text-text-gray">
+                              Tap a band to see its price history.
+                            </p>
                           </div>
                         ) : (
                           <p className="text-text-gray">
@@ -152,7 +155,7 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                           {productData.components.map((component, index) => (
                             <div key={index} className="mb-3 p-3 rounded-lg">
                               <div className="border w-full p-1">
-                                <div className="flex flex-row justify-between items-center w-full">
+                                <div className="flex flex-row flex-wrap gap-3 justify-between items-center w-full">
                                   <h3 className="font-semibold">
                                     {component?.categoryName ||
                                       'Unnamed Category'}
@@ -263,7 +266,7 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                           key={tax?.taxBand?._id}
                           className="mb-2 p-2 border-b"
                         >
-                          <div className="flex flex-row items-center justify-between mb-2">
+                          <div className="flex flex-row flex-wrap gap-2 items-center justify-between mb-2">
                             <h3 className="font-semibold">
                               {`${tax?.taxBand?.name} branch(es)` ||
                                 'Unnamed Tax Band'}
@@ -281,60 +284,55 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                               band.
                             </p>
                           ) : productData?.pricing?.length > 0 ? (
-                            <table className="w-full mb-3 my-1">
-                              <thead>
-                                <tr className="bg-background-2 border border-gray-border text-sm">
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    Price Band
-                                  </th>
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    {`Base tax (${tax?.taxBand?.rates?.rate}%)`}
-                                  </th>
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    Product Additional tax
-                                  </th>
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    Total tax
-                                  </th>
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    Net Price
-                                  </th>
-                                  <th className="p-1 text-left bg-green-shadow8 border border-gray-border">
-                                    Gross Price
-                                  </th>
-                                </tr>
-                              </thead>
-
-                              <tbody>
-                                {productData?.pricing?.map((band, index) => (
-                                  <tr
-                                    key={index}
-                                    onClick={() => setSelectedBand(band)}
-                                    title="Click to See history"
-                                    className="hover:bg-gray-shadow8 cursor-pointer border-b"
-                                  >
-                                    <td className="p-1">
-                                      {band?.band || 'Unnamed Band'}
-                                    </td>
-                                    <td className="p-1">
-                                      {`${getBaseTax(tax.taxBand?.rates?.rate || 0, band?.price || 0)} `}
-                                    </td>
-                                    <td className="p-1">
-                                      {getAdditionalTax(
-                                        tax.taxDetails,
-                                        band?.price
-                                      ) || 0}
-                                    </td>
-                                    <td className="p-1">{`${currencySymbol}${getTotalTax(tax, band?.price) || 0}`}</td>
-                                    <td className="p-1">{`${getNetPrice(band?.price, getTotalTax(tax, band?.price)) || 0}`}</td>
-                                    <td className="p-1">
-                                      {`${currencySymbol}${band?.price.toFixed(2)}` ||
-                                        'N/A'}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                            <ResponsiveTable
+                              className="mb-3 my-1"
+                              align="left"
+                              dense
+                              maxHeightClass=""
+                              rows={productData?.pricing || []}
+                              getRowKey={(_, i) => i}
+                              onRowClick={(band) => setSelectedBand(band)}
+                              columns={[
+                                {
+                                  key: 'band',
+                                  header: 'Price Band',
+                                  mobile: 'title',
+                                  cell: (band) => band?.band || 'Unnamed Band',
+                                },
+                                {
+                                  key: 'baseTax',
+                                  header: `Base tax (${tax?.taxBand?.rates?.rate}%)`,
+                                  cell: (band) =>
+                                    `${getBaseTax(tax.taxBand?.rates?.rate || 0, band?.price || 0)} `,
+                                },
+                                {
+                                  key: 'additionalTax',
+                                  header: 'Product Additional tax',
+                                  mobileLabel: 'Additional tax',
+                                  cell: (band) =>
+                                    getAdditionalTax(tax.taxDetails, band?.price) || 0,
+                                },
+                                {
+                                  key: 'totalTax',
+                                  header: 'Total tax',
+                                  cell: (band) =>
+                                    `${currencySymbol}${getTotalTax(tax, band?.price) || 0}`,
+                                },
+                                {
+                                  key: 'net',
+                                  header: 'Net Price',
+                                  cell: (band) =>
+                                    `${getNetPrice(band?.price, getTotalTax(tax, band?.price)) || 0}`,
+                                },
+                                {
+                                  key: 'gross',
+                                  header: 'Gross Price',
+                                  mobile: 'badge',
+                                  cell: (band) =>
+                                    `${currencySymbol}${band?.price.toFixed(2)}` || 'N/A',
+                                },
+                              ]}
+                            />
                           ) : (
                             <p> No pricing bands available in this tax band.</p>
                           )}

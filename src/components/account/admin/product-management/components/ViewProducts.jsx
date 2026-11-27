@@ -17,6 +17,7 @@ import {
 } from '@/services/productsServices';
 import { getAllProductsByCompanyIdService } from '@/services/productsServices';
 import { FaFileExport, FaFilter, FaPlus, FaSearch } from 'react-icons/fa';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewProducts = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -301,7 +302,7 @@ const ViewProducts = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Product Management'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <ProductManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -310,10 +311,10 @@ const ViewProducts = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
             {/* search bar and filters */}
-            <div className="flex flex-row gap-5 w-full justify-between items-center">
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-5 w-full md:justify-between md:items-center">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex flex-row items-center w-full">
                 <FaSearch className="text-text-gray" />
                 <input
                   type="text"
@@ -323,7 +324,7 @@ const ViewProducts = ({ pageDescription }) => {
                   className="focus:outline-none ml-2 w-full"
                 />
               </div>
-              <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
+              <div className="flex flex-row flex-wrap gap-2 text-sm md:min-w-fit text-text-gray">
                 <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
                   <FaFilter className="" />
                   <select
@@ -374,172 +375,125 @@ const ViewProducts = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="overflow-x-auto w-full h-full min-h-[50vh] max-h-[60vh] overflow-y-auto scrollbar-thin relative">
-                <table className="w-full table-auto relative">
-                  <thead className="bg-background-1 sticky top-[-1px] z-10">
-                    <tr className="text-left text-text-gray text-sm font-medium border border-gray-border">
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Product Name
-                      </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Product I D
-                      </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Category
-                      </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Availability
-                      </th>
-                      <th className="px-2 py-2 border border-gray-border text-center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm text-text-gray min-h-[40vh] w-full">
-                    {filteredProducts?.length > 0 ? (
-                      filteredProducts?.map((product) => (
-                        <tr
-                          key={product._id}
-                          className={`border-b border-gray-border hover:bg-gray-shadow10 hover:text-text-black cursor-pointer items-center w-full`}
-                          onClick={() =>
-                            Router.push(
-                              `/pages/account/admin/product-management/product-details?id=${product._id}`
-                            )
+              <div className="w-full h-full relative flex flex-col gap-2">
+                <ResponsiveTable
+                  maxHeightClass="md:max-h-[60vh]"
+                  rows={filteredProducts || []}
+                  onRowClick={(product) =>
+                    Router.push(
+                      `/pages/account/admin/product-management/product-details?id=${product._id}`
+                    )
+                  }
+                  selection={{
+                    isSelected: (product) => selectedProduct.includes(product._id),
+                    onToggle: (product) => handleSelectProduct(product._id),
+                    rowLabel: (product) => product?.name,
+                  }}
+                  emptyMessage={
+                    <span className="flex flex-col w-full justify-center items-center gap-4 font-normal">
+                      <span className="text-lg">No products found</span>
+                      <Link
+                        href="/pages/account/admin/product-management/create-new-product"
+                        className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-9 px-3 items-center hover:bg-blue-shadow1"
+                      >
+                        <Image src="/assets/add.png" alt="" width={15} height={15} />
+                        <span>start by creating a product</span>
+                      </Link>
+                    </span>
+                  }
+                  columns={[
+                    {
+                      key: 'name',
+                      header: 'Product Name',
+                      align: 'left',
+                      mobile: 'title',
+                      cell: (product) => (
+                        <span className="flex items-center gap-2">
+                          <Image
+                            src={product?.imageURL || '/assets/shopping-bag.png'}
+                            alt=""
+                            width={30}
+                            height={30}
+                            className="object-cover shrink-0"
+                          />
+                          <span className="font-semibold">{product?.name || '-'}</span>
+                        </span>
+                      ),
+                    },
+                    {
+                      key: 'id',
+                      header: 'Product ID',
+                      align: 'left',
+                      mobile: 'subtitle',
+                      cell: (product) => product?._id || '-',
+                    },
+                    {
+                      key: 'category',
+                      header: 'Category',
+                      align: 'left',
+                      cell: (product) => product?.category?.name || '-',
+                    },
+                    {
+                      key: 'availability',
+                      header: 'Availability',
+                      align: 'left',
+                      cell: (product) => (
+                        <>
+                          Available in
+                          <span className="font-semibold">
+                            {` ${product?.availability || 0}`}
+                          </span>
+                          {product?.availability > 1 ? ' branches' : ' branch'}
+                        </>
+                      ),
+                    },
+                  ]}
+                  actions={(product) => (
+                    <>
+                      <button
+                        type="button"
+                        title="Edit Product"
+                        aria-label="Edit Product"
+                        onClick={() =>
+                          Router.push(
+                            `/pages/account/admin/product-management/edit-product?id=${product._id}`
+                          )
+                        }
+                      >
+                        <Image src="/assets/edit.png" alt="" width={15} height={15} />
+                      </button>
+                      <button
+                        type="button"
+                        title={product.isDisabled ? 'Enable Product' : 'Disable Product'}
+                        aria-label={product.isDisabled ? 'Enable Product' : 'Disable Product'}
+                        onClick={(e) => handleOpenEnableOrDisableModal(e, [product._id])}
+                      >
+                        <Image
+                          src={
+                            product.isDisabled !== true
+                              ? '/assets/switch_active.png'
+                              : '/assets/switch_inactive.png'
                           }
-                        >
-                          <td
-                            className={`px-2 py-2 text-left flex items-center gap-2`}
-                          >
-                            <input
-                              type="checkbox"
-                              value={product._id}
-                              checked={selectedProduct.includes(product._id)}
-                              onClick={(e) => e.stopPropagation()} // Stop event propagation
-                              onChange={(e) => {
-                                e.stopPropagation(); // Stop event propagation
-                                handleSelectProduct(e.target.value);
-                              }}
-                              className="cursor-pointer mr-5"
-                            />
-
-                            <Image
-                              src={
-                                product?.imageURL || '/assets/shopping-bag.png'
-                              }
-                              alt={product?.name || 'Product Image'}
-                              width={30}
-                              height={30}
-                              className="object-cover"
-                            />
-                            <span
-                              className={`px-2 py-2 text-center font-semibold`}
-                            >
-                              {product?.name || '-'}
-                            </span>
-                          </td>
-                          <td className={`px-2 py-2 text-left w-1/6`}>
-                            {product?._id || '-'}
-                          </td>
-                          <td className={`px-2 py-2 text-left w-1/6`}>
-                            {product?.category?.name || '-'}
-                          </td>
-                          <td className={`px-2 py-2 text-left w-1/6`}>
-                            Available in
-                            <span className="font-semibold">
-                              {` ${product?.availability || 0}`}
-                            </span>
-                            {product?.availability > 1
-                              ? ' branches'
-                              : ' branch'}
-                          </td>
-
-                          {/* Actions */}
-                          <td className={`px-2 py-2 text-center w-1/6`}>
-                            <span className="flex flex-row items-center gap-2 justify-around">
-                              <button>
-                                <Image
-                                  src="/assets/edit.png"
-                                  alt="edit"
-                                  width={15}
-                                  height={15}
-                                  className="cursor-pointer"
-                                  title="Edit Product"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Stop event propagation
-                                    Router.push(
-                                      `/pages/account/admin/product-management/edit-product?id=${product._id}`
-                                    );
-                                  }}
-                                />
-                              </button>
-                              <button className="">
-                                <Image
-                                  src={
-                                    product.isDisabled !== true
-                                      ? '/assets/switch_active.png'
-                                      : '/assets/switch_inactive.png'
-                                  }
-                                  alt="delete"
-                                  width={20}
-                                  height={20}
-                                  title={
-                                    product.isDisabled
-                                      ? 'Enable Product'
-                                      : 'Disable Product'
-                                  }
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleOpenEnableOrDisableModal(e, [
-                                      product._id,
-                                    ]);
-                                  }}
-                                  className="cursor-pointer"
-                                />
-                              </button>
-                              <button className="">
-                                <Image
-                                  src="/assets/delete.png"
-                                  alt="delete"
-                                  width={15}
-                                  height={15}
-                                  title="Delete Product"
-                                  onClick={(e) =>
-                                    handleOpenDeleteModal(e, [product._id])
-                                  }
-                                  className="cursor-pointer"
-                                />
-                              </button>
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="text-center py-32">
-                          <div className="flex flex-col w-full justify-center items-center gap-4">
-                            <span className="text-lg">No products found</span>
-                            <Link
-                              href="/pages/account/admin/product-management/create-new-product"
-                              className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-8 px-2 items-center hover:bg-blue-shadow1"
-                            >
-                              <Image
-                                src="/assets/add.png"
-                                alt="add"
-                                width={15}
-                                height={15}
-                              />
-                              <span>start by creating a product</span>
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                          alt=""
+                          width={20}
+                          height={20}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        title="Delete Product"
+                        aria-label="Delete Product"
+                        onClick={(e) => handleOpenDeleteModal(e, [product._id])}
+                      >
+                        <Image src="/assets/delete.png" alt="" width={15} height={15} />
+                      </button>
+                    </>
+                  )}
+                />
 
                 {/* Selected products indicator */}
                 {selectedProduct.length > 0 && (
-                  <div className="flex justify-end mt-4 sticky bottom-0 right-5 gap-5">
+                  <div className="flex flex-wrap justify-end mt-4 sticky bottom-0 right-5 gap-3 md:gap-5">
                     <div className="bg-brand-green text-sm text-text-white p-2 rounded-md flex items-center gap-2">
                       <span>{selectedProduct.length} SELECTED</span>
                       <button
@@ -593,9 +547,7 @@ const ViewProducts = ({ pageDescription }) => {
               </div>
             )}
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

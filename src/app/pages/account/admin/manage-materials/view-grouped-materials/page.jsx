@@ -3,7 +3,7 @@ import ViewGroupedMaterialsPage from '@/components/account/admin/material-manage
 import React from 'react';
 
 const page = () => {
-  return <div><ViewGroupedMaterialsPage/></div>;
+  return <div className="h-full"><ViewGroupedMaterialsPage/></div>;
 };
 
 export default page;

@@ -1,5 +1,4 @@
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import NewPurchaseRecord from './components/purchases/NewPurchaseRecord';
 
@@ -19,10 +18,7 @@ const NewPurchaseRecordPage = () => {
 
   return (
     <div className="flex flex-row gap-0 bg-background-1 relative">
-      <div>
-        <AdminSideBar selectedMenu="purchases-and-supply" />
-      </div>
-      <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+      <div className="w-full h-full overflow-y-auto ">
         <NewPurchaseRecord pageDescription={pageDescription} />
       </div>
     </div>

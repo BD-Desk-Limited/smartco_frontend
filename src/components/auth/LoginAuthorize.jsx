@@ -223,7 +223,7 @@ const LoginAuthorize = () => {
               width={70}
               height={76}
               alt="Top Image"
-              className="absolute top-8 right-8"
+              className="absolute top-3 right-3 md:top-8 md:right-8"
               loading="lazy"
             />
           </div>

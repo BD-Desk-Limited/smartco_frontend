@@ -72,7 +72,7 @@ const DissociateBranchModal = ({
   };
 
   return (
-    <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-3 min-h-[50vh] w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60] p-3 w-full">
       {loading ? (
         <Spinner />
       ) : success ? (
@@ -96,7 +96,7 @@ const DissociateBranchModal = ({
           subText={''}
         />
       ) : (
-        <div className="bg-white rounded-lg w-[400px] p-5 relative">
+        <div className="bg-white rounded-lg w-[400px] max-w-full p-5 relative">
           {/* close button */}
           <button
             onClick={onCloseDissociateBranchModal}

@@ -11,6 +11,7 @@ import {
 } from '@/services/customerServices';
 import { fetchCustomersService } from '@/services/customerServices';
 import { formatDate } from '@/utilities/formatTime';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const CustomerGroupSideView = ({
   group,
@@ -139,7 +140,7 @@ const CustomerGroupSideView = ({
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin rounded-l-lg"
+      className="relative w-full md:w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin md:rounded-l-lg"
     >
       <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
         <FaTimes className="text-text-white" onClick={onClose} />
@@ -226,7 +227,7 @@ const CustomerGroupSideView = ({
       <hr></hr>
 
       {/* ---- members ---- */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-semibold text-text-black">Members</h4>
         <div className="h-8 px-2 border border-gray-border rounded-md flex items-center flex-1 max-w-xs">
           <FaSearch aria-hidden="true" />
@@ -250,52 +251,46 @@ const CustomerGroupSideView = ({
         <Spinner />
       ) : (
         <>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-shadow10">
-                {group.canManage && <th className="px-2 py-2 w-8"></th>}
-                <th className="px-2 py-2">Customer</th>
-                <th className="px-2 py-2">Registered at</th>
-                <th className="px-2 py-2">Last visit</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members?.members?.length ? (
-                members.members.map((m) => (
-                  <tr key={m._id} className="border-b border-gray-border">
-                    {group.canManage && (
-                      <td className="px-2 py-2">
-                        <input
-                          type="checkbox"
-                          checked={ticked.includes(m._id)}
-                          onChange={() => toggle(setTicked)(m._id)}
-                          aria-label={`Select ${m.name}`}
-                        />
-                      </td>
-                    )}
-                    <td className="px-2 py-2">
-                      <span className="block text-text-black">{m.name}</span>
-                      <span className="text-xs">{m.customerNumber}</span>
-                    </td>
-                    <td className="px-2 py-2">
-                      {m.registeredBranch?.name || 'N/A'}
-                    </td>
-                    <td className="px-2 py-2">
-                      {m.lastVisited
-                        ? formatDate(new Date(m.lastVisited))
-                        : '-'}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="px-2 py-6 text-center italic" colSpan={4}>
-                    No members yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <ResponsiveTable
+            align="left"
+            dense
+            maxHeightClass=""
+            rows={members?.members || []}
+            emptyMessage="No members yet."
+            selection={
+              group.canManage
+                ? {
+                    isSelected: (m) => ticked.includes(m._id),
+                    onToggle: (m) => toggle(setTicked)(m._id),
+                    rowLabel: (m) => m.name,
+                  }
+                : undefined
+            }
+            columns={[
+              {
+                key: 'customer',
+                header: 'Customer',
+                mobile: 'title',
+                cell: (m) => (
+                  <>
+                    <span className="block text-text-black">{m.name}</span>
+                    <span className="text-xs font-normal">{m.customerNumber}</span>
+                  </>
+                ),
+              },
+              {
+                key: 'registered',
+                header: 'Registered at',
+                cell: (m) => m.registeredBranch?.name || 'N/A',
+              },
+              {
+                key: 'lastVisit',
+                header: 'Last visit',
+                cell: (m) =>
+                  m.lastVisited ? formatDate(new Date(m.lastVisited)) : '-',
+              },
+            ]}
+          />
 
           {members?.pagination && (
             <Pagination
@@ -354,51 +349,44 @@ const CustomerGroupSideView = ({
               {pickerLoading ? (
                 <Spinner />
               ) : (
-                <table className="w-full text-left">
-                  <tbody>
-                    {picker?.customers?.length ? (
-                      picker.customers.map((c) => {
-                        const already = inGroup(c);
-                        return (
-                          <tr
-                            key={c._id}
-                            className="border-b border-gray-border"
-                          >
-                            <td className="px-2 py-2 w-8">
-                              <input
-                                type="checkbox"
-                                disabled={already}
-                                checked={already || picked.includes(c._id)}
-                                onChange={() => toggle(setPicked)(c._id)}
-                                aria-label={`Select ${c.name}`}
-                              />
-                            </td>
-                            <td className="px-2 py-2">
-                              <span className="block text-text-black">
-                                {c.name}
-                              </span>
-                              <span className="text-xs">
-                                {c.customerNumber}
-                              </span>
-                            </td>
-                            <td className="px-2 py-2">
-                              {c.registeredBranch?.name || 'N/A'}
-                            </td>
-                            <td className="px-2 py-2 text-xs">
-                              {already ? 'In group' : ''}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td className="px-2 py-4 text-center italic">
-                          No customers found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                <ResponsiveTable
+                  align="left"
+                  dense
+                  maxHeightClass=""
+                  rows={picker?.customers || []}
+                  emptyMessage="No customers found."
+                  selection={{
+                    isSelected: (c) => inGroup(c) || picked.includes(c._id),
+                    isDisabled: (c) => inGroup(c),
+                    onToggle: (c) => toggle(setPicked)(c._id),
+                    rowLabel: (c) => c.name,
+                  }}
+                  columns={[
+                    {
+                      key: 'customer',
+                      header: 'Customer',
+                      mobile: 'title',
+                      cell: (c) => (
+                        <>
+                          <span className="block text-text-black">{c.name}</span>
+                          <span className="text-xs font-normal">{c.customerNumber}</span>
+                        </>
+                      ),
+                    },
+                    {
+                      key: 'registered',
+                      header: 'Registered at',
+                      cell: (c) => c.registeredBranch?.name || 'N/A',
+                    },
+                    {
+                      key: 'inGroup',
+                      header: '',
+                      mobile: 'badge',
+                      cellClass: () => 'text-xs',
+                      cell: (c) => (inGroup(c) ? 'In group' : ''),
+                    },
+                  ]}
+                />
               )}
 
               {picker?.pagination && (

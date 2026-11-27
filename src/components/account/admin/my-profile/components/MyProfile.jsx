@@ -6,6 +6,7 @@ import SubHeader from '../../SubHeader';
 import Header from '../../AdminHeader';
 import { PROFILE_MENU_ITEMS } from './PROFILE_MENU_ITEMS';
 import SideMenu from './SideMenu';
+import MobileProfileMenu from './MobileProfileMenu';
 
 const hasChildren = (item) =>
   Array.isArray(item?.subMenus) && item.subMenus.length > 0;
@@ -88,8 +89,15 @@ const MyProfile = () => {
         <SubHeader title="My Profile" FirstComponents={<Logo />} />
       </div>
 
-      <div className="flex flex-row gap-4 w-full overflow-y-hidden no-scrollbar bg-text-white flex-1 p-4 items-start">
-        <div className="h-[420px] p-2">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:overflow-y-hidden bg-text-white flex-1 p-2 md:p-4 items-stretch md:items-start">
+        <MobileProfileMenu
+          items={PROFILE_MENU_ITEMS}
+          activePath={activePath}
+          activeChain={activeChain}
+          onSelect={handleSelect}
+        />
+        {/* md and up: menu with hover fly-outs */}
+        <div className="hidden md:block h-[420px] p-2">
           <h2 className="flex flex-row items-baseline mb-5 mt-7 text-lg text-brand-blue gap-2">
             <FaRegUser />
             <span>My Profile</span>
@@ -112,9 +120,9 @@ const MyProfile = () => {
           </nav>
         </div>
 
-        <section className="flex w-full justify-center bg-text-white rounded-lg shadow-sm p-4 h-[90%] overflow-y-auto scrollbar-thin relative">
+        <section className="flex w-full min-w-0 justify-center bg-text-white rounded-lg shadow-sm p-2 md:p-4 md:h-[90%] md:overflow-y-auto relative pb-6">
           <div className="w-full">
-            <p className="text-xs text-text-gray mb-3 text-left">
+            <p className="hidden md:block text-xs text-text-gray mb-3 text-left">
               {activeChain.map((i) => i.label).join(' / ')}
             </p>
             <AnimatePresence mode="wait">

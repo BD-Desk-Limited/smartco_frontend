@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import {useRouter} from 'next/navigation';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ComponentMaterialsModal = ({material, onClose, allMaterials}) => {
     const Router = useRouter();
@@ -10,7 +11,7 @@ const ComponentMaterialsModal = ({material, onClose, allMaterials}) => {
     };
 
   return (
-    <div className='w-[35%] p-4 flex flex-col items-center justify-between gap-1'>
+    <div className='w-full h-full md:h-auto md:w-[60%] lg:w-[35%] p-2 md:p-4 flex flex-col items-center justify-between gap-1'>
         <button
           onClick={onClose}
           title="Close"
@@ -18,7 +19,7 @@ const ComponentMaterialsModal = ({material, onClose, allMaterials}) => {
         >
           X
         </button>
-        <div className='flex flex-col gap-3 bg-background-1 rounded-lg p-3 w-full h-[80vh] overflow-y-auto scrollbar-thin'>
+        <div className='flex flex-col gap-3 bg-background-1 rounded-lg p-3 w-full flex-1 md:flex-none md:h-[80vh] overflow-y-auto'>
             <h1 className='font-bold'>Grouped Material Summary</h1>
             <h1 className='text-lg font-semibold text-brand-blue'>{material.name}</h1>
             <span className='text-sm max-h-40 overflow-y-auto scrollbar-thin'>{material.description}</span>
@@ -26,26 +27,24 @@ const ComponentMaterialsModal = ({material, onClose, allMaterials}) => {
             <div className='flex flex-col rounded-lg p-2'>
                 <h2 className=''>Component materials</h2>
                     {material.components && material.components.length > 0 ? (
-                        <table className='w-full rounded-lg'>
-                            <thead className='text-left text-md bg-gray-shadow5 '>
-                                <tr className='text-sm'> 
-                                    <th className='p-1 font-semibold'>Material</th>
-                                    <th className='p-1 font-semibold'>Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody className='text-sm max-h-[50vh] overflow-y-auto scrollbar-thin'>
-                                {material.components.map((component, index) => {
-                                    const componentMaterial = getComponentById(component.id);
-                                    if (!componentMaterial) return null; // Skip if material not found
-                                    return(
-                                        <tr key={index} className='text-sm'>
-                                            <td className='p-1'>{componentMaterial.name}</td>
-                                            <td className='p-1'>{component.quantity} {componentMaterial?.unitOfMeasurement?.name}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                        <ResponsiveTable
+                            align="left"
+                            dense
+                            maxHeightClass="md:max-h-[50vh]"
+                            getRowKey={(_, i) => i}
+                            rows={material.components
+                                .map((component) => ({ component, material: getComponentById(component.id) }))
+                                .filter((r) => r.material)}
+                            columns={[
+                                { key: 'material', header: 'Material', cell: (r) => r.material.name, mobile: 'title' },
+                                {
+                                    key: 'qty',
+                                    header: 'Quantity',
+                                    cell: (r) => `${r.component.quantity} ${r.material?.unitOfMeasurement?.name || ''}`,
+                                    mobile: 'badge',
+                                },
+                            ]}
+                        />
                     ):(
                         <div className='flex items-center justify-center h-20'>
                             <span className='text-sm text-gray-400'>This materials has no component</span>

@@ -186,7 +186,7 @@ const CreateUser = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Create a new User'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <UsersManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -195,7 +195,7 @@ const CreateUser = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-[70vh] overflow-y-auto scrollbar-thin flex flex-col gap-5 text-text-gray relative">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md md:h-[70vh] md:overflow-y-auto flex flex-col gap-5 text-text-gray relative">
             <span
               onClick={() =>
                 (window.href =
@@ -216,7 +216,7 @@ const CreateUser = ({ pageDescription }) => {
             <form className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <span>Select type of account to create</span>
-                <span className="flex flex-row gap-5 p-5">
+                <span className="flex flex-row flex-wrap gap-3 md:gap-5 p-2 md:p-5">
                   {roles.map((role) => (
                     <span
                       key={role?.name}
@@ -233,12 +233,12 @@ const CreateUser = ({ pageDescription }) => {
               </div>
 
               {formData?.role && (
-                <div className="flex flex-row gap-5 w-full h-full">
+                <div className="flex flex-col md:flex-row gap-5 w-full h-full">
                   <motion.div
                     initial={{ x: '100%', opacity: 0, scale: 0.95 }}
                     animate={{ x: 0, opacity: 1, scale: 1 }}
                     transition={{ type: 'spring', stiffness: 80, damping: 20 }}
-                    className="w-[50%]"
+                    className="w-full md:w-[50%]"
                   >
                     <CreateUserForm
                       formData={formData}
@@ -255,7 +255,7 @@ const CreateUser = ({ pageDescription }) => {
                         stiffness: 80,
                         damping: 20,
                       }}
-                      className="w-[50%]"
+                      className="w-full md:w-[50%]"
                     >
                       <UserBranchManagement
                         updatedUserData={formData}
@@ -271,7 +271,7 @@ const CreateUser = ({ pageDescription }) => {
                         stiffness: 80,
                         damping: 20,
                       }}
-                      className="w-[50%]"
+                      className="w-full md:w-[50%]"
                     >
                       <SelectUserTeam
                         formData={formData}
@@ -300,9 +300,7 @@ const CreateUser = ({ pageDescription }) => {
               />
             </div>
           )}
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

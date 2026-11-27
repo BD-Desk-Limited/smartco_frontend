@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import AdminSideBar from '../AdminSideBar';
 import AdminDashboard from './components/AdminDashboard';
 import { useSetup } from '@/contexts/setupContext';
 import SetUps from './components/setups/SetUps';
@@ -9,7 +8,6 @@ import OfflineScreen from '../../OfflineScreen';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
 
 const AdminDashboardPage = () => {
-  const [selectedMenu, setSelectedMenu] = React.useState('dashboard');
 
   const { setupComplete, setupProgress, loading, isSetUpAdmin, error } =
     useSetup();
@@ -48,14 +46,8 @@ const AdminDashboardPage = () => {
   return (
     <>
       {setupComplete === true ? (
-        <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
-          <div className="h-full">
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
-          <div className="w-full h-full overflow-y-auto no-scrollbar">
+        <div className="flex flex-row gap-0 bg-background-1 h-full overflow-hidden ">
+          <div className="w-full h-full overflow-y-auto ">
             <AdminDashboard />
           </div>
         </div>

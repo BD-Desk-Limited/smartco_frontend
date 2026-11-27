@@ -12,6 +12,7 @@ import {
   FaDownload,
   FaShippingFast,
 } from 'react-icons/fa';
+import FilterSheet from '../../ui/FilterSheet';
 
 const PurchasesAndSupplyFilters = ({
   selectedFilters,
@@ -136,29 +137,50 @@ const PurchasesAndSupplyFilters = ({
       ? `All ${plural} Selected`
       : `${count} ${count === 1 ? singular : plural} Selected`;
 
+  // applied filters (not drafts), for the badge on the phone "Filters" button
+  const activeCount =
+    (selectedFilters.branches?.length ? 1 : 0) +
+    (selectedFilters.suppliers?.length ? 1 : 0) +
+    (selectedFilters.from || selectedFilters.to ? 1 : 0) +
+    (selectedFilters.status ? 1 : 0);
+
+  // rendered twice: next to the Filters button on phones, in the filter row on md+
+  const searchBox = (extraClass = '') => (
+    <div
+      className={`h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex-row items-center bg-white ${extraClass}`}
+    >
+      <FaSearch width={15} height={15} className="shrink-0" />
+      <input
+        type="search"
+        enterKeyHint="search"
+        placeholder="Search by order ID/Supplier name"
+        aria-label="Search by order ID or supplier name"
+        value={draftFilters.searchTerm || ''}
+        onChange={(e) => onChangeFilter('searchTerm', e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+        className="focus:outline-none ml-2 w-full text-base md:text-sm bg-transparent"
+      />
+    </div>
+  );
+
   return (
-    <div className="flex flex-row gap-5 w-auto justify-between items-center">
-      <div className="flex flex-col gap-2 w-full border border-collapse border-gray-border rounded-md p-2">
-        <div className="flex flex-row gap-2 items-center w-full justify-between">
-          {/* Search */}
-          <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-1/2">
-            <FaSearch width={15} height={15} />
-            <input
-              type="text"
-              placeholder="Search by order ID/Supplier name"
-              value={draftFilters.searchTerm || ''}
-              onChange={(e) => onChangeFilter('searchTerm', e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-              className="focus:outline-none ml-2 w-full text-sm"
-            />
-          </div>
+    <div className="flex flex-col md:flex-row gap-3 md:gap-5 w-full justify-between md:items-center">
+      <div className="flex flex-col gap-2 w-full md:border border-collapse border-gray-border rounded-md md:p-2">
+        <FilterSheet
+          activeCount={activeCount}
+          leading={searchBox('flex w-full')}
+          onApply={applyFilters}
+        >
+        <div className="flex flex-col md:flex-row gap-3 md:gap-2 md:items-center w-full justify-between">
+          {/* Search (md+; phones get it next to the Filters button) */}
+          {searchBox('hidden md:flex md:w-1/2')}
 
           {/* Branches multi-selects */}
           {branches.length > 0 && (
-            <div className="w-1/4 relative">
+            <div className="w-full md:w-1/4 relative">
               <div
                 onClick={toggleBranchesDropdown}
-                className="focus:outline-none cursor-pointer whitespace-nowrap h-8 px-2 border border-gray-border rounded-md flex flex-row justify-between items-center text-sm text-text-gray w-full relative"
+                className="focus:outline-none cursor-pointer whitespace-nowrap h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row justify-between items-center text-sm text-text-gray w-full relative"
               >
                 <FaHome
                   aria-hidden="true"
@@ -179,7 +201,7 @@ const PurchasesAndSupplyFilters = ({
               </div>
 
               {branchesOpen && (
-                <div className="absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md min-w-[200px] max-h-72 overflow-y-auto scrollbar-thin">
+                <div className="md:absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md md:min-w-[200px] max-h-72 overflow-y-auto scrollbar-thin">
                   <label className="flex flex-row items-center gap-2 p-1 text-sm cursor-pointer border-b border-gray-border mb-1 pb-1 bg-blue-shadow10">
                     <input
                       type="checkbox"
@@ -215,10 +237,10 @@ const PurchasesAndSupplyFilters = ({
 
           {/* Suppliers multi-selects */}
           {suppliers.length > 0 && (
-            <div className="w-1/4 relative">
+            <div className="w-full md:w-1/4 relative">
               <div
                 onClick={toggleSuppliersDropdown}
-                className="focus:outline-none cursor-pointer whitespace-nowrap h-8 px-2 border border-gray-border rounded-md flex flex-row justify-between items-center text-sm text-text-gray w-full relative"
+                className="focus:outline-none cursor-pointer whitespace-nowrap h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row justify-between items-center text-sm text-text-gray w-full relative"
               >
                 <FaShippingFast
                   aria-hidden="true"
@@ -239,7 +261,7 @@ const PurchasesAndSupplyFilters = ({
               </div>
 
               {suppliersOpen && (
-                <div className="absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md w-full max-h-72 overflow-y-auto scrollbar-thin">
+                <div className="md:absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md w-full max-h-72 overflow-y-auto scrollbar-thin">
                   <label className="flex flex-row items-center gap-2 p-1 text-sm cursor-pointer border-b border-gray-border mb-1 pb-1 bg-blue-shadow10">
                     <input
                       type="checkbox"
@@ -282,8 +304,8 @@ const PurchasesAndSupplyFilters = ({
           )}
 
           {/* Date range */}
-          <div className="h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray w-1/4">
-            <FaCalendar aria-hidden="true" className="mr-2 text-brand-blue" />
+          <div className="h-10 md:h-8 px-2 border border-gray-border rounded-md flex flex-row items-center text-sm text-text-gray w-full md:w-1/4 bg-white">
+            <FaCalendar aria-hidden="true" className="mr-2 text-brand-blue shrink-0" />
             <DatePicker
               selectsRange
               startDate={parseDate(draftFilters.from)}
@@ -299,13 +321,14 @@ const PurchasesAndSupplyFilters = ({
           </div>
 
           {/* Status */}
-          <div className="flex flex-row gap-2 text-sm w-1/4 text-text-gray">
-            <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
-              <FaFilter aria-hidden="true" />
+          <div className="flex flex-row gap-2 text-sm w-full md:w-1/4 text-text-gray">
+            <div className="h-10 md:h-8 px-1 border border-gray-border rounded-md flex flex-row items-center w-full md:w-auto bg-white">
+              <FaFilter aria-hidden="true" className="shrink-0" />
               <select
                 value={draftFilters.status}
                 onChange={(e) => onChangeFilter('status', e.target.value)}
-                className="focus:outline-none cursor-pointer"
+                aria-label="Filter by status"
+                className="focus:outline-none cursor-pointer w-full md:w-auto bg-transparent"
               >
                 <option value="">All Status</option>
                 {STATUS_OPTIONS.map((type) => (
@@ -318,21 +341,23 @@ const PurchasesAndSupplyFilters = ({
           </div>
         </div>
 
-        <div className="flex flex-row justify-center w-full">
+        {/* md+ apply button; on phones the sheet's "Show results" applies */}
+        <div className="hidden md:flex flex-row justify-center w-full mt-2">
           <button
             onClick={applyFilters}
-            className="px-4 w-1/3 py-1 bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
+            className="px-4 w-full md:w-1/3 py-1 bg-brand-blue text-white rounded-lg hover:bg-blue-shadow1"
           >
             Apply filter
           </button>
         </div>
+        </FilterSheet>
       </div>
 
-      <div className="text-sm rounded-md flex flex-col justify-center gap-2 max-w-[100px] h-full">
+      <div className="text-sm rounded-md flex flex-row md:flex-col justify-between md:justify-center gap-2 md:max-w-[100px] h-full">
         <button
           onClick={onExport}
           disabled={preparingExport}
-          className="shadow-md border border-gray-border rounded-md p-1 whitespace-nowrap flex items-center gap-1 hover:bg-gray-shadow10 disabled:opacity-50 w-fit text-center"
+          className="shadow-md border border-gray-border rounded-md p-2 md:p-1 whitespace-nowrap flex items-center gap-1 hover:bg-gray-shadow10 disabled:opacity-50 w-fit text-center bg-white"
         >
           <FaDownload aria-hidden="true" />
           {preparingExport ? 'Preparing...' : 'Print / Export'}

@@ -9,20 +9,31 @@ import {
 } from '../cart/CartBillCalculationFunctions';
 import OrderFulfilmentTime from './OrderFulfilmentTime';
 import SelectPaymentMethod from './SelectPaymentMethod';
-import {
-  FaCashRegister,
-  FaCreditCard,
-  FaMobile,
-  FaMoneyBillAlt,
-  FaTimes,
-} from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import CashPayment from './payment-methods/CashPayment';
-import CardPayment from './payment-methods/CardPayment';
 import POSPayment from './payment-methods/POSPayment';
-import BankTransfer from './payment-methods/BankTransfer';
+import UnavailablePayment from './payment-methods/UnavailablePayment';
+import { OFFERED_METHODS } from '@/utilities/paymentMethods';
 import { persistTransactionMultiLayer } from '@/services/transactionPersistenceService';
 import { buildRewardSelections } from '../cart/offerHelpers';
 import { useAuth } from '@/contexts/authContext';
+import { commaNumberFormat } from '@/utilities/numbersUtils';
+import { PAYMENT_PLAN_LABELS } from './PaymentProgress';
+
+// the screen for each kind of till payment (a method's tillScreen in utilities/paymentMethods.jsx)
+const TILL_SCREENS = {
+  cash: CashPayment,
+  terminal: POSPayment,
+  unavailable: UnavailablePayment,
+};
+
+const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+
+// one id per checkout (letters, digits and dashes, as the server expects)
+const newCheckoutId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `co-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
 
 const Payment = ({
   cart,
@@ -37,23 +48,27 @@ const Payment = ({
   workBranch,
 }) => {
   const { user } = useAuth(); // the seller logged in at this till right now
-  const Now = new Date().toISOString().slice(0, 16);
   const [isHydrated, setIsHydrated] = React.useState(false);
   const [paymentType, setPaymentType] = React.useState(
     cart?.payment?.paymentType || null
   );
-  const [partialAmountPaid, setPartialAmountPaid] = React.useState(
-    cart?.payment?.partialAmountPaid || 0
+  // the amount the cashier types for "Pay part now": only what is being collected at this checkout
+  const [partialAmountNow, setPartialAmountNow] = React.useState(
+    cart?.payment?.partialAmountNow || 0
   );
   const [total, setTotal] = React.useState(cart?.payment?.total || 0);
   const [selectedFulfillmentTime, setSelectedFulfillmentTime] = React.useState(
     cart?.payment?.selectedFulfillmentTime || 'Now'
   );
+  // a full ISO time (UTC), so the server reads the moment the cashier picked in local time
   const [orderScheduledDateTime, setOrderScheduledDateTime] = React.useState(
-    cart?.payment?.orderScheduledDateTime || Now
+    cart?.payment?.orderScheduledDateTime || new Date().toISOString()
   );
+  // what the cashier chose for THIS checkout: 'full' | 'partial' | 'none' (null until chosen)
   const [selectedPaymentPlan, setSelectedPaymentPlan] = React.useState(
-    cart?.payment?.selectedPaymentPlan || 'full'
+    typeof cart?.payment?.selectedPaymentPlan === 'string'
+      ? cart.payment.selectedPaymentPlan
+      : null
   );
   const [openPaymentMethodOverlay, setOpenPaymentMethodOverlay] =
     React.useState(true);
@@ -81,6 +96,38 @@ const Payment = ({
     }
   }, [cart?.items, cart?.checkoutInitiatedAt, setActiveMenuItem]);
 
+  /*
+    Payment progress. The cashier only deals with what is collected NOW, and that is what the server is
+    sent (amountPaidNow), under an id for this checkout so a re-sent copy is never recorded twice.
+    - paidBefore: paid at earlier checkouts less refunds (set when a scheduled order is moved back to the cart)
+    - collectingNow: an order fulfilled now collects the whole balance; a scheduled one what the plan says
+    - total: today's price. A scheduled order's price is only fixed when it is fulfilled.
+  */
+  const paidBefore = round2(cart?.amountPaid || 0);
+  const earlierPayments = cart?.payment?.entries || [];
+  const earlierRefunds = cart?.payment?.refunds || [];
+  const balanceBefore = round2(Math.max(total - paidBefore, 0));
+  const isScheduled = selectedFulfillmentTime === 'scheduled';
+  const collectingNow = !isScheduled
+    ? balanceBefore
+    : selectedPaymentPlan === 'full'
+      ? balanceBefore
+      : selectedPaymentPlan === 'partial'
+        ? round2(
+            Math.min(Math.max(Number(partialAmountNow) || 0, 0), balanceBefore)
+          )
+        : 0;
+  const paidAfter = round2(paidBefore + collectingNow);
+  const balanceAfter = round2(Math.max(total - paidAfter, 0));
+  // where the order stands once this checkout is done, as the server stores it
+  const paymentPlanAfter =
+    paidAfter >= total && total > 0
+      ? 'full'
+      : paidAfter > 0
+        ? 'partial'
+        : 'none';
+  const nothingToCollect = collectingNow < 0.01;
+
   //tie payment info to cart, for persistency and sync with order.
   React.useEffect(() => {
     setCart((prevCart) => {
@@ -90,11 +137,15 @@ const Payment = ({
 
       const paymentData = {
         paymentType,
-        partialAmountPaid,
+        partialAmountNow,
+        collectingNow,
         selectedFulfillmentTime,
         orderScheduledDateTime,
         selectedPaymentPlan,
         total,
+        // earlier payments and refunds, from the scheduled order (shown, never sent back)
+        entries: prevCart.payment?.entries || [],
+        refunds: prevCart.payment?.refunds || [],
       };
 
       return {
@@ -104,7 +155,8 @@ const Payment = ({
     });
   }, [
     paymentType,
-    partialAmountPaid,
+    partialAmountNow,
+    collectingNow,
     selectedFulfillmentTime,
     orderScheduledDateTime,
     selectedPaymentPlan,
@@ -117,71 +169,32 @@ const Payment = ({
     { label: 'Schedule for later', value: 'scheduled' },
   ];
 
+  // choices for what is collected at this checkout of a scheduled order
   const PaymentPlans = [
     {
-      label: 'Full Advance',
+      label: paidBefore > 0 ? 'Pay the balance now' : 'Pay in full now',
       value: 'full',
-      amountPaid: cart?.payment?.total || 0,
+      amount: balanceBefore,
     },
-    {
-      label: 'Partial Payment',
-      value: 'partial',
-      amountPaid: partialAmountPaid,
-    },
-    { label: 'No Payment', value: 'none', amountPaid: 0 },
+    { label: 'Pay part now', value: 'partial' },
+    { label: 'Pay nothing now', value: 'none', amount: 0 },
   ];
 
-  const PAYMENT_METHOD_OPTIONS = [
-    {
-      label: 'Cash',
-      value: 'cash',
-      icon: () => <FaMoneyBillAlt className="font-bold" />,
-      image: '/assets/cash_payment.svg',
-      overlay: CashPayment,
-      style: {
-        overlay: 'border-2 border-brand-green',
-        button: 'bg-brand-green text-white',
-        spinnerColor: 'brand-green',
-      },
-    },
-    {
-      label: 'P.O.S',
-      value: 'pos',
-      icon: () => <FaCashRegister className="font-bold" />,
-      image:
-        'https://www.golomtbank.com/wp-content/uploads/2020/06/V240M-1-1.png',
-      overlay: POSPayment,
-      style: {
-        overlay: 'border-2 border-red-500',
-        button: 'bg-red-500 text-white',
-        spinnerColor: 'red-500',
-      },
-    },
-    {
-      label: 'Card',
-      value: 'card',
-      icon: () => <FaCreditCard className="font-bold" />,
-      image: '/assets/card_payment_method.png',
-      overlay: CardPayment,
-      style: {
-        overlay: 'border-2 border-blue-500',
-        button: 'bg-blue-500 text-white',
-        spinnerColor: 'blue-500',
-      },
-    },
-    {
-      label: 'Bank Transfer',
-      value: 'bank_transfer',
-      icon: () => <FaMobile className="font-bold" />,
-      image: '/assets/bank_payment_method.png',
-      overlay: BankTransfer,
-      style: {
-        overlay: 'border-2 border-yellow-500',
-        button: 'bg-yellow-500 text-white',
-        spinnerColor: 'yellow-500',
-      },
-    },
-  ];
+  const paymentProgress = {
+    total,
+    earlierPayments,
+    earlierRefunds,
+    paidBefore,
+    balanceBefore,
+    collectingNow,
+    balanceAfter,
+  };
+
+  // the payment methods the till offers, from the app's one list (utilities/paymentMethods.jsx)
+  const PAYMENT_METHOD_OPTIONS = OFFERED_METHODS.map((method) => ({
+    ...method,
+    overlay: TILL_SCREENS[method.tillScreen] || UnavailablePayment,
+  }));
 
   const SelectedPaymentMethod = PAYMENT_METHOD_OPTIONS?.find(
     (option) => option.value === cart?.payment?.paymentType
@@ -192,7 +205,10 @@ const Payment = ({
       (option) => option.value === paymentType
     );
     const canNowPay =
-      paymentType && validPaymentTypeSelected && openPaymentMethodOverlay;
+      !nothingToCollect && // nothing due: confirmed from the method column instead
+      paymentType &&
+      validPaymentTypeSelected &&
+      openPaymentMethodOverlay;
 
     if (canNowPay) {
       return true;
@@ -206,24 +222,46 @@ const Payment = ({
   };
 
   const handleActionsToFollowPaymentConfirmation = async () => {
+    // when the money at this checkout was taken. Stamped here so a sale synced later (offline) keeps its real time.
+    const confirmedAt = new Date().toISOString();
+
+    // The checkout as the server records it. checkoutId is made once here and travels with the sale
+    // through every offline retry, so the money is recorded once. No method when nothing was collected.
+    const paymentFields = { ...(cart.payment || {}) };
+    delete paymentFields.entries; // earlier payments and refunds are the server's; never sent back
+    delete paymentFields.refunds;
+    const paymentToSubmit = {
+      ...paymentFields,
+      checkoutId: newCheckoutId(),
+      amountPaidNow: collectingNow,
+      paymentType: nothingToCollect ? null : paymentType,
+      selectedPaymentPlan: paymentPlanAfter,
+      paidAt: confirmedAt,
+    };
+
     const successfullyPaidOrderStatus = {
       success: true,
       order: {
         ...cart,
         payment: {
-          ...cart.payment,
+          ...paymentToSubmit,
+          selectedPaymentPlan: {
+            value: paymentPlanAfter,
+            label: PAYMENT_PLAN_LABELS[paymentPlanAfter],
+          },
           paymentStatus: {
-            ...cart.payment.paymentStatus,
             value: 'success',
-            label:
-              cart?.payment?.selectedFulfillmentTime === 'Now'
-                ? `Payment confirmed!!!`
-                : cart?.payment?.selectedFulfillmentTime === 'scheduled' &&
-                    cart?.payment?.partialAmountPaid > 0
-                  ? `Payment of ${cart.payment.partialAmountPaid?.toFixed(2)} confirmed for scheduled order!!!`
-                  : 'Order Scheduled!!!',
-            time: new Date().toISOString(),
-            amountPaid: partialAmountPaid,
+            label: !isScheduled
+              ? nothingToCollect && paidBefore > 0
+                ? 'Order fulfilled, already paid in full!!!'
+                : 'Payment confirmed!!!'
+              : !nothingToCollect
+                ? `Payment of ${commaNumberFormat(collectingNow, 2)} confirmed for scheduled order!!!`
+                : 'Order Scheduled!!!',
+            time: confirmedAt,
+            paidBefore, // at earlier checkouts
+            amountPaidNow: collectingNow, // at this checkout
+            amountPaid: paidAfter, // in total so far
           },
         },
       },
@@ -252,7 +290,12 @@ const Payment = ({
       rewardSelections: buildRewardSelections(
         cart?.linkedCustomer?.appliedOffers || []
       ),
-      payment: cart?.payment || null,
+      payment: paymentToSubmit,
+      // the version of a restored scheduled order this checkout was made on; if the order has changed
+      // since (fulfilled, cancelled, rescheduled elsewhere), the server changes nothing
+      orderRevision: Number.isInteger(cart?.orderRevision)
+        ? cart.orderRevision
+        : null,
       items:
         cart?.items?.map((item) => {
           const product = item?.product?._id || null;
@@ -292,7 +335,7 @@ const Payment = ({
         },
         { taxType: 'Product Tax', taxAmount: productsTax(cart?.items) },
       ],
-      orderCompletedAt: new Date().toISOString(),
+      orderCompletedAt: confirmedAt,
     };
 
     try {
@@ -359,6 +402,7 @@ const Payment = ({
     mode,
     paymentMethod: { ...SelectedPaymentMethod },
     loading,
+    amountDueNow: collectingNow, // what to collect at this checkout, nothing more
   };
 
   if (!isHydrated || !cart) {
@@ -371,15 +415,17 @@ const Payment = ({
     >
       {/* Fulfilment time */}
       <OrderFulfilmentTime
-        cart={cart}
+        selectedFulfillmentTime={selectedFulfillmentTime}
         setSelectedFulfillmentTime={setSelectedFulfillmentTime}
+        orderScheduledDateTime={orderScheduledDateTime}
         setOrderScheduledDateTime={setOrderScheduledDateTime}
+        selectedPaymentPlan={selectedPaymentPlan}
         setSelectedPaymentPlan={setSelectedPaymentPlan}
-        partialAmountPaid={partialAmountPaid}
-        setPartialAmountPaid={setPartialAmountPaid}
+        partialAmountNow={partialAmountNow}
+        setPartialAmountNow={setPartialAmountNow}
         FulfilmentTimeOptions={FulfilmentTimeOptions}
         PaymentPlans={PaymentPlans}
-        Now={Now}
+        paymentProgress={paymentProgress}
         mode={mode}
       />
 
@@ -390,6 +436,12 @@ const Payment = ({
         PAYMENT_METHOD_OPTIONS={PAYMENT_METHOD_OPTIONS}
         setOpenPaymentMethodOverlay={setOpenPaymentMethodOverlay}
         mode={mode}
+        isScheduled={isScheduled}
+        selectedPaymentPlan={selectedPaymentPlan}
+        nothingToCollect={nothingToCollect}
+        paidBefore={paidBefore}
+        onConfirmWithoutPayment={handleActionsToFollowPaymentConfirmation}
+        loading={loading}
       />
 
       {/* Bill summary */}

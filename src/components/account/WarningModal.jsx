@@ -19,7 +19,7 @@ const WarningModal = ({
 }) => {
   return (
     <motion.div
-      className="bg-white w-[25%] h-[45%] rounded-md shadow-md flex flex-col items-center justify-between"
+      className="bg-white w-[calc(100%-2rem)] max-w-md h-[20rem] max-h-[90dvh] lg:w-[25%] lg:max-w-none lg:h-[45%] lg:max-h-none rounded-md shadow-md flex flex-col items-center justify-between"
       initial={{ scale: 0.5 }}
       animate={{ scale: 1 }}
       transition={{ duration: 0.5 }}

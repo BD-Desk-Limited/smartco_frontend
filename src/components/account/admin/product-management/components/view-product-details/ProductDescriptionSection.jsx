@@ -30,14 +30,14 @@ const ProductDescriptionSection = ({ productData, loading }) => {
           {/* Description Section */}
           <div className="bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2">
             <h4 className="font-semibold text-brand-blue mb-2">Description</h4>
-            <p className="text-text-gray text-sm h-24 overflow-y-auto no-scrollbar">
+            <p className="text-text-gray text-sm h-24 overflow-y-auto ">
               {productData?.description ||
                 'No description available for this product.'}
             </p>
           </div>
 
           {/* Audit Section */}
-          <div className="bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2 h-24 overflow-y-auto no-scrollbar">
+          <div className="bg-white shadow-lg p-2 rounded-lg flex flex-col gap-2 h-24 overflow-y-auto ">
             <p className="text-text-gray text-sm">
               Created at:{' '}
               {productData?.createdAt

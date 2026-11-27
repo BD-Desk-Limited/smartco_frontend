@@ -13,6 +13,7 @@ import {
   fetchPromoOptionsService,
   fetchRewardsGivenReportService,
 } from '@/services/customerServices';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ymd = (d) => d.toISOString().slice(0, 10);
 const money = (n, currency = '') => `${currency}${Number(n || 0).toFixed(2)}`;
@@ -23,31 +24,20 @@ const Table = ({ title, head, rows }) => (
     {rows.length === 0 ? (
       <p className="text-sm text-text-gray">Nothing in this period.</p>
     ) : (
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-text-gray">
-            {head.map((h, i) => (
-              <th
-                key={h}
-                className={`font-normal pb-1 ${i > 0 ? 'text-right' : ''}`}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.key} className="border-t">
-              {r.cells.map((c, i) => (
-                <td key={i} className={`py-1 ${i > 0 ? 'text-right' : ''}`}>
-                  {c}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ResponsiveTable
+        layout="table"
+        dense
+        align="left"
+        maxHeightClass=""
+        rows={rows}
+        getRowKey={(r) => r.key}
+        columns={head.map((h, i) => ({
+          key: h,
+          header: h,
+          align: i > 0 ? 'right' : 'left',
+          cell: (r) => r.cells[i],
+        }))}
+      />
     )}
   </div>
 );

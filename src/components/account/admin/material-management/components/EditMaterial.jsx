@@ -223,7 +223,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
       <div>
         <SubHeader title={'Edit Material'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -232,13 +232,13 @@ const EditMaterial = ({ materialData, pageDescription }) => {
           />
         </div>
         <div className="flex flex-col w-full h-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full text-text-gray">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full text-text-gray">
             <h1 className="font-bold text-lg">{materialData.name}</h1>
             <span className="text-sm">
               Edit this material in your stores, Click on any field to update
             </span>
-            <div className="flex flex-row gap-5 mt-5">
-              <form className="flex flex-row justify-between gap-10 w-[70%]">
+            <div className="flex flex-col-reverse lg:flex-row gap-5 mt-5">
+              <form className="flex flex-col md:flex-row justify-between gap-5 md:gap-10 w-full lg:w-[70%]">
                 <div className="flex flex-col gap-5 w-full">
                   <div className="flex flex-col gap-0.5 w-full">
                     <label className="text-sm">Material Name</label>
@@ -423,7 +423,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                   )}
                 </div>
               </form>
-              <div className="flex flex-col justify-center items-center gap-5 w-[30%]">
+              <div className="flex flex-col justify-center items-center gap-5 w-full lg:w-[30%]">
                 {uploadNewImage ? (
                   <div className="flex flex-col gap-1 w-full justify-center items-center">
                     <div className="flex flex-col justify-center items-center w-full gap-1">
@@ -433,7 +433,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                           alt="Material Image"
                           height={150}
                           width={150}
-                          className="rounded-[100%] h-[150px] w-[150px]"
+                          className="rounded-[100%] h-[150px] w-[150px] max-w-full"
                         />
                       )}
                     </div>
@@ -459,7 +459,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
                       alt={materialData.name || 'Material Image'}
                       width={200}
                       height={200}
-                      className="rounded-[100%] h-[200px] w-[200px]"
+                      className="rounded-[100%] h-[200px] w-[200px] max-w-full"
                     />
                     <span
                       onClick={() => setUploadNewImage(true)}
@@ -474,7 +474,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
             <div className="w-full mt-10">
               {error && <ErrorInterface error={error} />}
             </div>
-            <div className="flex flex-row justify-center w-full gap-20 my-10 items-center">
+            <div className="flex flex-row flex-wrap justify-center w-full gap-4 md:gap-20 my-6 md:my-10 items-center">
               <Button
                 text={'Cancel'}
                 buttonStyle={
@@ -501,7 +501,7 @@ const EditMaterial = ({ materialData, pageDescription }) => {
         </div>
       </div>
       {showSuccessModal && (
-        <div className="inset-0 fixed z-70 flex justify-center items-center bg-black bg-opacity-50">
+        <div className="inset-0 fixed z-[70] flex justify-center items-center bg-black bg-opacity-50">
           <SuccessModal
             title={'Material Updated'}
             message={'success!!!'}

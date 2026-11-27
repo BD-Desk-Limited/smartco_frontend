@@ -1,10 +1,8 @@
 import React from 'react';
-import AdminSideBar from '@/components/account/admin/AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import BulkBranchesUploadReview from './components/BulkBranchesUploadReview';
 
 const BulkBranchUploadReviewPage = () => {
-  const [selectedMenu, setSelectedMenu] = React.useState('branch-management');
 
   const pageDescription =
     'The bulk branch upload review page provides you with a comprehensive interface for reviewing the branches you have uploaded in bulk. It includes options for specifying branch details such as name, address, branch ID, email, phone number, band, tax band, opening hour, and closing hour. Additionally, it offers a bulk upload option for users who need to add multiple branches at once. These branches can be managed and updated as needed, ensuring accurate and up-to-date branch information.';
@@ -17,14 +15,8 @@ const BulkBranchUploadReviewPage = () => {
   }
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1">
-      <div>
-        <AdminSideBar
-          selectedMenu={selectedMenu}
-          setSelectedMenu={setSelectedMenu}
-        />
-      </div>
-      <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+    <div className="flex flex-row gap-0 bg-background-1 h-full">
+      <div className="w-full h-full overflow-y-auto ">
         <BulkBranchesUploadReview pageDescription={pageDescription} />
       </div>
     </div>

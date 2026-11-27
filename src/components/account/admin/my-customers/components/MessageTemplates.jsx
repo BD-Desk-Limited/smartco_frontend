@@ -70,7 +70,7 @@ const TemplateForm = ({ template, placeholders, onClose, onSaved }) => {
   };
 
   return (
-    <div className="relative bg-white p-5 rounded-lg shadow-lg w-[620px] max-w-[95vw] max-h-[90vh] overflow-y-auto text-sm text-text-gray">
+    <div className="relative bg-white p-5 rounded-none sm:rounded-lg shadow-lg w-full h-full sm:h-auto sm:w-[620px] sm:max-w-[95vw] sm:max-h-[90vh] overflow-y-auto text-sm text-text-gray">
       <button
         onClick={onClose}
         title="Close"
@@ -82,7 +82,7 @@ const TemplateForm = ({ template, placeholders, onClose, onSaved }) => {
         {editing ? 'Edit template' : 'New template'}
       </h2>
 
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         <label className="flex flex-col gap-1">
           Name
           <input
@@ -198,7 +198,7 @@ const MessageTemplates = ({ canManage, placeholders, onChanged }) => {
 
   return (
     <div className="flex flex-col gap-3 text-sm text-text-gray">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p>
           {canManage
             ? 'Templates are shared by everyone in your company. Changes apply to future messages only.'
@@ -218,13 +218,13 @@ const MessageTemplates = ({ canManage, placeholders, onChanged }) => {
       {templates === null ? (
         <Spinner />
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {templates.map((t) => (
             <article
               key={t._id}
               className="border border-gray-border rounded-md p-3 flex flex-col gap-1 hover:bg-green-shadow8 shadow-md cursor-pointer scale-95 hover:scale-105 transition-transform"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h4 className="font-semibold text-text-black">{t.name}</h4>
                 <span
                   className={`px-2 py-1 rounded-md text-xs flex flex-row gap-1 ${fetchTypesField(t.type, 'style')}`}

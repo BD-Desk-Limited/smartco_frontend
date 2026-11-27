@@ -4,7 +4,7 @@ import AdminDashboardPage from '@/components/account/admin/dashboard/AdminDashbo
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <AdminDashboardPage />
     </div>
   );

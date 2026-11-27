@@ -12,6 +12,7 @@ import ExportContent from '@/components/account/ExportContent';
 import DeleteModal from '@/components/account/DeleteModal';
 import ComponentMaterialsModal from './ComponentMaterialsModal';
 import SubMenuQuickLinks from '../SubMenuQuicklinks';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewGroupedMaterials = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -203,7 +204,7 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
           }
         />
       </div>
-      <div className="flex flex-row w-full h-full gap-5 relative">
+      <div className="flex flex-col md:flex-row w-full h-full gap-5 relative">
         <div className="min-w-fit absolute top-0 left-0 z-50">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -212,9 +213,9 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
-            <div className="flex flex-row gap-5 w-full justify-between items-center">
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-5 w-full md:justify-between md:items-center">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex flex-row items-center w-full">
                 <Image
                   src="/assets/search.png"
                   alt="search"
@@ -229,7 +230,7 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
                   className="focus:outline-none ml-2 w-full"
                 />
               </div>
-              <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
+              <div className="flex flex-row flex-wrap gap-2 text-sm md:min-w-fit text-text-gray">
                 <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
                   <Image
                     src="/assets/filter.png"
@@ -307,107 +308,103 @@ const ViewGroupedMaterials = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow8 text-sm text-text-gray">
-                      <th className="px-4 py-2">Material Name</th>
-                      <th className="px-4 py-2">Category</th>
-                      <th className="px-4 py-2">Material Type</th>
-                      <th className="px-4 py-2">Unit</th>
-                      <th className="px-4 py-2">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-text-gray">
-                    {filteredMaterials.length > 0 ? (
-                      <>
-                        {filteredMaterials.map((material) => (
-                          <tr
-                            key={material._id}
-                            onClick={() =>
-                              Router.push(
-                                `/pages/account/admin/manage-materials/view-material-details?id=${material._id}`
-                              )
-                            }
-                            className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="checkbox"
-                                value={material._id}
-                                checked={selectedMaterials.includes(
-                                  material._id
-                                )}
-                                onClick={(e) => e.stopPropagation()} // Stop event propagation
-                                onChange={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  handleSelectMaterial(e.target.value);
-                                }}
-                                className="mr-2 cursor-pointer"
-                              />
-                              <span>{material.name}</span>
-                            </td>
-                            <td className="px-4 py-2">
-                              {material.category?.name}
-                            </td>
-                            <td className="px-4 py-2">
-                              {material.materialType}
-                            </td>
-                            <td className="px-4 py-2">
-                              {material.unitOfMeasurement?.name}
-                            </td>
-                            <td className="px-4 py-2 flex flex-row w-full justify-between">
-                              <Image
-                                src="/assets/eye-gray.png"
-                                alt="view"
-                                width={15}
-                                height={15}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  setMaterialToView(material);
-                                }}
-                                title="View Component Materials"
-                              />
-                              <Link
-                                href={`/pages/account/admin/manage-materials/edit-grouped-material?id=${material._id}`}
-                                title="Edit Material"
-                              >
-                                <Image
-                                  src="/assets/edit.png"
-                                  alt="view"
-                                  width={15}
-                                  height={15}
-                                  onClick={(e) => e.stopPropagation()} // Stop event propagation
-                                />
-                              </Link>
-                              <Image
-                                src="/assets/delete.png"
-                                alt="delete"
-                                width={15}
-                                height={15}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  handleMaterialToDelete([material._id]);
-                                }}
-                                className="cursor-pointer"
-                                title="Delete Material"
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </>
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={5}>
-                          No materials found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <div className="flex flex-col gap-2">
+                <ResponsiveTable
+                  align="left"
+                  rows={filteredMaterials}
+                  emptyMessage="No materials found."
+                  onRowClick={(material) =>
+                    Router.push(
+                      `/pages/account/admin/manage-materials/view-material-details?id=${material._id}`
+                    )
+                  }
+                  selection={{
+                    isSelected: (m) => selectedMaterials.includes(m._id),
+                    onToggle: (m) => handleSelectMaterial(m._id),
+                    allSelected:
+                      filteredMaterials.length > 0 &&
+                      filteredMaterials.every((m) =>
+                        selectedMaterials.includes(m._id)
+                      ),
+                    onToggleAll: () =>
+                      setSelectedMaterials(
+                        filteredMaterials.every((m) =>
+                          selectedMaterials.includes(m._id)
+                        )
+                          ? []
+                          : filteredMaterials.map((m) => m._id)
+                      ),
+                    rowLabel: (m) => m.name,
+                  }}
+                  columns={[
+                    {
+                      key: 'name',
+                      header: 'Material Name',
+                      cell: (m) => m.name,
+                      mobile: 'title',
+                    },
+                    {
+                      key: 'category',
+                      header: 'Category',
+                      cell: (m) => m.category?.name,
+                    },
+                    {
+                      key: 'type',
+                      header: 'Material Type',
+                      cell: (m) => m.materialType,
+                    },
+                    {
+                      key: 'unit',
+                      header: 'Unit',
+                      cell: (m) => m.unitOfMeasurement?.name,
+                    },
+                  ]}
+                  actions={(material) => (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setMaterialToView(material)}
+                        title="View Component Materials"
+                        aria-label="View Component Materials"
+                      >
+                        <Image
+                          src="/assets/eye-gray.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
+                      </button>
+                      <Link
+                        href={`/pages/account/admin/manage-materials/edit-grouped-material?id=${material._id}`}
+                        title="Edit Material"
+                        aria-label="Edit Material"
+                      >
+                        <Image
+                          src="/assets/edit.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleMaterialToDelete([material._id])}
+                        title="Delete Material"
+                        aria-label="Delete Material"
+                      >
+                        <Image
+                          src="/assets/delete.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
+                      </button>
+                    </>
+                  )}
+                />
 
                 {selectedMaterials.length > 0 && (
-                  <div className="sticky bottom-0 bg-white flex flex-row py-1 justify-end px-5 gap-5">
+                  <div className="sticky bottom-0 bg-white flex flex-row flex-wrap py-2 justify-end px-2 md:px-5 gap-3 md:gap-5">
                     <button
                       onClick={() => handleMaterialToDelete(selectedMaterials)}
                       className="bg-error text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-90 flex flex-row items-center gap-1"

@@ -25,7 +25,7 @@ const CreateNewTaxBand = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Create new Tax band'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit">
           <SideBar
             selectedSubMenu="create-tax-band"
@@ -35,12 +35,10 @@ const CreateNewTaxBand = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex justify-center items-center">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex justify-center items-center">
             <CreateNewTaxBandForm standAloneTaxManagement={true} />
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
     </div>

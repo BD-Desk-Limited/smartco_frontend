@@ -10,6 +10,7 @@ import PageDescription from '@/components/account/PageDescription';
 import Button from '@/components/account/Button';
 import ReviewCreatedUsers from './ReviewCreatedUsers';
 import ErrorInterface from '@/components/account/errorInterface';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkUserUploadReview = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);
@@ -92,7 +93,7 @@ const BulkUserUploadReview = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Bulk Upload Review'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <UsersManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -100,7 +101,7 @@ const BulkUserUploadReview = ({ pageDescription }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col w-full h-full mx-5">
+        <div className="flex flex-col w-full h-full px-2 md:px-5 pb-6">
           <div>
             {errorData && errorData.length > 0 && hasError && (
               <div className="flex justify-center items-center flex-col p-4 gap-4 w-full bg-text-white rounded-lg my-5">
@@ -113,49 +114,55 @@ const BulkUserUploadReview = ({ pageDescription }) => {
                     Please fix the errors and retry the upload
                   </p>
                 </div>
-                <table className="w-full flex flex-col gap-1">
-                  <thead className="w-full">
-                    <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                      <th>S/No</th>
-                      <th>Error Description</th>
-                      <th>Row to check</th>
-                    </tr>
-                  </thead>
-                  <tbody className="w-full max-h-[50vh] overflow-y-auto scrollbar-thin">
-                    {filteredErrorData.map((datasets, Index) => (
-                      <tr
-                        key={Index}
-                        className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm"
-                      >
-                        <td className="font-semibold w-5">{Index + 1}</td>
-                        <td className="">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.error}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                        <td className="max-w-60 overflow-x-auto">
-                          {Object.values(datasets).map((errorDetail, index) => (
-                            <p
-                              key={index}
-                              className="text-error flex flex-col gap-0.5"
-                            >
-                              {errorDetail.map((detail, indx) => (
-                                <span key={indx}>{detail.row}</span>
-                              ))}
-                            </p>
-                          ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ResponsiveTable
+                  className="w-full"
+                  align="left"
+                  dense
+                  maxHeightClass="md:max-h-[50vh]"
+                  rows={filteredErrorData}
+                  getRowKey={(_, i) => i}
+                  columns={[
+                    {
+                      key: 'sn',
+                      header: 'S/No',
+                      cell: (_, i) => i + 1,
+                      mobile: 'badge',
+                      cellClass: () => 'font-semibold',
+                    },
+                    {
+                      key: 'error',
+                      header: 'Error Description',
+                      mobile: 'title',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5 font-normal"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.error}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                    {
+                      key: 'row',
+                      header: 'Row to check',
+                      mobile: 'wide',
+                      cell: (datasets) =>
+                        Object.values(datasets).map((errorDetail, index) => (
+                          <span
+                            key={index}
+                            className="text-error flex flex-col gap-0.5"
+                          >
+                            {errorDetail.map((detail, indx) => (
+                              <span key={indx}>{detail.row}</span>
+                            ))}
+                          </span>
+                        )),
+                    },
+                  ]}
+                />
               </div>
             )}
           </div>
@@ -178,45 +185,49 @@ const BulkUserUploadReview = ({ pageDescription }) => {
                   <div className="font-semibold w-full">
                     Your Uploaded users
                   </div>
-                  <table
-                    className={`w-full flex flex-col gap-1 ${hasError ? 'max-h-[30vh]' : 'max-h-[60vh]'} overflow-y-auto scrollbar-thin`}
-                  >
-                    <thead className="w-full">
-                      <tr className="w-full flex flex-row justify-between bg-gray-shadow9 font-thin text-text-gray p-1 text-sm">
-                        <th className="w-8 text-left">S/No</th>
-                        <th className="w-12 text-left">Staff ID</th>
-                        <th className="w-1/6 text-left">Full Name</th>
-                        <th className="w-8 text-left">Role</th>
-                        <th className="w-1/4 text-left">{`Branch(es)`}</th>
-                        <th className="w-1/6 text-left">Phone Number</th>
-                      </tr>
-                    </thead>
-                    <tbody className="w-full max-h-50 overflow-y-auto scrollbar-thin">
-                      {bulkUserData.map((user, index) => (
-                        <tr
-                          key={index}
-                          className="w-full flex flex-row justify-between border border-gray-shadow9 p-1 text-sm"
-                        >
-                          <td className="font-semibold w-8">{index + 1}</td>
-                          <td className="w-12 text-left">{user.staffId}</td>
-                          <td className="w-1/6 text-left">{user.fullName}</td>
-                          <td className="w-8 text-left">
-                            {user.role.charAt(0).toUpperCase() +
-                              user?.role?.slice(1)}
-                          </td>
-                          {/* separate branches with , if we have more than one branch. else render the first branch */}
-                          <td className="w-1/4 text-left">
-                            {user.branch?.length > 1
-                              ? user.branch?.join(', ')
-                              : user.branch[0]}
-                          </td>
-                          <td className="w-1/6 text-left">
-                            {user.phoneNumber || ' '}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <ResponsiveTable
+                    className="w-full"
+                    align="left"
+                    dense
+                    maxHeightClass={
+                      hasError ? 'md:max-h-[30vh]' : 'md:max-h-[60vh]'
+                    }
+                    rows={bulkUserData}
+                    getRowKey={(_, i) => i}
+                    columns={[
+                      {
+                        key: 'sn',
+                        header: 'S/No',
+                        cell: (_, i) => i + 1,
+                        mobile: 'badge',
+                        cellClass: () => 'font-semibold',
+                      },
+                      { key: 'staffId', header: 'Staff ID', cell: (u) => u.staffId },
+                      {
+                        key: 'name',
+                        header: 'Full Name',
+                        mobile: 'title',
+                        cell: (u) => u.fullName,
+                      },
+                      {
+                        key: 'role',
+                        header: 'Role',
+                        cell: (u) => u.role.charAt(0).toUpperCase() + u?.role?.slice(1),
+                      },
+                      {
+                        key: 'branches',
+                        header: 'Branch(es)',
+                        mobile: 'wide',
+                        cell: (u) =>
+                          u.branch?.length > 1 ? u.branch?.join(', ') : u.branch[0],
+                      },
+                      {
+                        key: 'phone',
+                        header: 'Phone Number',
+                        cell: (u) => u.phoneNumber || ' ',
+                      },
+                    ]}
+                  />
 
                   {error && <ErrorInterface error={error} />}
 

@@ -83,7 +83,7 @@ const ProductPriceHistory = ({
             </div>
           ) : (
             <>
-              <div className="flex flex-row rounded-md shadow-md w-fit p-3 m-5 gap-5 items-center bg-gray-shadow10">
+              <div className="flex flex-row flex-wrap rounded-md shadow-md w-fit max-w-full p-3 m-2 md:m-5 gap-3 md:gap-5 items-center bg-gray-shadow10">
                 {band.band && (
                   <span className="font-mono text-brand-green text-lg">
                     {band.band}:

@@ -5,7 +5,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className='no-scrollbar max-h-screen overflow-hidden'>
+    <div className='h-full'>
         <CreateBulkUserPage />
     </div>
   )

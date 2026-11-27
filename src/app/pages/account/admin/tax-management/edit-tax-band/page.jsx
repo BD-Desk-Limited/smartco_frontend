@@ -4,7 +4,7 @@ import EditTaxBandPage from '@/components/account/admin/tax-management/EditTaxBa
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <EditTaxBandPage />
     </div>
   );

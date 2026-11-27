@@ -1,6 +1,5 @@
 import React from 'react';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import AdminSideBar from '../AdminSideBar';
 import ViewUserDetails from './components/ViewUserDetails';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getUserById } from '@/services/usersServices';
@@ -10,7 +9,6 @@ const UserDetailsPage = () => {
   const id = searchParams.get('id');
   const router = useRouter();
   const [userData, setUserData] = React.useState({});
-  const [selectedMenu, setSelectedMenu] = React.useState('users-management');
 
   const pageDescription =
     'The User Details page provides an in-depth view of a specific user within your system. Here, you can review detailed information about the user, including their name, role, contact information, and associated metadata. This interface allows you to manage user-specific actions such as editing their details, resetting their password, or deactivating their account. Use this page to gain a comprehensive understanding of the selected user and perform necessary administrative tasks efficiently.';
@@ -48,16 +46,10 @@ const UserDetailsPage = () => {
   }
 
   return (
-    <div className="max-h-screen w-full overflow-y-auto no-scrollbar">
+    <div className="h-full w-full overflow-y-auto ">
       {id ? (
         <div className="flex flex-row gap-0 bg-background-1 w-full h-full">
-          <div>
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
-          <div className="max-h-screen w-full overflow-y-auto no-scrollbar">
+          <div className="h-full w-full overflow-y-auto ">
             <ViewUserDetails
               userData={userData}
               setUserData={setUserData}

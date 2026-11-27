@@ -3,7 +3,7 @@ import CreateMaterialPage from '@/components/account/admin/material-management/C
 
 const Page = () => {
   return (
-    <div>
+    <div className="h-full">
       <CreateMaterialPage />
     </div>
   );

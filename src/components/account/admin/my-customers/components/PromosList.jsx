@@ -25,7 +25,7 @@ const PromosList = ({
 }) => {
   return (
     <div className="text-text-gray">
-      <div className="flex items-center justify-between my-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 my-2">
         <p className="text-sm">
           {options.permissions.canManage
             ? 'Promos reward customers automatically when they meet your rules. Redeeming happens at the till.'
@@ -45,7 +45,7 @@ const PromosList = ({
 
       {/* filter */}
       <div className="flex flex-wrap items-center gap-2 rounded-md border border-gray-border p-2">
-        <div className="flex min-w-[180px] flex-col gap-1">
+        <div className="flex w-full sm:w-auto md:min-w-[180px] flex-col gap-1">
           <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
             Status
           </label>
@@ -69,7 +69,7 @@ const PromosList = ({
             </summary>
 
             {openStatusesDropDown && (
-              <div className="absolute left-0 top-full z-40 mt-1 max-h-60 w-full min-w-[180px] overflow-y-auto rounded-md border border-gray-border bg-white p-2 shadow-lg">
+              <div className="absolute left-0 top-full z-40 mt-1 max-h-60 w-full md:min-w-[180px] overflow-y-auto rounded-md border border-gray-border bg-white p-2 shadow-lg">
                 <label className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-1 py-1">
                   <input
                     type="checkbox"
@@ -99,7 +99,7 @@ const PromosList = ({
           </div>
         </div>
 
-        <div className="flex min-w-[170px] flex-col gap-1">
+        <div className="flex w-full sm:w-auto md:min-w-[170px] flex-col gap-1">
           <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
             From
           </label>
@@ -112,7 +112,7 @@ const PromosList = ({
           />
         </div>
 
-        <div className="flex min-w-[170px] flex-col gap-1">
+        <div className="flex w-full sm:w-auto md:min-w-[170px] flex-col gap-1">
           <label className="text-xs font-medium uppercase tracking-wide text-text-gray">
             To
           </label>

@@ -52,7 +52,7 @@ const EditTaxBandPage = () => {
   }
 
   return (
-    <div>
+    <div className="h-full">
       {id && !loading && taxbandData ? (
         <EditTaxBand
           taxbandData={taxbandData}

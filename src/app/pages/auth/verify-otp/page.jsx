@@ -4,7 +4,7 @@ import OTPForm from '@/components/auth/OTPForm';
 
 const page = () => {
   return (
-    <div className="h-screen w-full overflow-hidden">
+    <div className="h-dvh w-full overflow-y-auto overflow-x-hidden">
       <OTPForm />
     </div>
   );

@@ -7,6 +7,7 @@ import SubHeader from '../../SubHeader';
 import Image from 'next/image';
 import Button from '@/components/account/Button';
 import GroupedMaterialBreakdown from './groupedMaterials/GroupedMaterialBreakdown';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewMaterialDetails = ({
   materialData,
@@ -40,7 +41,7 @@ const ViewMaterialDetails = ({
   const someSelected = draftSelected.length > 0 && !allSelected;
 
   return (
-    <div className="w-full h-full max-h-screen overflow-hidden">
+    <div className="w-full h-full overflow-hidden">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
@@ -48,7 +49,7 @@ const ViewMaterialDetails = ({
         <SubHeader title={'View Material details'} />
       </div>
       <div className="flex flex-col gap-0 w-full h-full relative">
-        <div className="w-fit absolute top-0 left-0">
+        <div className="md:w-fit md:absolute md:top-0 md:left-0 md:z-10">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
@@ -56,16 +57,16 @@ const ViewMaterialDetails = ({
           />
         </div>
 
-        <div className="flex flex-col w-full max-h-[90%]">
-          <div className="bg-white p-5 m-3 rounded-md max-h-[90vh] overflow-y-auto no-scrollbar text-text-gray flex flex-row gap-5 px-3 py-5">
+        <div className="flex flex-col w-full pb-6">
+          <div className="bg-white p-3 md:p-5 m-2 md:m-3 rounded-md text-text-gray flex flex-col md:flex-row gap-5">
             {/* Image and details */}
-            <div className="items-center w-1/4">
+            <div className="items-center w-full md:w-1/4">
               <Image
                 src={materialData.imageURL || '/assets/edit-material.png'}
                 alt={materialData.name || 'Material Image'}
                 width={200}
                 height={200}
-                className="rounded-[100%] h-[200px] w-[200px]"
+                className="rounded-[100%] h-[200px] w-[200px] max-w-full"
               />
               <div>
                 <h1 className="font-bold text-lg">{materialData.name}</h1>
@@ -98,7 +99,7 @@ const ViewMaterialDetails = ({
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 h-full w-full overflow-y-auto no-scrollbar ">
+            <div className="flex flex-col gap-2 h-full w-full min-w-0">
               {/** component breakdown */}
               <div className=" justify-start flex">
                 {materialData.isGroup && (
@@ -109,7 +110,7 @@ const ViewMaterialDetails = ({
               <hr className="" />
               {/** stock Level */}
               <div className="w-full h-full my-3 ">
-                <div className="flex flex-row gap-2 items-center mb-5">
+                <div className="flex flex-row flex-wrap gap-2 items-center mb-5">
                   <span className="font-semibold">Stock Level:</span>
                   {/** Branches dropdown */}
                   {allUserBranches.length > 1 && (
@@ -134,7 +135,7 @@ const ViewMaterialDetails = ({
                         />
                       </button>
                       {branchDropdownOpen && (
-                        <div className="absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md min-w-[200px]">
+                        <div className="absolute z-10 bg-white border border-gray-border rounded-md mt-1 p-2 shadow-md md:min-w-[200px]">
                           <label className="flex flex-row items-center gap-2 py-1 text-sm cursor-pointer border-b border-gray-border mb-1 pb-1">
                             <input
                               type="checkbox"
@@ -198,7 +199,7 @@ const ViewMaterialDetails = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-start w-auto mx-5 overflow-y-auto scrollbar-thin">
+                <div className="flex flex-col justify-start w-auto md:mx-5">
                   {/** stock level display table*/}
                   <span className="w-full">
                     {stockByBranch.length > 0 ? (
@@ -209,57 +210,46 @@ const ViewMaterialDetails = ({
                               {branchStock.branchName}
                             </h3>
                             {branchStock.batches.length > 0 ? (
-                              <div className="overflow-y-auto scrollbar-thin max-h-40">
-                                <table className="w-full border-collapse rounded-sm">
-                                  <thead className=" sticky top-0">
-                                    <tr className="w-full px-5 py-0 rounded-t-lg flex flex-row justify-between gap-5 bg-brand-blue text-white border-b-2 border-b-text-white text-sm text-start">
-                                      <th className="w-1/4 text-left">
-                                        Batch ID
-                                      </th>
-                                      <th className="w-1/4 text-left">
-                                        Balance
-                                      </th>
-                                      <th className="w-1/4 text-left">
-                                        Supply Date
-                                      </th>
-                                      <th className="w-1/4 text-left">
-                                        Expiry Date
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {branchStock.batches.map((stockLevel) => (
-                                      <tr
-                                        key={stockLevel._id}
-                                        className="w-full flex flex-row gap-5 border-b-2 border-b-text-white bg-blue-shadow10 text-sm px-5 py-0.25"
-                                      >
-                                        <td className="w-1/4 text-left">
-                                          {stockLevel.batch_number}
-                                        </td>
-                                        <td className="w-1/4 text-left">
-                                          {stockLevel.balance}
-                                        </td>
-                                        <td className="w-1/4 text-left">
-                                          {new Date(
-                                            stockLevel.createdAt
-                                          ).toLocaleDateString()}
-                                        </td>
-                                        <td className="w-1/4 text-left">
-                                          {stockLevel.expiryDate
-                                            ? new Date(
-                                                stockLevel.expiryDate
-                                              ).toLocaleDateString()
-                                            : 'Not specified'}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                    <tr className="w-full px-5 py-0 rounded-b-lg flex flex-row gap-5 bg-brand-blue text-white text-sm font-semibold">
-                                      <td>Branch Total stock balance:</td>
-                                      <td>{branchStock.totalStock}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
+                              <ResponsiveTable
+                                align="left"
+                                dense
+                                maxHeightClass="md:max-h-60"
+                                rows={branchStock.batches}
+                                columns={[
+                                  {
+                                    key: 'batch',
+                                    header: 'Batch ID',
+                                    cell: (s) => s.batch_number,
+                                    mobile: 'title',
+                                  },
+                                  {
+                                    key: 'balance',
+                                    header: 'Balance',
+                                    cell: (s) => s.balance,
+                                    mobile: 'badge',
+                                  },
+                                  {
+                                    key: 'supplied',
+                                    header: 'Supply Date',
+                                    cell: (s) =>
+                                      new Date(s.createdAt).toLocaleDateString(),
+                                  },
+                                  {
+                                    key: 'expiry',
+                                    header: 'Expiry Date',
+                                    cell: (s) =>
+                                      s.expiryDate
+                                        ? new Date(s.expiryDate).toLocaleDateString()
+                                        : 'Not specified',
+                                  },
+                                ]}
+                                footer={
+                                  <p className="px-3 py-2 rounded-md bg-brand-blue text-white text-sm font-semibold flex justify-between gap-3">
+                                    <span>Branch total stock balance:</span>
+                                    <span>{branchStock.totalStock}</span>
+                                  </p>
+                                }
+                              />
                             ) : (
                               <span className="text-sm text-error">
                                 No stock available for this branch
@@ -279,7 +269,7 @@ const ViewMaterialDetails = ({
             </div>
           </div>
 
-          <div className="flex flex-row w-full gap-10 py-4 justify-center items-center sticky bottom-0 ">
+          <div className="flex flex-row flex-wrap w-full gap-4 md:gap-10 py-4 justify-center items-center sticky bottom-0 bg-background-1">
             <Button
               text={'Edit Material'}
               onClick={

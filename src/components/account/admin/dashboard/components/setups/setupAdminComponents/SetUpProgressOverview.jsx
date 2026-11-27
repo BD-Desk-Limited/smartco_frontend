@@ -40,7 +40,7 @@ const SetupProgressOverview = ({ setupProgress, setupStepConfigs, onStepSelect, 
         {/* Progress Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-400">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Mandatory Setup</h3>
                 <p className="text-3xl font-bold text-red-500 mt-2">
@@ -53,7 +53,7 @@ const SetupProgressOverview = ({ setupProgress, setupStepConfigs, onStepSelect, 
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-400">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Optional Setup</h3>
                 <p className="text-3xl font-bold text-blue-500 mt-2">
@@ -66,7 +66,7 @@ const SetupProgressOverview = ({ setupProgress, setupStepConfigs, onStepSelect, 
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-400">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Total Progress</h3>
                 <p className="text-3xl font-bold text-green-500 mt-2">

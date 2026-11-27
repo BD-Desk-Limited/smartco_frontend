@@ -5,7 +5,7 @@ import TaxManagementPage from '@/components/account/admin/tax-management/TaxMana
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <TaxManagementPage />
     </div>
   );

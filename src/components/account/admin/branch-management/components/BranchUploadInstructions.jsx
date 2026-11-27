@@ -18,8 +18,8 @@ const BranchUploadInstructions = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50">
+      <div className="bg-white sm:rounded-lg w-full h-full sm:h-auto max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="p-4 border-b flex justify-between items-center bg-gray-50">
           <h2 className="text-xl font-semibold text-gray-800">Branch Upload Instructions</h2>
@@ -32,12 +32,12 @@ const BranchUploadInstructions = ({ onClose }) => {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex border-b overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 ${
+              className={`px-4 py-2 whitespace-nowrap shrink-0 ${
                 activeTab === tab.id 
                   ? 'border-b-2 border-brand-blue text-brand-blue' 
                   : 'text-gray-600 hover:text-gray-800'
@@ -77,7 +77,7 @@ const BranchUploadInstructions = ({ onClose }) => {
               {branchUploadInstructions.map((field, index) => (
                 <div key={index} className="border-b pb-4 last:border-b-0">
                   <h3 className="font-semibold text-lg mb-2">{field.field}</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Format: {field.format}</p>
                       <p className="text-sm text-gray-600 mb-1">Required: {field.required ? 'Yes' : 'No'}</p>
@@ -120,7 +120,7 @@ const BranchUploadInstructions = ({ onClose }) => {
               {commonErrors.map((error, index) => (
                 <section key={index}>
                   <h3 className="font-semibold text-lg mb-2">{error.error}</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Incorrect Examples:</p>
                       <ul className="list-disc pl-5 text-sm text-error">

@@ -42,7 +42,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
 
 
   return (
-    <form className="flex flex-col gap-5 my-5 bg-white p-10 rounded-md w-full max-h-[80vh] overflow-y-auto scrollbar-thin">
+    <form className="flex flex-col gap-5 my-5 bg-white p-4 md:p-10 rounded-md w-full max-h-[80vh] overflow-y-auto scrollbar-thin">
       <div className="flex flex-col gap-10">
         <div>
           <h1 className="font-bold">Creating grouped material</h1>
@@ -52,8 +52,8 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
         </div>
 
         <div className='flex flex-col justify-between gap-5'>
-          <div className='flex flex-row gap-10'>
-            <div className='flex flex-col gap-5 w-[50%]'>
+          <div className='flex flex-col md:flex-row gap-5 md:gap-10'>
+            <div className='flex flex-col gap-5 w-full md:w-[50%]'>
               <div>
                 <label className='text-text-gray text-sm'>Grouped Material Name</label>
                 <input
@@ -118,7 +118,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
               </div>
             </div>
 
-            <div className='flex flex-col gap-8 w-[50%] mt-2'>
+            <div className='flex flex-col gap-8 w-full md:w-[50%] mt-2'>
               <div className="flex flex-col gap-1">
                 <label className="text-text-gray text-sm">Material Type</label>
                 <select
@@ -190,7 +190,7 @@ const CreateGroupedMaterialForm = ({formData, setFormData, allMaterials, allCate
               <h2 className='text-text-black text-md text-center'>
                 select component materials for your new grouped material. After you have finished, click submit on the summary panel on the right to create the new material. 
               </h2>
-              <div className='flex flex-row gap-3 items-center'>
+              <div className='flex flex-row flex-wrap gap-3 items-end justify-center w-full'>
                 <div>
                   <label className='text-text-black text-sm'>Add component Materials</label>
                   <select 

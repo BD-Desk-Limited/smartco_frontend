@@ -8,6 +8,7 @@ import PurchaseSummary from './PurchaseSummary';
 import Button from '@/components/account/Button';
 import { verifyInputText } from '@/utilities/verifyInput';
 import { getUserBranchesService } from '@/services/branchServices';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const PurchaseDetails = ({
   loading,
@@ -151,17 +152,17 @@ const PurchaseDetails = ({
   if (loading || branchesLoading) return <Spinner />;
 
   return (
-    <div className="max-h-screen overflow-y-auto no-scrollbar relative">
-      <div className="flex flex-row justify-between items-center mx-10">
+    <div className="relative">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-0 md:mx-10">
         {/* select destination branch */}
-        <div className="flex flex-col justify-start w-fit gap-1 my-1 mx-5">
+        <div className="flex flex-col justify-start w-full md:w-fit gap-1 md:my-1 md:mx-5">
           <label className="text-text-black text-sm font-semibold">
             Purchase Destination
           </label>
           <select
             value={purchaseRecord?.destination?._id ?? ''}
             onChange={handleBranchChange}
-            className="py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue"
+            className="h-10 md:h-auto py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue bg-white text-base md:text-sm"
           >
             <option value="" disabled>
               select destination branch
@@ -176,7 +177,7 @@ const PurchaseDetails = ({
         </div>
 
         {/* Supply date */}
-        <div className="flex flex-col justify-start w-fit gap-1 my-1 mx-5">
+        <div className="flex flex-col justify-start w-full md:w-fit gap-1 md:my-1 md:mx-5">
           <label className="text-text-black text-sm font-semibold">
             Purchase Date / Time
           </label>
@@ -184,12 +185,12 @@ const PurchaseDetails = ({
             type="datetime-local"
             onChange={handleDateChange}
             value={purchaseRecord?.date || ''}
-            className="py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue"
+            className="h-10 md:h-auto py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue bg-white text-base md:text-sm"
           />
         </div>
 
         {/* purchase/Invoice Id */}
-        <div className="flex flex-col justify-start w-fit gap-1 my-1 mx-5">
+        <div className="flex flex-col justify-start w-full md:w-fit gap-1 md:my-1 md:mx-5">
           <label className="text-text-black text-sm font-semibold">
             Purchase/Invoice ID
           </label>
@@ -200,117 +201,133 @@ const PurchaseDetails = ({
             }
             value={purchaseRecord?.purchaseId || ''}
             placeholder="ID-00123"
-            className="py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue"
+            className="h-10 md:h-auto py-1 border border-gray-border rounded-md px-2 focus:outline-brand-blue text-base md:text-sm"
           />
         </div>
       </div>
 
-      {/* list of items purchased */}
-      <div
-        className="flex flex-col gap-2 mx-10 my-5 h-[70%] overflow-y-auto scrollbar-thin
-       relative"
-      >
-        <table className="w-full relative">
-          <thead className="w-full sticky top-0">
-            <tr className="flex flex-row justify-between items-center p-1 border-y border-gray-border bg-gray-shadow4 text-white sticky top-0">
-              <td className="font-semibold text-sm w-12 text-left">#</td>
-              <td className="font-semibold text-sm w-1/6 text-left">Item</td>
-              <td className="font-semibold text-sm w-1/6 text-left">Brand</td>
-              <td className="font-semibold text-sm w-1/6 text-left">
-                Quantity
-              </td>
-              <td className="font-semibold text-sm w-1/6 text-left">
-                Total cost
-              </td>
-              <td className="font-semibold text-sm w-1/6 text-left">
-                Cost per unit
-              </td>
-              <td className="font-semibold text-sm w-1/6 text-left">
-                Expiry Date
-              </td>
-              <td className="font-semibold text-sm w-10 text-left"></td>
-            </tr>
-          </thead>
-
-          <tbody className="h-full overflow-y-auto scrollbar-thin px-2 w-full">
-            {purchaseRecord?.items?.length > 0 ? (
-              purchaseRecord.items.map((item, index) => (
-                <tr
-                  key={index}
-                  className="w-full  flex flex-row border-b border-gray-border text-sm py-1 hover:bg-gray-shadow9"
+      {/* purchased items: a table from md up, cards on phones */}
+      <div className="flex flex-col gap-2 my-4 md:mx-10 md:my-5">
+        <p className="md:hidden text-sm font-semibold text-text-black">
+          Items purchased
+        </p>
+        <ResponsiveTable
+          align="left"
+          dense
+          maxHeightClass="md:max-h-[55vh]"
+          rows={purchaseRecord?.items || []}
+          getRowKey={(_, i) => i}
+          emptyMessage="No items added to this purchase."
+          columns={[
+            {
+              key: 'n',
+              header: '#',
+              mobile: 'hidden',
+              cell: (_, i) => i + 1,
+            },
+            {
+              key: 'name',
+              header: 'Item',
+              mobile: 'title',
+              cell: (item, i) => (
+                <>
+                  <span className="md:hidden">{i + 1}. </span>
+                  {item.name}
+                </>
+              ),
+            },
+            {
+              key: 'brand',
+              header: 'Brand',
+              mobile: 'subtitle',
+              cell: (item) => item.brand || '-',
+            },
+            {
+              key: 'quantity',
+              header: 'Quantity',
+              cell: (item) => `${commaNumberFormat(item.quantity)} ${item.unitOfMeasurement || ''}`,
+            },
+            {
+              key: 'total',
+              header: 'Total cost',
+              cell: (item) => commaNumberFormat(item.totalCost, 2),
+            },
+            {
+              key: 'unit',
+              header: 'Cost per unit',
+              cell: (item) =>
+                commaNumberFormat(
+                  Number(item.totalCost) / Number(item.quantity),
+                  2
+                ) || 0,
+            },
+            {
+              key: 'expiry',
+              header: 'Expiry Date',
+              mobileLabel: 'Expiry',
+              cell: (item) =>
+                item.expiryDate ? ISOStringToLocalTime(item.expiryDate) : '-',
+            },
+          ]}
+          actionsHeader=""
+          actions={(item) => {
+            const index = purchaseRecord.items.indexOf(item);
+            return (
+              <>
+                <button
+                  type="button"
+                  title="Edit item"
+                  aria-label={`Edit ${item.name}`}
+                  onClick={(e) => onEditItemClick(e, index)}
+                  className="rounded-md hover:bg-gray-shadow9"
                 >
-                  <td className="w-12 text-left">{index + 1}</td>
-                  <td className="w-1/6 text-left">{item.name}</td>
-                  <td className="w-1/6 text-left">{item.brand || '-'}</td>
-                  <td className="w-1/6 text-left">
-                    {commaNumberFormat(item.quantity)} {item.unitOfMeasurement}
-                  </td>
-                  <td className="w-1/6 text-left">
-                    {commaNumberFormat(item.totalCost, 2)}
-                  </td>
-                  <td className="w-1/6 text-left">
-                    {commaNumberFormat(
-                      Number(item.totalCost) / Number(item.quantity),
-                      2
-                    ) || 0}
-                  </td>
-                  <td className="w-1/6 text-left">
-                    {ISOStringToLocalTime(item.expiryDate)}
-                  </td>
-                  <td className="w-10 text-left flex flex-row items-center gap-2">
-                    <FaEdit
-                      className="cursor-pointer"
-                      title="Edit item"
-                      onClick={(e) => onEditItemClick(e, index)}
-                    />
-                    <FaTrash
-                      className="cursor-pointer"
-                      title="Delete item"
-                      onClick={(e) => onDeleteItemClick(e, index)}
-                    />
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr className="w-full py-5 h-full flex flex-col justify-center items-center gap-2">
-                <td colSpan="6" className="text-text-gray text-center">
-                  No items added to this purchase.
-                </td>
-                <td>
-                  <AddItemButton buttonText="Add a purchase item" />
-                </td>
-              </tr>
-            )}
-          </tbody>
-
-          {/* Add item button and summary at the bottom of the table if there are items in the purchase*/}
-          {purchaseRecord?.items?.length > 0 && (
-            <tfoot className="w-full sticky bottom-0 bg-text-white drop-shadow-lg p-2">
-              <tr className="w-full h-full flex flex-col justify-center items-center">
-                <td className="mt-2">
-                  <AddItemButton buttonText="Add another purchase item" />
-                </td>
-              </tr>
-
-              {/* summary of purchase */}
-              <PurchaseSummary data={purchaseRecord} />
-            </tfoot>
-          )}
-        </table>
+                  <FaEdit />
+                </button>
+                <button
+                  type="button"
+                  title="Delete item"
+                  aria-label={`Delete ${item.name}`}
+                  onClick={(e) => onDeleteItemClick(e, index)}
+                  className="rounded-md hover:bg-gray-shadow9 text-error"
+                >
+                  <FaTrash />
+                </button>
+              </>
+            );
+          }}
+          footer={
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="flex justify-center">
+                <AddItemButton
+                  buttonText={
+                    purchaseRecord?.items?.length > 0
+                      ? 'Add another purchase item'
+                      : 'Add a purchase item'
+                  }
+                />
+              </div>
+              {purchaseRecord?.items?.length > 0 && (
+                <div className="border-t border-gray-border pt-2">
+                  <PurchaseSummary data={purchaseRecord} asRow={false} />
+                </div>
+              )}
+            </div>
+          }
+        />
       </div>
 
       <div className="w-full flex items-center py-1"></div>
 
       {/* Save purchase button and error display */}
-      <div className="w-full py-2 sticky bottom-0 bg-text-white flex flex-col justify-end items-end px-5 gap-2">
+      <div className="w-full py-2 sticky bottom-0 bg-text-white flex flex-col justify-end items-stretch md:items-end md:px-5 gap-2">
         {/* error display */}
-        <p className="">
+        <div>
           {validationsError && <ErrorInterface error={validationsError} />}
-        </p>
+        </div>
         <Button
           icon={FaSave}
           iconAfterText={false}
-          buttonStyle={`w-1/4 bg-brand-green hover:bg-green-shadow1`}
+          buttonStyle={`w-full md:w-1/4 bg-brand-green hover:bg-green-shadow1`}
           onClick={onSavePurchaseRecord}
         />
       </div>

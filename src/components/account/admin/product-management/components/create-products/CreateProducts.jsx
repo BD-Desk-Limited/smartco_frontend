@@ -367,8 +367,8 @@ const CreateProducts = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Create a Product'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute top-0 z-10">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:top-0 md:z-10">
           <ProductManagementSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
@@ -376,8 +376,8 @@ const CreateProducts = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="p-5 h-full flex flex-row gap-5 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
-            <div className="max-h-[90%] overflow-y-auto scrollbar-thin w-4/5">
+          <div className="p-2 md:p-5 h-full flex flex-col lg:flex-row gap-5 pb-6">
+            <div className="w-full lg:w-4/5">
               <CreateProductForm
                 emptyForm={emptyForm}
                 products={products}
@@ -399,7 +399,7 @@ const CreateProducts = ({ pageDescription }) => {
                 companyDetails={companyDetails}
               />
             </div>
-            <div className="max-h-[90%] overflow-y-auto scrollbar-thin w-1/5">
+            <div className="w-full lg:w-1/5">
               <ProductSidePreview
                 products={products}
                 selectedProduct={selectedProduct}
@@ -409,9 +409,7 @@ const CreateProducts = ({ pageDescription }) => {
               />
             </div>
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

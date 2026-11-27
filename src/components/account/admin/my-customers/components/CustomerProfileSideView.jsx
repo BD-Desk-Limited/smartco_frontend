@@ -283,11 +283,11 @@ const CustomerProfileSideView = ({ customer, onClose }) => {
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-2/3 h-full bg-text-white flex flex-col px-4 pb-4 text-sm text-text-gray gap-4 overflow-y-auto scrollbar-thin rounded-l-lg"
+      className="relative w-full md:w-2/3 h-full bg-text-white flex flex-col px-4 pb-4 text-sm text-text-gray gap-4 overflow-y-auto scrollbar-thin md:rounded-l-lg"
     >
       {/* identity: name and number only, never contact details */}
       <div className=" sticky top-0 bg-text-white shadow-sm px-1 pt-4">
-        <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer">
+        <div className="absolute top-2 right-0 z-50 p-2 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer">
           <FaTimes className="text-text-white" onClick={onClose} />
         </div>
         <div className="pr-8 text-text-black py-4">
@@ -333,14 +333,14 @@ const CustomerProfileSideView = ({ customer, onClose }) => {
           )}
         </div>
 
-        <div className="flex gap-1 border-b border-gray-border" role="tablist">
+        <div className="flex gap-1 border-b border-gray-border overflow-x-auto no-scrollbar" role="tablist">
           {tabs.map((t) => (
             <button
               key={t.value}
               role="tab"
               aria-selected={tab === t.value}
               onClick={() => setTab(t.value)}
-              className={`px-4 py-2 ${
+              className={`px-4 py-2 whitespace-nowrap shrink-0 ${
                 tab === t.value
                   ? 'border-b-2 border-brand-blue text-brand-blue font-semibold'
                   : 'text-text-gray'

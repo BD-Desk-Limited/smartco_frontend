@@ -28,7 +28,7 @@ const EditTaxBandForm = ({
         className=" text-sm flex flex-col w-full gap-7 h-full items-center justify-center"
       >
         {/* Tax band name and rate */}
-        <div className="flex flex-row justify-center items-center gap-5 w-[80%]">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 w-full md:w-[80%]">
           <div className="flex flex-col gap-1 w-full">
             <label className="text-text-black w-fit" htmlFor="name">
               Tax Profile Name
@@ -62,7 +62,7 @@ const EditTaxBandForm = ({
         </div>
 
         {/* Update rate toggle */}
-        <div className="flex items-center gap-2 w-[80%] justify-start">
+        <div className="flex items-center gap-2 w-full md:w-[80%] justify-start">
           <input
             type="checkbox"
             id="updateRate"
@@ -77,9 +77,9 @@ const EditTaxBandForm = ({
 
         {/* New rate & Effective date */}
         <div
-          className={`flex flex-row justify-center items-center gap-5 w-[80%] ${updateRate ? '' : 'bg-gray-200 p-2 pointer-events-none opacity-50 rounded-md'}`}
+          className={`flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 w-full md:w-[80%] ${updateRate ? '' : 'bg-gray-200 p-2 pointer-events-none opacity-50 rounded-md'}`}
         >
-          <div className="flex flex-col gap-1 w-[80%]">
+          <div className="flex flex-col gap-1 w-full md:w-[80%]">
             <label
               className="text-text-black text-sm w-fit"
               htmlFor="rate"
@@ -105,7 +105,7 @@ const EditTaxBandForm = ({
               }
             />
           </div>
-          <div className="flex flex-col gap-1 w-[80%]">
+          <div className="flex flex-col gap-1 w-full md:w-[80%]">
             <label
               className="text-text-black text-sm w-fit"
               htmlFor="date"
@@ -133,7 +133,7 @@ const EditTaxBandForm = ({
         </div>
 
         {/* Description */}
-        <div className="flex flex-col gap-1 w-[80%]">
+        <div className="flex flex-col gap-1 w-full md:w-[80%]">
           <label
             className="text-text-black text-sm w-fit"
             htmlFor="description"

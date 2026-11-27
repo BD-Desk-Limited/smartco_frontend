@@ -15,6 +15,7 @@ import {
 import { formatDate, ISOStringToLocalTime } from '@/utilities/formatTime';
 import { capitalizeFirst } from '@/utilities/stringUtils';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 export const PHASE = {
   draft: { label: 'Draft', style: 'bg-gray-500 text-text-white' },
@@ -218,7 +219,7 @@ const PromoDetailSideView = ({
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin rounded-l-xl"
+      className="relative w-full md:w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin md:rounded-l-xl"
     >
       <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
         <FaTimes className="text-text-white" onClick={onClose} />
@@ -313,7 +314,7 @@ const PromoDetailSideView = ({
             )}
           </div>
 
-          <div className="grid grid-cols-4 gap-2 text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
             {[
               ['Given', promo.awardedCount],
               ['Available (unused)', rewards?.counts?.available || 0],
@@ -536,7 +537,7 @@ const PromoDetailSideView = ({
               </div>
             )}
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h4 className="font-semibold text-text-black">Rewards given</h4>
             <div className="flex gap-2">
               <input
@@ -570,74 +571,70 @@ const PromoDetailSideView = ({
               </select>
             </div>
           </div>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-shadow10">
-                <th className="px-2 py-2">Customer</th>
-                <th className="px-2 py-2">Status</th>
-                <th className="px-2 py-2">Earned</th>
-                <th className="px-2 py-2">Expires</th>
-                {canManage && <th className="px-2 py-2"></th>}
-              </tr>
-            </thead>
-            <tbody>
-              {rewards?.rewards?.length ? (
-                rewards.rewards.map((r) => (
-                  <tr key={r._id} className="border-b border-gray-border">
-                    <td className="px-2 py-2">
-                      <span className="block text-text-black">
-                        {r.customer?.name || 'Unknown'}
-                        {r.cycle > 1 ? ` (#${r.cycle})` : ''}
-                      </span>
-                      <span className="text-xs">
-                        {r.customer?.customerNumber}
-                      </span>
-                    </td>
-                    <td className="px-2 py-2">
-                      <span
-                        className={`px-2 py-1 rounded-md ${REWARD_STATUS[r.status]}`}
+          <ResponsiveTable
+            align="left"
+            dense
+            maxHeightClass=""
+            rows={rewards?.rewards || []}
+            emptyMessage="No rewards given yet."
+            columns={[
+              {
+                key: 'customer',
+                header: 'Customer',
+                mobile: 'title',
+                cell: (r) => (
+                  <>
+                    <span className="block text-text-black">
+                      {r.customer?.name || 'Unknown'}
+                      {r.cycle > 1 ? ` (#${r.cycle})` : ''}
+                    </span>
+                    <span className="text-xs font-normal">
+                      {r.customer?.customerNumber}
+                    </span>
+                  </>
+                ),
+              },
+              {
+                key: 'status',
+                header: 'Status',
+                mobile: 'badge',
+                cell: (r) => (
+                  <span className={`px-2 py-1 rounded-md text-xs ${REWARD_STATUS[r.status]}`}>
+                    {capitalizeFirst(r.status)}
+                  </span>
+                ),
+              },
+              {
+                key: 'earned',
+                header: 'Earned',
+                cell: (r) => formatDate(new Date(r.earnedAt)),
+              },
+              {
+                key: 'expires',
+                header: 'Expires',
+                cell: (r) => formatDate(new Date(r.expiresAt)),
+              },
+            ]}
+            actionsHeader=""
+            actions={
+              canManage
+                ? (r) =>
+                    r.status === 'available' ? (
+                      <button
+                        onClick={() => revoke(r._id)}
+                        disabled={busy}
+                        className="text-error underline disabled:opacity-50 px-1"
                       >
-                        {capitalizeFirst(r.status)}
+                        Revoke
+                      </button>
+                    ) : r.status === 'redeemed' && r.redeemedAt ? (
+                      <span className="text-xs">
+                        {ISOStringToLocalTime(r.redeemedAt)}
                       </span>
-                    </td>
-                    <td className="px-2 py-2">
-                      {formatDate(new Date(r.earnedAt))}
-                    </td>
-                    <td className="px-2 py-2">
-                      {formatDate(new Date(r.expiresAt))}
-                    </td>
-                    {canManage && (
-                      <td className="px-2 py-2">
-                        {r.status === 'available' && (
-                          <button
-                            onClick={() => revoke(r._id)}
-                            disabled={busy}
-                            className="text-error underline disabled:opacity-50"
-                          >
-                            Revoke
-                          </button>
-                        )}
-                        {r.status === 'redeemed' && r.redeemedAt ? (
-                          <span className="text-xs">
-                            {ISOStringToLocalTime(r.redeemedAt)}
-                          </span>
-                        ) : null}
-                      </td>
-                    )}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    className="px-2 py-6 text-center italic"
-                    colSpan={canManage ? 5 : 4}
-                  >
-                    No rewards given yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    ) : null
+                : undefined
+            }
+          />
           {rewards?.pagination && (
             <Pagination
               currentPage={page}

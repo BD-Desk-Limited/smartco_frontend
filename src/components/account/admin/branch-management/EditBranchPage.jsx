@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import EditBranch from './components/EditBranch';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -11,7 +10,6 @@ const EditBranchPage = () => {
   const id = searchParams.get('id');
   const router = useRouter();
   const [branchData, setBranchData] = React.useState({});
-  const [selectedMenu, setSelectedMenu] = React.useState('branch-management');
 
   const pageDescription =
     'The Edit Branch page allows you to update the details of an existing branch within your company. You can modify branch information such as its name, location, and associated metadata. This interface ensures that branch details remain accurate and up-to-date. Use the provided form to make changes and save updates. Additionally, you can review the current branch details before making any modifications.';
@@ -46,13 +44,7 @@ const EditBranchPage = () => {
   return (
     <div>
       {id ? (
-        <div className="flex flex-row gap-0 bg-background-1">
-          <div>
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
+        <div className="flex flex-row gap-0 bg-background-1 h-full">
           <div className="w-full">
             <EditBranch
               branchData={branchData}

@@ -3,7 +3,6 @@ import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import ViewProductDetails from './components/view-product-details/ViewProductDetails';
-import AdminSideBar from '../AdminSideBar';
 import { getProductByIdService } from '@/services/productsServices';
 import { getAllBranchesByCompanyId } from '@/services/branchServices';
 import Spinner from '../../Spinner';
@@ -17,7 +16,6 @@ const ProductDetailsPage = () => {
   const [errorMessage, setErrorMessage] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
-  const [selectedMenu, setSelectedMenu] = React.useState('my-products');
   const pageDescription =
     "The Product Details page provides a comprehensive overview of a product, including its name, category, tax information, prices across branch bands, stock status, and other relevant details. It also displays the product's components and any available alternatives for components that have options. Use this page to review all attributes and settings associated with the product, ensuring accurate management and visibility throughout your organization.";
 
@@ -84,13 +82,7 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="flex flex-row gap-0 bg-background-1 h-[100vh] overflow-hidden no-scrollbar">
-        <div className="h-full">
-          <AdminSideBar
-            selectedMenu={selectedMenu}
-            setSelectedMenu={setSelectedMenu}
-          />
-        </div>
+      <div className="flex flex-row gap-0 bg-background-1 h-full overflow-hidden ">
         {errorMessage ? (
           <div className="w-full h-full flex flex-col justify-center items-center">
             <p className="text-error font-semibold">{errorMessage}</p>{' '}
@@ -104,7 +96,7 @@ const ProductDetailsPage = () => {
             </button>
           </div>
         ) : (
-          <div className="w-full h-full overflow-y-auto no-scrollbar">
+          <div className="w-full h-full overflow-y-auto ">
             <ViewProductDetails
               pageDescription={pageDescription}
               productData={productData}

@@ -95,12 +95,12 @@ const EnterQuantityPannel = ({
   };
 
   return (
-    <div className="flex flex-col bg-white w-80 h-auto gap-3 rounded-lg p-3 relative">
+    <div className="flex flex-col bg-white w-full h-full overflow-y-auto sm:w-80 sm:h-auto sm:max-h-[90dvh] gap-3 sm:rounded-lg p-4 sm:p-3 pt-12 sm:pt-3 relative">
       {/* Close button */}
       <span
         onClick={onClose}
         title="close"
-        className="absolute top-0 right-0 p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
+        className="absolute top-2 right-2 sm:top-0 sm:right-0 p-3 sm:p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
       >
         <FaTimes className="text-text-white" />
       </span>
@@ -119,11 +119,12 @@ const EnterQuantityPannel = ({
           <span className="flex flex-row items-center gap-2">
             <input
               type="number"
+              inputMode="decimal"
               placeholder="Enter quantity"
               name="quantity"
               value={material?.quantity || ''}
               onChange={handleChange}
-              className="border-2 border-gray-border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="border-2 border-gray-border rounded-md p-2 sm:p-1 text-base sm:text-sm w-full sm:w-auto min-w-0 focus:outline-none focus:ring-2 focus:ring-brand-blue"
             />
             <span className="text-sm ml-2 text-brand-blue font-semibold">
               {material?.unitOfMeasurement ?? ''}
@@ -136,11 +137,12 @@ const EnterQuantityPannel = ({
           <span className="flex flex-row items-center gap-2">
             <input
               type="number"
+              inputMode="decimal"
               placeholder="Enter total cost"
               name="totalCost"
               value={material?.totalCost || ''}
               onChange={handleChange}
-              className="border-2 border-gray-border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="border-2 border-gray-border rounded-md p-2 sm:p-1 text-base sm:text-sm w-full sm:w-auto min-w-0 focus:outline-none focus:ring-2 focus:ring-brand-blue"
             />
           </span>
         </li>
@@ -165,7 +167,7 @@ const EnterQuantityPannel = ({
               name="brand"
               value={material?.brand || ''}
               onChange={handleChange}
-              className="border-2 border-gray-border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="border-2 border-gray-border rounded-md p-2 sm:p-1 text-base sm:text-sm w-full sm:w-auto min-w-0 focus:outline-none focus:ring-2 focus:ring-brand-blue"
             />
           </span>
         </li>
@@ -179,7 +181,7 @@ const EnterQuantityPannel = ({
               name="expiryDate"
               value={material?.expiryDate || ''}
               onChange={handleChange}
-              className="border-2 border-gray-border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="border-2 border-gray-border rounded-md p-2 sm:p-1 text-base sm:text-sm w-full sm:w-auto min-w-0 focus:outline-none focus:ring-2 focus:ring-brand-blue"
             />
           </span>
         </li>
@@ -194,7 +196,7 @@ const EnterQuantityPannel = ({
       <span className="flex flex-row items-center justify-end gap-2">
         <button
           onClick={onUpdatePurchaseItems}
-          className={`flex flex-row items-center gap-2 w-fit p-2 rounded-md text-text-white ${material?.isUpdate ? 'bg-yellow-500 hover:bg-yellow-400' : 'bg-brand-blue hover:bg-blue-shadow1'}`}
+          className={`flex flex-row items-center justify-center gap-2 w-full sm:w-fit p-3 sm:p-2 rounded-md text-text-white ${material?.isUpdate ? 'bg-yellow-500 hover:bg-yellow-400' : 'bg-brand-blue hover:bg-blue-shadow1'}`}
         >
           <FaCheckCircle className="text-white text-lg" />
           {material?.isUpdate ? 'Update Item' : 'Add Item'}

@@ -351,7 +351,7 @@ const MessageComposer = ({ options, onSent, fixedCustomer = null }) => {
                   There are no customer groups you can use yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-3 gap-1 max-h-40 overflow-y-auto border border-gray-border rounded-md p-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 max-h-40 overflow-y-auto border border-gray-border rounded-md p-2">
                   {groups.map((g) => (
                     <label
                       key={g._id}
@@ -474,7 +474,7 @@ const MessageComposer = ({ options, onSent, fixedCustomer = null }) => {
 
       {/* ---------- message ---------- */}
       <Section title="2. What do you want to say?">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1">
             Channel
             <select
@@ -614,7 +614,7 @@ const MessageComposer = ({ options, onSent, fixedCustomer = null }) => {
           Allow customers to reply
         </label>
         {allowReplies && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="flex flex-col gap-1">
               Reply email
               <input

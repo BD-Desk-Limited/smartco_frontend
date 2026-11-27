@@ -1,5 +1,4 @@
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import SalesReports from './components/sales-reports/SalesReports';
 
@@ -14,11 +13,8 @@ const SalesReportsPage = () => {
   }
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1">
-      <div>
-        <AdminSideBar selectedMenu="reports" />
-      </div>
-      <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+    <div className="flex flex-row gap-0 bg-background-1 h-full">
+      <div className="w-full h-full overflow-y-auto ">
         <SalesReports pageDescription={pageDescription} />
       </div>
     </div>

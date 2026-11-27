@@ -12,6 +12,7 @@ import {
 } from '@/services/customerServices';
 import { formatDate, ISOStringToLocalTime } from '@/utilities/formatTime';
 import { capitalizeFirst } from '@/utilities/stringUtils';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const STATUS = {
   queued: { label: 'Queued', style: 'bg-yellow-500 text-text-white' },
@@ -105,7 +106,7 @@ const CampaignDetail = ({ campaignId, onClose, onChanged }) => {
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin rounded-l-lg"
+      className="relative w-full md:w-1/2 h-full bg-text-white flex flex-col p-4 text-sm text-text-gray gap-3 overflow-y-auto md:rounded-l-lg"
     >
       <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
         <FaTimes className="text-text-white" onClick={onClose} />
@@ -142,7 +143,7 @@ const CampaignDetail = ({ campaignId, onClose, onChanged }) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-5 gap-2 text-center">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center">
             {[
               ['Sent', campaign.counts.sent],
               ['Waiting', campaign.counts.queued + campaign.counts.sending],
@@ -210,7 +211,7 @@ const CampaignDetail = ({ campaignId, onClose, onChanged }) => {
             </p>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h4 className="font-semibold text-text-black">Recipients</h4>
             <select
               value={filter}
@@ -236,53 +237,54 @@ const CampaignDetail = ({ campaignId, onClose, onChanged }) => {
               ))}
             </select>
           </div>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-shadow10">
-                <th className="px-2 py-2">Customer</th>
-                <th className="px-2 py-2">Status</th>
-                <th className="px-2 py-2">Detail</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recipients?.recipients?.length ? (
-                recipients.recipients.map((r) => (
-                  <tr
-                    key={r._id}
-                    className="border-b border-gray-border align-top"
-                  >
-                    <td className="px-2 py-2">
-                      <span className="block text-text-black">
-                        {r.customer?.name || 'Unknown'}
-                      </span>
-                      <span className="text-xs">
-                        {r.customer?.customerNumber}
-                      </span>
-                    </td>
-                    <td className="px-2 py-2">{capitalizeFirst(r.status)}</td>
-                    <td className="px-2 py-2 text-xs">
-                      {r.status === 'sent' && r.sentAt
-                        ? ISOStringToLocalTime(r.sentAt)
-                        : ''}
-                      {r.status === 'skipped'
-                        ? SKIP_TEXT[r.skipReason] || ''
-                        : ''}
-                      {['failed', 'queued'].includes(r.status) && r.error
-                        ? r.error
-                        : ''}
-                      {r.attempts > 1 ? ` (attempt ${r.attempts})` : ''}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="px-2 py-6 text-center italic" colSpan={3}>
-                    No recipients here.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <ResponsiveTable
+            align="left"
+            dense
+            maxHeightClass=""
+            rows={recipients?.recipients || []}
+            emptyMessage="No recipients here."
+            columns={[
+              {
+                key: 'customer',
+                header: 'Customer',
+                mobile: 'title',
+                cell: (r) => (
+                  <>
+                    <span className="block text-text-black">
+                      {r.customer?.name || 'Unknown'}
+                    </span>
+                    <span className="text-xs font-normal">
+                      {r.customer?.customerNumber}
+                    </span>
+                  </>
+                ),
+              },
+              {
+                key: 'status',
+                header: 'Status',
+                mobile: 'badge',
+                cell: (r) => capitalizeFirst(r.status),
+              },
+              {
+                key: 'detail',
+                header: 'Detail',
+                mobile: 'wide',
+                cellClass: () => 'text-xs',
+                cell: (r) => (
+                  <>
+                    {r.status === 'sent' && r.sentAt
+                      ? ISOStringToLocalTime(r.sentAt)
+                      : ''}
+                    {r.status === 'skipped' ? SKIP_TEXT[r.skipReason] || '' : ''}
+                    {['failed', 'queued'].includes(r.status) && r.error
+                      ? r.error
+                      : ''}
+                    {r.attempts > 1 ? ` (attempt ${r.attempts})` : ''}
+                  </>
+                ),
+              },
+            ]}
+          />
           {recipients?.pagination && (
             <Pagination
               currentPage={page}
@@ -339,7 +341,7 @@ const MessageHistory = ({ isAdmin, openCampaignId, onOpened, refreshKey }) => {
 
   return (
     <div className="flex flex-col gap-3 text-sm text-text-gray">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p>
           {isAdmin
             ? 'Every message sent from your company.'
@@ -367,71 +369,66 @@ const MessageHistory = ({ isAdmin, openCampaignId, onOpened, refreshKey }) => {
       {loading ? (
         <Spinner />
       ) : (
-        <table className="w-full">
-          <thead>
-            <tr className="text-left bg-gray-shadow10">
-              <th className="px-4 py-3 border border-gray-shadow8">Sent</th>
-              <th className="px-4 py-3 border border-gray-shadow8">Message</th>
-              <th className="px-4 py-3 border border-gray-shadow8">Sent as</th>
-              {isAdmin && (
-                <th className="px-4 py-3 border border-gray-shadow8">By</th>
-              )}
-              <th className="px-4 py-3 text-center border border-gray-shadow8">
-                Delivered
-              </th>
-              <th className="px-4 py-3 text-center border border-gray-shadow8">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.campaigns?.length ? (
-              data.campaigns.map((c) => (
-                <tr
-                  key={c._id}
-                  onClick={() => setSelectedId(c._id)}
-                  className="border-b border-gray-border cursor-pointer hover:bg-gray-shadow10"
-                >
-                  <td className="px-4 py-3">
-                    {formatDate(new Date(c.createdAt))}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="block text-text-black">
-                      {c.subject || capitalizeFirst(c.type)}
-                    </span>
-                    <span className="text-xs">
-                      {capitalizeFirst(c.type)} · {c.channel.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">{c.senderName}</td>
-                  {isAdmin && (
-                    <td className="px-4 py-3">
-                      {c.createdBy?.fullName || '-'}
-                    </td>
+        <ResponsiveTable
+          align="left"
+          maxHeightClass=""
+          rows={data?.campaigns || []}
+          onRowClick={(c) => setSelectedId(c._id)}
+          emptyMessage="No messages sent yet."
+          columns={[
+            {
+              key: 'sent',
+              header: 'Sent',
+              mobile: 'subtitle',
+              cell: (c) => formatDate(new Date(c.createdAt)),
+            },
+            {
+              key: 'message',
+              header: 'Message',
+              mobile: 'title',
+              cell: (c) => (
+                <>
+                  <span className="block text-text-black">
+                    {c.subject || capitalizeFirst(c.type)}
+                  </span>
+                  <span className="text-xs font-normal text-text-gray">
+                    {capitalizeFirst(c.type)} · {c.channel.toUpperCase()}
+                  </span>
+                </>
+              ),
+            },
+            { key: 'senderName', header: 'Sent as', cell: (c) => c.senderName },
+            ...(isAdmin
+              ? [
+                  {
+                    key: 'by',
+                    header: 'By',
+                    cell: (c) => c.createdBy?.fullName || '-',
+                  },
+                ]
+              : []),
+            {
+              key: 'delivered',
+              header: 'Delivered',
+              align: 'center',
+              cell: (c) => (
+                <>
+                  {c.counts.sent}/{c.totals.queued}
+                  {c.counts.failed > 0 && (
+                    <span className="text-error"> · {c.counts.failed} failed</span>
                   )}
-                  <td className="px-4 py-3 text-center">
-                    {c.counts.sent}/{c.totals.queued}
-                    {c.counts.failed > 0 && (
-                      <span className="text-error">
-                        {' '}
-                        · {c.counts.failed} failed
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Badge status={c.status} />
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr className="text-center h-[30vh]">
-                <td className="font-semibold" colSpan={isAdmin ? 6 : 5}>
-                  No messages sent yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                </>
+              ),
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              align: 'center',
+              mobile: 'badge',
+              cell: (c) => <Badge status={c.status} />,
+            },
+          ]}
+        />
       )}
 
       {data?.pagination && (

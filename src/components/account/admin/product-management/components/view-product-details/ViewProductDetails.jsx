@@ -246,15 +246,15 @@ const ViewProductDetails = ({
     : [];
 
   return (
-    <div className="relative bg-background-1 h-screen overflow-hidden">
+    <div className="relative bg-background-1 h-full overflow-hidden">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
       <div className="w-full">
         <SubHeader title={'View Product Details'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute top-0 z-20">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:top-0 md:z-20">
           <ProductManagementSidebar
             selectedSubMenu={selectedSubMenu}
             isOpen={openSidebar}
@@ -262,11 +262,11 @@ const ViewProductDetails = ({
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="px-5 h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar">
+          <div className="md:px-5 h-full flex flex-col gap-2 pb-6">
             {productData && !loading ? (
-              <div className=" h-full flex flex-col gap-2 min-h-[70vh] max-h-[80vh] overflow-y-auto no-scrollbar relative">
+              <div className="h-full flex flex-col gap-2 relative">
                 {/* Header Section */}
-                <div className="bg-text-white p-2 sticky top-0 z-10 w-full flex flex-row items-center justify-between ml-5">
+                <div className="bg-text-white p-2 md:sticky md:top-14 z-10 w-full flex flex-row flex-wrap gap-2 items-center justify-between md:ml-5">
                   <h3 className="flex flex-row items-center gap-4">
                     <span className="text-base font-semibold flex flex-col">
                       <span>
@@ -298,7 +298,7 @@ const ViewProductDetails = ({
                   )}
 
                   {/* Action Buttons */}
-                  <ul className="flex flex-row gap-3 mx-5">
+                  <ul className="flex flex-row flex-wrap gap-2 md:gap-3 md:mx-5">
                     <button
                       onClick={() =>
                         Router.push(
@@ -331,9 +331,9 @@ const ViewProductDetails = ({
                   </ul>
                 </div>
 
-                <div className="flex flex-row w-full px-5 gap-5">
+                <div className="flex flex-col lg:flex-row w-full px-2 md:px-5 gap-5">
                   {/* Product Description and Audit Section */}
-                  <div className="w-1/5 gap-2 flex flex-col overflow-y-auto scrollbar-thin">
+                  <div className="w-full lg:w-1/5 gap-2 flex flex-col">
                     <ProductDescriptionSection
                       productData={productData}
                       loading={loading}
@@ -341,7 +341,7 @@ const ViewProductDetails = ({
                   </div>
 
                   {/* Product Components, Price and Tax Details Section */}
-                  <div className="w-3/5 bg-white rounded-lg shadow-lg p-2">
+                  <div className="w-full lg:w-3/5 bg-white rounded-lg shadow-lg p-2">
                     <ProductComponentsPriceAndTaxDetails
                       productData={productData}
                       setProductData={setProductData}
@@ -350,7 +350,7 @@ const ViewProductDetails = ({
                   </div>
 
                   {/* Product Availability Details Section */}
-                  <div className="w-1/5 bg-white rounded-lg shadow-lg p-2">
+                  <div className="w-full lg:w-1/5 bg-white rounded-lg shadow-lg p-2">
                     <ProductAvailabilityDetails
                       branches={branches}
                       selectedBranches={selectedBranches}
@@ -374,9 +374,7 @@ const ViewProductDetails = ({
             ) : (
               <Spinner />
             )}
-            <div className="">
-              <PageDescription pageDescription={pageDescription} />
-            </div>
+            <PageDescription pageDescription={pageDescription} />
           </div>
         </div>
       </div>

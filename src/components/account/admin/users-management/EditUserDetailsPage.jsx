@@ -1,6 +1,5 @@
 import React from 'react';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
-import AdminSideBar from '../AdminSideBar';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getUserById } from '@/services/usersServices';
 import EditUserDetails from './components/EditUserDetails/EditUserDetails';
@@ -10,7 +9,6 @@ const EditUserDetailsPage = () => {
   const id = searchParams.get('id');
   const router = useRouter();
   const [userData, setUserData] = React.useState({});
-  const [selectedMenu, setSelectedMenu] = React.useState('users-management');
 
   const pageDescription =
     'The Update User Details page allows administrators to modify the information of a specific user within the system. Here, you can update user details such as their name, role, contact information, and other associated metadata. This interface is designed to streamline administrative tasks, ensuring that user information remains accurate and up-to-date.';
@@ -48,15 +46,9 @@ const EditUserDetailsPage = () => {
   }
 
   return (
-    <div>
+    <div className="h-full">
       {id ? (
         <div className="flex flex-row gap-0 bg-background-1 h-full w-full overflow-hidden">
-          <div>
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
           <div className="w-full">
             <EditUserDetails
               userData={userData}

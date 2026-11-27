@@ -56,7 +56,7 @@ const PageAccessDenied = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen bg-background-1 gap-5">
+    <div className="flex flex-col items-center justify-center w-full min-h-full py-10 px-4 bg-background-1 gap-5">
       <h1 className="text-l font-bold text-center text-error">
         You do not have permission to view this part of the business!!!
         <p className="text-amber-500">

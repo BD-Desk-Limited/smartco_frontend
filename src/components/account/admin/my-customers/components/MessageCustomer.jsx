@@ -65,8 +65,8 @@ const CustomerMessages = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Customer Messages'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute left-0 top-0 z-50">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:left-0 md:top-0 md:z-50">
           <SideBar
             selectedSubMenu="customer-messages"
             isOpen={openSidebar}
@@ -75,9 +75,9 @@ const CustomerMessages = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-4">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-4">
             <div
-              className="flex gap-1 border-b border-gray-border"
+              className="flex gap-1 border-b border-gray-border overflow-x-auto no-scrollbar"
               role="tablist"
             >
               {TABS.map((t) => (
@@ -89,7 +89,7 @@ const CustomerMessages = ({ pageDescription }) => {
                     setTab(t.value);
                     setNotice('');
                   }}
-                  className={`px-4 py-2 text-sm ${
+                  className={`px-4 py-2 text-sm whitespace-nowrap shrink-0 ${
                     tab === t.value
                       ? 'border-b-2 border-brand-blue text-brand-blue font-semibold'
                       : 'text-text-gray'
@@ -133,9 +133,7 @@ const CustomerMessages = ({ pageDescription }) => {
               )
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
     </div>

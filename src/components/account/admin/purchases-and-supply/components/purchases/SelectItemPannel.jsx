@@ -46,19 +46,19 @@ const SelectItemPannel = ({
       onClick={(e) => {
         e.stopPropagation();
       }}
-      className="bg-white w-[80%] h-[90%] rounded-lg p-5 relative"
+      className="bg-white w-full h-full sm:w-[80%] sm:h-[90%] sm:rounded-lg p-4 sm:p-5 pt-12 sm:pt-5 relative flex flex-col"
     >
       {/* Close button */}
       <span
         onClick={onCloseSelectItemPannel}
         title="close"
-        className="absolute top-0 right-0 p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
+        className="absolute top-2 right-2 sm:top-0 sm:right-0 p-3 sm:p-2 rounded-full bg-gray-shadow5 hover:bg-error-hover cursor-pointer"
       >
         <FaTimes className="text-text-white" />
       </span>
 
       {/* search bar */}
-      <div className="h-8 px-3 border-2 border-gray-border rounded-md flex flex-row items-center w-full">
+      <div className="h-11 sm:h-8 px-3 border-2 border-gray-border rounded-md flex flex-row items-center w-full shrink-0">
         <FaSearch className="text-text-gray" />
         <input
           type="text"
@@ -69,7 +69,7 @@ const SelectItemPannel = ({
         />
       </div>
 
-      <div className="flex flex-col h-full w-full">
+      <div className="flex flex-col flex-1 min-h-0 sm:h-full w-full">
         <span className="my-1 text-sm">Select Item purchased:</span>
 
         <div className="flex flex-row items-center justify-center p-3 rounded-md cursor-pointer h-full w-full">

@@ -17,6 +17,7 @@ import ExportContent from '@/components/account/ExportContent';
 import DeleteModal from '@/components/account/DeleteModal';
 import DeactivationModal from '@/components/account/DeactivationModal';
 import SuccessModal from '@/components/account/SuccessModal';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewUsers = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -232,7 +233,7 @@ const ViewUsers = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'View All Users in your Organisation'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <UsersManagementSidebar
             selectedSubMenu={selectedSubMenu}
@@ -241,10 +242,10 @@ const ViewUsers = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
             {/* search bar and filters */}
-            <div className="flex flex-row gap-5 w-full justify-between items-center">
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-5 w-full md:justify-between md:items-center">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex flex-row items-center w-full">
                 <Image
                   src="/assets/search.png"
                   alt="search"
@@ -259,7 +260,7 @@ const ViewUsers = ({ pageDescription }) => {
                   className="focus:outline-none ml-2 w-full"
                 />
               </div>
-              <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
+              <div className="flex flex-row flex-wrap gap-2 text-sm md:min-w-fit text-text-gray">
                 <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
                   <Image
                     src="/assets/filter.png"
@@ -365,149 +366,120 @@ const ViewUsers = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="overflow-x-auto w-full h-full min-h-[50vh]">
-                <table className="w-full table-auto">
-                  <thead className="bg-gray-shadow8">
-                    <tr className="text-left text-text-black text-sm font-medium">
-                      <th className="px-2 py-2"></th>
-                      <th className="px-2 py-2">Staff ID</th>
-                      <th className="px-2 py-2">Full Name</th>
-                      <th className="px-2 py-2">Email</th>
-                      <th className="px-2 py-2">Team/Dept</th>
-                      <th className="px-2 py-2">Role</th>
-                      <th className="px-2 py-2 text-center">Actions</th>
-                      <th className="px-2 py-2"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm text-text-gray min-h-[40vh] w-full">
-                    {filteredUsers?.length > 0 ? (
-                      filteredUsers?.map((user) => (
-                        <tr
-                          key={user._id}
-                          className={`border-b border-gray-border hover:bg-gray-shadow10 hover:text-text-black cursor-pointer items-center w-full`}
-                          onClick={() =>
-                            Router.push(
-                              `/pages/account/admin/users-management/user-details?id=${user._id}`
-                            )
+              <div className="w-full h-full flex flex-col gap-2">
+                <ResponsiveTable
+                  align="left"
+                  rows={filteredUsers || []}
+                  emptyMessage={<span className="text-error">No users found!!!</span>}
+                  onRowClick={(user) =>
+                    Router.push(
+                      `/pages/account/admin/users-management/user-details?id=${user._id}`
+                    )
+                  }
+                  selection={{
+                    isSelected: (user) => selectedUsers.includes(user._id),
+                    onToggle: (user) => handleSelectUser(user._id),
+                    rowLabel: (user) => user?.fullName,
+                  }}
+                  columns={[
+                    {
+                      key: 'staffId',
+                      header: 'Staff ID',
+                      cell: (user) => user?.staffId || '-',
+                    },
+                    {
+                      key: 'name',
+                      header: 'Full Name',
+                      mobile: 'title',
+                      cell: (user) => user?.fullName || '-',
+                    },
+                    {
+                      key: 'email',
+                      header: 'Email',
+                      mobile: 'subtitle',
+                      cell: (user) => user?.email || '-',
+                    },
+                    {
+                      key: 'team',
+                      header: 'Team/Dept',
+                      cell: (user) => user?.team?.name || '-',
+                    },
+                    {
+                      key: 'role',
+                      header: 'Role',
+                      cellClass: (user) =>
+                        user?.role === 'admin'
+                          ? 'text-error font-semibold'
+                          : user?.role === 'manager'
+                            ? 'text-brand-blue font-semibold'
+                            : '',
+                      cell: (user) =>
+                        user?.role?.charAt(0).toUpperCase() +
+                          user?.role?.slice(1).toLowerCase() || '-',
+                    },
+                    {
+                      key: 'status',
+                      header: '',
+                      mobileLabel: 'Status',
+                      mobile: 'badge',
+                      cell: (user) => (
+                        <span
+                          className="flex items-center gap-1"
+                          title={user.is_active ? 'Active' : 'Inactive'}
+                        >
+                          <span
+                            className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-brand-green' : 'bg-gray-shadow8 shadow-lg'}`}
+                          />
+                          <span className="md:hidden text-xs font-normal">
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </span>
+                      ),
+                    },
+                  ]}
+                  actions={(user) => (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleUserToChangeStatus([user._id]);
+                          setSelectedUserStatus(user.is_active ? 'active' : 'inactive');
+                        }}
+                        title={user?.is_active ? 'Deactivate user' : 'Activate user'}
+                        aria-label={user?.is_active ? 'Deactivate user' : 'Activate user'}
+                      >
+                        <Image
+                          src={
+                            user?.is_active
+                              ? '/assets/switch_active.png'
+                              : '/assets/switch_inactive.png'
                           }
-                        >
-                          <td className={`px-2 py-2 text-left`}>
-                            <input
-                              type="checkbox"
-                              value={user._id}
-                              checked={selectedUsers.includes(user._id)}
-                              onClick={(e) => e.stopPropagation()} // Stop event propagation
-                              onChange={(e) => {
-                                e.stopPropagation(); // Stop event propagation
-                                handleSelectUser(e.target.value);
-                              }}
-                              className="cursor-pointer"
-                            />
-                          </td>
-                          <td className={`px-2 py-2 text-left`}>
-                            {user?.staffId || '-'}
-                          </td>
-                          <td className={`px-2 py-2 text-left`}>
-                            {user?.fullName || '-'}
-                          </td>
-                          <td className={`px-2 py-2 text-left`}>
-                            {user?.email || '-'}
-                          </td>
-                          <td className={`px-2 py-2 text-left`}>
-                            {user?.team?.name || '-'}
-                          </td>
-                          <td
-                            className={`px-2 py-2 text-left ${
-                              user?.role === 'admin'
-                                ? 'text-error font-semibold'
-                                : user?.role === 'manager'
-                                  ? 'text-brand-blue font-semibold '
-                                  : ''
-                            }`}
-                          >
-                            {user?.role?.charAt(0).toUpperCase() +
-                              user?.role?.slice(1).toLowerCase() || '-'}
-                          </td>
-
-                          {/* Actions */}
-                          <td className="px-4 py-2 h-full text-left flex flex-row w-full justify-between items-center">
-                            <Image
-                              src={
-                                user?.is_active
-                                  ? '/assets/switch_active.png'
-                                  : '/assets/switch_inactive.png'
-                              }
-                              alt="switch"
-                              height={9}
-                              width={25}
-                              onClick={(e) => {
-                                e.stopPropagation(); // Stop event propagation
-                                handleUserToChangeStatus([user._id]);
-                                setSelectedUserStatus(
-                                  user.is_active ? 'active' : 'inactive'
-                                );
-                              }}
-                              className="cursor-pointer"
-                              title={
-                                user?.is_active
-                                  ? 'Deactivate user'
-                                  : 'Activate user'
-                              }
-                            />
-                            <Link
-                              href={`/pages/account/admin/users-management/edit-user?id=${user?._id}`}
-                              title="Edit User"
-                              className=""
-                            >
-                              <Image
-                                src="/assets/edit.png"
-                                alt="edit"
-                                width={15}
-                                height={15}
-                                onClick={(e) => e.stopPropagation()} // Stop event propagation
-                                className="cursor-pointer"
-                              />
-                            </Link>
-                            <Image
-                              src="/assets/delete.png"
-                              alt="delete"
-                              width={15}
-                              height={15}
-                              onClick={(e) => {
-                                e.stopPropagation(); // Stop event propagation
-                                handleUserToDelete([user._id]);
-                              }}
-                              className="cursor-pointer"
-                              title="Delete User"
-                            />
-                          </td>
-
-                          {/* status indicator */}
-                          <td
-                            className="px-2 py-2 text-left"
-                            title={user.is_active ? 'Active' : 'Inactive'}
-                          >
-                            <div
-                              className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-brand-green' : 'bg-gray-shadow8 shadow-lg'}`}
-                            ></div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="text-center text-base text-error h-[40vh]"
-                        >
-                          No users found!!!
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                          alt=""
+                          height={9}
+                          width={25}
+                        />
+                      </button>
+                      <Link
+                        href={`/pages/account/admin/users-management/edit-user?id=${user?._id}`}
+                        title="Edit User"
+                        aria-label="Edit User"
+                      >
+                        <Image src="/assets/edit.png" alt="" width={15} height={15} />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleUserToDelete([user._id])}
+                        title="Delete User"
+                        aria-label="Delete User"
+                      >
+                        <Image src="/assets/delete.png" alt="" width={15} height={15} />
+                      </button>
+                    </>
+                  )}
+                />
 
                 {selectedUsers.length > 0 && (
-                  <div className="sticky bottom-0 bg-white flex flex-row py-1 justify-end px-5 gap-5">
+                  <div className="sticky bottom-0 bg-white flex flex-row flex-wrap py-2 justify-end px-2 md:px-5 gap-3 md:gap-5">
                     <div className="bg-success text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-90 flex flex-row items-center gap-3">
                       {`${selectedUsers.length} selected`}
                       <Image
@@ -543,9 +515,7 @@ const ViewUsers = ({ pageDescription }) => {
               </div>
             )}
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

@@ -11,17 +11,10 @@ import {
   updateTrustedDeviceService,
 } from '@/services/trustedDeviceServices';
 import DeviceFilters from './DeviceFilters';
-import DeviceRow from './DeviceRow';
+import { deviceColumns, DeviceActions } from './DeviceRow';
 import EditDeviceModal from './EditDeviceModal';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
-const COLUMNS = [
-  'Device',
-  'Branches',
-  'Added by',
-  'Date added',
-  'Last used',
-  'Action',
-];
 const time = (value) => (value ? new Date(value).getTime() : 0);
 
 const SORTERS = {
@@ -144,49 +137,29 @@ const DeviceAuthorizations = () => {
         <h3 className="bg-brand-blue text-text-white text-center text-lg py-3">
           Authorized Devices
         </h3>
-        {/* Fixed height: the table scrolls inside, the header row stays visible */}
-        <div className="h-[55vh] min-h-[280px] overflow-auto px-4 sm:px-6">
-          <table className="w-full min-w-[820px] text-left">
-            <thead className="sticky top-0 bg-white z-10">
-              <tr>
-                {COLUMNS.map((column) => (
-                  <th
-                    key={column}
-                    scope="col"
-                    className={`py-3 text-sm font-medium text-brand-green border-b border-gray-border ${
-                      column === 'Action' ? 'text-center' : ''
-                    }`}
-                  >
-                    {column}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {devices.map((device) => (
-                <DeviceRow
-                  key={device._id}
-                  device={device}
-                  canManage={result.canManage}
-                  busy={busy && revoking?._id === device._id}
-                  onEdit={setEditing}
-                  onRevoke={setRevoking}
-                />
-              ))}
-              {devices.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={COLUMNS.length}
-                    className="py-10 text-center text-sm text-text-gray"
-                  >
-                    {result.data.length
-                      ? 'No devices match your filters.'
-                      : 'No authorized devices yet.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* md and up: fixed height, the table scrolls inside and the header row stays visible */}
+        <div className="md:h-[55vh] md:min-h-[280px] px-3 sm:px-6 py-3 md:py-0">
+          <ResponsiveTable
+            align="left"
+            maxHeightClass="md:h-full"
+            rows={devices}
+            emptyMessage={
+              result.data.length
+                ? 'No devices match your filters.'
+                : 'No authorized devices yet.'
+            }
+            columns={deviceColumns}
+            actionsHeader="Action"
+            actions={(device) => (
+              <DeviceActions
+                device={device}
+                canManage={result.canManage}
+                busy={busy && revoking?._id === device._id}
+                onEdit={setEditing}
+                onRevoke={setRevoking}
+              />
+            )}
+          />
         </div>
         <footer className="bg-brand-blue h-10" />
       </section>

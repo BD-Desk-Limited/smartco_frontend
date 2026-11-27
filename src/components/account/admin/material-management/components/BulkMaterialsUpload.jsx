@@ -258,7 +258,7 @@ const BulkMaterialsUpload = ({ pageDescription }) => {
       <div>
         <SubHeader title={'Bulk Upload Material'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <MaterialSidebar
             selectedSubMenu={selectedSubMenu}
@@ -267,8 +267,8 @@ const BulkMaterialsUpload = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col w-full h-full">
-          <div className="bg-background-1 p-5 my-2 mx-5 rounded-md h-full flex flex-col justify-center items-center">
-            <div className="bg-text-white p-5 rounded-md min-h-[50vh] w-[40vw] flex flex-col justify-center items-center gap-2">
+          <div className="bg-background-1 p-2 md:p-5 my-2 md:mx-5 rounded-md h-full flex flex-col justify-center items-center">
+            <div className="bg-text-white p-3 md:p-5 rounded-md min-h-[50vh] w-[calc(100%-1rem)] max-w-lg lg:w-[40vw] lg:max-w-none flex flex-col justify-center items-center gap-2">
               <h1 className="text-base font-bold">Bulk Upload Materials</h1>
               <span className="text-text-gray text-sm">
                 upload bulk materials to your stores
@@ -335,7 +335,7 @@ const BulkMaterialsUpload = ({ pageDescription }) => {
                   Upload
                 </button>
               ) : (
-                <div className="w-full flex flex-row justify-center gap-5 text-sm">
+                <div className="w-full flex flex-row flex-wrap justify-center gap-3 md:gap-5 text-sm">
                   <a
                     onClick={() => {
                       setFile(null);
@@ -367,7 +367,7 @@ const BulkMaterialsUpload = ({ pageDescription }) => {
             </div>
 
             {uploading && (
-              <div className="mb-20 mt-5 flex flex-col justify-center items-center gap-2 w-[40vw]">
+              <div className="mb-8 md:mb-20 mt-5 flex flex-col justify-center items-center gap-2 w-[calc(100%-1rem)] max-w-lg lg:w-[40vw] lg:max-w-none">
                 <div className="text-text-black font-bold text-left text-base w-full">
                   Upload Progress
                 </div>

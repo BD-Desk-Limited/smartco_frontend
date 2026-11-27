@@ -36,8 +36,8 @@ const LoginExisting = ({ seller, setSeller }) => {
     );
 
   return (
-    <div className="w-[85%] h-[80%] bg-white rounded-md shadow-md flex flex-col items-center justify-center p-5">
-      <div className="flex flex-row items-center gap-5 w-full">
+    <div className="w-full sm:w-[85%] sm:h-[80%] bg-white rounded-md shadow-md flex flex-col items-center justify-center p-4 sm:p-5">
+      <div className="flex flex-row flex-wrap items-center gap-3 sm:gap-5 w-full">
         <p
           onClick={() => setSeller(null)}
           className="px-3 py-3 bg-gray-shadow9 rounded-[100%] cursor-pointer hover:bg-gray-shadow8"

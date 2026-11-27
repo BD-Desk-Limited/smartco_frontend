@@ -57,7 +57,7 @@ const SetupModal = ({ stepModule, stepConfig, setupProgress, onComplete, onSkip,
       }`}>
         {/* Header */}
         <div className={`bg-gradient-to-r ${getGradientColors(stepConfig?.color)} text-white p-8 rounded-t-2xl`}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-4">
               <div className="text-5xl">{stepConfig?.icon}</div>
               <div>

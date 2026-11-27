@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import ViewBranchDetails from './components/ViewBranchDetails';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -11,7 +10,6 @@ const ViewBranchDetailsPage = () => {
   const id = searchParams.get('id');
   const router = useRouter();
   const [branchData, setBranchData] = React.useState({});
-  const [selectedMenu, setSelectedMenu] = React.useState('branch-management');
 
   const pageDescription =
     'The Branch Details page provides an overview of a specific branch within your company. Here, you can view detailed information about the branch, including its name, location, and contact details. Additionally, you can see a list of users associated with this branch, along with their roles and contact information. This interface allows you to efficiently manage branch details and the users assigned to it.';
@@ -48,13 +46,7 @@ const ViewBranchDetailsPage = () => {
   return (
     <div>
       {id ? (
-        <div className="flex flex-row gap-0 bg-background-1">
-          <div>
-            <AdminSideBar
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-            />
-          </div>
+        <div className="flex flex-row gap-0 bg-background-1 h-full">
           <div className="w-full">
             <ViewBranchDetails
               branchData={branchData}

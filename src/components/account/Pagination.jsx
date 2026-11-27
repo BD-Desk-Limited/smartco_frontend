@@ -33,7 +33,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <>
       {totalPages > 1 && (
-        <div className="flex flex-row justify-center items-center gap-5">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-5 py-2">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -46,7 +46,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             />
           </button>
 
-          <span className="gap-5 flex flex-row justify-center items-center">
+          <span className="gap-1 sm:gap-5 flex flex-row flex-wrap justify-center items-center">
             {showPageNumbers()}
           </span>
 

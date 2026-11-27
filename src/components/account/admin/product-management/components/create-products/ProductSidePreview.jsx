@@ -33,7 +33,7 @@ const ProductSidePreview = ({
   };
 
   return (
-    <div className="max-h-[99%] min-h-[99%] overflow-y-auto no-scrollbar bg-brand-blue rounded-md text-text-white px-3 relative">
+    <div className="max-h-[99%] min-h-[99%] overflow-y-auto bg-brand-blue rounded-md text-text-white px-3 relative">
       <h2 className="text-base font-semibold sticky top-0 py-2 bg-brand-blue">
         {selectedProduct?.name || 'Product Preview'}
       </h2>

@@ -3,7 +3,7 @@ import UserDetailsPage from '@/components/account/admin/users-management/UserDet
 
 const page = () => {
   return (
-    <div>  
+    <div className="h-full">  
       <UserDetailsPage />
     </div>
   )

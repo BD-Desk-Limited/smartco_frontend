@@ -72,7 +72,7 @@ const UserBranchManagement = ({ updatedUserData, setUpdatedUserData }) => {
             No branches associated with this user yet.
           </li>
         ) : (
-          <ul className="w-full px-2 rounded-lg shadow-sm my-2 py-5 grid grid-cols-4 gap-2 min-h-[150px] relative">
+          <ul className="w-full px-2 rounded-lg shadow-sm my-2 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 min-h-[150px] relative">
             <span className="absolute top-0 right-2 text-brand-blue text-sm">
               Number of branches - {branches && branches.length}
             </span>

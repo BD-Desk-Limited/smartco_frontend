@@ -17,6 +17,8 @@ import Pagination from '@/components/account/Pagination';
 import ErrorModal from '@/components/account/ErrorModal';
 import PurchaseAndSupplyDetailSideView from './PurchaseAndSupplyDetailSideView';
 import ExportContent from '@/components/account/ExportContent';
+import SideView from '../../ui/SideView';
+import Modal from '../../ui/Modal';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import { capitalizeFirst } from '@/utilities/stringUtils';
 
@@ -265,7 +267,7 @@ const PurchasesAndSupply = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Purchase Orders List'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit">
           <SideBar
             selectedSubMenu="my-purchases"
@@ -275,7 +277,7 @@ const PurchasesAndSupply = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-4 md:gap-5">
             <PurchasesAndSupplyFilters
               selectedFilters={selectedFilters}
               draftFilters={draftFilters}
@@ -311,14 +313,12 @@ const PurchasesAndSupply = ({ pageDescription }) => {
               />
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 
       {errorMessage && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-[70] flex justify-center items-center ">
+        <Modal bare zClass="z-[70]" label="Error" onClose={() => setErrorMessage(null)}>
           <ErrorModal
             message={errorMessage}
             title={'Error'}
@@ -327,13 +327,13 @@ const PurchasesAndSupply = ({ pageDescription }) => {
             buttonText={'Close'}
             subText={'Please try again'}
           />
-        </div>
+        </Modal>
       )}
 
       {selectedOrder && (
-        <div
-          className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center "
-          onClick={() => setSelectedOrder(null)}
+        <SideView
+          onClose={() => setSelectedOrder(null)}
+          label="Purchase order details"
         >
           <PurchaseAndSupplyDetailSideView
             order={selectedOrder}
@@ -341,17 +341,17 @@ const PurchasesAndSupply = ({ pageDescription }) => {
             STATUS_OPTIONS={STATUS_OPTIONS}
             onExport={setExportConfig}
           />
-        </div>
+        </SideView>
       )}
 
       {/* rendered last and above the side view, so it opens on top of it */}
       {exportConfig && (
-        <div className="inset-0 fixed bg-black bg-opacity-50 z-[60] flex justify-center items-center">
+        <Modal bare zClass="z-[60]" label="Export" onClose={() => setExportConfig(null)}>
           <ExportContent
             {...exportConfig}
             onClose={() => setExportConfig(null)}
           />
-        </div>
+        </Modal>
       )}
     </div>
   );

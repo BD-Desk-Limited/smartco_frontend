@@ -8,7 +8,7 @@ const page = () => {
     //const searchParams = useSearchParams();
     //onst id = searchParams.get('id');
   return (
-    <div>suppliers page. ID:{/*id*/}</div>
+    <div className="h-full">suppliers page. ID:{/*id*/}</div>
   )
 }
 

@@ -122,7 +122,7 @@ const ResetPassword = ({ token }) => {
               <span className="text-sm text-center text-[#7D8482]">
                 Choose a new password that meets the requirements below
               </span>
-              <div className="flex flex-col items-center h-[50%] justify-between gap-4 mt-4 w-[80%]">
+              <div className="flex flex-col items-center h-[50%] justify-between gap-4 mt-4 w-full sm:w-[80%]">
                 <div className="w-full gap-2 flex flex-col">
                   <label
                     htmlFor="newPassword"

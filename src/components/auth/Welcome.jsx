@@ -79,10 +79,8 @@ const Welcome = () => {
   const divStyle = {
     backgroundImage: `url('/images/welcome.png')`,
     backgroundPosition: 'center',
-    backgroundSize: '100% 100%',
+    backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
-    height: '100vh',
-    width: '100vw',
   };
 
   const canRenderOffline =
@@ -94,9 +92,12 @@ const Welcome = () => {
   }
 
   return (
-    <div style={divStyle} className="w-full">
-      <div className="absolute bottom-28 left-28 w-[37%] text-white text-[40px] font-serif">
-        <div className="relative bg-brand-blue w-full h-full px-6 py-12 opacity-[80%] rounded-3xl">
+    <div
+      style={divStyle}
+      className="relative w-full min-h-dvh lg:h-dvh flex flex-col justify-end gap-6 p-4 pb-16 sm:p-8 lg:block lg:p-0 overflow-x-hidden"
+    >
+      <div className="lg:absolute lg:bottom-28 lg:left-28 w-full lg:w-[37%] text-white text-2xl sm:text-3xl lg:text-[40px] leading-tight font-serif order-1">
+        <div className="relative bg-brand-blue w-full h-full px-3 py-8 lg:px-6 lg:py-12 opacity-[80%] rounded-3xl">
           {/* Black overlay */}
           <div className="absolute inset-0 bg-black opacity-[70%] z-10 rounded-3xl"></div>
 
@@ -126,28 +127,28 @@ const Welcome = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col justify-center absolute bottom-10 text-left left-28 w-80 text-white text-[12px]">
+      <div className="flex flex-col justify-center lg:absolute lg:bottom-10 text-left lg:left-28 lg:w-80 text-white text-[12px] order-3">
         <p>
           For support or enquiry, please reach out to us through our email{' '}
           <strong>info@bd-desk.com</strong>
         </p>
         <p>All rights reserved BD-Desk Limited &copy;2024.</p>
       </div>
-      <div className="absolute h-full justify-center right-28 flex flex-col gap-3 w-56">
+      <div className="lg:absolute lg:top-0 lg:h-full justify-center lg:right-28 flex flex-col gap-3 w-full sm:w-72 lg:w-56 sm:self-center order-2">
         <p className="text-text-white text-center">Continue to</p>
         <Link href="/pages/auth/login">
-          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+          <button className="bg-white px-3 py-3 lg:py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Admin/Manager Login
           </button>
         </Link>
         <Link href="/pages/auth/login/sales-point">
-          <button className="bg-white px-3 py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
+          <button className="bg-white px-3 py-3 lg:py-1 w-full rounded-md text-[16px] text-brand-blue font-bold hover:bg-brand-blue hover:text-white">
             Sales point
           </button>
         </Link>
 
         <Link href="/pages/splash/open-pages/local-data-management">
-          <button className="w-full text-sm text-brand-blue font-semibold hover:bg-brand-blue hover:text-white">
+          <button className="w-full py-2 lg:py-0 text-sm text-text-white lg:text-brand-blue font-semibold hover:bg-brand-blue hover:text-white rounded-md">
             local data management
           </button>
         </Link>

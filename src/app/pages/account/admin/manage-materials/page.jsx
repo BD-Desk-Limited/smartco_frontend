@@ -4,7 +4,7 @@ import ViewMaterialPage from '@/components/account/admin/material-management/Vie
 
 const Page = () => {
   return (
-    <div>
+    <div className="h-full">
       <ViewMaterialPage />
     </div>
   );

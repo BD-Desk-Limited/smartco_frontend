@@ -237,7 +237,7 @@ const NewPurchaseRecord = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Enter New Purchase Record'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
         <div className="min-w-fit">
           <SideBar
             selectedSubMenu="new-purchase"
@@ -248,10 +248,10 @@ const NewPurchaseRecord = ({ pageDescription }) => {
         </div>
 
         <div className="flex flex-col h-full w-full relative p-1 text-text-gray">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-[80%] flex flex-col gap-3">
+          <div className="bg-white p-3 md:p-5 mx-1 md:mx-5 my-2 rounded-md md:h-[80%] flex flex-col gap-3">
             {/* Select supplier */}
             {!selectedSupplier ? (
-              <div className="flex flex-row items-center w-full h-full gap-10">
+              <div className="flex flex-row items-center w-full h-full gap-10 py-10 md:py-0">
                 <div
                   onClick={(e) => openSelectSupplierPannel(e)}
                   className="flex flex-col justify-center items-center w-full gap-1"
@@ -260,7 +260,7 @@ const NewPurchaseRecord = ({ pageDescription }) => {
                     Select purchase supplier
                   </label>
 
-                  <div className="h-8 px-2 border border-gray-border rounded-md flex flex-row items-center w-full">
+                  <div className="h-11 md:h-8 px-2 border border-gray-border rounded-md flex flex-row items-center w-full">
                     <span className="flex flex-row justify-between items-center gap-5 w-full cursor-pointer">
                       <span>Select supplier</span>
                       <FaChevronDown />
@@ -282,7 +282,7 @@ const NewPurchaseRecord = ({ pageDescription }) => {
                 <span
                   onClick={() => setOpenSupplierSelectPannel(true)}
                   title="change supplier"
-                  className="font-thin text-xs w-fit bg-error text-text-white py-0.5 px-1 rounded-full shadow-black shadow-md cursor-pointer hover:bg-red-400 hover:text-text-black flex flex-row gap-2"
+                  className="font-thin text-xs w-fit bg-error text-text-white py-1.5 px-3 md:py-0.5 md:px-1 rounded-full shadow-black shadow-md cursor-pointer hover:bg-red-400 hover:text-text-black flex flex-row gap-2"
                 >
                   <span>change supplier</span>
                   <FaExchangeAlt />
@@ -292,7 +292,7 @@ const NewPurchaseRecord = ({ pageDescription }) => {
                 {selectedSupplier &&
                   selectedSupplier._id &&
                   selectedSupplier._id === OPEN_MARKET_ID && (
-                    <div className="flex flex-col justify-start w-auto gap-1 my-1 mx-5">
+                    <div className="flex flex-col justify-start w-auto gap-1 my-1 md:mx-5">
                       <label className="text-text-black text-sm font-semibold">
                         Vendor name <span className="italic">(optional)</span>
                       </label>
@@ -375,9 +375,7 @@ const NewPurchaseRecord = ({ pageDescription }) => {
             )}
           </div>
 
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

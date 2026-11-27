@@ -15,6 +15,7 @@ import { formatDate } from '@/utilities/formatTime';
 import CustomerGroupFormModal from './CustomerGroupFormModal';
 import CustomerGroupSideView from './CustomerGroupSideView';
 import { FaUserGroup, FaUsers } from 'react-icons/fa6';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const CustomerGroups = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -80,8 +81,8 @@ const CustomerGroups = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'Customer Groups'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full relative">
-        <div className="min-w-fit absolute left-0 top-0 z-50">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full relative">
+        <div className="min-w-fit md:absolute md:left-0 md:top-0 md:z-50">
           <SideBar
             selectedSubMenu="customer-groups"
             isOpen={openSidebar}
@@ -90,9 +91,9 @@ const CustomerGroups = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
             <div className="flex flex-row justify-between items-center gap-3">
-              <div className="h-8 px-3 border border-gray-border rounded-md flex flex-row items-center w-1/3 text-sm">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md flex flex-row items-center w-full md:w-1/3 text-sm">
                 <FaSearch aria-hidden="true" />
                 <input
                   type="text"
@@ -105,7 +106,7 @@ const CustomerGroups = ({ pageDescription }) => {
               {permissions.canCreate && (
                 <button
                   onClick={() => setForm({ group: null })}
-                  className="px-3 py-1 text-sm shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue whitespace-nowrap"
+                  className="px-3 h-10 md:h-8 text-sm shadow-md bg-blue-shadow1 text-text-white rounded-md hover:bg-brand-blue whitespace-nowrap shrink-0"
                 >
                   Create group
                 </button>
@@ -115,90 +116,75 @@ const CustomerGroups = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow10 text-sm text-text-gray">
-                      <th className="px-4 py-4 border border-gray-shadow8">
-                        Group
-                      </th>
-                      <th className="px-4 py-4 border border-gray-shadow8">
-                        Branches
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Members
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Created by
-                      </th>
-                      <th className="px-4 py-4 text-center border border-gray-shadow8">
-                        Created
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-text-gray">
-                    {visible.length > 0 ? (
-                      visible.map((g) => (
-                        <tr
-                          key={g._id}
-                          onClick={() => setSelectedGroupId(g._id)}
-                          className="border-b border-gray-border text-sm cursor-pointer hover:bg-gray-shadow10"
-                        >
-                          <td className="px-4 py-3 flex flex-row items-center gap-2">
-                            <span>
-                              <FaUsers className="text-lg text-brand-green" />
+              <ResponsiveTable
+                rows={visible}
+                onRowClick={(g) => setSelectedGroupId(g._id)}
+                emptyMessage={
+                  groups.length
+                    ? 'No groups match your search.'
+                    : 'No customer groups yet.'
+                }
+                columns={[
+                  {
+                    key: 'group',
+                    header: 'Group',
+                    align: 'left',
+                    mobile: 'title',
+                    cell: (g) => (
+                      <span className="flex flex-row items-start gap-2">
+                        <FaUsers className="text-lg text-brand-green shrink-0" />
+                        <span className="flex flex-col text-text-black">
+                          <span className="font-semibold">{g.name}</span>
+                          {g.description && (
+                            <span className="text-xs font-normal text-text-gray">
+                              {g.description}
                             </span>
-                            <span className="flex flex-col text-text-black">
-                              <span className="font-semibold">{g.name}</span>
-
-                              <span>
-                                {g.description && (
-                                  <span className="text-xs">
-                                    {g.description}
-                                  </span>
-                                )}
-                              </span>
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            {g.isGlobal ? (
-                              <span className="px-2 py-1 rounded-md bg-blue-shadow10">
-                                All branches
-                              </span>
-                            ) : (
-                              g.branches.map((b) => b.name).join(', ')
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {g.memberCount}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {g.createdBy?.fullName || '-'}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {g.createdAt
-                              ? formatDate(new Date(g.createdAt))
-                              : '-'}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={5}>
-                          {groups.length
-                            ? 'No groups match your search.'
-                            : 'No customer groups yet.'}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                          )}
+                        </span>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: 'branches',
+                    header: 'Branches',
+                    align: 'left',
+                    mobile: 'wide',
+                    cell: (g) =>
+                      g.isGlobal ? (
+                        <span className="px-2 py-1 rounded-md bg-blue-shadow10">
+                          All branches
+                        </span>
+                      ) : (
+                        g.branches.map((b) => b.name).join(', ')
+                      ),
+                  },
+                  {
+                    key: 'members',
+                    header: 'Members',
+                    mobile: 'badge',
+                    cell: (g) => (
+                      <>
+                        {g.memberCount}
+                        <span className="md:hidden"> members</span>
+                      </>
+                    ),
+                  },
+                  {
+                    key: 'createdBy',
+                    header: 'Created by',
+                    cell: (g) => g.createdBy?.fullName || '-',
+                  },
+                  {
+                    key: 'created',
+                    header: 'Created',
+                    cell: (g) =>
+                      g.createdAt ? formatDate(new Date(g.createdAt)) : '-',
+                  },
+                ]}
+              />
             )}
           </div>
-          <div className="sticky bottom-0">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

@@ -13,6 +13,37 @@
   outline: none;
 }
 
+/* Thin scrollbars everywhere. They only appear where content overflows: use
+   overflow-auto / overflow-y-auto, not overflow-scroll. */
+* {
+  scrollbar-width: thin; /* Firefox, Chrome 121+, Edge */
+  scrollbar-color: #b8beca transparent;
+}
+
+*::-webkit-scrollbar {
+  /* older Safari / Chrome */
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #b8beca;
+  border-radius: 9999px;
+}
+
+/* Phones: form fields at 16px, so iOS doesn't zoom the page when one is focused */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar {
   scrollbar-width: none; /* Firefox */
@@ -23,12 +54,7 @@
   display: none; /* Safari and Chrome */
 }
 
-/* thin scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 2px;
-  border-radius: 10px;
-}
-
+/* thin scrollbar (kept for existing markup; every scrollbar is thin now) */
 .scrollbar-thin {
   scrollbar-width: thin;
 }

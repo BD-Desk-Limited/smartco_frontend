@@ -144,7 +144,7 @@ const OTPForm = () => {
         <div className="relative overflow-hidden flex flex-col items-center justify-center h-full w-full z-20">
           <form
             onSubmit={handleVerify}
-            className="bg-brand-blue min-h-[50%] w-[90%] md:w-[30%] rounded-lg flex flex-col"
+            className="bg-brand-blue min-h-[50%] w-[calc(100%-2rem)] max-w-md md:w-[50%] lg:w-[30%] md:max-w-none rounded-lg flex flex-col"
           >
             <h1 className="py-3 text-text-white text-center">
               Two step verification · {MFA_METHOD_LABELS[challenge.method]}
@@ -235,7 +235,7 @@ const OTPForm = () => {
                 {message && <span className="text-success">{message}</span>}
               </div>
 
-              <div className="flex items-center justify-center w-full gap-10">
+              <div className="flex flex-wrap items-center justify-center w-full gap-4 sm:gap-10">
                 <button
                   type="button"
                   onClick={backToLogin}

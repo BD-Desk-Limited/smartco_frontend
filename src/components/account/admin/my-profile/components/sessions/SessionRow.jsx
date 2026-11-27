@@ -45,39 +45,52 @@ const deviceText = (session) =>
     session.kind === 'sales_point' ? ' (Sales point)' : ''
   }`;
 
-// One row of the sessions table. Extra details (location, sign-in time, clock) are in tooltips.
-const SessionRow = ({ session, onSignOut, busy }) => {
-  const active = session.status === 'active';
-  const location = locationText(session.location);
-  const clockOff = Math.abs(session.clockSkewSeconds || 0) > 120;
-
-  return (
-    <tr className={`text-sm text-text-black ${active ? '' : 'opacity-60'}`}>
-      <td className="py-3 pr-4">
-        <div className="flex items-center gap-3">
+// Columns of the sessions table. Extra details (location, sign-in time, clock) are in tooltips.
+export const sessionColumns = [
+  {
+    key: 'ip',
+    header: 'IP Address',
+    mobile: 'title',
+    cell: (session) => {
+      const location = locationText(session.location);
+      return (
+        <span className="flex items-center gap-3">
           <CountryFlag country={session.location?.country} title={location} />
-          <div className="flex flex-col">
+          <span className="flex flex-col">
             <span className="font-medium">{session.ipAddress || 'Unknown IP'}</span>
-            <span className="text-xs text-text-gray">{location}</span>
-          </div>
-        </div>
-      </td>
-
-      <td
-        className="py-3 pr-4 whitespace-nowrap"
-        title={`Signed in ${formatDeviceTime(session.signedInAt, session.deviceTimezone)}${
-          session.deviceTimezone ? ` · device timezone ${session.deviceTimezone}` : ''
-        }`}
-      >
-        {formatDeviceTime(session.lastAccessAt, session.deviceTimezone)}
-        {clockOff && (
-          <span className="block text-xs text-error">
-            Device clock off by {Math.round(Math.abs(session.clockSkewSeconds) / 60)} min
+            <span className="text-xs text-text-gray font-normal">{location}</span>
           </span>
-        )}
-      </td>
-
-      <td className="py-3 pr-4">
+        </span>
+      );
+    },
+  },
+  {
+    key: 'lastActive',
+    header: 'Last Accessed',
+    cell: (session) => {
+      const clockOff = Math.abs(session.clockSkewSeconds || 0) > 120;
+      return (
+        <span
+          title={`Signed in ${formatDeviceTime(session.signedInAt, session.deviceTimezone)}${
+            session.deviceTimezone ? ` · device timezone ${session.deviceTimezone}` : ''
+          }`}
+        >
+          {formatDeviceTime(session.lastAccessAt, session.deviceTimezone)}
+          {clockOff && (
+            <span className="block text-xs text-error">
+              Device clock off by {Math.round(Math.abs(session.clockSkewSeconds) / 60)} min
+            </span>
+          )}
+        </span>
+      );
+    },
+  },
+  {
+    key: 'device',
+    header: 'Device',
+    mobile: 'wide',
+    cell: (session) => (
+      <>
         <span>{deviceText(session)}</span>
         {session.rememberedUntil && (
           <span
@@ -88,28 +101,26 @@ const SessionRow = ({ session, onSignOut, busy }) => {
             {formatDeviceTime(session.rememberedUntil, session.deviceTimezone)}
           </span>
         )}
-      </td>
+      </>
+    ),
+  },
+];
 
-      <td className="py-3 text-center whitespace-nowrap">
-        {session.isCurrent ? (
-          <span className="text-sm font-semibold text-brand-green">This is you</span>
-        ) : active ? (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onSignOut(session)}
-            className="text-sm text-text-gray hover:text-error hover:underline disabled:opacity-60"
-          >
-            {busy ? 'Signing out…' : 'Unauthorize device'}
-          </button>
-        ) : (
-          <span className="text-xs text-text-gray">
-            {session.status === 'expired' ? 'Expired' : 'Signed out'}
-          </span>
-        )}
-      </td>
-    </tr>
+// Sign-out control for one session (the Action column / bottom of the card).
+export const SessionAction = ({ session, onSignOut, busy }) =>
+  session.isCurrent ? (
+    <span className="text-sm font-semibold text-brand-green">This is you</span>
+  ) : session.status === 'active' ? (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={() => onSignOut(session)}
+      className="text-sm text-text-gray hover:text-error hover:underline disabled:opacity-60 px-1"
+    >
+      {busy ? 'Signing out…' : 'Unauthorize device'}
+    </button>
+  ) : (
+    <span className="text-xs text-text-gray">
+      {session.status === 'expired' ? 'Expired' : 'Signed out'}
+    </span>
   );
-};
-
-export default SessionRow;

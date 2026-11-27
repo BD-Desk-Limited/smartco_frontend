@@ -2,7 +2,7 @@ import CreateGroupedMaterialPage from '@/components/account/admin/material-manag
 import React from 'react';
 
 const page = () => {
-  return <div><CreateGroupedMaterialPage/></div>;
+  return <div className="h-full"><CreateGroupedMaterialPage/></div>;
 };
 
 export default page;

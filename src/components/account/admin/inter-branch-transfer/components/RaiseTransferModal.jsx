@@ -129,14 +129,14 @@ const RaiseTransferModal = ({
   };
 
   const field =
-    'w-full h-8 px-2 border border-gray-border rounded-md text-sm focus:outline-none focus:ring focus:border-brand-blue';
+    'w-full h-10 sm:h-8 px-2 border border-gray-border rounded-md text-base sm:text-sm bg-white focus:outline-none focus:ring focus:border-brand-blue';
 
   return (
-    <div className="relative bg-white p-5 rounded-lg shadow-lg w-[95vw] max-h-[90vh] overflow-y-auto text-sm text-text-gray">
+    <div className="relative bg-white p-4 pt-12 sm:p-5 sm:rounded-lg shadow-lg w-full h-full sm:h-auto sm:w-[95vw] sm:max-h-[90vh] overflow-y-auto text-sm text-text-gray">
       <button
         onClick={onClose}
         title="Close"
-        className="absolute top-2 right-2 p-1 rounded-full bg-brand-gray hover:bg-error"
+        className="absolute top-2 right-2 p-2 sm:p-1 rounded-full bg-brand-gray hover:bg-error"
       >
         <FaTimes className="text-text-white" />
       </button>
@@ -151,7 +151,7 @@ const RaiseTransferModal = ({
         branch until the receiver accepts.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <label className="flex flex-col gap-1 font-semibold">
           From (sending branch)
           {userBranches.length > 1 ? (
@@ -189,8 +189,8 @@ const RaiseTransferModal = ({
         </label>
       </div>
 
-      <div className="p-2 m-2 bg-blue-shadow10">
-        <div className="flex items-center justify-between mb-2">
+      <div className="p-2 sm:m-2 bg-blue-shadow10 rounded-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
           <span className="font-semibold text-text-black">
             Material Batches
           </span>
@@ -199,7 +199,7 @@ const RaiseTransferModal = ({
             placeholder="Filter by material, batch no. or brand"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="h-8 w-64 px-2 border border-gray-border rounded-md focus:outline-none"
+            className="h-10 sm:h-8 w-full sm:w-64 px-2 border border-gray-border rounded-md text-base sm:text-sm focus:outline-none"
           />
         </div>
 
@@ -216,8 +216,8 @@ const RaiseTransferModal = ({
               const qty = Number(line.quantity);
               const over = b && qty > b.balance;
               return (
-                <li key={line.key} className="flex items-start gap-2">
-                  <div className="flex-1 flex flex-col gap-1">
+                <li key={line.key} className="flex flex-wrap sm:flex-nowrap items-start gap-2 pb-3 sm:pb-0 border-b sm:border-0 border-blue-shadow8">
+                  <div className="basis-full sm:basis-auto flex-1 min-w-0 flex flex-col gap-1">
                     <select
                       value={line.batchId}
                       onChange={(e) =>
@@ -248,7 +248,7 @@ const RaiseTransferModal = ({
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex flex-1 sm:flex-none items-center gap-1">
                     <input
                       type="number"
                       min="0"
@@ -258,7 +258,8 @@ const RaiseTransferModal = ({
                       onChange={(e) =>
                         updateLine(line.key, { quantity: e.target.value })
                       }
-                      className={`${field} w-28 text-right`}
+                      inputMode="decimal"
+                      className={`${field} sm:w-28 text-right`}
                       aria-label="Quantity"
                     />
                     <span className="w-10 text-xs">{b?.unit}</span>
@@ -272,7 +273,7 @@ const RaiseTransferModal = ({
                       )
                     }
                     title="Remove row"
-                    className="h-8 px-2 text-error"
+                    className="h-10 sm:h-8 px-3 sm:px-2 text-error"
                   >
                     <FaTrash aria-hidden="true" />
                   </button>
@@ -305,15 +306,15 @@ const RaiseTransferModal = ({
       </label>
 
       {error && (
-        <p>
+        <div>
           <ErrorInterface
             error={error}
             className="mt-3 px-3 text-center text-error w-full"
           />
-        </p>
+        </div>
       )}
 
-      <div className="mt-4 flex justify-end gap-2">
+      <div className="sticky bottom-0 -mx-4 sm:mx-0 px-4 sm:px-0 py-3 sm:py-0 bg-white border-t sm:border-0 border-gray-border mt-4 flex justify-end gap-2 [&>button]:flex-1 sm:[&>button]:flex-none">
         <button
           onClick={onClose}
           disabled={submitting}

@@ -4,7 +4,7 @@ import EditProductPage from '@/components/account/admin/product-management/EditP
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <EditProductPage />
     </div>
   )

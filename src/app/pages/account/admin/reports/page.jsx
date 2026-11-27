@@ -5,7 +5,7 @@ import SalesReportsPage from '@/components/account/admin/reports/SalesReportsPag
 
 const page = () => {
   return (
-    <div>
+    <div className="h-full">
       <SalesReportsPage />
     </div>
   );

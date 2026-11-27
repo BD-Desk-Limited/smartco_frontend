@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const CustomerOverview = ({
   profile,
@@ -31,7 +32,7 @@ const CustomerOverview = ({
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard
           label="Visits"
           value={s.visits}
@@ -77,7 +78,7 @@ const CustomerOverview = ({
         />
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-semibold text-text-black">Trends</h4>
         <label className="flex items-center gap-2">
           Period
@@ -124,7 +125,7 @@ const CustomerOverview = ({
         </ResponsiveContainer>
       </ChartCard>
 
-      <div className="grid grid-cols-2 gap-3 z-40">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 z-40">
         <ChartCard title="Visits by weekday (all time)">
           <ResponsiveContainer>
             <BarChart data={profile.weekdays}>
@@ -154,69 +155,48 @@ const CustomerOverview = ({
         </ChartCard>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <div className="border border-gray-border rounded-md p-3">
           <h4 className="font-semibold text-text-black mb-2">By branch</h4>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-border">
-                <th className="py-1">Branch</th>
-                <th className="py-1 text-right">Visits</th>
-                <th className="py-1 text-right">Spent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profile.branches.length ? (
-                profile.branches.map((b) => (
-                  <tr key={b.branchId} className="border-b border-gray-border">
-                    <td className="py-1">{b.name}</td>
-                    <td className="py-1 text-right">{b.visits}</td>
-                    <td className="py-1 text-right">
-                      {commaNumberFormat(b.spent, 2)}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="py-2 italic" colSpan={3}>
-                    No sales yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <ResponsiveTable
+            layout="table"
+            dense
+            align="left"
+            maxHeightClass=""
+            rows={profile.branches}
+            getRowKey={(b) => b.branchId}
+            emptyMessage="No sales yet."
+            columns={[
+              { key: 'branch', header: 'Branch', cell: (b) => b.name },
+              { key: 'visits', header: 'Visits', align: 'right', cell: (b) => b.visits },
+              {
+                key: 'spent',
+                header: 'Spent',
+                align: 'right',
+                cell: (b) => commaNumberFormat(b.spent, 2),
+              },
+            ]}
+          />
         </div>
 
         <div className="border border-gray-border rounded-md p-3">
           <h4 className="font-semibold text-text-black mb-2">
             Favourite items
           </h4>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-border">
-                <th className="py-1">Item</th>
-                <th className="py-1 text-right">Units</th>
-                <th className="py-1 text-right">Orders</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profile.topProducts.length ? (
-                profile.topProducts.map((p) => (
-                  <tr key={p.productId} className="border-b border-gray-border">
-                    <td className="py-1">{p.name}</td>
-                    <td className="py-1 text-right">{p.quantity}</td>
-                    <td className="py-1 text-right">{p.orders}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="py-2 italic" colSpan={3}>
-                    No purchases yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <ResponsiveTable
+            layout="table"
+            dense
+            align="left"
+            maxHeightClass=""
+            rows={profile.topProducts}
+            getRowKey={(p) => p.productId}
+            emptyMessage="No purchases yet."
+            columns={[
+              { key: 'item', header: 'Item', cell: (p) => p.name },
+              { key: 'units', header: 'Units', align: 'right', cell: (p) => p.quantity },
+              { key: 'orders', header: 'Orders', align: 'right', cell: (p) => p.orders },
+            ]}
+          />
         </div>
       </div>
     </>

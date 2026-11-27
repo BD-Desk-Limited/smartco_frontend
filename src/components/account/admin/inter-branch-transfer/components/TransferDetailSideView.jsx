@@ -170,23 +170,29 @@ const TransferDetailSideView = ({
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/3 h-full bg-text-white flex flex-col px-3 text-sm text-text-gray gap-3 overflow-y-auto scrollbar-thin"
+      // sized and scrolled by the SideView wrapper (full screen on phones)
+      className="relative w-full min-h-full bg-text-white flex flex-col px-3 md:px-4 text-sm text-text-gray gap-3"
     >
-      <div className="sticky top-0 z-40 py-1 bg-text-white">
-        <div className="flex items-center justify-between pr-8">
+      <div className="sticky top-0 z-40 py-2 md:py-1 bg-text-white">
+        <div className="flex items-center justify-between gap-2 pr-10 md:pr-8">
           <h3 className="font-semibold text-text-black">TRANSFER DETAILS</h3>
           {onExport && (
             <button
               onClick={handleExport}
-              className="flex items-center gap-1 px-2 py-1 border border-gray-border rounded-md hover:bg-gray-shadow10"
+              className="flex items-center gap-1 px-2 py-1 border border-gray-border rounded-md hover:bg-gray-shadow10 whitespace-nowrap"
             >
               <FaPrint aria-hidden="true" /> Print / Export
             </button>
           )}
 
-          <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
-            <FaTimes className="text-text-white" onClick={close} />
-          </div>
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close"
+            className="absolute top-1 right-0 z-50 p-2 md:p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1"
+          >
+            <FaTimes className="text-text-white" />
+          </button>
         </div>
         <hr></hr>
       </div>
@@ -343,7 +349,8 @@ const TransferDetailSideView = ({
       )}
 
       {canAct && !mode && (
-        <div className="flex flex-wrap gap-2">
+        // stays at the bottom of the panel so Accept/Dispute are always in reach
+        <div className="sticky bottom-0 z-30 -mx-3 md:-mx-4 px-3 md:px-4 py-3 bg-text-white border-t border-gray-border flex flex-wrap gap-2 [&>button]:flex-1 md:[&>button]:flex-none">
           {p.canAccept && (
             <button
               onClick={() => startMode('accept')}
@@ -390,7 +397,7 @@ const TransferDetailSideView = ({
               onChange={(e) => setText(e.target.value)}
               rows={4}
               maxLength={1000}
-              className="w-full border border-gray-border rounded-md p-2 text-text-black focus:outline-none focus:ring focus:border-brand-blue"
+              className="w-full border border-gray-border rounded-md p-2 text-base md:text-sm text-text-black focus:outline-none focus:ring focus:border-brand-blue"
             />
           </label>
           {error && <span className="text-error">{error}</span>}

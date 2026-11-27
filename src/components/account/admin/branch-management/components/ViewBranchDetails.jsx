@@ -60,14 +60,14 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
   };
 
   return (
-    <div className="w-full h-full max-h-screen overflow-hidden">
+    <div className="w-full h-full overflow-hidden">
       <div className="w-full sticky top-0 z-50">
         <Header />
       </div>
       <div>
         <SubHeader title={'View Branch details'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <BranchSidebar
             selectedSubMenu={selectedSubMenu}
@@ -75,8 +75,8 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
             setIsOpen={setOpenSidebar}
           />
         </div>
-        <div className="flex flex-col w-full max-h-[85vh] overflow-y-auto scrollbar-thin">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md max-h-[90vh] overflow-y-auto scrollbar-thin flex flex-col gap-5 px-5 py-5 relative">
+        <div className="flex flex-col w-full pb-6">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md flex flex-col gap-5 relative">
             <div className="absolute top-2 right-5 flex items-center justify-center gap-2">
               <span
                 className={`w-5 h-5 rounded-full ${branchData.status === 'active' ? 'bg-brand-green' : 'bg-error'}`}
@@ -127,8 +127,8 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
               <p className="text-sm text-text-gray">
                 Branch ID: {branchData?.branchId}
               </p>
-              <div className="flex flex-row justify-between gap-2 border-y border-gray-border text-left">
-                <div className="flex flex-row gap-2 py-2">
+              <div className="flex flex-col md:flex-row md:justify-between gap-2 border-y border-gray-border text-left">
+                <div className="flex flex-row flex-wrap gap-2 py-2">
                   <p className="text-sm text-text-gray flex flex-row items-center">
                     <Image
                       src={'/assets/email.png'}
@@ -157,7 +157,7 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
                     {branchData?.address}
                   </p>
                 </div>
-                <div className="flex flex-row gap-2 py-2">
+                <div className="flex flex-row flex-wrap gap-2 py-2">
                   <p className="text-sm text-text-gray flex flex-col items-center border-r-2 border-gray-border pr-2">
                     <span className="flex flex-row gap-2 items-center">
                       <Image
@@ -185,7 +185,7 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-row gap-2 py-2 justify-between">
+              <div className="flex flex-col md:flex-row gap-2 py-2 md:justify-between">
                 <div className="flex flex-col gap-2 py-2">
                   <p className="text-sm text-text-gray">
                     Branch Band: <strong>{branchData?.band}</strong>
@@ -218,12 +218,12 @@ const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {
                       width={20}
                       alt="info"
                       className="cursor-pointer"
-                      onClick={() => setSeeTaxBandInfo(true)}
+                      onClick={() => setSeeTaxBandInfo((v) => !v)}
                       title={`${branchData?.taxBand?.rate}%. Click for more info`}
                     />
                     {seeTaxBandInfo && (
                       <span
-                        className="absolute bg-white border border-brand-blue rounded-md p-1 w-[50%] z-50"
+                        className="absolute left-0 right-0 md:left-auto md:right-auto bg-white border border-brand-blue rounded-md p-2 md:w-[50%] z-50"
                         onMouseLeave={() => setSeeTaxBandInfo(false)}
                       >
                         <span className="text-sm text-text-gray">

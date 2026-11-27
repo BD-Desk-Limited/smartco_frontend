@@ -16,6 +16,7 @@ import {
   toggleBranchStatus,
 } from '@/services/branchServices';
 import SuccessModal from '@/components/account/SuccessModal';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewBranches = ({ pageDescription }) => {
   const selectedSubMenu = {
@@ -201,7 +202,7 @@ const ViewBranches = ({ pageDescription }) => {
       <div className="w-full">
         <SubHeader title={'View All Branches'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <BranchSidebar
             selectedSubMenu={selectedSubMenu}
@@ -210,10 +211,10 @@ const ViewBranches = ({ pageDescription }) => {
           />
         </div>
         <div className="flex flex-col h-full w-full">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full flex flex-col gap-5">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full flex flex-col gap-5">
             {/* search bar */}
-            <div className="flex flex-row gap-5 w-full justify-between items-center">
-              <div className="h-8 px-3 border border-gray-border rounded-md focus:outline-none focus:ring focus:border-brand-blue flex flex-row items-center w-full">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-5 w-full md:justify-between md:items-center">
+              <div className="h-10 md:h-8 px-3 border border-gray-border rounded-md focus-within:ring focus-within:border-brand-blue flex flex-row items-center w-full">
                 <Image
                   src="/assets/search.png"
                   alt="search"
@@ -228,7 +229,7 @@ const ViewBranches = ({ pageDescription }) => {
                   className="focus:outline-none ml-2 w-full"
                 />
               </div>
-              <div className="flex flex-row gap-2 text-sm min-w-fit text-text-gray">
+              <div className="flex flex-row flex-wrap gap-2 text-sm md:min-w-fit text-text-gray">
                 <div className="h-8 px-1 border border-gray-border rounded-md flex flex-row items-center">
                   <Image
                     src="/assets/filter.png"
@@ -309,127 +310,134 @@ const ViewBranches = ({ pageDescription }) => {
             {loading ? (
               <Spinner />
             ) : (
-              <div className="max-h-[70vh] overflow-y-auto scrollbar-thin">
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left bg-gray-shadow8 text-sm text-text-gray">
-                      <th className="px-4 py-2">Branch Name</th>
-                      <th className="px-4 py-2">Email</th>
-                      <th className="px-4 py-2">Phone Number</th>
-                      <th className="px-4 py-2">Band</th>
-                      <th className="px-4 py-2">Tax Band</th>
-                      <th className="px-4 py-2">status</th>
-                      <th className="px-4 py-2">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-text-gray">
-                    {filteredBranches.length > 0 ? (
-                      <>
-                        {filteredBranches.map((branch) => (
-                          <tr
-                            key={branch._id}
-                            onClick={() =>
-                              Router.push(
-                                `/pages/account/admin/branch-management/view-branch-details?id=${branch._id}`
-                              )
-                            }
-                            className="border-b border-gray-border text-sm py-5 cursor-pointer hover:bg-gray-shadow10"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="checkbox"
-                                value={branch._id}
-                                checked={selectedBranches.includes(branch._id)}
-                                onClick={(e) => e.stopPropagation()} // Stop event propagation
-                                onChange={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  handleSelecBranch(e.target.value);
-                                }}
-                                className="mr-2 cursor-pointer"
-                              />
-                              <span>{branch.name}</span>
-                            </td>
-                            <td className="px-4 py-2">{branch.email}</td>
-                            <td className="px-4 py-2">{branch.phoneNumber}</td>
-                            <td className="px-4 py-2">{branch.band}</td>
-                            <td className="px-4 py-2">
-                              {branch.taxBand?.name}
-                            </td>
-                            <td
-                              className={`px-4 py-2 ${
-                                branch.status === 'active'
-                                  ? 'text-success'
-                                  : branch.status === 'inactive'
-                                    ? 'text-error'
-                                    : 'text-yellow-600'
-                              }`}
-                            >
-                              {branch.status}
-                            </td>
-                            <td className="px-4 py-2 gap-1 flex flex-row w-full justify-between">
-                              <Image
-                                src={
-                                  branch.status === 'active'
-                                    ? '/assets/switch_active.png'
-                                    : '/assets/switch_inactive.png'
-                                }
-                                alt="switch"
-                                height={9}
-                                width={25}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  handleBranchToChangeStatus([branch._id]);
-                                  setSelectedBranchStatus(branch.status);
-                                }}
-                                className="cursor-pointer"
-                                title={
-                                  branch.status === 'active'
-                                    ? 'Deactivate Branch'
-                                    : 'Activate Branch'
-                                }
-                              />
-                              <Link
-                                href={`/pages/account/admin/branch-management/edit-branch?id=${branch._id}`}
-                                title="Edit Branch"
-                                className=""
-                              >
-                                <Image
-                                  src="/assets/edit.png"
-                                  alt="edit"
-                                  width={15}
-                                  height={15}
-                                  onClick={(e) => e.stopPropagation()} // Stop event propagation
-                                  className="cursor-pointer"
-                                />
-                              </Link>
-                              <Image
-                                src="/assets/delete.png"
-                                alt="delete"
-                                width={15}
-                                height={15}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Stop event propagation
-                                  handleBranchToDelete([branch._id]);
-                                }}
-                                className="cursor-pointer"
-                                title="Delete Branch"
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </>
-                    ) : (
-                      <tr className="text-center text-text-gray h-[40vh]">
-                        <td className="font-semibold" colSpan={7}>
-                          No branches found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <div className="flex flex-col gap-2">
+                <ResponsiveTable
+                  align="left"
+                  rows={filteredBranches}
+                  emptyMessage="No branches found"
+                  onRowClick={(branch) =>
+                    Router.push(
+                      `/pages/account/admin/branch-management/view-branch-details?id=${branch._id}`
+                    )
+                  }
+                  selection={{
+                    isSelected: (branch) => selectedBranches.includes(branch._id),
+                    onToggle: (branch) => handleSelecBranch(branch._id),
+                    allSelected:
+                      filteredBranches.length > 0 &&
+                      filteredBranches.every((b) =>
+                        selectedBranches.includes(b._id)
+                      ),
+                    onToggleAll: () =>
+                      setSelectedBranches(
+                        filteredBranches.every((b) =>
+                          selectedBranches.includes(b._id)
+                        )
+                          ? []
+                          : filteredBranches.map((b) => b._id)
+                      ),
+                    rowLabel: (branch) => branch.name,
+                  }}
+                  columns={[
+                    {
+                      key: 'name',
+                      header: 'Branch Name',
+                      cell: (b) => b.name,
+                      mobile: 'title',
+                    },
+                    {
+                      key: 'email',
+                      header: 'Email',
+                      cell: (b) => b.email,
+                      mobile: 'subtitle',
+                    },
+                    {
+                      key: 'phone',
+                      header: 'Phone Number',
+                      cell: (b) => b.phoneNumber,
+                    },
+                    { key: 'band', header: 'Band', cell: (b) => b.band },
+                    {
+                      key: 'taxBand',
+                      header: 'Tax Band',
+                      cell: (b) => b.taxBand?.name,
+                    },
+                    {
+                      key: 'status',
+                      header: 'Status',
+                      cell: (b) => b.status,
+                      mobile: 'badge',
+                      cellClass: (b) =>
+                        `capitalize ${
+                          b.status === 'active'
+                            ? 'text-success'
+                            : b.status === 'inactive'
+                              ? 'text-error'
+                              : 'text-yellow-600'
+                        }`,
+                    },
+                  ]}
+                  actions={(branch) => (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleBranchToChangeStatus([branch._id]);
+                          setSelectedBranchStatus(branch.status);
+                        }}
+                        title={
+                          branch.status === 'active'
+                            ? 'Deactivate Branch'
+                            : 'Activate Branch'
+                        }
+                        aria-label={
+                          branch.status === 'active'
+                            ? 'Deactivate Branch'
+                            : 'Activate Branch'
+                        }
+                      >
+                        <Image
+                          src={
+                            branch.status === 'active'
+                              ? '/assets/switch_active.png'
+                              : '/assets/switch_inactive.png'
+                          }
+                          alt=""
+                          height={9}
+                          width={25}
+                        />
+                      </button>
+                      <Link
+                        href={`/pages/account/admin/branch-management/edit-branch?id=${branch._id}`}
+                        title="Edit Branch"
+                        aria-label="Edit Branch"
+                      >
+                        <Image
+                          src="/assets/edit.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleBranchToDelete([branch._id])}
+                        title="Delete Branch"
+                        aria-label="Delete Branch"
+                      >
+                        <Image
+                          src="/assets/delete.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
+                      </button>
+                    </>
+                  )}
+                />
 
                 {selectedBranches.length > 0 && (
-                  <div className="sticky bottom-0 bg-white flex flex-row py-1 justify-end px-5 gap-5">
+                  <div className="sticky bottom-0 bg-white flex flex-row flex-wrap py-2 justify-end px-2 md:px-5 gap-3 md:gap-5">
                     <div className="bg-success text-white text-sm px-2 py-2 rounded-md mt-5 hover:bg-opacity-90 flex flex-row items-center gap-3">
                       {`${selectedBranches.length} selected`}
                       <Image
@@ -466,9 +474,7 @@ const ViewBranches = ({ pageDescription }) => {
               </div>
             )}
           </div>
-          <div className="">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
 

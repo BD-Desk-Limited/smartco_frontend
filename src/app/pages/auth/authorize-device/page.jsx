@@ -16,7 +16,7 @@ const Page = () => {
 
   if (!user || user?.role !== 'admin') {
     return (
-      <div className="flex flex-col h-screen justify-center items-center gap-4">
+      <div className="flex flex-col min-h-dvh justify-center items-center gap-4 px-4 text-center">
         <Image src="/assets/Danger.png" width={100} height={100} alt="403" />
         <p className="text-error">
           This device is not authorized for your company use. Contact your Admin
@@ -33,11 +33,11 @@ const Page = () => {
   };
 
   return (
-    <div className="h-screen w-full bg-white text-text-black text-base flex items-center flex-row justify-center">
-      <div className="w-[50%] h-full px-[10vw] py-[10vh]">
+    <div className="min-h-dvh w-full bg-white text-text-black text-base flex items-center flex-row justify-center">
+      <div className="hidden md:block w-1/2 h-dvh md:px-[5vw] lg:px-[10vw] py-[10vh]">
         <PictureCarousel />
       </div>
-      <div className="w-[50%] px-[10vw] items-center justify-center">
+      <div className="w-full md:w-1/2 px-5 sm:px-10 md:px-[5vw] lg:px-[10vw] py-16 md:py-8 items-center justify-center">
         <LoginAuthorize />
       </div>
       <button onClick={goBack}>
@@ -46,7 +46,7 @@ const Page = () => {
           width={30}
           height={30}
           alt="Logo"
-          className="p-1 rounded-[100%] absolute top-5 left-5 bg-brand-blue hover:bg-blue-shadow3"
+          className="p-1 rounded-[100%] absolute top-3 left-3 md:top-5 md:left-5 bg-brand-blue hover:bg-blue-shadow3"
         />
       </button>
     </div>

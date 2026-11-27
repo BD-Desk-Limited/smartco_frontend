@@ -1,5 +1,4 @@
 import React from 'react';
-import AdminSideBar from '../AdminSideBar';
 import { PageAccessRequirement } from '../../PageAccessRequirement';
 import StockTransfers from './components/StockTransfers';
 
@@ -17,11 +16,8 @@ const InterBranchTransferPage = () => {
   }
 
   return (
-    <div className="flex flex-row gap-0 bg-background-1">
-      <div>
-        <AdminSideBar selectedMenu="inter-branch-transfers" />
-      </div>
-      <div className="w-full max-h-[100vh] overflow-y-auto no-scrollbar">
+    <div className="flex flex-row gap-0 bg-background-1 h-full">
+      <div className="w-full h-full overflow-y-auto ">
         <StockTransfers pageDescription={pageDescription} />
       </div>
     </div>

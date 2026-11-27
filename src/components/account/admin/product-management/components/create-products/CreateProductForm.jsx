@@ -135,9 +135,9 @@ const CreateProductForm = ({
                             </div>
 
                             {/* Input Fields */}
-                            <div className="flex flex-row gap-5 mb-2 w-full">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-2 w-full">
                                 {/** Product Name **/}
-                                <div className="flex gap-1 flex-col w-1/3">
+                                <div className="flex gap-1 flex-col w-full md:w-1/3">
                                     <label className="text-sm font-thin text-text-black" htmlFor={`product-name-${index}`}>Product Name</label>
                                     <input
                                       type="text"
@@ -189,7 +189,7 @@ const CreateProductForm = ({
                                                     value={categorySearch[index] || ''}
                                                     onChange={(e)=>setCategorySearch(prev => ({...prev, [index]:e.target.value}))}
                                                     placeholder='Search categories'
-                                                    className='py-1 bg-transparent rounded-xl w-3/4 p-2 focus:outline-none text-sm text-text-gray focus:ring-0'
+                                                    className='py-1 bg-transparent rounded-xl w-full md:w-3/4 p-2 focus:outline-none text-sm text-text-gray focus:ring-0'
                                                 />
                                             </li>
                                             <li className='max-h-80 overflow-y-auto  scrollbar-thin my-0.5 flex flex-col'>
@@ -298,7 +298,7 @@ const CreateProductForm = ({
                                       <span className='py-0.5'>select Components</span>
                                     </div>
                                     {componentsDropDown[index] &&(
-                                      <div className="absolute z-10 top-9 right-[-50%] bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col w-[50vw]">
+                                      <div className="absolute z-10 top-9 right-[-50%] bg-brand-blue rounded-md shadow-gray-shadow1 shadow-lg flex flex-col w-[calc(100%-1rem)] max-w-lg lg:w-[50vw] lg:max-w-none">
                                         <SelectComponents
                                           products={products}
                                           setProducts={setProducts}
@@ -397,7 +397,7 @@ const CreateProductForm = ({
             </div>
           )}
           
-          <div className='flex flex-row justify-between px-10'>
+          <div className='flex flex-row justify-between px-2 md:px-10 gap-2 flex-wrap'>
             <button 
               onClick={handleAddMoreProduct}
               className='flex flex-row p-2 text-brand-blue bg-blue-shadow9 gap-2 rounded-lg text-sm font-semibold items-center'

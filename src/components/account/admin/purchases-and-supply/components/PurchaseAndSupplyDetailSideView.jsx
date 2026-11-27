@@ -73,12 +73,18 @@ const PurchaseAndSupplyDetailSideView = ({
       initial={{ x: '50%', y: '0%' }}
       animate={{ x: 0, y: 0 }}
       transition={{ duration: 0.75 }}
-      className="relative w-1/3 h-full bg-text-white flex flex-col p-3 text-sm text-text-gray gap-3 overflow-y-auto"
+      // sized by the SideView wrapper (full screen on phones)
+      className="relative w-full min-h-full bg-text-white flex flex-col p-3 md:p-4 text-sm text-text-gray gap-3"
     >
       {/* close button */}
-      <div className="absolute top-0 right-0 z-50 p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1">
-        <FaTimes className="text-text-white" onClick={closeSideView} />
-      </div>
+      <button
+        type="button"
+        onClick={closeSideView}
+        aria-label="Close"
+        className="absolute top-0 right-0 z-50 p-2 md:p-1 rounded-full text-brand-gray text-lg bg-brand-gray hover:bg-error cursor-pointer m-1"
+      >
+        <FaTimes className="text-text-white" />
+      </button>
 
       <div className="flex items-center justify-between pr-8">
         <h3 className="font-semibold text-text-black">

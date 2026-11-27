@@ -48,7 +48,7 @@ const WarningWithFeedbackModal = ({
 
   return (
     <motion.div
-      className="bg-white w-[30%] h-[55%] rounded-md shadow-md flex flex-col items-center justify-between gap-5"
+      className="bg-white w-[calc(100%-2rem)] max-w-md h-[26rem] max-h-[90dvh] lg:w-[30%] lg:max-w-none lg:h-[55%] lg:max-h-none rounded-md shadow-md flex flex-col items-center justify-between gap-5"
       initial={{ scale: 0.5 }}
       animate={{ scale: 1 }}
       transition={{ duration: 1 }}

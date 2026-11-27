@@ -1,6 +1,7 @@
 import Spinner from '@/components/account/Spinner';
 import { getMaterialComponentsBreakdown } from '@/services/materialServices';
 import React from 'react';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const GroupedMaterialBreakdown = ({ id }) => {
   const [groupedMaterialBreakdown, setGroupedMaterialBreakdown] =
@@ -41,41 +42,23 @@ const GroupedMaterialBreakdown = ({ id }) => {
   return loading ? (
     <Spinner />
   ) : (
-    <div className="w-1/2 text-left">
+    <div className="w-full md:w-1/2 text-left">
       <h1 className="font-semibold">Components breakdown</h1>
-      <table className="w-full">
-        <thead className="bg-brand-gray text-white text-sm">
-          <tr className="text-left flex justify-between px-5">
-            <th className="p-1">Material</th>
-            <th className="p-1">Quantity</th>
-          </tr>
-        </thead>
-      </table>
-      <div className="max-h-40 overflow-y-auto scrollbar-thin shadow-md">
-        <table className="w-full">
-          <tbody className="text-sm">
-            {loading ? (
-              <tr>
-                <td colSpan={2} className="text-center">
-                  Loading...
-                </td>
-              </tr>
-            ) : (
-              aggregatedBreakdown.map((material) => (
-                <tr
-                  key={material._id}
-                  className="border-t border-brand-gray flex  justify-between px-5"
-                >
-                  <td className="px-2">{material.name}</td>
-                  <td className="px-2">
-                    {material.quantity} {material?.unitOfMeasurement?.name}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <ResponsiveTable
+        align="left"
+        dense
+        maxHeightClass="md:max-h-40"
+        rows={aggregatedBreakdown}
+        columns={[
+          { key: 'material', header: 'Material', cell: (m) => m.name, mobile: 'title' },
+          {
+            key: 'qty',
+            header: 'Quantity',
+            mobile: 'badge',
+            cell: (m) => `${m.quantity} ${m?.unitOfMeasurement?.name || ''}`,
+          },
+        ]}
+      />
     </div>
   );
 };

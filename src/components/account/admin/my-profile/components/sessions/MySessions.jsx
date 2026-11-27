@@ -10,9 +10,8 @@ import {
   revokeOtherSessionsService,
   revokeSessionService,
 } from '@/services/sessionServices';
-import SessionRow from './SessionRow';
-
-const COLUMNS = ['IP Address', 'Last Accessed', 'Device', 'Action'];
+import { sessionColumns, SessionAction } from './SessionRow';
+import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 // Devices where the logged in user is (or recently was) signed in.
 const MySessions = () => {
@@ -114,44 +113,23 @@ const MySessions = () => {
           Active Sessions
         </h2>
 
-        <div className="overflow-x-auto px-4 sm:px-8 pt-4 pb-2 min-h-[240px]">
-          <table className="w-full min-w-[640px] text-left">
-            <thead>
-              <tr>
-                {COLUMNS.map((column) => (
-                  <th
-                    key={column}
-                    scope="col"
-                    className={`pb-3 text-sm font-medium text-brand-green ${
-                      column === 'Action' ? 'text-center' : ''
-                    }`}
-                  >
-                    {column}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((session) => (
-                <SessionRow
-                  key={session._id}
-                  session={session}
-                  busy={busyId === session._id}
-                  onSignOut={(s) => setConfirm({ type: 'one', session: s })}
-                />
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={COLUMNS.length}
-                    className="py-8 text-center text-sm text-text-gray"
-                  >
-                    No active sessions.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="px-3 sm:px-8 pt-4 pb-2 min-h-[240px]">
+          <ResponsiveTable
+            align="left"
+            maxHeightClass=""
+            rows={rows}
+            emptyMessage="No active sessions."
+            rowClassName={(session) => (session.status === 'active' ? '' : 'opacity-60')}
+            columns={sessionColumns}
+            actionsHeader="Action"
+            actions={(session) => (
+              <SessionAction
+                session={session}
+                busy={busyId === session._id}
+                onSignOut={(s) => setConfirm({ type: 'one', session: s })}
+              />
+            )}
+          />
         </div>
 
         {ended.length > 0 && (

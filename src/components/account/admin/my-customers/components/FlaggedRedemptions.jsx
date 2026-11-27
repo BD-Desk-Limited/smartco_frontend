@@ -74,7 +74,7 @@ const FlaggedRedemptions = ({ data, setData, onOpenCountChange }) => {
 
   return (
     <div className="p-4 flex flex-col gap-4">
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row flex-wrap gap-2 items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <FaExclamationTriangle className="text-amber-500" />
           Rewards to review

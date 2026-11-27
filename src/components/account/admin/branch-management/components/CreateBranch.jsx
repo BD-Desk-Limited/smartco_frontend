@@ -173,7 +173,7 @@ const CreateBranch = ({ pageDescription }) => {
       <div>
         <SubHeader title={'Create New Branch'} />
       </div>
-      <div className="flex flex-row gap-0 w-full h-full">
+      <div className="flex flex-col md:flex-row gap-0 w-full h-full">
         <div className="min-w-fit">
           <BranchSidebar
             selectedSubMenu={selectedSubMenu}
@@ -183,8 +183,8 @@ const CreateBranch = ({ pageDescription }) => {
         </div>
 
         <div className="flex flex-col w-full h-full relative">
-          <div className="bg-white p-5 mx-5 my-2 rounded-md h-full">
-            <div className="flex flex-row justify-between items-center w-full">
+          <div className="bg-white p-3 md:p-5 mx-2 md:mx-5 mt-2 mb-6 rounded-md h-full">
+            <div className="flex flex-row flex-wrap gap-3 justify-between items-center w-full">
               <div>
                 <h1 className="font-bold text-text-black">
                   Create a new branch in your company
@@ -204,7 +204,7 @@ const CreateBranch = ({ pageDescription }) => {
               onSubmit={handleOpenSubmitModal}
               className="flex flex-col gap-5 my-5 w-full text-text-gray"
             >
-              <div className="flex flex-row gap-10 w-full">
+              <div className="flex flex-col md:flex-row gap-5 md:gap-10 w-full">
                 {/* Col 1 */}
                 <div className="flex flex-col gap-5 w-full">
                   <div className="flex flex-col gap-2">
@@ -301,7 +301,7 @@ const CreateBranch = ({ pageDescription }) => {
               </div>
 
               {/* Bands and taxband*/}
-              <div className="flex flex-row gap-10 w-full">
+              <div className="flex flex-col md:flex-row gap-5 md:gap-10 w-full">
                 <div className="flex flex-col gap-1 w-full">
                   <label htmlFor="bands" className="text-sm font-semibold">
                     Branch Band
@@ -437,9 +437,7 @@ const CreateBranch = ({ pageDescription }) => {
               </div>
             </form>
           </div>
-          <div className="sticky bottom-0 w-full">
-            <PageDescription pageDescription={pageDescription} />
-          </div>
+          <PageDescription pageDescription={pageDescription} />
         </div>
       </div>
       {openBulkUploadModal && (
@@ -479,7 +477,7 @@ const CreateBranch = ({ pageDescription }) => {
         </div>
       )}
       {openSubmitModal && (
-        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-70 absolute">
+        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-[70] fixed">
           <WarningModal
             title={'Create a new Branch'}
             message={'Are you sure you want to create this branch?'}
@@ -497,7 +495,7 @@ const CreateBranch = ({ pageDescription }) => {
         </div>
       )}
       {openSuccessModal && (
-        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-70 absolute">
+        <div className="inset-0 bg-black bg-opacity-80 w-full h-full rounded-lg flex items-center justify-center z-[70] fixed">
           <SuccessModal
             title={'Branch Created'}
             message={'Branch created successfully!'}
