@@ -1,5 +1,5 @@
 import React from 'react';
-import Spinner from '../../Spinner';
+import Spinner from '../../common/Spinner';
 import { useAuth } from '@/contexts/authContext';
 import MyProfile from './components/MyProfile';
 

@@ -1,6 +1,12 @@
 // functions to handle online and offline login
 import { salesPointLoginService } from '@/services/authServices';
 import { importSPKI, jwtVerify } from 'jose';
+import { offlineTokenKey } from '@/utilities/deviceCompanies';
+
+// the stored offline token: per company, or the older per-staff-ID key from before
+const storedOfflineToken = (companyId, staffId) =>
+  localStorage.getItem(offlineTokenKey(companyId, staffId)) ||
+  localStorage.getItem(`token_${staffId}`);
 
 // helper function to derive a local encryption key
 const deriveLocalKey = async (pin, staffId, deviceId) => {
@@ -89,10 +95,17 @@ const handleOnlineLogin = async (
   toggleUserMode
 ) => {
   try {
-    const response = await salesPointLoginService(body);
+    // the device's company: staff IDs are only unique inside a company
+    const response = await salesPointLoginService({
+      ...body,
+      ...(companyData?.id ? { companyId: companyData.id } : {}),
+    });
 
     if (response.error) {
-      const hasOfflineAccess = !!localStorage.getItem(`token_${body.staffId}`);
+      const hasOfflineAccess = !!storedOfflineToken(
+        companyData?.id,
+        body.staffId
+      );
       if (hasOfflineAccess) {
         await handleOfflineLogin(
           body,
@@ -123,8 +136,12 @@ const handleOnlineLogin = async (
         companyData?.authorizationToken
       );
 
-      // 3. Store encrypted token for offline login purposes (localStorage)
-      localStorage.setItem(`token_${body.staffId}`, encryptedToken);
+      // 3. Store encrypted token for offline login purposes (localStorage), per company
+      localStorage.setItem(
+        offlineTokenKey(companyData?.id, body.staffId),
+        encryptedToken
+      );
+      localStorage.removeItem(`token_${body.staffId}`); // the older key, replaced
 
       // Store token in sessionStorage for normal online usage (clears on tab close)
       sessionStorage.setItem('token', response?.data?.token);
@@ -143,7 +160,11 @@ const handleOnlineLogin = async (
       //check if the seller already exists
       const sellerIndex =
         sellersInfo &&
-        sellersInfo?.findIndex((seller) => seller.staffId === body.staffId);
+        sellersInfo?.findIndex(
+          (seller) =>
+            seller.staffId === body.staffId &&
+            String(seller.companyId) === String(companyData?.id)
+        );
 
       if (sellerIndex === -1) {
         sellersInfo.push(newSeller);
@@ -155,7 +176,10 @@ const handleOnlineLogin = async (
       router.push('/pages/account/sales-point');
     }
   } catch (error) {
-    const hasOfflineAccess = !!localStorage.getItem(`token_${body.staffId}`);
+    const hasOfflineAccess = !!storedOfflineToken(
+      companyData?.id,
+      body.staffId
+    );
     if (hasOfflineAccess) {
       await handleOfflineLogin(
         body,
@@ -183,7 +207,7 @@ const handleOfflineLogin = async (
 ) => {
   try {
     // Load encrypted token
-    const encryptedPayload = localStorage.getItem(`token_${body.staffId}`);
+    const encryptedPayload = storedOfflineToken(companyData?.id, body.staffId);
 
     if (!encryptedPayload) {
       throw new Error(

@@ -1,4 +1,4 @@
-import ExportContent from '@/components/account/ExportContent';
+import ExportContent from '@/components/account/common/ExportContent';
 import React from 'react';
 import { PhoneNumber } from 'react-phone-number-input';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
@@ -55,7 +55,10 @@ const ReviewCreatedUsers = ({
               rows={[
                 { label: 'New users created', users: newUsers },
                 { label: 'Users already existing', users: existingUsers },
-                { label: 'Users with error (not created)', users: usersWithErrors },
+                {
+                  label: 'Users with error (not created)',
+                  users: usersWithErrors,
+                },
               ]}
               columns={[
                 { key: 'label', header: 'Result', cell: (r) => r.label },

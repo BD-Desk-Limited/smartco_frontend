@@ -1,11 +1,11 @@
 import React from 'react';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
-import PageDescription from '@/components/account/PageDescription';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import { verifyInputText } from '@/utilities/verifyInput';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import BranchSidebar from './BranchSideBar';
 import Image from 'next/image';
 import CreateNewBand from './band/CreateNewBand';
@@ -15,7 +15,7 @@ import {
   getAllBranchBandsByCompanyId,
 } from '@/services/branchServices';
 import { validateEmail, validatePhoneNumber } from '@/utilities/validateInput';
-import WarningModal from '@/components/account/WarningModal';
+import WarningModal from '@/components/account/common/WarningModal';
 import BulkBranchUploadModal from './BulkBranchUploadModal';
 
 const bandDescription = `Band is used to group branches that share similar attributes, such as having the same sales price. This grouping helps organize branches logically based on shared characteristics, making it easier to manage and apply consistent rules or operations to them. For example:

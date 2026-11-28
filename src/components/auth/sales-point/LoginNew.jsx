@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/authContext';
 import ErrorModal from '../commons/ErrorModal';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
 import { login } from './loginFunctions';
+import SalesPointCompanyPicker from './SalesPointCompanyPicker';
 
 const LoginNew = () => {
   const [form, setForm] = useState({ staffId: '', pin: '' });
@@ -59,6 +60,7 @@ const LoginNew = () => {
       <h1 className="text-2xl text-brand-green w-full text-center font-semibold">
         Login to sales point
       </h1>
+      <SalesPointCompanyPicker />
 
       <form onSubmit={handleLogin} className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-2 w-full">

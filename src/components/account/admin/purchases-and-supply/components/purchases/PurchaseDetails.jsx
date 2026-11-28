@@ -1,11 +1,11 @@
-import ErrorInterface from '@/components/account/errorInterface';
-import Spinner from '@/components/account/Spinner';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import Spinner from '@/components/account/common/Spinner';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React, { useEffect, useState } from 'react';
 import { FaPlusCircle, FaEdit, FaSave, FaTrash } from 'react-icons/fa';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import PurchaseSummary from './PurchaseSummary';
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import { verifyInputText } from '@/utilities/verifyInput';
 import { getUserBranchesService } from '@/services/branchServices';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
@@ -245,7 +245,8 @@ const PurchaseDetails = ({
             {
               key: 'quantity',
               header: 'Quantity',
-              cell: (item) => `${commaNumberFormat(item.quantity)} ${item.unitOfMeasurement || ''}`,
+              cell: (item) =>
+                `${commaNumberFormat(item.quantity)} ${item.unitOfMeasurement || ''}`,
             },
             {
               key: 'total',

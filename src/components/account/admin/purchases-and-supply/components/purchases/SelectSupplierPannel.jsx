@@ -1,6 +1,6 @@
-import Button from '@/components/account/Button';
-import Pagination from '@/components/account/Pagination';
-import Spinner from '@/components/account/Spinner';
+import Button from '@/components/account/common/Button';
+import Pagination from '@/components/account/common/Pagination';
+import Spinner from '@/components/account/common/Spinner';
 import React from 'react';
 import { FaSearch, FaShippingFast, FaTimes, FaWalking } from 'react-icons/fa';
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import { firstName } from '@/utilities/stringUtils';
 
 const Greeting = ({ user }) => {
     const getGreatingMessage = () => {
@@ -18,7 +19,7 @@ const Greeting = ({ user }) => {
     <div className="h-fit flex justify-between w-full border-y-2 border-gray-border shadow-md p-1 bg-text-white">
       <div className="font-bold flex flex-col justify-start items-start text-brand-green shadow-sm">
         <span>
-            {user && `Hello, ${user?.fullName.split(' ')[0] || ''}`}
+            {user && `Hello, ${firstName(user?.fullName)}`}
         </span>
         <span className="flex justify-center items-center text-sm font-thin">
           {getGreatingMessage()}

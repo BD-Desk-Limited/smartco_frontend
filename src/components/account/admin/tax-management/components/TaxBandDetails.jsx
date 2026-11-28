@@ -7,7 +7,7 @@ import {
   FaTrash,
 } from 'react-icons/fa';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
-import WarningWithFeedbackModal from '@/components/account/WarningWithFeedbackModal';
+import WarningWithFeedbackModal from '@/components/account/common/WarningWithFeedbackModal';
 import { deleteTaxRateEntryService } from '@/services/taxBandServices';
 import DissociateBranchModal from './DissociateBranchModal';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
@@ -143,7 +143,8 @@ const TaxBandDetails = ({
             rows={
               band?.historicalRates
                 ? [...band.historicalRates].sort(
-                    (a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate)
+                    (a, b) =>
+                      new Date(b.effectiveDate) - new Date(a.effectiveDate)
                   )
                 : []
             }
@@ -170,7 +171,8 @@ const TaxBandDetails = ({
               {
                 key: 'date',
                 header: 'Effective Date',
-                cell: (rate) => ISOStringToLocalTime(rate.effectiveDate) || 'date not set',
+                cell: (rate) =>
+                  ISOStringToLocalTime(rate.effectiveDate) || 'date not set',
               },
               {
                 key: 'setBy',

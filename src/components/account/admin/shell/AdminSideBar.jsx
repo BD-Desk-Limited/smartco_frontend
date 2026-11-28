@@ -9,7 +9,7 @@ import {
   menuHref,
   menuNameForPath,
   userRoleLabel,
-} from './shell/adminMenu';
+} from './adminMenu';
 
 // Small pause before collapsing, so brushing the mouse past the edge doesn't make it flicker.
 const CLOSE_DELAY_MS = 150;
@@ -108,8 +108,12 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
                   aria-current={active ? 'page' : undefined}
                   className={`text-base hover:bg-brand-green hover:text-white cursor-pointer rounded-md mx-1 px-1 py-2 flex flex-row items-center ${showLabels ? '' : 'justify-center'} ${active ? 'bg-white text-brand-blue' : ''}`}
                 >
-                  <Icon className={active ? 'text-brand-blue' : 'text-text-white'} />
-                  {showLabels && <span className="ml-2 text-sm">{menu.label}</span>}
+                  <Icon
+                    className={active ? 'text-brand-blue' : 'text-text-white'}
+                  />
+                  {showLabels && (
+                    <span className="ml-2 text-sm">{menu.label}</span>
+                  )}
                 </button>
               );
             })}
@@ -124,7 +128,12 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
                 title={!showLabels ? 'Logout' : ''}
                 onClick={logOut}
               >
-                <Image src="/assets/logout.png" alt="logout" width={15} height={15} />
+                <Image
+                  src="/assets/logout.png"
+                  alt="logout"
+                  width={15}
+                  height={15}
+                />
                 {showLabels && <span className="text-sm">Logout</span>}
               </button>
               {user?.superAdmin && (
@@ -145,7 +154,12 @@ const AdminSideBar = ({ selectedMenu, openSideBar }) => {
             <div
               className={`flex ${showLabels ? ' flex-row gap-3' : 'flex-col gap-1'} items-center py-2 w-full text-center text-white bg-blue-shadow4 justify-center rounded-full`}
             >
-              <Image src="/assets/profile.png" alt="profile" width={20} height={15} />
+              <Image
+                src="/assets/profile.png"
+                alt="profile"
+                width={20}
+                height={15}
+              />
               <p className="text-sm">{userRoleLabel(user)}</p>
             </div>
           </div>

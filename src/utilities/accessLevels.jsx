@@ -52,4 +52,10 @@ export const allAccess = [
     accessGranted: true,
     allowedGrantOthers: true,
   },
+  {
+    // cash reconciliation: check and approve what managers declare as banked
+    accessName: 'Finance_Management',
+    accessGranted: true,
+    allowedGrantOthers: true,
+  },
 ];

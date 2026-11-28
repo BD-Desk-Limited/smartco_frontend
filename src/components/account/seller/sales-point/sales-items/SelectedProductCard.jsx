@@ -1,4 +1,4 @@
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import Image from 'next/image';
 import React from 'react';
 import {

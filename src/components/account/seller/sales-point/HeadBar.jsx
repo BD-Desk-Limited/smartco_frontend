@@ -1,13 +1,16 @@
 import Image from 'next/image';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/authContext';
+import { firstName, initials } from '@/utilities/stringUtils';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
   FaChevronCircleDown,
   FaChevronCircleLeft,
   FaDoorOpen,
+  FaReply,
 } from 'react-icons/fa';
+import { backToConsole, consoleHome } from './consoleHome';
 
 const HeadBar = ({
   style,
@@ -56,6 +59,9 @@ const HeadBar = ({
       onClick: () => router.push('/pages/account/sales-point/change-pin'),
     },
   ];
+
+  // managers and admins can go back to their console and stay signed in
+  const home = consoleHome(user);
 
   const handleDropDownClick = (e) => {
     e.stopPropagation();
@@ -160,14 +166,11 @@ const HeadBar = ({
           />
         ) : (
           <span className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-bold border">
-            {user?.fullName
-              ? user.fullName?.split(' ')[0].charAt(0).toUpperCase() +
-                  user.fullName?.split(' ')[1]?.charAt(0).toUpperCase() || 'SU'
-              : 'SU'}
+            {initials(user?.fullName, 'SU')}
           </span>
         )}
         <span className="text-text-white text-sm font-semibold">
-          {user?.fullName?.split(' ')[0] || 'Seller'}
+          {firstName(user?.fullName, 'Seller')}
         </span>
         <span>
           {userMenuDropdown ? (
@@ -196,6 +199,19 @@ const HeadBar = ({
                 </li>
               ))}
             </ul>
+
+            {home && (
+              <li
+                onClick={(e) => {
+                  e.stopPropagation();
+                  backToConsole(user, router);
+                }}
+                className="flex flex-row justify-center items-center font-semibold text-brand-green hover:underline py-1 rounded-md cursor-pointer space-x-2 w-full"
+              >
+                <FaReply />
+                <span>Back to console</span>
+              </li>
+            )}
 
             {/* Logout Button */}
             <li

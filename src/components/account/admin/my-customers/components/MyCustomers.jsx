@@ -1,13 +1,13 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaFilter, FaHome, FaSort } from 'react-icons/fa';
-import SubHeader from '../../SubHeader';
-import SideBar from '../../SideBar';
+import SubHeader from '../../shell/SubHeader';
+import SideBar from '../../shell/SideBar';
 import MY_CUSTOMER_SUBMENUS from './MY_CUSTOMER_SUBMENUS';
-import PageDescription from '@/components/account/PageDescription';
-import Spinner from '@/components/account/Spinner';
-import Pagination from '@/components/account/Pagination';
-import ErrorModal from '@/components/account/ErrorModal';
+import PageDescription from '@/components/account/common/PageDescription';
+import Spinner from '@/components/account/common/Spinner';
+import Pagination from '@/components/account/common/Pagination';
+import ErrorModal from '@/components/account/common/ErrorModal';
 import { getUserBranchesService } from '@/services/branchServices';
 import { fetchCustomersService } from '@/services/customerServices';
 import { fetchGroupsService } from '@/services/customerServices';
@@ -156,7 +156,10 @@ const MyCustomers = ({ pageDescription }) => {
 
                 {userBranches.length > 1 && (
                   <div className={box}>
-                    <FaHome aria-hidden="true" className="mr-2 text-brand-blue" />
+                    <FaHome
+                      aria-hidden="true"
+                      className="mr-2 text-brand-blue"
+                    />
                     <select
                       value={draftFilters.branch}
                       onChange={(e) => onChangeFilter('branch', e.target.value)}
@@ -254,7 +257,11 @@ const MyCustomers = ({ pageDescription }) => {
                       </span>
                     ),
                   },
-                  { key: 'visits', header: 'Visits', cell: (c) => c.stats.visits },
+                  {
+                    key: 'visits',
+                    header: 'Visits',
+                    cell: (c) => c.stats.visits,
+                  },
                   {
                     key: 'spent',
                     header: 'Total spent',
@@ -288,7 +295,9 @@ const MyCustomers = ({ pageDescription }) => {
                     ),
                     mobileLabel: 'Groups',
                     cell: (c) =>
-                      c.groups.length ? c.groups.map((g) => g.name).join(', ') : '-',
+                      c.groups.length
+                        ? c.groups.map((g) => g.name).join(', ')
+                        : '-',
                   },
                 ]}
               />
@@ -324,7 +333,9 @@ const MyCustomers = ({ pageDescription }) => {
       {selectedCustomer && (
         <div
           className="inset-0 fixed bg-black bg-opacity-50 z-50 flex justify-end items-center"
-          onClick={(e) => e.target === e.currentTarget && setSelectedCustomer(null)}
+          onClick={(e) =>
+            e.target === e.currentTarget && setSelectedCustomer(null)
+          }
         >
           <CustomerProfileSideView
             key={selectedCustomer._id}

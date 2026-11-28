@@ -1,6 +1,6 @@
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import SuccessModal from '@/components/account/SuccessModal';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import {
   createTaxBand,
   getAllTaxBandsByCompanyId,
@@ -249,8 +249,18 @@ const CreateNewTaxBandForm = ({
               getRowKey={(_, i) => i}
               emptyMessage="You have no existing tax band please create a tax band!!!"
               columns={[
-                { key: 'name', header: 'Band Name', mobile: 'title', cell: (b) => b.name },
-                { key: 'rate', header: 'Tax Rate', mobile: 'badge', cell: (b) => `${b.rate}%` },
+                {
+                  key: 'name',
+                  header: 'Band Name',
+                  mobile: 'title',
+                  cell: (b) => b.name,
+                },
+                {
+                  key: 'rate',
+                  header: 'Tax Rate',
+                  mobile: 'badge',
+                  cell: (b) => `${b.rate}%`,
+                },
                 {
                   key: 'description',
                   header: 'Description',

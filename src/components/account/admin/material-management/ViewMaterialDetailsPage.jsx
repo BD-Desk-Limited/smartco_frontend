@@ -3,12 +3,11 @@ import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ViewMaterialDetails from './components/ViewMaterialDetails';
 import { getMaterialDetailsAndStockById } from '@/services/materialServices';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
-import Spinner from '../../Spinner';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
+import Spinner from '../../common/Spinner';
 import { getUserBranchesService } from '@/services/branchServices';
 
 const ViewMaterialDetailsPage = () => {
-
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const router = useRouter();

@@ -2,7 +2,7 @@ import Image from 'next/image';
 import React from 'react';
 import NumberPad from '../../NumberPad';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 
 const CashPayment = ({
   handleActionsToFollowPaymentConfirmation,

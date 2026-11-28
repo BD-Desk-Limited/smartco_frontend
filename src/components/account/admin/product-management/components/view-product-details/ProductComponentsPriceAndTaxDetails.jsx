@@ -1,7 +1,7 @@
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React from 'react';
 import ProductPriceHistory from './ProductPriceHistory';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
@@ -122,12 +122,14 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                                 {
                                   key: 'date',
                                   header: 'Effective Date',
-                                  cell: (band) => ISOStringToLocalTime(band.effectiveDate),
+                                  cell: (band) =>
+                                    ISOStringToLocalTime(band.effectiveDate),
                                 },
                                 {
                                   key: 'setBy',
                                   header: 'Set By',
-                                  cell: (band) => band.setBy?.fullName || 'unknown',
+                                  cell: (band) =>
+                                    band.setBy?.fullName || 'unknown',
                                 },
                               ]}
                             />
@@ -310,7 +312,10 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                                   header: 'Product Additional tax',
                                   mobileLabel: 'Additional tax',
                                   cell: (band) =>
-                                    getAdditionalTax(tax.taxDetails, band?.price) || 0,
+                                    getAdditionalTax(
+                                      tax.taxDetails,
+                                      band?.price
+                                    ) || 0,
                                 },
                                 {
                                   key: 'totalTax',
@@ -329,7 +334,8 @@ const ProductComponentsPriceAndTaxDetails = ({ productData, loading }) => {
                                   header: 'Gross Price',
                                   mobile: 'badge',
                                   cell: (band) =>
-                                    `${currencySymbol}${band?.price.toFixed(2)}` || 'N/A',
+                                    `${currencySymbol}${band?.price.toFixed(2)}` ||
+                                    'N/A',
                                 },
                               ]}
                             />

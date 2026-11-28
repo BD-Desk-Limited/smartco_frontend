@@ -17,6 +17,7 @@ const ResetPassword = ({ token }) => {
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [companyName, setCompanyName] = useState(null); // the company this link is for
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const router = useRouter();
@@ -42,6 +43,7 @@ const ResetPassword = ({ token }) => {
           setError(response.error || 'Invalid token.');
         } else {
           setIsTokenValid(true);
+          setCompanyName(response.data?.companyName || null);
         }
       } catch (error) {
         setError('An error occurred while verifying the token.');
@@ -120,7 +122,14 @@ const ResetPassword = ({ token }) => {
 
             <div className="w-full bg-white flex flex-col items-center justify-between p-3">
               <span className="text-sm text-center text-[#7D8482]">
+                {companyName && (
+                  <span className="block font-semibold text-text-black mb-1">
+                    For your account with {companyName}
+                  </span>
+                )}
                 Choose a new password that meets the requirements below
+                {companyName &&
+                  '. It must be different from your passwords for your other companies.'}
               </span>
               <div className="flex flex-col items-center h-[50%] justify-between gap-4 mt-4 w-full sm:w-[80%]">
                 <div className="w-full gap-2 flex flex-col">

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaSearch, FaUsers } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
-import Pagination from '@/components/account/Pagination';
+import Spinner from '@/components/account/common/Spinner';
+import Pagination from '@/components/account/common/Pagination';
 import {
   fetchGroupMembersService,
   addGroupMembersService,
@@ -274,7 +274,9 @@ const CustomerGroupSideView = ({
                 cell: (m) => (
                   <>
                     <span className="block text-text-black">{m.name}</span>
-                    <span className="text-xs font-normal">{m.customerNumber}</span>
+                    <span className="text-xs font-normal">
+                      {m.customerNumber}
+                    </span>
                   </>
                 ),
               },
@@ -368,8 +370,12 @@ const CustomerGroupSideView = ({
                       mobile: 'title',
                       cell: (c) => (
                         <>
-                          <span className="block text-text-black">{c.name}</span>
-                          <span className="text-xs font-normal">{c.customerNumber}</span>
+                          <span className="block text-text-black">
+                            {c.name}
+                          </span>
+                          <span className="text-xs font-normal">
+                            {c.customerNumber}
+                          </span>
                         </>
                       ),
                     },

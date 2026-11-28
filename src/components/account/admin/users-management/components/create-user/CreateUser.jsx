@@ -1,21 +1,21 @@
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import React from 'react';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import CreateUserForm from './CreateUserForm';
 import { motion } from 'framer-motion';
 import UserBranchManagement from '../EditUserDetails/UserBranchManagement';
-import Button from '@/components/account/Button';
-import WarningModal from '@/components/account/WarningModal';
+import Button from '@/components/account/common/Button';
+import WarningModal from '@/components/account/common/WarningModal';
 import {
   verifyEmail,
   verifyInputText,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import { createUserService } from '@/services/usersServices';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import SelectUserTeam from './SelectUserTeam';
 import BulkUserUploadModal from '../create-bulk-user/BulkUserUploadModal';
 

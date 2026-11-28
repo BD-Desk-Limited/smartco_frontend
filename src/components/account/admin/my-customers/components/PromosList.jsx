@@ -1,4 +1,4 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { formatDate } from '@/utilities/formatTime';
 import { capitalizeFirst } from '@/utilities/stringUtils';
 import React from 'react';

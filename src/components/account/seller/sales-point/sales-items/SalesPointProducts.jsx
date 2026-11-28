@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import Spinner from '../../../Spinner';
-import ErrorInterface from '../../../errorInterface';
-import Button from '../../../Button';
+import Spinner from '../../../common/Spinner';
+import ErrorInterface from '../../../common/errorInterface';
+import Button from '../../../common/Button';
 import Image from 'next/image';
 import { useNotification } from '@/contexts/notificationContext';
 import {

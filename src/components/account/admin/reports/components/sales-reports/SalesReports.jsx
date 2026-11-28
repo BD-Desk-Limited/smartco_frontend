@@ -1,14 +1,14 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React, { useCallback, useState } from 'react';
-import SubHeader from '../../../SubHeader';
-import SideBar from '../../../SideBar';
-import ExportContent from '@/components/account/ExportContent';
+import SubHeader from '../../../shell/SubHeader';
+import SideBar from '../../../shell/SideBar';
+import ExportContent from '@/components/account/common/ExportContent';
 import { REPORTS_SUBMENUS } from '../REPORTS_SUBMENUS';
 import { FaChartLine, FaLightbulb, FaTools } from 'react-icons/fa';
 import { SALES_REPORT_NAVS } from './SALES_REPORT_NAVIGATIONS';
 import SalesReportFilters from './SalesReportFilters';
 import { presetRange } from '../DateRangeButton';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 
 const SalesReports = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -23,6 +23,32 @@ const SalesReports = ({ pageDescription }) => {
   const [branches, setBranches] = useState([]);
   const [loaded, setLoaded] = useState(null); // { insight, export } from the active tab
   const [showExport, setShowExport] = useState(false);
+  // rows of an export that loads them when opened ({ load }), e.g. every page of a paged list
+  const [exportRows, setExportRows] = useState({
+    status: 'idle',
+    data: null,
+    error: null,
+  });
+
+  const openExport = async () => {
+    const load = loaded?.export?.load;
+    setShowExport(true);
+    if (!load) return;
+    setExportRows({ status: 'loading', data: null, error: null });
+    try {
+      setExportRows({ status: 'done', data: await load(), error: null });
+    } catch (e) {
+      setExportRows({
+        status: 'error',
+        data: null,
+        error: e.message || 'Could not load the rows to export',
+      });
+    }
+  };
+  const closeExport = () => {
+    setShowExport(false);
+    setExportRows({ status: 'idle', data: null, error: null });
+  };
 
   const handleLoaded = useCallback(({ branches: list, ...rest }) => {
     if (list) setBranches(list);
@@ -64,7 +90,7 @@ const SalesReports = ({ pageDescription }) => {
               setFilters={setFilters}
               branches={branches}
               canExport={Boolean(loaded?.export)}
-              onExport={() => setShowExport(true)}
+              onExport={openExport}
             />
 
             {/* Tabs: one report per tab */}
@@ -101,20 +127,58 @@ const SalesReports = ({ pageDescription }) => {
             </div>
           )}
           <PageDescription
-              pageDescription={loaded?.insight || pageDescription}
-            />
+            pageDescription={loaded?.insight || pageDescription}
+          />
         </div>
       </div>
 
       {showExport && loaded?.export && (
-        <div className="inset-0 fixed bg-black bg-opacity-60 z-[80] flex justify-center items-center">
-          <ExportContent
-            title={`Export ${loaded.export.title}`}
-            fileName={loaded.export.fileName}
-            metadata={loaded.export.metadata}
-            data={loaded.export.data}
-            onClose={() => setShowExport(false)}
-          />
+        <div
+          className="inset-0 fixed bg-black bg-opacity-60 z-[80] flex justify-center items-center"
+          onClick={
+            exportRows.status === 'done' || !loaded.export.load
+              ? undefined
+              : closeExport
+          }
+        >
+          {loaded.export.load && exportRows.status !== 'done' ? (
+            <div
+              className="bg-white rounded-lg shadow-lg p-6 mx-4 flex flex-col items-center gap-3 text-sm"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {exportRows.status === 'error' ? (
+                <>
+                  <p className="text-error">{exportRows.error}</p>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={openExport}
+                      className="text-brand-blue hover:underline"
+                    >
+                      Try again
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeExport}
+                      className="text-text-gray hover:underline"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p>Preparing the export…</p>
+              )}
+            </div>
+          ) : (
+            <ExportContent
+              title={`Export ${loaded.export.title}`}
+              fileName={loaded.export.fileName}
+              metadata={loaded.export.metadata}
+              data={loaded.export.load ? exportRows.data : loaded.export.data}
+              onClose={closeExport}
+            />
+          )}
         </div>
       )}
     </div>

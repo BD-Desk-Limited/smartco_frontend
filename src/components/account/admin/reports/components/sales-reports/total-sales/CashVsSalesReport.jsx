@@ -5,6 +5,46 @@ import React from 'react';
   but not sales until the order is fulfilled, so they are shown here, never added to total sales.
 */
 
+/*
+  What finance has signed off as banked (cash reconciliation). Until every branch-day in the period with
+  till activity is approved, the amount is not final, so the line says "Pending approval" instead.
+*/
+const BankedLine = ({ banking, money }) => {
+  if (!banking || banking.days === 0) return null;
+  const parts = [
+    `${banking.approved} of ${banking.days} branch-day(s) approved`,
+    banking.submitted && `${banking.submitted} waiting for finance`,
+    banking.changesRequested && `${banking.changesRequested} sent back`,
+    banking.notSubmitted && `${banking.notSubmitted} not submitted`,
+  ].filter(Boolean);
+  return (
+    <li className="flex justify-between gap-3">
+      <span>
+        Banked (approved by finance)
+        <span className="block text-xs text-text-gray">
+          {banking.allApproved
+            ? `All ${banking.days} branch-day(s) approved`
+            : parts.join(', ')}
+        </span>
+      </span>
+      {banking.allApproved ? (
+        <span className="whitespace-nowrap text-right">
+          {money(banking.approvedBanked)}
+          {Math.abs(banking.approvedVariance) >= 0.01 && (
+            <span className="block text-xs text-error">
+              variance {money(banking.approvedVariance)}
+            </span>
+          )}
+        </span>
+      ) : (
+        <span className="whitespace-nowrap text-amber-600 font-semibold">
+          Pending approval
+        </span>
+      )}
+    </li>
+  );
+};
+
 const CashVsSalesReport = ({ cash, money }) => {
   const held = cash.heldForScheduledOrders || {};
   const lines = [
@@ -62,6 +102,7 @@ const CashVsSalesReport = ({ cash, money }) => {
               <span>Money recorded at the tills (less refunds)</span>
               <span>{money(cash.actualCollections)}</span>
             </li>
+            <BankedLine banking={cash.banking} money={money} />
             {Math.abs(cash.difference) >= 0.01 && (
               <li className="flex justify-between gap-3 text-error">
                 <span>

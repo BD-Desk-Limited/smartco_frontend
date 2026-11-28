@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Spinner from '@/components/account/Spinner';
-import ErrorInterface from '@/components/account/errorInterface';
+import Spinner from '@/components/account/common/Spinner';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import { fetchTotalSalesReportService } from '@/services/reportServices';
 import KpiCard from '../../KpiCard';
 import ComparisonBarChart from '../../ComparisonBarChart';

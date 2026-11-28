@@ -13,7 +13,7 @@ import {
 } from '@/utilities/mfaChallengeStorage';
 import { saveRememberToken } from '@/utilities/deviceInfo';
 import { useAuth } from '@/contexts/authContext';
-import Spinner from '../account/Spinner';
+import Spinner from '../account/common/Spinner';
 
 const RESEND_COOLDOWN = 30; // seconds before "Resend code" is allowed again
 const emptyCode = () => new Array(6).fill('');
@@ -125,7 +125,10 @@ const OTPForm = () => {
       }
 
       clearMfaChallenge();
-      saveRememberToken(response.data.rememberToken, response.data.rememberedUntil);
+      saveRememberToken(
+        response.data.rememberToken,
+        response.data.rememberedUntil
+      );
       sessionStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       setMessage('Verified successfully! logging in...');
@@ -221,14 +224,21 @@ const OTPForm = () => {
                     className="h-4 w-4 accent-brand-blue"
                   />
                   Remember this device for 24 hours
-                  <span className="text-xs text-text-gray">(not on shared computers)</span>
+                  <span className="text-xs text-text-gray">
+                    (not on shared computers)
+                  </span>
                 </label>
               )}
 
               <div className="w-full text-center text-sm">
                 {error && (
                   <span className="text-error w-full items-center flex justify-center gap-2">
-                    <Image src="/assets/error.png" alt="" width={20} height={20} />
+                    <Image
+                      src="/assets/error.png"
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
                     <span>{error}</span>
                   </span>
                 )}

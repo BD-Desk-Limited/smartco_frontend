@@ -1,5 +1,5 @@
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import React from 'react';
 
 const EditTaxBandForm = ({

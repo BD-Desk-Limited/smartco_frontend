@@ -12,7 +12,7 @@ import {
   fetchTransferableBatchesService,
   raiseTransferService,
 } from '@/services/transferServices';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 
 let lineKey = 0;
 const newLine = () => ({ key: ++lineKey, batchId: '', quantity: '' });
@@ -216,7 +216,10 @@ const RaiseTransferModal = ({
               const qty = Number(line.quantity);
               const over = b && qty > b.balance;
               return (
-                <li key={line.key} className="flex flex-wrap sm:flex-nowrap items-start gap-2 pb-3 sm:pb-0 border-b sm:border-0 border-blue-shadow8">
+                <li
+                  key={line.key}
+                  className="flex flex-wrap sm:flex-nowrap items-start gap-2 pb-3 sm:pb-0 border-b sm:border-0 border-blue-shadow8"
+                >
                   <div className="basis-full sm:basis-auto flex-1 min-w-0 flex flex-col gap-1">
                     <select
                       value={line.batchId}

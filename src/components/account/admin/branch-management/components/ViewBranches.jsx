@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import BranchSidebar from './BranchSideBar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import Spinner from '@/components/account/Spinner';
-import ExportContent from '@/components/account/ExportContent';
-import DeleteModal from '@/components/account/DeleteModal';
-import DeactivationModal from '@/components/account/DeactivationModal';
+import Spinner from '@/components/account/common/Spinner';
+import ExportContent from '@/components/account/common/ExportContent';
+import DeleteModal from '@/components/account/common/DeleteModal';
+import DeactivationModal from '@/components/account/common/DeactivationModal';
 import {
   deleteBranchesById,
   getAllBranchesByCompanyId,
   toggleBranchStatus,
 } from '@/services/branchServices';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewBranches = ({ pageDescription }) => {
@@ -321,7 +321,8 @@ const ViewBranches = ({ pageDescription }) => {
                     )
                   }
                   selection={{
-                    isSelected: (branch) => selectedBranches.includes(branch._id),
+                    isSelected: (branch) =>
+                      selectedBranches.includes(branch._id),
                     onToggle: (branch) => handleSelecBranch(branch._id),
                     allSelected:
                       filteredBranches.length > 0 &&

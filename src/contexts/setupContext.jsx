@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './authContext';
 import { useInternetStatus } from './internetStatusContext';
 import { checkCompanySetupCompletionService } from '@/services/setupServices';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 
 const SetupContext = createContext();
 
@@ -48,7 +48,9 @@ export const SetupProvider = ({ children }) => {
     pathname?.startsWith('/pages/account/sales-point') ||
     pathname?.startsWith('/pages/auth/login/sales-point');
   const shouldBypassSetupChecks =
-    isSalesPointRoute || user?.role === 'seller' || internetStatus === 'offline';
+    isSalesPointRoute ||
+    user?.role === 'seller' ||
+    internetStatus === 'offline';
 
   //Helper Function to get allowed pages from sessionStorage
   const getAllowedPages = useCallback(() => {

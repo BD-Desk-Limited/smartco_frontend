@@ -1,16 +1,16 @@
 import React from 'react';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import Image from 'next/image';
 import Link from 'next/link';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useRouter } from 'next/navigation';
 import ProductManagementSidebar from './ProductManagementSidebar';
-import Spinner from '@/components/account/Spinner';
-import DeleteModal from '@/components/account/DeleteModal';
-import ExportContent from '@/components/account/ExportContent';
-import SuccessModal from '@/components/account/SuccessModal';
-import DeactivationModal from '@/components/account/DeactivationModal';
+import Spinner from '@/components/account/common/Spinner';
+import DeleteModal from '@/components/account/common/DeleteModal';
+import ExportContent from '@/components/account/common/ExportContent';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import DeactivationModal from '@/components/account/common/DeactivationModal';
 import {
   deleteProductsService,
   enableOrDisableProductService,
@@ -385,7 +385,8 @@ const ViewProducts = ({ pageDescription }) => {
                     )
                   }
                   selection={{
-                    isSelected: (product) => selectedProduct.includes(product._id),
+                    isSelected: (product) =>
+                      selectedProduct.includes(product._id),
                     onToggle: (product) => handleSelectProduct(product._id),
                     rowLabel: (product) => product?.name,
                   }}
@@ -396,7 +397,12 @@ const ViewProducts = ({ pageDescription }) => {
                         href="/pages/account/admin/product-management/create-new-product"
                         className="flex flex-row gap-1 rounded-md bg-brand-blue text-white h-9 px-3 items-center hover:bg-blue-shadow1"
                       >
-                        <Image src="/assets/add.png" alt="" width={15} height={15} />
+                        <Image
+                          src="/assets/add.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
                         <span>start by creating a product</span>
                       </Link>
                     </span>
@@ -410,13 +416,17 @@ const ViewProducts = ({ pageDescription }) => {
                       cell: (product) => (
                         <span className="flex items-center gap-2">
                           <Image
-                            src={product?.imageURL || '/assets/shopping-bag.png'}
+                            src={
+                              product?.imageURL || '/assets/shopping-bag.png'
+                            }
                             alt=""
                             width={30}
                             height={30}
                             className="object-cover shrink-0"
                           />
-                          <span className="font-semibold">{product?.name || '-'}</span>
+                          <span className="font-semibold">
+                            {product?.name || '-'}
+                          </span>
                         </span>
                       ),
                     },
@@ -460,13 +470,28 @@ const ViewProducts = ({ pageDescription }) => {
                           )
                         }
                       >
-                        <Image src="/assets/edit.png" alt="" width={15} height={15} />
+                        <Image
+                          src="/assets/edit.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
                       </button>
                       <button
                         type="button"
-                        title={product.isDisabled ? 'Enable Product' : 'Disable Product'}
-                        aria-label={product.isDisabled ? 'Enable Product' : 'Disable Product'}
-                        onClick={(e) => handleOpenEnableOrDisableModal(e, [product._id])}
+                        title={
+                          product.isDisabled
+                            ? 'Enable Product'
+                            : 'Disable Product'
+                        }
+                        aria-label={
+                          product.isDisabled
+                            ? 'Enable Product'
+                            : 'Disable Product'
+                        }
+                        onClick={(e) =>
+                          handleOpenEnableOrDisableModal(e, [product._id])
+                        }
                       >
                         <Image
                           src={
@@ -485,7 +510,12 @@ const ViewProducts = ({ pageDescription }) => {
                         aria-label="Delete Product"
                         onClick={(e) => handleOpenDeleteModal(e, [product._id])}
                       >
-                        <Image src="/assets/delete.png" alt="" width={15} height={15} />
+                        <Image
+                          src="/assets/delete.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
                       </button>
                     </>
                   )}

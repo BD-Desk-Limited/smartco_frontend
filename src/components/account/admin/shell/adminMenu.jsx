@@ -10,6 +10,7 @@ import {
   FaWindows,
   FaChartLine,
   FaExchangeAlt,
+  FaMoneyCheckAlt,
 } from 'react-icons/fa';
 
 export const ADMIN_BASE_PATH = '/pages/account/admin';
@@ -36,6 +37,15 @@ export const ADMIN_MENU = [
     label: 'Reports',
     requiredAccess: 'Reports',
     mobileTab: true,
+  },
+  {
+    name: 'cash-reconciliation',
+    Icon: FaMoneyCheckAlt,
+    ActiveIcon: FaMoneyCheckAlt,
+    link: '/cash-reconciliation',
+    label: 'Cash Reconciliation',
+    shortLabel: 'Banking',
+    requiredAccess: 'Finance_Management',
   },
   {
     name: 'purchases-and-supply',

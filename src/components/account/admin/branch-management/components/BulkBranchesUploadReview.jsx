@@ -1,14 +1,14 @@
 import React from 'react';
 import { useBulkbranchUpload } from '@/contexts/bulkBranchUploadContext';
 import { useRouter } from 'next/navigation';
-import PageDescription from '@/components/account/PageDescription';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
 import BranchSidebar from './BranchSideBar';
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import { createBranchService } from '@/services/branchServices';
-import SuccessModal from '@/components/account/SuccessModal';
-import ErrorInterface from '@/components/account/errorInterface';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkBranchesUploadReview = ({ pageDescription }) => {
@@ -216,28 +216,58 @@ const BulkBranchesUploadReview = ({ pageDescription }) => {
                         cell: (b) => b.name,
                         mobile: 'title',
                       },
-                      { key: 'branchId', header: 'Branch ID', cell: (b) => b.branchId },
-                      { key: 'email', header: 'Email', cell: (b) => b.email, mobile: 'subtitle' },
-                      { key: 'phone', header: 'Phone Number', cell: (b) => b.phoneNumber },
+                      {
+                        key: 'branchId',
+                        header: 'Branch ID',
+                        cell: (b) => b.branchId,
+                      },
+                      {
+                        key: 'email',
+                        header: 'Email',
+                        cell: (b) => b.email,
+                        mobile: 'subtitle',
+                      },
+                      {
+                        key: 'phone',
+                        header: 'Phone Number',
+                        cell: (b) => b.phoneNumber,
+                      },
                       { key: 'band', header: 'Band', cell: (b) => b.band },
-                      { key: 'taxBand', header: 'Tax Band', cell: (b) => b.taxBand },
-                      { key: 'taxRate', header: 'Tax Rate(%)', cell: (b) => b.taxRate },
-                      { key: 'address', header: 'Address', cell: (b) => b.address, mobile: 'wide' },
+                      {
+                        key: 'taxBand',
+                        header: 'Tax Band',
+                        cell: (b) => b.taxBand,
+                      },
+                      {
+                        key: 'taxRate',
+                        header: 'Tax Rate(%)',
+                        cell: (b) => b.taxRate,
+                      },
+                      {
+                        key: 'address',
+                        header: 'Address',
+                        cell: (b) => b.address,
+                        mobile: 'wide',
+                      },
                       {
                         key: 'open',
                         header: 'Opening Hour',
-                        cell: (b) => formatBusinessHours(b?.openingHour).display,
+                        cell: (b) =>
+                          formatBusinessHours(b?.openingHour).display,
                         cellClass: (b) =>
-                          formatBusinessHours(b?.openingHour).display === 'Invalid Time'
+                          formatBusinessHours(b?.openingHour).display ===
+                          'Invalid Time'
                             ? 'text-red-500'
                             : '',
                       },
                       {
                         key: 'close',
                         header: 'Closing Hour',
-                        cell: (b) => formatBusinessHours(b?.closingHour).display,
+                        cell: (b) =>
+                          formatBusinessHours(b?.closingHour).display,
                         cellClass: (b) =>
-                          formatBusinessHours(b?.closingHour).display === 'Invalid Time'
+                          formatBusinessHours(b?.closingHour).display ===
+                          'Invalid Time'
                             ? 'text-red-500'
                             : '',
                       },

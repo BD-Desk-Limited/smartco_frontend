@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 
 const ALL_BRANCHES = '-1';
 
 // Rename a trusted device and choose which branches it can access.
-const EditDeviceModal = ({ device, branches, saving, error, onSave, onClose }) => {
+const EditDeviceModal = ({
+  device,
+  branches,
+  saving,
+  error,
+  onSave,
+  onClose,
+}) => {
   const [name, setName] = useState(device.deviceName);
   const [allBranches, setAllBranches] = useState(device.allBranches);
-  const [selected, setSelected] = useState(() => new Set(device.branches.map((b) => String(b._id))));
+  const [selected, setSelected] = useState(
+    () => new Set(device.branches.map((b) => String(b._id)))
+  );
   const [localError, setLocalError] = useState(null);
 
   const toggle = (id) =>
@@ -45,7 +54,9 @@ const EditDeviceModal = ({ device, branches, saving, error, onSave, onClose }) =
         transition={{ duration: 0.2 }}
         className="bg-white w-full max-w-md rounded-md shadow-md flex flex-col overflow-hidden"
       >
-        <h2 className="bg-brand-blue text-text-white text-center py-3">Edit device</h2>
+        <h2 className="bg-brand-blue text-text-white text-center py-3">
+          Edit device
+        </h2>
         <div className="flex flex-col gap-4 p-5">
           <label className="text-sm font-semibold text-text-gray">
             Device name
@@ -59,7 +70,9 @@ const EditDeviceModal = ({ device, branches, saving, error, onSave, onClose }) =
           </label>
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="text-sm font-semibold text-text-gray mb-1">Branches this device can access</legend>
+            <legend className="text-sm font-semibold text-text-gray mb-1">
+              Branches this device can access
+            </legend>
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -67,7 +80,10 @@ const EditDeviceModal = ({ device, branches, saving, error, onSave, onClose }) =
                 onChange={(e) => setAllBranches(e.target.checked)}
                 className="h-4 w-4 accent-brand-blue"
               />
-              All branches <span className="text-xs text-text-gray">(including ones added later)</span>
+              All branches{' '}
+              <span className="text-xs text-text-gray">
+                (including ones added later)
+              </span>
             </label>
             <div
               className={`max-h-48 overflow-y-auto border border-gray-border rounded-md p-2 flex flex-col gap-1 ${
@@ -85,14 +101,26 @@ const EditDeviceModal = ({ device, branches, saving, error, onSave, onClose }) =
                   {b.name}
                 </label>
               ))}
-              {branches.length === 0 && <span className="text-xs text-text-gray">No branches found.</span>}
+              {branches.length === 0 && (
+                <span className="text-xs text-text-gray">
+                  No branches found.
+                </span>
+              )}
             </div>
           </fieldset>
 
-          {(localError || error) && <ErrorInterface error={localError || error} />}
+          {(localError || error) && (
+            <ErrorInterface error={localError || error} />
+          )}
 
           <div className="flex flex-row justify-center gap-5">
-            <Button type="submit" text="Save" loading={saving} loadingText="Saving..." buttonStyle="px-5" />
+            <Button
+              type="submit"
+              text="Save"
+              loading={saving}
+              loadingText="Saving..."
+              buttonStyle="px-5"
+            />
             <Button
               onClick={onClose}
               text="Cancel"

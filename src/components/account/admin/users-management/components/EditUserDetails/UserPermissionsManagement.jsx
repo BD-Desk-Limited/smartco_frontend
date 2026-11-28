@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { allAccess } from '@/utilities/accessLevels';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
@@ -254,7 +254,8 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
                 header: 'Access Name',
                 align: 'left',
                 mobile: 'title',
-                cell: (a) => a.accessName.split('_')[0] + ' ' + a.accessName.split('_')[1],
+                cell: (a) =>
+                  a.accessName.split('_')[0] + ' ' + a.accessName.split('_')[1],
               },
               {
                 key: 'granted',
@@ -328,7 +329,10 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
                       header: 'Access Name',
                       align: 'left',
                       mobile: 'title',
-                      cell: (a) => a.accessName.split('_')[0] + ' ' + a.accessName.split('_')[1],
+                      cell: (a) =>
+                        a.accessName.split('_')[0] +
+                        ' ' +
+                        a.accessName.split('_')[1],
                     },
                     {
                       key: 'grant',
@@ -354,8 +358,9 @@ const UserPermissionsManagement = ({ updatedUserData, setUpdatedUserData }) => {
                           type="checkbox"
                           aria-label={`Allow user to grant others: ${a.accessName}`}
                           checked={
-                            accessLevels?.find((x) => x.accessName === a.accessName)
-                              ?.allowedGrantOthers || false
+                            accessLevels?.find(
+                              (x) => x.accessName === a.accessName
+                            )?.allowedGrantOthers || false
                           }
                           onChange={() => handleGrantOthersChange(a.accessName)}
                           className="form-checkbox h-5 w-5 md:h-4 md:w-4"

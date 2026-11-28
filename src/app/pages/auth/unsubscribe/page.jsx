@@ -8,7 +8,7 @@ import {
   fetchUnsubscribeInfoService,
   unsubscribeService,
 } from '@/services/customerServices';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 
 const CHANNEL_NAME = { email: 'emails', sms: 'text messages' };
 

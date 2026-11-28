@@ -2,14 +2,14 @@ import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBulkUserUpload } from '@/contexts/bulkUserUploadContext';
 import { createUserService } from '@/services/usersServices';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import SuccessModal from '@/components/account/SuccessModal';
-import PageDescription from '@/components/account/PageDescription';
-import Button from '@/components/account/Button';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import PageDescription from '@/components/account/common/PageDescription';
+import Button from '@/components/account/common/Button';
 import ReviewCreatedUsers from './ReviewCreatedUsers';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkUserUploadReview = ({ pageDescription }) => {
@@ -202,7 +202,11 @@ const BulkUserUploadReview = ({ pageDescription }) => {
                         mobile: 'badge',
                         cellClass: () => 'font-semibold',
                       },
-                      { key: 'staffId', header: 'Staff ID', cell: (u) => u.staffId },
+                      {
+                        key: 'staffId',
+                        header: 'Staff ID',
+                        cell: (u) => u.staffId,
+                      },
                       {
                         key: 'name',
                         header: 'Full Name',
@@ -212,14 +216,17 @@ const BulkUserUploadReview = ({ pageDescription }) => {
                       {
                         key: 'role',
                         header: 'Role',
-                        cell: (u) => u.role.charAt(0).toUpperCase() + u?.role?.slice(1),
+                        cell: (u) =>
+                          u.role.charAt(0).toUpperCase() + u?.role?.slice(1),
                       },
                       {
                         key: 'branches',
                         header: 'Branch(es)',
                         mobile: 'wide',
                         cell: (u) =>
-                          u.branch?.length > 1 ? u.branch?.join(', ') : u.branch[0],
+                          u.branch?.length > 1
+                            ? u.branch?.join(', ')
+                            : u.branch[0],
                       },
                       {
                         key: 'phone',

@@ -1,10 +1,10 @@
 import React, { useEffect, useId } from 'react';
 import { FaLightbulb } from 'react-icons/fa';
-import { usePageDescriptionApi } from './admin/shell/PageDescriptionSlot';
+import { usePageDescriptionApi } from './PageDescriptionSlot';
 
 // Inside the admin frame this renders nothing: the text goes to the frame, which
 // shows it as a bar at the bottom (md and up) or behind a lightbulb button in
-// the header (phones). See admin/shell/PageDescriptionSlot.jsx.
+// the header (phones). See common/PageDescriptionSlot.jsx.
 // Outside the frame it falls back to the old inline box.
 const PageDescription = ({ pageDescription }) => {
   const slot = usePageDescriptionApi();

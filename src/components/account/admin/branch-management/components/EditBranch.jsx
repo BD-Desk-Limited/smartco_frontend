@@ -1,6 +1,6 @@
-import Header from '@/components/account/admin/AdminHeader';
-import PageDescription from '@/components/account/PageDescription';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import React from 'react';
 import BranchSidebar from './BranchSideBar';
 import {
@@ -12,10 +12,10 @@ import Image from 'next/image';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import WarningModal from '@/components/account/WarningModal';
-import SuccessModal from '@/components/account/SuccessModal';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import WarningModal from '@/components/account/common/WarningModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { verifyInputText } from '@/utilities/verifyInput';
 
 const EditBranch = ({ branchData, setBranchData, pageDescription }) => {

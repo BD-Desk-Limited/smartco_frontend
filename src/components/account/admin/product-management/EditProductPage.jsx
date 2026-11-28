@@ -1,10 +1,9 @@
 'use client';
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import EditableProductDetails from './components/edit-product/EditableProductDetails';
 
 const EditProductPage = () => {
-
   const pageDescription =
     'The Edit Product page allows you to update details of an existing finished product. You can modify its name, description, category, image, pricing across bands, tax details, and component materials/options. Use this interface to keep product information accurate and aligned with current inventory and pricing policies.';
 

@@ -1,17 +1,17 @@
 import React from 'react';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
-import PageDescription from '@/components/account/PageDescription';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
 import EditUserForm from './EditUserForm';
 import UserPermissionsManagement from './UserPermissionsManagement';
 import UserBranchManagement from './UserBranchManagement';
 import { useAuth } from '@/contexts/authContext';
-import Button from '@/components/account/Button';
-import WarningModal from '@/components/account/WarningModal';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import WarningModal from '@/components/account/common/WarningModal';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import { updateUserService } from '@/services/usersServices';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import {
   verifyEmail,
   verifyInputText,

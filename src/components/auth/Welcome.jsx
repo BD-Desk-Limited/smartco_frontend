@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
-import Spinner from '../account/Spinner';
+import Spinner from '../account/common/Spinner';
 
 const Welcome = () => {
   const router = useRouter();

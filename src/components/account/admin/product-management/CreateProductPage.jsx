@@ -1,10 +1,9 @@
 'use client';
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import CreateProducts from './components/create-products/CreateProducts';
 
 const CreateProductPage = () => {
-
   const pageDescription =
     'The Create Product page allows you to add new finished and packaged items by selecting component materials and products. Here, you can enter product details such as name, category, price, and stock status. Once created, products will appear in the store front sales display and can be managed from the Product Management page. Use this interface to efficiently organize and expand your product offerings.';
 

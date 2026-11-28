@@ -1,4 +1,4 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -15,12 +15,12 @@ import {
   FaClock,
   FaTimes,
 } from 'react-icons/fa';
-import SubHeader from '../../SubHeader';
-import PageDescription from '@/components/account/PageDescription';
-import Spinner from '@/components/account/Spinner';
-import Pagination from '@/components/account/Pagination';
-import ErrorModal from '@/components/account/ErrorModal';
-import ExportContent from '@/components/account/ExportContent';
+import SubHeader from '../../shell/SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import Spinner from '@/components/account/common/Spinner';
+import Pagination from '@/components/account/common/Pagination';
+import ErrorModal from '@/components/account/common/ErrorModal';
+import ExportContent from '@/components/account/common/ExportContent';
 import { getUserBranchesService } from '@/services/branchServices';
 import {
   fetchTransfersService,
@@ -223,7 +223,9 @@ const StockTransfers = ({ pageDescription }) => {
     return (
       <span className="flex items-center justify-center whitespace-nowrap">
         {option?.icon || null}
-        <span className={`px-2 md:px-4 py-1 md:py-2 ${option?.color || ' text-gray-500'}`}>
+        <span
+          className={`px-2 md:px-4 py-1 md:py-2 ${option?.color || ' text-gray-500'}`}
+        >
           {option?.label || capitalizeFirst(t.status) || '-'}
         </span>
       </span>
@@ -257,7 +259,9 @@ const StockTransfers = ({ pageDescription }) => {
           <span className="md:hidden">
             {t.fromBranch?.name || 'N/A'} → {t.toBranch?.name || 'N/A'}
           </span>
-          <span className="hidden md:inline">{t.fromBranch?.name || 'N/A'}</span>
+          <span className="hidden md:inline">
+            {t.fromBranch?.name || 'N/A'}
+          </span>
         </>
       ),
     },
@@ -276,7 +280,8 @@ const StockTransfers = ({ pageDescription }) => {
     {
       key: 'total',
       header: 'Total Value',
-      cell: (t) => (t.totalCost != null ? commaNumberFormat(t.totalCost, 2) : '-'),
+      cell: (t) =>
+        t.totalCost != null ? commaNumberFormat(t.totalCost, 2) : '-',
     },
     { key: 'status', header: 'Status', mobile: 'badge', cell: statusCell },
   ];
@@ -345,7 +350,9 @@ const StockTransfers = ({ pageDescription }) => {
                       />
                       <select
                         value={draftFilters.branch}
-                        onChange={(e) => onChangeFilter('branch', e.target.value)}
+                        onChange={(e) =>
+                          onChangeFilter('branch', e.target.value)
+                        }
                         className="focus:outline-none cursor-pointer w-full md:w-auto bg-transparent"
                         aria-label="Filter by your branch"
                       >
@@ -435,7 +442,12 @@ const StockTransfers = ({ pageDescription }) => {
       </div>
 
       {errorMessage && (
-        <Modal bare zClass="z-[70]" label="Error" onClose={() => setErrorMessage(null)}>
+        <Modal
+          bare
+          zClass="z-[70]"
+          label="Error"
+          onClose={() => setErrorMessage(null)}
+        >
           <ErrorModal
             message={errorMessage}
             title={'Error'}
@@ -475,7 +487,12 @@ const StockTransfers = ({ pageDescription }) => {
       )}
 
       {exportConfig && (
-        <Modal bare zClass="z-[60]" label="Export" onClose={() => setExportConfig(null)}>
+        <Modal
+          bare
+          zClass="z-[60]"
+          label="Export"
+          onClose={() => setExportConfig(null)}
+        >
           <ExportContent
             {...exportConfig}
             onClose={() => setExportConfig(null)}

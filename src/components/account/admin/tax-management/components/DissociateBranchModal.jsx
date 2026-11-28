@@ -1,6 +1,6 @@
-import ErrorModal from '@/components/account/ErrorModal';
-import Spinner from '@/components/account/Spinner';
-import SuccessModal from '@/components/account/SuccessModal';
+import ErrorModal from '@/components/account/common/ErrorModal';
+import Spinner from '@/components/account/common/Spinner';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { changeBranchTaxBandService } from '@/services/branchServices';
 import React, { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';

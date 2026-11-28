@@ -226,14 +226,17 @@ export const updateMyProfileService = async (body) => {
   const token = getToken();
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
 
     if (response.ok) {
       const responseData = await response.json();

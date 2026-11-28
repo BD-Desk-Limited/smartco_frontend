@@ -1,5 +1,5 @@
-import Pagination from '@/components/account/Pagination';
-import Spinner from '@/components/account/Spinner';
+import Pagination from '@/components/account/common/Pagination';
+import Spinner from '@/components/account/common/Spinner';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import { capitalizeFirst } from '@/utilities/stringUtils';

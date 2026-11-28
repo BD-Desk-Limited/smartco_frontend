@@ -17,9 +17,12 @@ export const PageAccessRequirement = (requiredRole, requiredAccess) => {
       user?.accessLevel.filter((access) => access.accessGranted === true)) ||
     [];
 
+  // No access level named (e.g. PageAccessRequirement('manager', '')): the role alone is enough.
+  // Managers have no access levels, so they would otherwise never pass.
   const conditionsToShowPage =
     user?.role === requiredRole &&
-    (user?.superAdmin ||
+    (!requiredAccess ||
+      user?.superAdmin ||
       (user?.accessLevel
         ?.map((access) => access.accessName)
         .includes('All_Access') &&

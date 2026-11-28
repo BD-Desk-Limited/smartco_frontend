@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';
-import ErrorInterface from '@/components/account/errorInterface';
-import Spinner from '@/components/account/Spinner';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import Spinner from '@/components/account/common/Spinner';
 import {
   selfRegisterationCustomerService,
   validateCustomerSelfRegistrationTokenService,

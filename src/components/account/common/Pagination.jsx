@@ -11,7 +11,23 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   const showPageNumbers = () => {
     let pageNumbers = [];
+    // many pages: first, last and two either side of the current one, "…" for the gaps
+    const shown = (i) =>
+      totalPages <= 9 ||
+      i === 1 ||
+      i === totalPages ||
+      Math.abs(i - currentPage) <= 2;
     for (let i = 1; i <= totalPages; i++) {
+      if (!shown(i)) {
+        if (shown(i - 1)) {
+          pageNumbers.push(
+            <span key={`gap-${i}`} className="px-1 text-text-gray">
+              …
+            </span>
+          );
+        }
+        continue;
+      }
       pageNumbers.push(
         <button
           key={i}

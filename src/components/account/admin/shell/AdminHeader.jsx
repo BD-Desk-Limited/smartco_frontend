@@ -1,15 +1,13 @@
 import React from 'react';
-import { FaRegBell, FaReply } from 'react-icons/fa';
+import { FaReply } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
+import { firstName, initials } from '@/utilities/stringUtils';
 import Image from 'next/image';
 import AppSearch from './AppSearch';
-import { PageDescriptionButton } from './shell/PageDescriptionSlot';
+import { PageDescriptionButton } from '@/components/account/common/PageDescriptionSlot';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
-const initials = (fullName = '') => {
-  const [first = '', second = ''] = fullName.split(' ');
-  return (first.charAt(0) + second.charAt(0)).toUpperCase();
-};
 
 // Top bar on every admin page. Fixed height (h-14) so sticky sub headers can sit
 // right under it (top-14). On phones the Back label and the greeting are hidden,
@@ -33,14 +31,7 @@ const Header = () => {
       <div className="flex flex-row gap-3 md:gap-5 items-center min-w-0">
         <AppSearch />
         <PageDescriptionButton />
-        {/* Notification bell */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="shrink-0 p-1 hover:text-green-shadow1"
-        >
-          <FaRegBell className="text-lg" />
-        </button>
+        <NotificationBell className="hover:text-green-shadow1" />
 
         {/* user profile */}
         <button
@@ -63,7 +54,7 @@ const Header = () => {
               {initials(user?.fullName)}
             </span>
           )}
-          <span className="hidden md:inline font-semibold text-sm whitespace-nowrap">{`Hello ${user?.fullName?.split(' ')[0] ?? ''},`}</span>
+          <span className="hidden md:inline font-semibold text-sm whitespace-nowrap">{`Hello ${firstName(user?.fullName)},`}</span>
         </button>
       </div>
     </header>

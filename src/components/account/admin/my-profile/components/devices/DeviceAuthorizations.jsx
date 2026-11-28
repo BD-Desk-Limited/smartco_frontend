@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaShieldAlt } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import WarningModal from '@/components/account/WarningModal';
+import Spinner from '@/components/account/common/Spinner';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import WarningModal from '@/components/account/common/WarningModal';
 import { useCompanyData } from '@/contexts/companyDataContext';
 import {
   getTrustedDevicesService,

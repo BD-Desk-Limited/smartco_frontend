@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 
 const NonSetupAdminDisplay = ({ loading }) => {
   const { user, logOut } = useAuth();

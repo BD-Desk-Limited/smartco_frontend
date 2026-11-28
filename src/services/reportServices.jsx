@@ -51,6 +51,25 @@ export const fetchScheduledOrdersReportService = (filters) =>
   );
 
 // The scheduled orders list: open and needing a refund whatever their date, plus orders cancelled or
-// refunded in the period. -> { orders: [...], summary: { open, overdue, held }, canManage, currency, filters }
-export const fetchOpenScheduledOrdersService = (filters) =>
-  post('/reports/sales/scheduled-orders/open', toBody(filters));
+// refunded in the period. List options (all optional):
+//   listBranchIds: [] narrows the list to some of the report's branches ([] = all of them)
+//   status: 'all' | 'scheduled' | 're-scheduled' | 'cancelled' | 'refunded' | 'needs-refund'
+//   page (from 1), pageSize (max 100), all: true for every row (export)
+// -> { orders (one page), pagination: { page, pageSize, total, totalPages }, statusCounts,
+//      summary: { open, overdue, held } (the report's branches), canManage, currency, truncated, filters }
+export const fetchOpenScheduledOrdersService = ({
+  listBranchIds = [],
+  status = 'all',
+  page = 1,
+  pageSize,
+  all = false,
+  ...filters
+}) =>
+  post('/reports/sales/scheduled-orders/open', {
+    ...toBody(filters),
+    ...(listBranchIds.length ? { listBranchIds } : {}),
+    status,
+    page,
+    ...(pageSize ? { pageSize } : {}),
+    ...(all ? { all: true } : {}),
+  });

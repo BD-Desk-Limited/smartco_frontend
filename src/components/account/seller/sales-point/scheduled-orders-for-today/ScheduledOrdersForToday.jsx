@@ -20,7 +20,7 @@ import {
   subtotal,
   taxfreeProduct,
 } from '../cart/CartBillCalculationFunctions';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import { methodLabel } from '@/utilities/paymentMethods';
 

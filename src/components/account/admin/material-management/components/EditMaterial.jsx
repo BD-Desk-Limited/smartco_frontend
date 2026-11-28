@@ -1,9 +1,9 @@
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
 import MaterialSidebar from './materialSidebar';
 import {
   createMaterialCategories,
@@ -12,9 +12,9 @@ import {
   getMaterialUnits,
   updateMaterial,
 } from '@/services/materialServices';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import SuccessModal from '@/components/account/SuccessModal';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { verifyInputText } from '@/utilities/verifyInput';
 
 const EditMaterial = ({ materialData, pageDescription }) => {

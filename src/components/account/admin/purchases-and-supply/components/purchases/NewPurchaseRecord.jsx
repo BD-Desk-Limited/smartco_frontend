@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../../SubHeader';
-import SideBar from '../../../SideBar';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../../shell/SubHeader';
+import SideBar from '../../../shell/SideBar';
 import { PURCHASES_AND_SUPPLY_SUBMENUS } from '../PurchasesAndSupplySubMenus';
 import {
   FaAdjust,
@@ -16,11 +16,11 @@ import {
 import { fetchSuppliersByCompanyIdService } from '@/services/purchaseAndSupplyServices';
 import SelectSupplierPannel from './SelectSupplierPannel';
 import { getAllMaterials } from '@/services/materialServices';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import PurchaseDetails from './PurchaseDetails';
 import SelectItemPannel from './SelectItemPannel';
 import { savePurchaseRecordService } from '@/services/purchaseAndSupplyServices';
-import WarningWithFeedbackModal from '@/components/account/WarningWithFeedbackModal';
+import WarningWithFeedbackModal from '@/components/account/common/WarningWithFeedbackModal';
 
 const NewPurchaseRecord = ({ pageDescription }) => {
   const [openSidebar, setOpenSidebar] = React.useState(false);

@@ -1,4 +1,4 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
 import Image from 'next/image';
 import React from 'react';

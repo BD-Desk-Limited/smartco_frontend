@@ -1,11 +1,11 @@
 'use client';
 import React from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import ViewProductDetails from './components/view-product-details/ViewProductDetails';
 import { getProductByIdService } from '@/services/productsServices';
 import { getAllBranchesByCompanyId } from '@/services/branchServices';
-import Spinner from '../../Spinner';
+import Spinner from '../../common/Spinner';
 
 const ProductDetailsPage = () => {
   const searchParams = useSearchParams();

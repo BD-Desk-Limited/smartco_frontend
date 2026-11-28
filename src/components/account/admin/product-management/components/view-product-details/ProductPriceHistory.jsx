@@ -1,5 +1,5 @@
-import ErrorInterface from '@/components/account/errorInterface';
-import Spinner from '@/components/account/Spinner';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import Spinner from '@/components/account/common/Spinner';
 import { getProductPriceHistoryByIdService } from '@/services/productsServices';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
 import React from 'react';

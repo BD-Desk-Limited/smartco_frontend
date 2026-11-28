@@ -1,4 +1,4 @@
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 

@@ -1,14 +1,14 @@
 import React from 'react';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import BranchSidebar from './BranchSideBar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import Image from 'next/image';
-import DeactivationModal from '@/components/account/DeactivationModal';
-import SuccessModal from '@/components/account/SuccessModal';
+import DeactivationModal from '@/components/account/common/DeactivationModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { toggleBranchStatus } from '@/services/branchServices';
 import UsersInBranch from './UsersInBranch';
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import { useRouter } from 'next/navigation';
 
 const ViewBranchDetails = ({ pageDescription, branchData, setBranchData }) => {

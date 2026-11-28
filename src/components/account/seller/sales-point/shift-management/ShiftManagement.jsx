@@ -1,4 +1,4 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import React, { useEffect, useRef } from 'react';
 import ShiftManagementSidebar from './ShiftManagementSidebar';
 import MovableCircle from './MovableCircle';

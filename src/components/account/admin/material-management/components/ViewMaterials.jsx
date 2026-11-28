@@ -1,16 +1,16 @@
 import React, { use } from 'react';
 import Image from 'next/image';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
 import MaterialSidebar from './materialSidebar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import Link from 'next/link';
-import ExportContent from '../../../ExportContent';
+import ExportContent from '../../../common/ExportContent';
 import { deleteMaterials, getMaterials } from '@/services/materialServices';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { useRouter } from 'next/navigation';
-import DeleteModal from '@/components/account/DeleteModal';
+import DeleteModal from '@/components/account/common/DeleteModal';
 import SubMenuQuickLinks from './SubMenuQuicklinks';
 
 const ViewMaterial = ({ pageDescription }) => {

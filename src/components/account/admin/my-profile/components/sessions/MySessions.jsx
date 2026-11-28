@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaLaptopHouse } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import WarningModal from '@/components/account/WarningModal';
+import Spinner from '@/components/account/common/Spinner';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import WarningModal from '@/components/account/common/WarningModal';
 import { useAuth } from '@/contexts/authContext';
 import {
   getMySessionsService,
@@ -119,7 +119,9 @@ const MySessions = () => {
             maxHeightClass=""
             rows={rows}
             emptyMessage="No active sessions."
-            rowClassName={(session) => (session.status === 'active' ? '' : 'opacity-60')}
+            rowClassName={(session) =>
+              session.status === 'active' ? '' : 'opacity-60'
+            }
             columns={sessionColumns}
             actionsHeader="Action"
             actions={(session) => (

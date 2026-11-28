@@ -33,6 +33,10 @@ const safeFileName = (name) => String(name).replace(/[\\/:*?"<>|]/g, '_');
  * - hiddenButtons: any of 'excel' | 'pdf' | 'print'
  * - fileName:      base name for the downloaded files (no extension)
  * - emptyMessage:  shown when data is empty (metadata is still exported)
+ * - totals:        optional row added under the data, in bold ({ column: value }; the first
+ *                  column usually holds a "Total" label)
+ * - sections:      optional extra tables after the main one: [{ title, data, totals? }]
+ *                  (e.g. totals by branch); exported, printed and previewed the same way
  */
 const ExportContent = ({
   data = [],
@@ -42,27 +46,53 @@ const ExportContent = ({
   hiddenButtons = [],
   fileName = 'exported_data',
   emptyMessage = 'No rows',
+  totals = null,
+  sections = [],
 }) => {
   const show = (name) => !hiddenButtons.includes(name);
-  const keys = [...new Set(data.flatMap((row) => Object.keys(row)))];
   const metadataEntries = Object.entries(metadata);
   const baseName = safeFileName(fileName);
 
-  const bodyRows = () => data.map((row) => keys.map((k) => cell(row[k])));
+  // every table exported: the main one, then the sections. rows include the totals row.
+  const tables = [
+    { title: null, data, totals },
+    ...sections.filter((s) => s?.data?.length),
+  ].map((t) => {
+    const rows = t.totals ? [...t.data, t.totals] : t.data;
+    const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+    return {
+      ...t,
+      rows,
+      keys,
+      body: rows.map((row) => keys.map((k) => cell(row[k]))),
+    };
+  });
+  const main = tables[0];
+  const keys = main.keys;
+  const extra = tables.slice(1);
 
   // ---------- Excel ----------
   const exportToExcel = () => {
     const metadataRows = metadataEntries.map(([key, v]) => [`${key}:`, fmt(v)]);
-    const worksheetData = [
-      ...metadataRows,
-      [],
-      ...(keys.length ? [keys, ...bodyRows()] : []),
-    ];
+    const worksheetData = [...metadataRows, []];
+    tables.forEach((t) => {
+      if (!t.keys.length) return;
+      if (t.title) worksheetData.push([], [t.title]);
+      worksheetData.push(t.keys, ...t.body);
+    });
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    worksheet['!cols'] = keys.map((k) => ({
+    const widest = Math.max(...tables.map((t) => t.keys.length));
+    worksheet['!cols'] = Array.from({ length: widest }, (_, i) => ({
       wch: Math.min(
         40,
-        Math.max(k.length, ...data.map((r) => String(cell(r[k])).length)) + 2
+        Math.max(
+          8,
+          ...tables.flatMap((t) =>
+            t.keys[i]
+              ? [t.keys[i].length, ...t.body.map((r) => String(r[i]).length)]
+              : []
+          )
+        ) + 2
       ),
     }));
     const workbook = XLSX.utils.book_new();
@@ -102,15 +132,36 @@ const ExportContent = ({
       y += lines.length * 4.5 + 1.5;
     });
 
-    if (keys.length) {
+    tables.forEach((t) => {
+      if (!t.keys.length) return;
+      if (t.title) {
+        y = (doc.lastAutoTable?.finalY ?? y) + 8;
+        if (y > pageH - margin * 2) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFontSize(11);
+        doc.text(String(t.title), margin, y);
+        doc.setFontSize(9);
+      }
       autoTable(doc, {
         startY: y + 2,
-        head: [keys],
-        body: bodyRows(),
+        head: [t.keys],
+        body: t.body,
         styles: { fontSize: 8 },
         margin: { left: margin, right: margin },
+        // the totals row in bold
+        didParseCell: (hook) => {
+          if (
+            t.totals &&
+            hook.section === 'body' &&
+            hook.row.index === t.body.length - 1
+          ) {
+            hook.cell.styles.fontStyle = 'bold';
+          }
+        },
       });
-    }
+    });
     doc.save(`${baseName}.pdf`);
   };
 
@@ -123,17 +174,23 @@ const ExportContent = ({
       )
       .join('');
 
-    const tableHtml = keys.length
-      ? `<table>
-          <thead><tr>${keys.map((k) => `<th>${escapeHtml(k)}</th>`).join('')}</tr></thead>
-          <tbody>${data
+    const tableOf = (t) =>
+      `${t.title ? `<h3>${escapeHtml(t.title)}</h3>` : ''}<table>
+          <thead><tr>${t.keys.map((k) => `<th>${escapeHtml(k)}</th>`).join('')}</tr></thead>
+          <tbody>${t.body
             .map(
-              (row) =>
-                `<tr>${keys.map((k) => `<td>${escapeHtml(cell(row[k]))}</td>`).join('')}</tr>`
+              (row, i) =>
+                `<tr${t.totals && i === t.body.length - 1 ? ' class="total"' : ''}>${row
+                  .map((v) => `<td>${escapeHtml(v)}</td>`)
+                  .join('')}</tr>`
             )
             .join('')}</tbody>
-        </table>`
-      : `<p><em>${escapeHtml(emptyMessage)}</em></p>`;
+        </table>`;
+    const tableHtml =
+      (keys.length
+        ? tableOf(main)
+        : `<p><em>${escapeHtml(emptyMessage)}</em></p>`) +
+      extra.map(tableOf).join('');
 
     const printWindow = window.open('', '', 'width=900,height=700');
     if (!printWindow) {
@@ -150,6 +207,8 @@ const ExportContent = ({
         th, td { border: 1px solid #000; padding: 6px; text-align: left; }
         th { background: #f0f0f0; }
         tr { break-inside: avoid; }
+        tr.total td { font-weight: bold; background: #f7f7f7; }
+        h3 { margin: 18px 0 0; font-size: 13px; }
         * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       </style></head><body>
       <h2>${escapeHtml(title)}</h2>${metaHtml}${tableHtml}
@@ -187,21 +246,37 @@ const ExportContent = ({
         )}
 
         {keys.length > 0 ? (
-          <div className="max-h-[45vh] overflow-auto">
+          <div className="max-h-[45vh] overflow-auto flex flex-col gap-4">
             {/* the preview of what gets exported: a table from md up, cards on phones */}
-            <ResponsiveTable
-              align="left"
-              dense
-              maxHeightClass=""
-              rows={data}
-              getRowKey={(_, i) => i}
-              columns={keys.map((key, i) => ({
-                key,
-                header: key,
-                mobile: i === 0 ? 'title' : 'field',
-                cell: (item) => cell(item[key]),
-              }))}
-            />
+            {tables
+              .filter((t) => t.keys.length)
+              .map((t, n) => (
+                <div key={n}>
+                  {t.title && (
+                    <h3 className="text-sm font-semibold text-text-black mb-1">
+                      {t.title}
+                    </h3>
+                  )}
+                  <ResponsiveTable
+                    align="left"
+                    dense
+                    maxHeightClass=""
+                    rows={t.rows}
+                    getRowKey={(_, i) => i}
+                    rowClassName={(row) =>
+                      t.totals && row === t.totals
+                        ? 'font-semibold bg-gray-shadow10'
+                        : ''
+                    }
+                    columns={t.keys.map((key, i) => ({
+                      key,
+                      header: key,
+                      mobile: i === 0 ? 'title' : 'field',
+                      cell: (item) => cell(item[key]),
+                    }))}
+                  />
+                </div>
+              ))}
           </div>
         ) : (
           <p className="py-4 text-center text-sm italic text-text-gray">

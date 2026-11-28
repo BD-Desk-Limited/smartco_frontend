@@ -8,13 +8,13 @@ import {
   verifyInputText,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import UsersManagementSidebar from '../UsersManagementSidebar';
-import ErrorModal from '@/components/account/ErrorModal';
-import SuccessModal from '@/components/account/SuccessModal';
+import ErrorModal from '@/components/account/common/ErrorModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import Image from 'next/image';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 
 const BulkUserUpload = ({ pageDescription }) => {
   const selectedSubMenu = {

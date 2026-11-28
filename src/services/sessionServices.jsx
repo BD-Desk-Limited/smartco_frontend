@@ -25,7 +25,9 @@ const request = async (path, { method = 'GET' } = {}) => {
     };
   } catch (error) {
     console.error('Session request failed:', error);
-    return { error: 'Network error, please check your connection and try again' };
+    return {
+      error: 'Network error, please check your connection and try again',
+    };
   }
 };
 

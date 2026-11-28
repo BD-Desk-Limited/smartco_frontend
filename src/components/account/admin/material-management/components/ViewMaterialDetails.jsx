@@ -1,11 +1,11 @@
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import MaterialSidebar from './materialSidebar';
-import SubHeader from '../../SubHeader';
+import SubHeader from '../../shell/SubHeader';
 import Image from 'next/image';
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import GroupedMaterialBreakdown from './groupedMaterials/GroupedMaterialBreakdown';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
@@ -232,14 +232,18 @@ const ViewMaterialDetails = ({
                                     key: 'supplied',
                                     header: 'Supply Date',
                                     cell: (s) =>
-                                      new Date(s.createdAt).toLocaleDateString(),
+                                      new Date(
+                                        s.createdAt
+                                      ).toLocaleDateString(),
                                   },
                                   {
                                     key: 'expiry',
                                     header: 'Expiry Date',
                                     cell: (s) =>
                                       s.expiryDate
-                                        ? new Date(s.expiryDate).toLocaleDateString()
+                                        ? new Date(
+                                            s.expiryDate
+                                          ).toLocaleDateString()
                                         : 'Not specified',
                                   },
                                 ]}

@@ -1,5 +1,5 @@
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -10,13 +10,13 @@ import {
   getAllUsersByCompanyId,
   toggleUserStatus,
 } from '@/services/usersServices';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { useAuth } from '@/contexts/authContext';
-import PageDescription from '@/components/account/PageDescription';
-import ExportContent from '@/components/account/ExportContent';
-import DeleteModal from '@/components/account/DeleteModal';
-import DeactivationModal from '@/components/account/DeactivationModal';
-import SuccessModal from '@/components/account/SuccessModal';
+import PageDescription from '@/components/account/common/PageDescription';
+import ExportContent from '@/components/account/common/ExportContent';
+import DeleteModal from '@/components/account/common/DeleteModal';
+import DeactivationModal from '@/components/account/common/DeactivationModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const ViewUsers = ({ pageDescription }) => {
@@ -370,7 +370,9 @@ const ViewUsers = ({ pageDescription }) => {
                 <ResponsiveTable
                   align="left"
                   rows={filteredUsers || []}
-                  emptyMessage={<span className="text-error">No users found!!!</span>}
+                  emptyMessage={
+                    <span className="text-error">No users found!!!</span>
+                  }
                   onRowClick={(user) =>
                     Router.push(
                       `/pages/account/admin/users-management/user-details?id=${user._id}`
@@ -443,10 +445,16 @@ const ViewUsers = ({ pageDescription }) => {
                         type="button"
                         onClick={() => {
                           handleUserToChangeStatus([user._id]);
-                          setSelectedUserStatus(user.is_active ? 'active' : 'inactive');
+                          setSelectedUserStatus(
+                            user.is_active ? 'active' : 'inactive'
+                          );
                         }}
-                        title={user?.is_active ? 'Deactivate user' : 'Activate user'}
-                        aria-label={user?.is_active ? 'Deactivate user' : 'Activate user'}
+                        title={
+                          user?.is_active ? 'Deactivate user' : 'Activate user'
+                        }
+                        aria-label={
+                          user?.is_active ? 'Deactivate user' : 'Activate user'
+                        }
                       >
                         <Image
                           src={
@@ -464,7 +472,12 @@ const ViewUsers = ({ pageDescription }) => {
                         title="Edit User"
                         aria-label="Edit User"
                       >
-                        <Image src="/assets/edit.png" alt="" width={15} height={15} />
+                        <Image
+                          src="/assets/edit.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
                       </Link>
                       <button
                         type="button"
@@ -472,7 +485,12 @@ const ViewUsers = ({ pageDescription }) => {
                         title="Delete User"
                         aria-label="Delete User"
                       >
-                        <Image src="/assets/delete.png" alt="" width={15} height={15} />
+                        <Image
+                          src="/assets/delete.png"
+                          alt=""
+                          width={15}
+                          height={15}
+                        />
                       </button>
                     </>
                   )}

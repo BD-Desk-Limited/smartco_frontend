@@ -32,15 +32,69 @@ export const loginService = async (form) => {
       const responseData = await response.json();
       return { data: responseData };
     } else {
-      const errorData = await response.json();
-      const errorMessage = errorData.message;
-      console.log('Error:', errorMessage);
-      return { error: errorMessage };
+      const errorData = await response.json().catch(() => ({}));
+      // details: e.g. { wrongCompanyPassword, company } when the password is another company's
+      return {
+        error: errorData.message || 'Error logging in, please try again',
+        details: errorData,
+      };
     }
   } catch (error) {
     return {
       error: 'Internal server error, please try again or contact support',
     };
+  }
+};
+
+// devices: [{ id, name, authorizationToken }] from this browser
+// -> { data: [{ id, name, authorizationToken }] } the companies still trusting it
+export const deviceCompaniesService = async (devices) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/device-companies`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          devices: devices.map((d) => ({
+            companyId: d.id,
+            authorizationToken: d.authorizationToken,
+          })),
+        }),
+      }
+    );
+    const payload = await response.json().catch(() => ({}));
+    if (response.ok) return { data: payload.companies || [] };
+    return { error: payload.message || 'Could not check this device' };
+  } catch {
+    return { error: 'Network error' };
+  }
+};
+
+// The device's authorization for one company, with its allowed branches
+// -> { data: companyData } or { error }
+export const checkDeviceAuthorizationService = async ({
+  companyId,
+  authorizationToken,
+}) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/is-device-authorized`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companyId, authorizationToken }),
+      }
+    );
+    const payload = await response.json().catch(() => ({}));
+    if (response.ok && payload.isAuthorized) return { data: payload.companyData };
+    // unauthorized: the company no longer trusts this device (not a network problem)
+    return {
+      error: payload.message || 'This device is not authorized',
+      unauthorized: response.status === 403 || payload.isAuthorized === false,
+    };
+  } catch {
+    return { error: 'Network error' };
   }
 };
 
@@ -143,7 +197,9 @@ export const logOutAllDevicesService = async (token) => {
     };
   } catch (error) {
     console.error('Log out of all devices failed:', error);
-    return { error: 'Network error, please check your connection and try again' };
+    return {
+      error: 'Network error, please check your connection and try again',
+    };
   }
 };
 

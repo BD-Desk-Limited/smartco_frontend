@@ -1,4 +1,4 @@
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import React from 'react';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
 

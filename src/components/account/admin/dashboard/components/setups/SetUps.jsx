@@ -1,9 +1,8 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import SetUpAdminDisplay from './SetUpAdminDisplay';
 import NonSetupAdminDisplay from './NonSetupAdminDisplay';
 
 const SetUps = ({ setupProgress, loading, isSetUpAdmin }) => {
-
   // Show spinner until everything is ready
   if (loading || isSetUpAdmin === undefined || isSetUpAdmin === null) {
     return <Spinner />;
@@ -18,6 +17,6 @@ const SetUps = ({ setupProgress, loading, isSetUpAdmin }) => {
       )}
     </>
   );
-}
+};
 
 export default SetUps;

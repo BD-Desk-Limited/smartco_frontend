@@ -24,13 +24,37 @@ const post = async (path, body) => {
     };
   } catch (error) {
     console.error('Password request failed:', error);
+    return {
+      error: 'Network error, please check your connection and try again',
+    };
+  }
+};
+
+// The companies this person has an account in (same email), to pick whose password to change.
+// -> { companies: [{ id, name, current }] }
+export const listPasswordCompaniesService = async () => {
+  try {
+    const response = await fetch(`${API}/auth/password/companies`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        ...deviceHeaders(),
+      },
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (response.ok) return { data: payload };
+    return { error: payload?.message || 'Could not load your companies' };
+  } catch {
     return { error: 'Network error, please check your connection and try again' };
   }
 };
 
+// companyId: whose password (default: the company signed in to)
 // -> { challengeId, method, methods, destination, question, codeExpiresAt, message }
-export const startPasswordChangeService = (currentPassword) =>
-  post('/auth/password/change/start', { currentPassword });
+export const startPasswordChangeService = (currentPassword, companyId) =>
+  post('/auth/password/change/start', {
+    currentPassword,
+    ...(companyId ? { companyId } : {}),
+  });
 
 export const completePasswordChangeService = ({
   challengeId,
@@ -39,4 +63,10 @@ export const completePasswordChangeService = ({
   newPassword,
   confirmPassword,
 }) =>
-  post('/auth/password/change', { challengeId, code, answer, newPassword, confirmPassword });
+  post('/auth/password/change', {
+    challengeId,
+    code,
+    answer,
+    newPassword,
+    confirmPassword,
+  });

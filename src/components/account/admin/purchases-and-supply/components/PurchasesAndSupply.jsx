@@ -1,10 +1,10 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React, { useState, useEffect } from 'react';
-import SubHeader from '../../SubHeader';
-import SideBar from '../../SideBar';
-import PageDescription from '@/components/account/PageDescription';
+import SubHeader from '../../shell/SubHeader';
+import SideBar from '../../shell/SideBar';
+import PageDescription from '@/components/account/common/PageDescription';
 import { PURCHASES_AND_SUPPLY_SUBMENUS } from './PurchasesAndSupplySubMenus';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import PurchaseAndSupplyTable from './PurchaseAndSupplyTable';
 import PurchasesAndSupplyFilters from './PurchasesAndSupplyFilters';
 import { getUserBranchesService } from '@/services/branchServices';
@@ -13,10 +13,10 @@ import {
   fetchSuppliersByCompanyIdService,
 } from '@/services/purchaseAndSupplyServices';
 import { formatDate } from '@/utilities/formatTime';
-import Pagination from '@/components/account/Pagination';
-import ErrorModal from '@/components/account/ErrorModal';
+import Pagination from '@/components/account/common/Pagination';
+import ErrorModal from '@/components/account/common/ErrorModal';
 import PurchaseAndSupplyDetailSideView from './PurchaseAndSupplyDetailSideView';
-import ExportContent from '@/components/account/ExportContent';
+import ExportContent from '@/components/account/common/ExportContent';
 import SideView from '../../ui/SideView';
 import Modal from '../../ui/Modal';
 import { commaNumberFormat } from '@/utilities/numbersUtils';
@@ -318,7 +318,12 @@ const PurchasesAndSupply = ({ pageDescription }) => {
       </div>
 
       {errorMessage && (
-        <Modal bare zClass="z-[70]" label="Error" onClose={() => setErrorMessage(null)}>
+        <Modal
+          bare
+          zClass="z-[70]"
+          label="Error"
+          onClose={() => setErrorMessage(null)}
+        >
           <ErrorModal
             message={errorMessage}
             title={'Error'}
@@ -346,7 +351,12 @@ const PurchasesAndSupply = ({ pageDescription }) => {
 
       {/* rendered last and above the side view, so it opens on top of it */}
       {exportConfig && (
-        <Modal bare zClass="z-[60]" label="Export" onClose={() => setExportConfig(null)}>
+        <Modal
+          bare
+          zClass="z-[60]"
+          label="Export"
+          onClose={() => setExportConfig(null)}
+        >
           <ExportContent
             {...exportConfig}
             onClose={() => setExportConfig(null)}

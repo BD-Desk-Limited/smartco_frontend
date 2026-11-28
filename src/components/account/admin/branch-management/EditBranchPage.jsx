@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import EditBranch from './components/EditBranch';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getBranchById } from '@/services/branchServices';
 

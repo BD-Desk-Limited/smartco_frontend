@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 
 const SUGGESTED_QUESTIONS = [
   'What was the name of your first pet?',
@@ -16,7 +16,8 @@ const MIN_QUESTIONS = 2;
 const MAX_QUESTIONS = 3;
 
 const emptyRow = () => ({ choice: '', custom: '', answer: '' });
-const questionOf = (row) => (row.choice === CUSTOM ? row.custom.trim() : row.choice);
+const questionOf = (row) =>
+  row.choice === CUSTOM ? row.custom.trim() : row.choice;
 
 // Collects 2-3 question/answer pairs. Password confirmation happens in the parent.
 const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
@@ -26,7 +27,9 @@ const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
   const [error, setError] = useState(null);
 
   const updateRow = (index, patch) =>
-    setRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    setRows((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, ...patch } : row))
+    );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,8 +39,12 @@ const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
     if (filled.length < MIN_QUESTIONS) {
       return setError(`Please answer at least ${MIN_QUESTIONS} questions.`);
     }
-    if (filled.some((row) => !questionOf(row) || row.answer.trim().length < 2)) {
-      return setError('Each question needs an answer of at least 2 characters.');
+    if (
+      filled.some((row) => !questionOf(row) || row.answer.trim().length < 2)
+    ) {
+      return setError(
+        'Each question needs an answer of at least 2 characters.'
+      );
     }
     if (filled.some((row) => questionOf(row).length < 5)) {
       return setError('Custom questions must be at least 5 characters long.');
@@ -56,8 +63,8 @@ const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <p className="text-xs text-text-gray">
-        Choose {MIN_QUESTIONS}–{MAX_QUESTIONS} questions only you can answer. Answers
-        are stored encrypted and are not case sensitive.
+        Choose {MIN_QUESTIONS}–{MAX_QUESTIONS} questions only you can answer.
+        Answers are stored encrypted and are not case sensitive.
       </p>
 
       {rows.map((row, index) => {
@@ -80,7 +87,9 @@ const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
                 className="border border-gray-border rounded-md p-2 text-sm text-text-black focus:outline-none focus:ring-2 focus:ring-brand-blue"
               >
                 <option value="">Select a question</option>
-                {SUGGESTED_QUESTIONS.filter((q) => !takenByOthers.includes(q)).map((q) => (
+                {SUGGESTED_QUESTIONS.filter(
+                  (q) => !takenByOthers.includes(q)
+                ).map((q) => (
                   <option key={q} value={q}>
                     {q}
                   </option>
@@ -116,7 +125,12 @@ const SecurityQuestionsForm = ({ onSubmit, onCancel, loading }) => {
       {error && <ErrorInterface error={error} />}
 
       <div className="flex flex-row gap-4">
-        <Button type="submit" text="Save questions" loading={loading} buttonStyle="px-5" />
+        <Button
+          type="submit"
+          text="Save questions"
+          loading={loading}
+          buttonStyle="px-5"
+        />
         <Button
           onClick={onCancel}
           text="Cancel"

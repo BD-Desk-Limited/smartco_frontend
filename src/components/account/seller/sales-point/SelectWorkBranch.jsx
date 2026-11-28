@@ -1,5 +1,8 @@
 import React from 'react';
-import Button from '../../Button';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/authContext';
+import Button from '../../common/Button';
+import { backToConsole, consoleHome } from './consoleHome';
 
 const SelectWorkBranch = ({
   branchesAccessibleOnDevice,
@@ -8,6 +11,9 @@ const SelectWorkBranch = ({
   style,
 }) => {
   const [selectedBranch, setSelectedBranch] = React.useState(null);
+  const router = useRouter();
+  const { user } = useAuth();
+  const home = consoleHome(user);
 
   return (
     <div
@@ -32,13 +38,23 @@ const SelectWorkBranch = ({
       </ul>
 
       {/* Enter and back buttons */}
-      <div className="flex justify-between my-2 px-4">
-        <Button
-          text="Logout"
-          onClick={logOutSalesPoint}
-          type="secondary"
-          buttonStyle="px-4 py-2 shadow-sm"
-        />
+      <div className="flex justify-between my-2 px-4 gap-2">
+        <div className="flex gap-2">
+          <Button
+            text="Logout"
+            onClick={logOutSalesPoint}
+            type="secondary"
+            buttonStyle="px-4 py-2 shadow-sm"
+          />
+          {home && (
+            <Button
+              text="Back to console"
+              onClick={() => backToConsole(user, router)}
+              type="secondary"
+              buttonStyle="px-4 py-2 shadow-sm"
+            />
+          )}
+        </div>
 
         <Button
           text="Enter"

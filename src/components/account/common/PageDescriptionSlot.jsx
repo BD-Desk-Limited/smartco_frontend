@@ -9,11 +9,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FaChevronDown, FaChevronUp, FaLightbulb, FaTimes } from 'react-icons/fa';
-import useEscapeToClose from '../ui/useEscapeToClose';
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaLightbulb,
+  FaTimes,
+} from 'react-icons/fa';
+import useEscapeToClose from '../admin/ui/useEscapeToClose';
 
 // Pages keep writing <PageDescription pageDescription="..." /> where they always
-// did. Inside the admin frame that component renders nothing and hands its text
+// did. Inside the admin and manager account frame that component renders nothing and hands its text
 // to this slot instead, and the frame shows it in one place:
 // - md and up: a bar under the scroll area (<PageDescriptionBar/>). It is outside
 //   the scrolling <main>, so it never covers content, even scrolled to the end.

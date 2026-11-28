@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import CustomerGroups from './components/CustomerGroups';
 
 const CustomerGroupsPage = () => {

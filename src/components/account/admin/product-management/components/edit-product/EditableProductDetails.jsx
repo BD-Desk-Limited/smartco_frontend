@@ -1,9 +1,9 @@
 /* Working from here next time*/
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useAuth } from '@/contexts/authContext';
 import { getAllBranchBandsByCompanyId } from '@/services/branchServices';
 import { getAllTaxBandsByCompanyId } from '@/services/taxBandServices';
@@ -14,9 +14,9 @@ import {
 } from '@/services/productsServices';
 import { getAllMaterials } from '@/services/materialServices';
 import { verifyInputText } from '@/utilities/verifyInput';
-import Spinner from '@/components/account/Spinner';
-import SuccessModal from '@/components/account/SuccessModal';
-import WarningModal from '@/components/account/WarningModal';
+import Spinner from '@/components/account/common/Spinner';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import WarningModal from '@/components/account/common/WarningModal';
 import { getCompanyDetails } from '@/services/companyServices';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -625,7 +625,11 @@ const EditableProductDetails = ({ pageDescription }) => {
                             rows={product.pricing}
                             getRowKey={(_, i) => i}
                             columns={[
-                              { key: 'band', header: 'Price Band', cell: (band) => band.band },
+                              {
+                                key: 'band',
+                                header: 'Price Band',
+                                cell: (band) => band.band,
+                              },
                               {
                                 key: 'price',
                                 header: 'Base Price',
@@ -682,8 +686,8 @@ const EditableProductDetails = ({ pageDescription }) => {
                               header: 'Tax Band',
                               mobile: 'title',
                               cell: (tax) =>
-                                taxBands.find((tb) => tb._id === tax.taxBand)?.name ||
-                                'Unknown Tax Band',
+                                taxBands.find((tb) => tb._id === tax.taxBand)
+                                  ?.name || 'Unknown Tax Band',
                             },
                             {
                               key: 'percentage',
@@ -704,7 +708,9 @@ const EditableProductDetails = ({ pageDescription }) => {
                                 ) : (
                                   <>
                                     {companyDetails?.currency?.symbol || '$'}
-                                    {Number(tax.additionalTaxAmount || 0).toFixed(2)}
+                                    {Number(
+                                      tax.additionalTaxAmount || 0
+                                    ).toFixed(2)}
                                   </>
                                 ),
                             },

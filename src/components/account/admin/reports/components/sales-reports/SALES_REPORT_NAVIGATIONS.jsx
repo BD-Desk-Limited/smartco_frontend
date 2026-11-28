@@ -1,6 +1,6 @@
 // Tabs of the Sales Performance report. `ready: false` tabs show a "coming soon" note until built.
 import TotalSales from './total-sales/TotalSales';
-import ScheduledOrders from './ScheduledOrders';
+import ScheduledOrders from './scheduled-orders-report/ScheduledOrders';
 
 // The component for each ready tab is mapped in SalesReports.jsx (REPORT_COMPONENTS).
 export const SALES_REPORT_NAVS = [

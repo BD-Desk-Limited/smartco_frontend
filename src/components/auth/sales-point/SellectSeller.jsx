@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import LoginExisting from './LoginExisting';
+import SalesPointCompanyPicker from './SalesPointCompanyPicker';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -20,6 +21,7 @@ const SelectSeller = ({ selectedSeller, setSelectedSeller, sellersInfo }) => {
           <h1 className="text-brand-green text-lg w-full text-center font-semibold">
             Login to sales point
           </h1>
+          <SalesPointCompanyPicker />
           <div className="w-full flex flex-col gap-1 text-left">
             <h2 className="font-semibold">Select seller</h2>
             <hr></hr>

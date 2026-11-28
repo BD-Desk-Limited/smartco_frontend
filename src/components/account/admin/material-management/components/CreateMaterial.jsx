@@ -1,8 +1,8 @@
 import React from 'react';
 import MaterialSidebar from './materialSidebar';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
-import PageDescription from '@/components/account/PageDescription';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
 import {
   getMaterialCategories,
   getMaterialUnits,
@@ -10,11 +10,11 @@ import {
   createMaterialUnits,
   createMaterial,
 } from '@/services/materialServices';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import BulkMaterialUploadModal from './BulkMaterialUploadModal';
 import { verifyInputText } from '@/utilities/verifyInput';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 
 const CreateMaterial = ({ pageDescription }) => {
   const [form, setForm] = React.useState({

@@ -8,10 +8,10 @@ import {
   verifyName,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
-import ErrorInterface from '@/components/account/errorInterface';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import { registerNewCustomerService } from '@/services/customerServices';
 import { useNotification } from '@/contexts/notificationContext';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 
 const NewCustomerRegistration = () => {
   const { showNotification } = useNotification();

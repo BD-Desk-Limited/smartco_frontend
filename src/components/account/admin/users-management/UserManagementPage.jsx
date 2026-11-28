@@ -1,9 +1,8 @@
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import ViewUsers from './components/ViewUsers';
 
 const UserManagementPage = () => {
-
   const pageDescription =
     'The User Management page allows you to view all users within your system, filter through them, and perform quick actions such as creating a new user, editing user information, and managing user details. This interface provides a comprehensive overview of all users, enabling efficient management and updates. You can click on any user to view their details, including their name, role, and associated metadata. Additionally, you have the option to edit user information or deactivate users that are no longer active. Use the search and filter functionalities to quickly find specific users.';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import TaxManagement from './components/TaxManagement';
 
 const TaxManagementPage = () => {

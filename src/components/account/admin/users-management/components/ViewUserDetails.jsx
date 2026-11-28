@@ -1,10 +1,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import UsersManagementSidebar from './UsersManagementSidebar';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
-import PageDescription from '@/components/account/PageDescription';
-import Button from '@/components/account/Button';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import Button from '@/components/account/common/Button';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/authContext';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
@@ -92,7 +92,8 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
                 <div className="text-text-gray text-sm italic px-5 flex flex-col gap-2">
                   <p>
                     <strong>Account Status: </strong>
-                    {userData?.isActive ? 'Active' : 'Inactive'}
+                    {/* the user record stores it as is_active (true unless deactivated) */}
+                    {userData?.is_active === false ? 'Inactive' : 'Active'}
                   </p>
                   <p>
                     <strong>Last Login: </strong>
@@ -149,7 +150,8 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
                           header: 'Access Granted',
                           mobile: 'badge',
                           cell: (a) => (a.accessGranted ? 'Yes' : 'No'),
-                          cellClass: (a) => (a.accessGranted ? 'text-success' : 'text-error'),
+                          cellClass: (a) =>
+                            a.accessGranted ? 'text-success' : 'text-error',
                         },
                         {
                           key: 'grantOthers',
@@ -157,13 +159,21 @@ const ViewUserDetails = ({ pageDescription, userData }) => {
                           mobileLabel: 'Can grant others',
                           cell: (a) => (a.allowedGrantOthers ? 'Yes' : 'No'),
                         },
-                        { key: 'grantedBy', header: 'Granted By', cell: (a) => a.grantedBy },
+                        {
+                          key: 'grantedBy',
+                          header: 'Granted By',
+                          cell: (a) => a.grantedBy,
+                        },
                         {
                           key: 'updated',
                           header: 'Last Updated',
                           cell: (a) => a.lastModified.toLocaleString(),
                         },
-                        { key: 'updatedBy', header: 'Updated By', cell: (a) => a.modifiedBy },
+                        {
+                          key: 'updatedBy',
+                          header: 'Updated By',
+                          cell: (a) => a.modifiedBy,
+                        },
                       ]}
                     />
                   ) : (

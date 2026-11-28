@@ -1,5 +1,5 @@
 'use client';
-// @search analytics, statistics, sales report, revenue, profit
+// @search analytics, statistics, sales report, revenue, profit, scheduled, orders,
 import React from 'react';
 import SalesReportsPage from '@/components/account/admin/reports/SalesReportsPage';
 

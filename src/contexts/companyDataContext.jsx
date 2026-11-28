@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useState, useContext } from 'react';
+import { rememberDeviceCompany } from '@/utilities/deviceCompanies';
 
 // Create a context for company data
 const CompanyDataContext = createContext(null);
@@ -26,6 +27,8 @@ export const CompanyDataProvider = ({ children }) => {
     // Update the company data in state and localStorage
     SetCompanyDataState({ ...data, isLoaded: true });
     localStorage.setItem('companyData', JSON.stringify(data));
+    // every company this browser is authorized for is kept for the login page's company list
+    if (data?.id && data?.authorizationToken) rememberDeviceCompany(data);
   };
 
   return (

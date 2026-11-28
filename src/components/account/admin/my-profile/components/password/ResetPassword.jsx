@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FaKey } from 'react-icons/fa';
-import ErrorInterface from '@/components/account/errorInterface';
-import SuccessModal from '@/components/account/SuccessModal';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { useAuth } from '@/contexts/authContext';
 import { sendMfaCodeService } from '@/services/mfaServices';
 import {
   completePasswordChangeService,
+  listPasswordCompaniesService,
   startPasswordChangeService,
 } from '@/services/passwordServices';
 import PasswordInput from './PasswordInput';
-import PasswordRules, { passwordMeetsRules } from '@/components/auth/PasswordRules';
+import PasswordRules, {
+  passwordMeetsRules,
+} from '@/components/auth/PasswordRules';
 import IdentityCheck from './IdentityCheck';
 
 const RESEND_COOLDOWN = 30;
@@ -32,7 +35,24 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
-  const [done, setDone] = useState(null); // success message
+  const [done, setDone] = useState(null); // { message, loggedOut }
+  // the companies with an account for this email; each has its own password
+  const [companies, setCompanies] = useState([]);
+  const [companyId, setCompanyId] = useState('');
+
+  useEffect(() => {
+    let current = true;
+    listPasswordCompaniesService().then((res) => {
+      if (!current || !res.data) return;
+      const list = res.data.companies || [];
+      setCompanies(list);
+      setCompanyId(list.find((c) => c.current)?.id || list[0]?.id || '');
+    });
+    return () => {
+      current = false;
+    };
+  }, []);
+  const companyName = companies.find((c) => c.id === companyId)?.name;
 
   useEffect(() => {
     if (step !== 'verify') return undefined;
@@ -75,7 +95,10 @@ const ResetPassword = () => {
     e.preventDefault();
     if (!currentPassword) return setError('Enter your current password.');
     return run(async () => {
-      const response = await startPasswordChangeService(currentPassword);
+      const response = await startPasswordChangeService(
+        currentPassword,
+        companyId
+      );
       if (response.error) return setError(response.error);
       applyChallenge(response.data);
       setStep('verify');
@@ -91,9 +114,13 @@ const ResetPassword = () => {
     });
 
   const isQuestion = challenge?.method === 'security_question';
-  const factorReady = isQuestion ? answer.trim().length > 0 : !code.includes('');
+  const factorReady = isQuestion
+    ? answer.trim().length > 0
+    : !code.includes('');
   const canSubmit =
-    factorReady && passwordMeetsRules(newPassword) && newPassword === confirmPassword;
+    factorReady &&
+    passwordMeetsRules(newPassword) &&
+    newPassword === confirmPassword;
 
   const handleComplete = (e) => {
     e.preventDefault();
@@ -110,7 +137,10 @@ const ResetPassword = () => {
         setCode(emptyCode());
         return setError(response.error);
       }
-      setDone(response.data.message);
+      setDone({
+        message: response.data.message,
+        loggedOut: response.data.loggedOut !== false,
+      });
     });
   };
 
@@ -119,10 +149,15 @@ const ResetPassword = () => {
       <section className="flex flex-row gap-3 border-b border-gray-border pb-4">
         <FaKey className="text-2xl mt-1 text-brand-blue" />
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-text-black">Change password</h2>
+          <h2 className="text-lg font-semibold text-text-black">
+            Change password
+          </h2>
           <p className="text-sm">
-            For your security we confirm it&apos;s you with your current password and a
-            verification code. All your devices will be signed out afterwards.
+            For your security we confirm it&apos;s you with your current
+            password and a verification code. All devices signed in to that
+            account will be signed out afterwards.
+            {companies.length > 1 &&
+              ' Your email is registered with more than one company: each has its own password, and no two can be the same.'}
           </p>
         </div>
       </section>
@@ -132,14 +167,47 @@ const ResetPassword = () => {
         className="flex flex-col rounded-lg overflow-hidden shadow-md bg-white"
       >
         <h3 className="bg-brand-blue text-text-white text-center py-4">
-          {step === 'current' ? 'Step 1 of 2 · Current password' : 'Step 2 of 2 · Verify & set new password'}
+          {step === 'current'
+            ? 'Step 1 of 2 · Current password'
+            : 'Step 2 of 2 · Verify & set new password'}
         </h3>
 
         <div className="flex flex-col items-center gap-5 px-6 sm:px-12 py-6">
+          {companies.length > 1 &&
+            (step === 'current' ? (
+              <label className="w-full flex flex-col gap-1 text-sm">
+                <span className="font-semibold text-text-black">
+                  Change the password for
+                </span>
+                <select
+                  value={companyId}
+                  onChange={(e) => setCompanyId(e.target.value)}
+                  className="h-10 rounded-md border border-gray-border px-3 bg-white text-text-black"
+                >
+                  {companies.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                      {c.current ? ' (signed in now)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              <p className="w-full text-sm">
+                Changing the password for{' '}
+                <span className="font-semibold text-text-black">
+                  {companyName}
+                </span>
+              </p>
+            ))}
           {step === 'current' ? (
             <PasswordInput
               id="currentPassword"
-              label="Current password"
+              label={
+                companies.length > 1 && companyName
+                  ? `Current password for ${companyName}`
+                  : 'Current password'
+              }
               value={currentPassword}
               onChange={setCurrentPassword}
               autoComplete="current-password"
@@ -172,14 +240,21 @@ const ResetPassword = () => {
                 value={confirmPassword}
                 onChange={setConfirmPassword}
                 autoComplete="new-password"
-                invalid={Boolean(confirmPassword) && confirmPassword !== newPassword}
+                invalid={
+                  Boolean(confirmPassword) && confirmPassword !== newPassword
+                }
               />
-              <PasswordRules password={newPassword} confirmPassword={confirmPassword} />
+              <PasswordRules
+                password={newPassword}
+                confirmPassword={confirmPassword}
+              />
             </>
           )}
 
           {error && <ErrorInterface error={error} />}
-          {message && <span className="text-sm text-success text-center">{message}</span>}
+          {message && (
+            <span className="text-sm text-success text-center">{message}</span>
+          )}
 
           <div className="flex items-center justify-center w-full gap-6">
             {step === 'verify' && (
@@ -196,7 +271,11 @@ const ResetPassword = () => {
               disabled={loading || (step === 'verify' && !canSubmit)}
               className="rounded-lg px-5 py-2 bg-brand-blue text-text-white hover:bg-blue-shadow4 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? 'Please wait…' : step === 'current' ? 'Continue' : 'Change password'}
+              {loading
+                ? 'Please wait…'
+                : step === 'current'
+                  ? 'Continue'
+                  : 'Change password'}
             </button>
           </div>
         </div>
@@ -208,11 +287,24 @@ const ResetPassword = () => {
         <div className="inset-0 z-50 flex justify-center items-center fixed bg-black bg-opacity-80">
           <SuccessModal
             title="Password changed"
-            message={done}
-            subText="All your devices have been signed out."
-            buttonText="Log in again"
+            message={done.message}
+            subText={
+              done.loggedOut
+                ? 'All your devices have been signed out.'
+                : `Devices signed in to ${companyName || 'that company'} have been signed out. You are still signed in here.`
+            }
+            buttonText={done.loggedOut ? 'Log in again' : 'Done'}
             buttonStyle="text-white bg-brand-blue hover:bg-blue-shadow5 rounded-md px-4 py-2"
-            onClose={logOut}
+            onClose={
+              done.loggedOut
+                ? logOut
+                : () => {
+                    setDone(null);
+                    restart(null);
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  }
+            }
           />
         </div>
       )}

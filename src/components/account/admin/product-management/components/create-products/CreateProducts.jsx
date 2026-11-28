@@ -1,8 +1,8 @@
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useCreateProducts } from '@/contexts/createProductsContext';
 import CreateProductForm from './CreateProductForm';
 import CreateProductSidePreview from './ProductSidePreview';
@@ -15,9 +15,9 @@ import {
 } from '@/services/productsServices';
 import { getAllMaterials } from '@/services/materialServices';
 import { verifyInputText, verifyName } from '@/utilities/verifyInput';
-import Spinner from '@/components/account/Spinner';
-import SuccessModal from '@/components/account/SuccessModal';
-import WarningModal from '@/components/account/WarningModal';
+import Spinner from '@/components/account/common/Spinner';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import WarningModal from '@/components/account/common/WarningModal';
 import { getCompanyDetails } from '@/services/companyServices';
 import ProductSidePreview from './ProductSidePreview';
 

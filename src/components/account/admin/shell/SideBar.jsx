@@ -1,5 +1,5 @@
 import React from 'react';
-import SectionMenu from './shell/SectionMenu';
+import SectionMenu from './SectionMenu';
 
 // Section menu used by purchases, customers, reports and tax pages.
 // sideBarSubmenus: [{ name, label, link }] with absolute links.

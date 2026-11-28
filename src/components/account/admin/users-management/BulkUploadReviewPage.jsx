@@ -1,9 +1,8 @@
 import React from 'react';
 import BulkUserUploadReview from './components/create-bulk-user/BulkUserUploadReview';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 
 const BulkUploadReviewPage = () => {
-
   const pageDescription =
     'The bulk user upload review page provides a comprehensive interface for reviewing the users you have uploaded in bulk. You can verify user details, make necessary corrections, and confirm the list before finalizing the upload. This process helps ensure that all user information is accurate and ready for addition to the system.';
 

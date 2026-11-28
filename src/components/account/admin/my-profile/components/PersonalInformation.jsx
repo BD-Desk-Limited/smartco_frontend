@@ -12,10 +12,10 @@ import {
   verifyInputText,
   verifyPhoneNumber,
 } from '@/utilities/verifyInput';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import WarningModal from '@/components/account/WarningModal';
-import SuccessModal from '@/components/account/SuccessModal';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import WarningModal from '@/components/account/common/WarningModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 
 const EDITABLE_FIELDS = ['fullName', 'email', 'phoneNumber'];
 

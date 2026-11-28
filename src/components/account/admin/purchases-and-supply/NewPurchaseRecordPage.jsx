@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import NewPurchaseRecord from './components/purchases/NewPurchaseRecord';
 
 const NewPurchaseRecordPage = () => {

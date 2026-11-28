@@ -4,7 +4,7 @@ import {
   getErrorMessage,
 } from '@/utilities/indexedDBManagement';
 import React from 'react';
-import Spinner from '../../Spinner';
+import Spinner from '../../common/Spinner';
 import UnsyncedDataTableView from './UnsyncedDataTableView';
 
 const UnsyncedDataCheckPage = () => {

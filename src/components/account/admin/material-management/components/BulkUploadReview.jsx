@@ -1,14 +1,14 @@
 import React from 'react';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
-import PageDescription from '@/components/account/PageDescription';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
+import PageDescription from '@/components/account/common/PageDescription';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
 import MaterialSidebar from './materialSidebar';
-import Button from '@/components/account/Button';
+import Button from '@/components/account/common/Button';
 import { createMaterial } from '@/services/materialServices';
-import SuccessModal from '@/components/account/SuccessModal';
-import ErrorInterface from '@/components/account/errorInterface';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import ErrorInterface from '@/components/account/common/errorInterface';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
 const BulkUploadReview = ({ pageDescription }) => {
@@ -196,9 +196,21 @@ const BulkUploadReview = ({ pageDescription }) => {
                         cell: (m) => m.name,
                         mobile: 'title',
                       },
-                      { key: 'type', header: 'Material Type', cell: (m) => m.materialType },
-                      { key: 'category', header: 'Material Category', cell: (m) => m.category },
-                      { key: 'unit', header: 'Material Unit', cell: (m) => m.unitOfMeasurement },
+                      {
+                        key: 'type',
+                        header: 'Material Type',
+                        cell: (m) => m.materialType,
+                      },
+                      {
+                        key: 'category',
+                        header: 'Material Category',
+                        cell: (m) => m.category,
+                      },
+                      {
+                        key: 'unit',
+                        header: 'Material Unit',
+                        cell: (m) => m.unitOfMeasurement,
+                      },
                       {
                         key: 'description',
                         header: 'Material Description',

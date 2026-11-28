@@ -1,4 +1,4 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import { useAuth } from '@/contexts/authContext';
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,11 +9,7 @@ import {
   FaShippingFast,
 } from 'react-icons/fa';
 import Greeting from './Greeting';
-import {
-  ADMIN_BASE_PATH,
-  ADMIN_MENU,
-  canSeeMenu,
-} from '../../shell/adminMenu';
+import { ADMIN_BASE_PATH, ADMIN_MENU, canSeeMenu } from '../../shell/adminMenu';
 
 // Shortcuts to the jobs admins do on the move. `menu` ties each one to a menu
 // item so it follows the same access rules as the sidebar.

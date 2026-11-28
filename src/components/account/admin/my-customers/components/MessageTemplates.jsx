@@ -7,7 +7,7 @@ import {
   FaTimes,
   FaUserAlt,
 } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import {
   fetchTemplatesService,
   createTemplateService,

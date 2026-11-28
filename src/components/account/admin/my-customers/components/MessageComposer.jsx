@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { fetchGroupsService } from '@/services/customerServices';
 import { fetchCustomersService } from '@/services/customerServices';
 import {

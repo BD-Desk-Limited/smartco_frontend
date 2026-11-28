@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 import AdminDashboard from './components/AdminDashboard';
 import { useSetup } from '@/contexts/setupContext';
 import SetUps from './components/setups/SetUps';
-import Spinner from '../../Spinner';
-import OfflineScreen from '../../OfflineScreen';
+import Spinner from '../../common/Spinner';
+import OfflineScreen from '../../common/OfflineScreen';
 import { useInternetStatus } from '@/contexts/internetStatusContext';
 
 const AdminDashboardPage = () => {
-
   const { setupComplete, setupProgress, loading, isSetUpAdmin, error } =
     useSetup();
   const { internetStatus } = useInternetStatus();

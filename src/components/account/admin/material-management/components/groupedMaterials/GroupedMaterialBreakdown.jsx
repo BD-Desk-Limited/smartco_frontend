@@ -1,4 +1,4 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { getMaterialComponentsBreakdown } from '@/services/materialServices';
 import React from 'react';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
@@ -50,7 +50,12 @@ const GroupedMaterialBreakdown = ({ id }) => {
         maxHeightClass="md:max-h-40"
         rows={aggregatedBreakdown}
         columns={[
-          { key: 'material', header: 'Material', cell: (m) => m.name, mobile: 'title' },
+          {
+            key: 'material',
+            header: 'Material',
+            cell: (m) => m.name,
+            mobile: 'title',
+          },
           {
             key: 'qty',
             header: 'Quantity',

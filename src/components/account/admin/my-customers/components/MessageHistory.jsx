@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
-import Pagination from '@/components/account/Pagination';
+import Spinner from '@/components/account/common/Spinner';
+import Pagination from '@/components/account/common/Pagination';
 import {
   fetchCampaignsService,
   fetchCampaignByIdService,
@@ -275,7 +275,9 @@ const CampaignDetail = ({ campaignId, onClose, onChanged }) => {
                     {r.status === 'sent' && r.sentAt
                       ? ISOStringToLocalTime(r.sentAt)
                       : ''}
-                    {r.status === 'skipped' ? SKIP_TEXT[r.skipReason] || '' : ''}
+                    {r.status === 'skipped'
+                      ? SKIP_TEXT[r.skipReason] || ''
+                      : ''}
                     {['failed', 'queued'].includes(r.status) && r.error
                       ? r.error
                       : ''}
@@ -415,7 +417,10 @@ const MessageHistory = ({ isAdmin, openCampaignId, onOpened, refreshKey }) => {
                 <>
                   {c.counts.sent}/{c.totals.queued}
                   {c.counts.failed > 0 && (
-                    <span className="text-error"> · {c.counts.failed} failed</span>
+                    <span className="text-error">
+                      {' '}
+                      · {c.counts.failed} failed
+                    </span>
                   )}
                 </>
               ),

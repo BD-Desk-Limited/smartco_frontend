@@ -1,9 +1,8 @@
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import BulkUserUpload from './components/create-bulk-user/BulkUserUpload';
 
 const CreateBulkUserPage = () => {
-
   const pageDescription = `The Bulk User Creation page allows you to add multiple users to your system at once using a template. This is ideal for administrators who need to onboard several users quickly. The template includes fields for user details such as name, email, and role. After filling out the template, you can upload it here to create all the users in one step. Note that only non-administrative users can be created in bulk.`;
 
   const accessCheckFailed = PageAccessRequirement('admin', 'Users_Management');

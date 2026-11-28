@@ -102,6 +102,7 @@ const LoginAuthorize = () => {
         //register device to local storage and in state before redirecting
         const companydata = {
           id: user.company,
+          name: user.companyName || null,
           authorizationToken: response?.data?.deviceId,
           allowedBranches: response?.data?.allowedBranches || [], //list of branches the device can access
         };

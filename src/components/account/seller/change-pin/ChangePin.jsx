@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useTheme } from '@/contexts/themeContext';
-import Button from '../../Button';
+import Button from '../../common/Button';
 import { FaChevronLeft, FaLock } from 'react-icons/fa';
-import Spinner from '../../Spinner';
-import ErrorInterface from '../../errorInterface';
+import Spinner from '../../common/Spinner';
+import ErrorInterface from '../../common/errorInterface';
 import { changePinService } from '@/services/authServices';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/authContext';
+import { useCompanyData } from '@/contexts/companyDataContext';
+import { offlineTokenKey } from '@/utilities/deviceCompanies';
 import Image from 'next/image';
 
 const ChangePin = () => {
@@ -20,6 +22,7 @@ const ChangePin = () => {
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
   const { user, setUser } = useAuth();
+  const { companyData } = useCompanyData();
   console.log('user', user);
 
   const onSubmit = async (e) => {
@@ -56,6 +59,7 @@ const ChangePin = () => {
       if (response?.data && response?.data?.success) {
         //clear traces of old token and other credentials
         localStorage.removeItem(`token_${user.staffId}`);
+        localStorage.removeItem(offlineTokenKey(companyData?.id, user.staffId));
         sessionStorage.removeItem('token');
         setUser(null);
         setSuccess(true);

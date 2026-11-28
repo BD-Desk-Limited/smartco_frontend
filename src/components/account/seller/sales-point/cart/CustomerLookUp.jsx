@@ -1,6 +1,6 @@
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
-import Spinner from '@/components/account/Spinner';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
+import Spinner from '@/components/account/common/Spinner';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import {

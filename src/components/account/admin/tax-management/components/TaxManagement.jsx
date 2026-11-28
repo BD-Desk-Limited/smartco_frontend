@@ -1,9 +1,9 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React, { useEffect, useState } from 'react';
-import SubHeader from '../../SubHeader';
-import SideBar from '../../SideBar';
+import SubHeader from '../../shell/SubHeader';
+import SideBar from '../../shell/SideBar';
 import { TAX_MANAGEMENT_SUB_MENUS } from './TaxManagementSideBarItems';
-import PageDescription from '@/components/account/PageDescription';
+import PageDescription from '@/components/account/common/PageDescription';
 import { useAuth } from '@/contexts/authContext';
 import {
   FaEdit,
@@ -12,17 +12,17 @@ import {
   FaSearch,
   FaTrash,
 } from 'react-icons/fa';
-import ExportContent from '@/components/account/ExportContent';
-import Spinner from '@/components/account/Spinner';
+import ExportContent from '@/components/account/common/ExportContent';
+import Spinner from '@/components/account/common/Spinner';
 import {
   deleteTaxBandById,
   getAllTaxBandDetailsByCompanyId,
 } from '@/services/taxBandServices';
 import { ISOStringToLocalTime } from '@/utilities/formatTime';
-import WarningModal from '@/components/account/WarningModal';
-import DeleteModal from '@/components/account/DeleteModal';
+import WarningModal from '@/components/account/common/WarningModal';
+import DeleteModal from '@/components/account/common/DeleteModal';
 import TaxBandDetails from './TaxBandDetails';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { useRouter } from 'next/navigation';
 import ResponsiveTable from '@/components/account/admin/ui/ResponsiveTable';
 
@@ -232,14 +232,16 @@ const TaxManagement = ({ pageDescription }) => {
                     header: 'Tax band rate',
                     mobile: 'badge',
                     cell: (band) =>
-                      `${band?.effectiveRate?.rate?.toFixed(2)}%` || 'rate not set',
+                      `${band?.effectiveRate?.rate?.toFixed(2)}%` ||
+                      'rate not set',
                   },
                   {
                     key: 'effective',
                     header: 'Effective date',
                     cell: (band) =>
-                      ISOStringToLocalTime(band?.effectiveRate?.effectiveDate) ||
-                      'effective date not set',
+                      ISOStringToLocalTime(
+                        band?.effectiveRate?.effectiveDate
+                      ) || 'effective date not set',
                   },
                   {
                     key: 'branches',
@@ -247,7 +249,9 @@ const TaxManagement = ({ pageDescription }) => {
                     cell: (band) => (
                       <>
                         {band?.associatedBranches?.length || 0}{' '}
-                        {band?.associatedBranches?.length > 1 ? 'branches' : 'branch'}
+                        {band?.associatedBranches?.length > 1
+                          ? 'branches'
+                          : 'branch'}
                       </>
                     ),
                   },

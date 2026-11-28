@@ -3,12 +3,12 @@ import Image from 'next/image';
 import * as XLSX from 'xlsx';
 import { useBulkMaterialUpload } from '@/contexts/bulkMaterialUploadContext';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '../../SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '../../shell/SubHeader';
 import MaterialSidebar from './materialSidebar';
-import SuccessModal from '@/components/account/SuccessModal';
-import PageDescription from '@/components/account/PageDescription';
-import ErrorModal from '../../../ErrorModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import PageDescription from '@/components/account/common/PageDescription';
+import ErrorModal from '../../../common/ErrorModal';
 import { verifyInputText } from '@/utilities/verifyInput';
 
 const BulkMaterialsUpload = ({ pageDescription }) => {

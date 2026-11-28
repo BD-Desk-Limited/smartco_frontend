@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getUserById } from '@/services/usersServices';
 import EditUserDetails from './components/EditUserDetails/EditUserDetails';

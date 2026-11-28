@@ -1,16 +1,16 @@
 'use client';
 import React from 'react';
 import ProductManagementSidebar from '../ProductManagementSidebar';
-import SubHeader from '@/components/account/admin/SubHeader';
-import Header from '@/components/account/admin/AdminHeader';
-import PageDescription from '@/components/account/PageDescription';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import PageDescription from '@/components/account/common/PageDescription';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import ProductAvailabilityDetails from './ProductAvailabilityDetails';
 import ProductComponentsPriceAndTaxDetails from './ProductComponentsPriceAndTaxDetails';
-import DeleteModal from '@/components/account/DeleteModal';
-import DeactivationModal from '@/components/account/DeactivationModal';
+import DeleteModal from '@/components/account/common/DeleteModal';
+import DeactivationModal from '@/components/account/common/DeactivationModal';
 import { capitalizeFirst } from '@/utilities/stringUtils';
 import {
   activateProductInAllBranchesService,
@@ -19,7 +19,7 @@ import {
   enableOrDisableProductService,
   updateProductAvailabilityInBranchesService,
 } from '@/services/productsServices';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import ProductDescriptionSection from './ProductDescriptionSection';
 import { FaEdit, FaExclamationTriangle, FaTrash } from 'react-icons/fa';
 

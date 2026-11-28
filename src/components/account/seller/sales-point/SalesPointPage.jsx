@@ -3,10 +3,10 @@ import { useCompanyData } from '@/contexts/companyDataContext';
 import { useAuth } from '@/contexts/authContext';
 import SalesPoint from './SalesPoint';
 import SelectWorkBranch from './SelectWorkBranch';
-import WarningModal from '../../WarningModal';
+import WarningModal from '../../common/WarningModal';
 import { useRouter } from 'next/navigation';
 import ErrorModal from '@/components/auth/commons/ErrorModal';
-import Spinner from '../../Spinner';
+import Spinner from '../../common/Spinner';
 import { useTheme } from '@/contexts/themeContext';
 import ShiftManagement from './shift-management/ShiftManagement';
 

@@ -1,4 +1,4 @@
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import React from 'react';
 import { FaBan, FaEyeSlash, FaLock, FaSign, FaToggleOff } from 'react-icons/fa';
 

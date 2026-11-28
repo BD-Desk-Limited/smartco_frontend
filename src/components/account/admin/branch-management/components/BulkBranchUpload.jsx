@@ -4,12 +4,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import * as XLSX from 'xlsx';
 import { verifyEmail, verifyInputText } from '@/utilities/verifyInput';
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import BranchSidebar from './BranchSideBar';
-import PageDescription from '@/components/account/PageDescription';
-import SuccessModal from '@/components/account/SuccessModal';
-import ErrorModal from '@/components/account/ErrorModal';
+import PageDescription from '@/components/account/common/PageDescription';
+import SuccessModal from '@/components/account/common/SuccessModal';
+import ErrorModal from '@/components/account/common/ErrorModal';
 
 const BulkBranchUpload = ({ pageDescription }) => {
   const selectedSubMenu = {

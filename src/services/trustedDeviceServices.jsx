@@ -19,10 +19,14 @@ const request = async (path, { method = 'GET', body, deviceToken } = {}) => {
     });
     const payload = await response.json().catch(() => ({}));
     if (response.ok) return { data: payload };
-    return { error: payload?.message || 'Something went wrong, please try again' };
+    return {
+      error: payload?.message || 'Something went wrong, please try again',
+    };
   } catch (error) {
     console.error('Trusted device request failed:', error);
-    return { error: 'Network error, please check your connection and try again' };
+    return {
+      error: 'Network error, please check your connection and try again',
+    };
   }
 };
 

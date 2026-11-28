@@ -32,7 +32,7 @@ const AppSearch = () => {
   // doesn't carry the profile screens' code on every page.
   const loadProfileTabs = () => {
     if (profileTabs.length) return;
-    import('./my-profile/components/PROFILE_MENU_ITEMS')
+    import('../my-profile/components/PROFILE_MENU_ITEMS')
       .then(({ PROFILE_MENU_ITEMS }) =>
         setProfileTabs(
           prepareEntries(profileTabEntries(PROFILE_MENU_ITEMS, PROFILE_PATH))

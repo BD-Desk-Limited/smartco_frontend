@@ -4,13 +4,13 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/authContext';
 import { useSetup } from '@/contexts/setupContext';
-import AdminSideBar from '../AdminSideBar';
+import AdminSideBar from './AdminSideBar';
 import MobileAdminNav from './MobileAdminNav';
 import { ADMIN_BASE_PATH } from './adminMenu';
 import {
   PageDescriptionBar,
   PageDescriptionProvider,
-} from './PageDescriptionSlot';
+} from '../../common/PageDescriptionSlot';
 
 // Admin pages that must render on their own, without the menus.
 // Each entry gets the pathname; return true to leave the page bare.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Button from '@/components/account/Button';
-import ErrorInterface from '@/components/account/errorInterface';
+import Button from '@/components/account/common/Button';
+import ErrorInterface from '@/components/account/common/errorInterface';
 
 // Confirmation step for sensitive MFA changes. Calls onConfirm(password); the parent
 // shows server errors through `error`.
@@ -31,7 +31,9 @@ const PasswordConfirmModal = ({
         transition={{ duration: 0.2 }}
         className="bg-white w-full max-w-md rounded-md shadow-md flex flex-col overflow-hidden"
       >
-        <h2 className="bg-brand-blue text-text-white text-center py-3">{title}</h2>
+        <h2 className="bg-brand-blue text-text-white text-center py-3">
+          {title}
+        </h2>
         <div className="flex flex-col gap-4 p-5">
           <p className={`text-sm ${danger ? 'text-error' : 'text-text-gray'}`}>
             {message}

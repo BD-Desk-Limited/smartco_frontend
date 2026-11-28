@@ -27,7 +27,9 @@ const request = async (path, { method = 'GET', body, auth = false } = {}) => {
     };
   } catch (error) {
     console.error('MFA request failed:', error);
-    return { error: 'Network error, please check your connection and try again' };
+    return {
+      error: 'Network error, please check your connection and try again',
+    };
   }
 };
 
@@ -36,10 +38,19 @@ export const sendMfaCodeService = (challengeId, method) =>
   request('/auth/mfa/send', { method: 'POST', body: { challengeId, method } });
 
 // rememberDevice: skip MFA on this browser for 24 hours (server returns rememberToken)
-export const verifyMfaService = (challengeId, { code, answer, rememberDevice = false }) =>
+export const verifyMfaService = (
+  challengeId,
+  { code, answer, rememberDevice = false }
+) =>
   request('/auth/mfa/verify', {
     method: 'POST',
-    body: { challengeId, code, answer, rememberDevice, deviceInfo: getDeviceInfo() },
+    body: {
+      challengeId,
+      code,
+      answer,
+      rememberDevice,
+      deviceInfo: getDeviceInfo(),
+    },
   });
 
 // ---- settings for the logged in user

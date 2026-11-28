@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import ViewBranchDetails from './components/ViewBranchDetails';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getBranchById } from '@/services/branchServices';

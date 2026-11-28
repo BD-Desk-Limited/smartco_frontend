@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaEdit, FaGift, FaTimes, FaTrash } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
-import Pagination from '@/components/account/Pagination';
+import Spinner from '@/components/account/common/Spinner';
+import Pagination from '@/components/account/common/Pagination';
 import {
   fetchPromoByIdService,
   changePromoStatusService,
@@ -599,7 +599,9 @@ const PromoDetailSideView = ({
                 header: 'Status',
                 mobile: 'badge',
                 cell: (r) => (
-                  <span className={`px-2 py-1 rounded-md text-xs ${REWARD_STATUS[r.status]}`}>
+                  <span
+                    className={`px-2 py-1 rounded-md text-xs ${REWARD_STATUS[r.status]}`}
+                  >
                     {capitalizeFirst(r.status)}
                   </span>
                 ),

@@ -1,12 +1,12 @@
 import React from 'react';
 
-import Header from '@/components/account/admin/AdminHeader';
-import SubHeader from '@/components/account/admin/SubHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
+import SubHeader from '@/components/account/admin/shell/SubHeader';
 import { useRouter } from 'next/navigation';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import { useAuth } from '@/contexts/authContext';
-import PageDescription from '@/components/account/PageDescription';
-import SideBar from '../../SideBar';
+import PageDescription from '@/components/account/common/PageDescription';
+import SideBar from '../../shell/SideBar';
 import CreateNewTaxBandForm from './CreateNewTaxBandForm';
 import { TAX_MANAGEMENT_SUB_MENUS } from './TaxManagementSideBarItems';
 

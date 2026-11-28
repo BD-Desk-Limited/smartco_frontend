@@ -1,13 +1,13 @@
-import Header from '@/components/account/admin/AdminHeader';
+import Header from '@/components/account/admin/shell/AdminHeader';
 import React from 'react';
-import SubHeader from '../../SubHeader';
-import SideBar from '../../SideBar';
-import PageDescription from '@/components/account/PageDescription';
+import SubHeader from '../../shell/SubHeader';
+import SideBar from '../../shell/SideBar';
+import PageDescription from '@/components/account/common/PageDescription';
 import { TAX_MANAGEMENT_SUB_MENUS } from './TaxManagementSideBarItems';
 import EditTaxBandForm from './EditTaxBandForm';
-import SuccessModal from '@/components/account/SuccessModal';
+import SuccessModal from '@/components/account/common/SuccessModal';
 import { verifyInputText } from '@/utilities/verifyInput';
-import WarningWithFeedbackModal from '@/components/account/WarningWithFeedbackModal';
+import WarningWithFeedbackModal from '@/components/account/common/WarningWithFeedbackModal';
 import { updateTaxBand } from '@/services/taxBandServices';
 
 const EditTaxBand = ({
@@ -142,7 +142,6 @@ const EditTaxBand = ({
 
   return (
     <div className="flex flex-row gap-0 bg-background-1 h-full w-full overflow-hidden">
-
       <div className="flex flex-col h-full overflow-y-auto w-full relative">
         <div className="w-full sticky top-0 z-50">
           <Header />

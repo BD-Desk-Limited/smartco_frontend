@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { PageAccessRequirement } from '../../PageAccessRequirement';
+import { PageAccessRequirement } from '../../common/PageAccessRequirement';
 import EditTaxBand from './components/EditTaxBand';
 import { getTaxBandDetailsById } from '@/services/taxBandServices';
-import Spinner from '../../Spinner';
+import Spinner from '../../common/Spinner';
 
 const EditTaxBandPage = () => {
   const searchParams = useSearchParams();

@@ -4,7 +4,7 @@ import {
   verifyEmail,
   normalizePhoneForWhatsapp,
 } from '@/utilities/verifyInput';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 
 const SendReceipt = ({
   linkedCustomer,

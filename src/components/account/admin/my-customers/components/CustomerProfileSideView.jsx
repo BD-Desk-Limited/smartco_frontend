@@ -8,7 +8,7 @@ import {
   FaUser,
   FaUserPlus,
 } from 'react-icons/fa';
-import Spinner from '@/components/account/Spinner';
+import Spinner from '@/components/account/common/Spinner';
 import {
   addGroupMembersService,
   fetchComposeOptionsService,
@@ -333,7 +333,10 @@ const CustomerProfileSideView = ({ customer, onClose }) => {
           )}
         </div>
 
-        <div className="flex gap-1 border-b border-gray-border overflow-x-auto no-scrollbar" role="tablist">
+        <div
+          className="flex gap-1 border-b border-gray-border overflow-x-auto no-scrollbar"
+          role="tablist"
+        >
           {tabs.map((t) => (
             <button
               key={t.value}
